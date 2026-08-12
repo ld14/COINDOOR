@@ -1,8 +1,9 @@
 # Frontend
 
-> **Sin código todavía.** El stack está decidido en `spec/constitution/frontend-architecture.md`
-> y la estructura de abajo es la acordada. La crea la feature
-> [003](../spec/features/003-base-frontend/spec.md).
+Base creada por la feature [003](../spec/features/003-base-frontend/spec.md): Vite +
+React + Router, tokens, primitivas `components/dos/` y layout de `App.tsx`. El dominio
+(`lib/domain/`) y el mock server (`mocks/`) los trae la feature
+[004](../spec/features/004-dominio-y-contrato/spec.md).
 
 Stack: React 18 + TypeScript `strict` + Vite + TanStack Query v5 + CSS Modules.
 
@@ -30,15 +31,19 @@ Stack: React 18 + TypeScript `strict` + Vite + TanStack Query v5 + CSS Modules.
 
 ## Estructura
 
-```
+```text
 frontend/src/
 ├── styles/         # tokens.css · reset.css
 ├── lib/domain/     # contract.json · fielddefs.json · types · completeness · validation
-├── lib/api/        # client.ts + un módulo por recurso
+├── mocks/          # seed + handlers del mock server (MSW)
 ├── components/dos/ # primitivas visuales, sin lógica de negocio
-├── features/       # una carpeta por pantalla
-└── hooks/
+├── pages/          # una carpeta/archivo por pantalla (App.tsx arma las rutas)
+├── hooks/
+└── test/           # setup de Vitest + Testing Library
 ```
+
+`lib/api/` (cliente TanStack Query por recurso) todavía no existe: lo trae la feature que
+conecte contra el backend real en vez del mock.
 
 ## Contexto ampliado
 

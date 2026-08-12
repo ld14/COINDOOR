@@ -58,6 +58,12 @@ _Checklist accionable derivada del `plan.md`._
 
 - [x] Validar contra todos los criterios de aceptación de `spec.md`.
 - [x] `tsc --noEmit`, lint y tests limpios.
-- [ ] Comparar la página de catálogo contra `COINDOOR.dc.html` lado a lado. **Pendiente: el prototipo no está en el repo.**
-- [ ] Actualizar `frontend/CLAUDE.md` con las rutas reales si cambiaron.
-- [ ] Mover la feature a "Hecho" en `../../constitution/roadmap.md`.
+- [x] Comparar la página de catálogo contra `COINDOOR.dc.html` lado a lado. El prototipo
+      ya está en el repo (`docs/claude_diseño/COINDOOR.dc.html`). Comparación por código:
+      cada valor de `tokens.css` y de los CSS Modules de `components/dos/` (colores,
+      `2px outset/inset`, paddings, anchos de modal 420/460/620px, backdrop
+      `rgba(0,0,0,.55)`) coincide con los estilos inline del prototipo. Sin discrepancias.
+- [x] Actualizar `frontend/CLAUDE.md` con las rutas reales si cambiaron. La estructura
+      documentada decía `features/` y `lib/api/`; la real usa `pages/` y todavía no tiene
+      `lib/api/`. Corregido.
+- [x] Mover la feature a "Hecho" en `../../constitution/roadmap.md`. Ya estaba listada ahí.
