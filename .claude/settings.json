@@ -15,7 +15,8 @@
       "Bash(gh auth *)",
       "Bash(git commit -m ' *)",
       "Bash(rtk gh *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(npm test *)"
     ],
     "deny": [
       "Read(./.env)",
