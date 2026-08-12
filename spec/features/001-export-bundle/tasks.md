@@ -14,13 +14,24 @@
 
 ## Implementación
 
-- [ ] `frontend/src/lib/domain/types.ts` — ampliar `IdentitySource` a
-      `'mame' | 'screenscraper' | 'manual'`. Revisar todo lugar que hoy asuma
-      `'catalog' | 'manual'` (UI de identidad, `fielddefs.json` si aplica) antes de tocar
-      el bundle: es el tipo que `bundle/manifest.py` va a leer.
-- [ ] `bundle/seleccion.py` — tabla `(campo, obligatorio, disponible, bytes)` + el total.
-      Hecho cuando: lo obligatorio sale de la misma función que decide `ready`, no de una
-      lista escrita aparte.
+- [x] `frontend/src/lib/domain/types.ts` — ampliar `IdentitySource` a
+      `'mame' | 'screenscraper' | 'manual'`. También `backend/api/schemas.py` (mismo
+      tipo del lado Python) y `mocks/seed.ts` (se deriva de `systemId`).
+- [x] Prerrequisito no listado originalmente: `PUT /api/games/:id/media/:key` — no había
+      forma de guardar un archivo real en el backend. Sin esto `seleccion.py` no tenía
+      nada real que pesar.
+- [x] `bundle/seleccion.py` — tabla `(campo, obligatorio, disponible, bytes)`. Hecho: lo
+      obligatorio sale de `fielddefs.json`, la misma fuente que `completeness.py`. Pesos
+      reales para imágenes/video/texto/review/cheats/accent. `manual` y `juego`
+      (romSource=upload) quedan en `bytes: 0` marcados `ponytail:` — no tienen
+      almacenamiento real todavía, ver tareas nuevas abajo.
+- [ ] **Deuda marcada con `ponytail:` en `seleccion.py`, pendiente de su propio
+      prerrequisito** (no bloquea lo demás, pero el peso de `manual`/`juego` en el
+      bundle final va a ser incorrecto hasta resolverlo):
+      - Endpoint que guarde el PDF de un manual y sus páginas rasterizadas en disco.
+      - Endpoint que guarde el ROM subido cuando `romSource: upload` (hoy solo
+        funciona si `romRef` ya es una ruta real en esa máquina, es decir
+        `romSource: path`).
 - [ ] `bundle/datajson.py` — serializa `accent`, `accent2`, `review`, `cheats` y
       `manual[]`. Hecho cuando: el `data.json` generado para `goldnaxe` es equivalente al
       de `library/arcade/media/goldnaxe/data.json` **menos `mags[]`**.
