@@ -31,7 +31,7 @@ Stack: Python 3.12 + FastAPI + Pydantic v2 + Uvicorn. **Sin base de datos**: un
 
 ## Estructura actual
 
-```
+```text
 backend/
 ├── api/             # routers, DTOs Pydantic, errores
 │   ├── schemas.py
@@ -39,14 +39,16 @@ backend/
 │   ├── systems.py
 │   ├── games.py
 │   ├── fields.py
+│   ├── media.py
 │   └── jobs.py
 ├── services/        # lógica de negocio
 │   ├── systems.py
 │   ├── games.py
-│   └── fields.py
+│   ├── fields.py
+│   └── media.py
 ├── store/           # archivo.py (atómico) · juegos · sistemas · cuotas · migracion
 ├── lib/
-│   ├── domain/      # completeness.py · validation.py
+│   ├── domain/      # completeness.py · validation.py · fielddefs.py
 │   └── jobs/        # registro.py · ejecutor.py
 ├── config.py
 ├── main.py
