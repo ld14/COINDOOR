@@ -43,9 +43,19 @@
       `filecmp.dircmp`). `manual` se descarta siempre de `incluir` antes de armar
       `data.json` — mismo hueco de rasterizado marcado en `seleccion.py`/`datajson.py`,
       acá con la consecuencia real: nunca miente sobre páginas que el zip no trae.
-- [ ] `bundle/manifest.py` — `bundle.json` con identidad, artefactos, `incluye[]` y
-      `verificado`. Hecho cuando: un juego con identidad editada sale con
-      `origen: declarada`, y un bundle sin verificar lo declara.
+- [x] `bundle/manifest.py` — `bundle.json` con identidad, artefactos, `incluye[]` y
+      `verificado`. `origen` sale de `identitySource` directo (`mame`→`mame`, el resto
+      →`declarada`). **Deuda marcada `ponytail:`**: no hay tracking de "identidad
+      editada a mano después de precargarse desde MAME" (ADR-0004 regla 1) —
+      `StoredGame` no guarda los valores originales para diffear. El lado elegido es el
+      seguro: nunca dice `mame` de algo no confirmado, en el peor caso subreporta
+      `declarada`.
+- [x] **Fix de raíz encontrado al escribir manifest.py**: `staging.py` copiaba una
+      carpeta de MS-DOS tal cual (`copytree`) en vez de comprimirla — spec.md exige que
+      **los dos casos terminen en `.zip`**. Corregido: `_copy_rom` ahora zippea
+      carpetas y devuelve `(nombre, tratamiento)`; `build_staging` devuelve
+      `StagingResult` (root + incluye efectivo + rom_archivo + rom_tratamiento) en vez
+      de un `Path` pelado.
 - [ ] `bundle/verify.py` — `attract doctor` sobre el staging, con degradación si el binario
       falta. Hecho cuando: en una máquina sin ATTRACT devuelve `no_verificado` y no lanza.
 - [ ] `bundle/pack.py` — `ZIP_STORED`, y limpieza del staging pase lo que pase.

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import shutil
 import tempfile
+import zipfile
 from collections.abc import Collection, Mapping
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -12,7 +14,15 @@ from backend.lib.domain import fielddefs
 from backend.store.archivo import escribir_json, media_path
 
 
-def build_staging(settings: Settings, game: Mapping[str, Any], incluir: Collection[str]) -> Path:
+@dataclass(frozen=True)
+class StagingResult:
+    root: Path
+    incluye: frozenset[str]
+    rom_archivo: str | None
+    rom_tratamiento: str | None
+
+
+def build_staging(settings: Settings, game: Mapping[str, Any], incluir: Collection[str]) -> StagingResult:  # noqa: E501
     """Arma el árbol temporal que `attract doctor` va a verificar. Los nombres ya son
     los del contrato (`caratula` -> `boxFront`, etc): la traducción ocurre acá y en
     ningún otro lado."""
@@ -34,10 +44,18 @@ def build_staging(settings: Settings, game: Mapping[str, Any], incluir: Collecti
     escribir_json(media_dir / "data.json", build_datajson(game, efectivo))
     _write_synopsis(root, game)
 
+    rom_archivo: str | None = None
+    rom_tratamiento: str | None = None
     if "juego" in efectivo:
-        _copy_rom(game, root / "juego")
+        resultado = _copy_rom(game, root / "juego")
+        if resultado is not None:
+            nombre, tratamiento = resultado
+            rom_archivo = f"juego/{nombre}"
+            rom_tratamiento = tratamiento
+        else:
+            efectivo.discard("juego")
 
-    return root
+    return StagingResult(root=root, incluye=frozenset(efectivo), rom_archivo=rom_archivo, rom_tratamiento=rom_tratamiento)  # noqa: E501
 
 
 def _copy_assets(
@@ -73,18 +91,31 @@ def _write_synopsis(root: Path, game: Mapping[str, Any]) -> None:
     escribir_json(root / "_synopsis.json", {"summary": str(value)})
 
 
-def _copy_rom(game: Mapping[str, Any], juego_dir: Path) -> None:
+def _copy_rom(game: Mapping[str, Any], juego_dir: Path) -> tuple[str, str] | None:
+    """Devuelve (nombre_del_archivo, tratamiento) o None si no hay nada que copiar.
+
+    Los dos casos terminan en `.zip` (spec.md): un romset de MAME ya es un `.zip` y se
+    copia tal cual (`copiar`, install lo deja comprimido); una carpeta de MS-DOS son
+    archivos sueltos que hay que comprimir para el viaje, y `install` los desempaqueta
+    (`descomprimir`). Por la extensión no se distinguen — el tratamiento es lo único
+    que le dice a `install` qué hacer con cada uno.
+    """
     rom_ref = str(game.get("romRef", ""))
     if not rom_ref:
-        return
+        return None
     source = Path(rom_ref)
     if not source.exists():
-        return
+        return None
     juego_dir.mkdir(parents=True, exist_ok=True)
     if source.is_dir():
-        shutil.copytree(source, juego_dir / source.name)
-    else:
-        shutil.copy2(source, juego_dir / source.name)
+        nombre = f"{source.name}.zip"
+        with zipfile.ZipFile(juego_dir / nombre, "w", zipfile.ZIP_DEFLATED) as archivo:
+            for entry in source.rglob("*"):
+                if entry.is_file():
+                    archivo.write(entry, entry.relative_to(source))
+        return nombre, "descomprimir"
+    shutil.copy2(source, juego_dir / source.name)
+    return source.name, "copiar"
 
 
 def _manual_files_exist(settings: Settings, game: Mapping[str, Any]) -> bool:
