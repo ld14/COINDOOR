@@ -23,6 +23,17 @@ def _keys(section: str) -> frozenset[str]:
     return frozenset(str(field["key"]) for field in _load()[section])
 
 
+def fields(section: str) -> tuple[Mapping[str, Any], ...]:
+    return tuple(_load()[section])
+
+
+def label_for(section: str, key: str) -> str:
+    for field in fields(section):
+        if field["key"] == key:
+            return str(field["label"])
+    raise KeyError(f"{section}.{key} no está en fielddefs.json")
+
+
 def identity_keys() -> frozenset[str]:
     return _keys("identity")
 
