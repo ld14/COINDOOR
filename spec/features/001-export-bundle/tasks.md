@@ -32,9 +32,11 @@
       - Endpoint que guarde el ROM subido cuando `romSource: upload` (hoy solo
         funciona si `romRef` ya es una ruta real en esa máquina, es decir
         `romSource: path`).
-- [ ] `bundle/datajson.py` — serializa `accent`, `accent2`, `review`, `cheats` y
-      `manual[]`. Hecho cuando: el `data.json` generado para `goldnaxe` es equivalente al
-      de `library/arcade/media/goldnaxe/data.json` **menos `mags[]`**.
+- [x] `bundle/datajson.py` — serializa `accent`, `accent2`, `review`, `cheats` y
+      `manual[]`. Test con el `data.json` real de `goldnaxe` copiado en el test (no como
+      dependencia de `../attract` en tiempo de test) — coincide exacto, menos `mags[]`.
+      `manual[].pages` deriva nombres `pNNN.png` por convención de ATTRACT (mismo hueco
+      de rasterizado pendiente que ya marca `seleccion.py`).
 - [ ] `bundle/staging.py` — árbol temporal con los nombres del contrato, respetando la
       selección. Hecho cuando: `caratula` sale como `boxFront`, `captura` como
       `screenshot`, y correrlo dos veces sobre el mismo juego produce árboles idénticos.
