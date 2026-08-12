@@ -1,0 +1,8 @@
+.page {
+  display: grid;
+  gap: var(--dos-space-5);
+}
+
+.text {
+  color: var(--dos-ink-soft);
+}

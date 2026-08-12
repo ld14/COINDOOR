@@ -1,0 +1,20 @@
+.progress {
+  appearance: none;
+  background: var(--dos-terminal);
+  border: var(--dos-border-2) inset var(--dos-panel);
+  height: var(--dos-progress-height);
+  overflow: hidden;
+  width: 100%;
+}
+
+.progress::-webkit-progress-bar {
+  background: var(--dos-terminal);
+}
+
+.progress::-webkit-progress-value {
+  background: var(--dos-accent);
+}
+
+.progress::-moz-progress-bar {
+  background: var(--dos-accent);
+}

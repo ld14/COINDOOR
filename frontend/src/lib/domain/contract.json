@@ -1,0 +1,50 @@
+{
+  "version": "attract-derived-2026-08-11",
+  "source": {
+    "kind": "derived",
+    "note": "Derivado a mano porque ATTRACT todavía no publica contract.json.",
+    "documents": [
+      "../attract/docs/CONVENCION.md",
+      "../attract/src/attract/doctor.py",
+      "../attract/library/arcade/metadata.pegasus.txt",
+      "../attract/library/arcade/media/goldnaxe/"
+    ]
+  },
+  "metadataFields": {
+    "required": ["game", "x-formato"],
+    "optional": ["file", "developer", "publisher", "genre", "players", "release", "summary", "x-set"]
+  },
+  "assets": {
+    "boxFront": {
+      "kind": "image",
+      "extensions": [".jpg", ".jpeg", ".png", ".webp"]
+    },
+    "poster": {
+      "kind": "image",
+      "extensions": [".jpg", ".jpeg", ".png", ".webp"]
+    },
+    "marquee": {
+      "kind": "image",
+      "extensions": [".jpg", ".jpeg", ".png", ".webp"]
+    },
+    "logo": {
+      "kind": "image",
+      "extensions": [".jpg", ".jpeg", ".png", ".webp"]
+    },
+    "screenshot": {
+      "kind": "image",
+      "extensions": [".jpg", ".jpeg", ".png", ".webp"]
+    },
+    "video": {
+      "kind": "video",
+      "extensions": [".mp4", ".webm"]
+    }
+  },
+  "richDataFields": {
+    "optional": ["accent", "accent2", "review", "cheats", "manual", "mags"]
+  },
+  "reviewCats": ["originalidad", "graficos", "adiccion", "sonido", "dificultad", "animacion"],
+  "fallbacks": {
+    "cover": ["boxFront", "poster", "marquee", "generic"]
+  }
+}

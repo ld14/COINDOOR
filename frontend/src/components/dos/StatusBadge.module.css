@@ -1,0 +1,22 @@
+.badge {
+  background: var(--dos-terminal);
+  font-size: var(--dos-size-meta);
+  font-weight: 700;
+  padding: var(--dos-space-titlebar-y) var(--dos-space-badge-x);
+  white-space: nowrap;
+}
+
+.ready {
+  border: var(--dos-px-1) solid var(--dos-ok);
+  color: var(--dos-ok-crt);
+}
+
+.incomplete {
+  border: var(--dos-px-1) solid var(--dos-warn);
+  color: var(--dos-warn-crt);
+}
+
+.error {
+  border: var(--dos-px-1) solid var(--dos-error);
+  color: var(--dos-error-crt);
+}

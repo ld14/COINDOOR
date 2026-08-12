@@ -1,0 +1,56 @@
+.backdrop {
+  align-items: center;
+  background: var(--dos-backdrop);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: var(--dos-space-6);
+  position: fixed;
+  z-index: 10;
+}
+
+.window {
+  background: var(--dos-panel);
+  border: var(--dos-border-2) outset var(--dos-panel);
+  box-shadow: var(--dos-hard-shadow);
+  max-width: 100%;
+  width: var(--dos-modal-medium);
+}
+
+.small {
+  width: var(--dos-modal-small);
+}
+
+.large {
+  width: var(--dos-modal-large);
+}
+
+.titlebar {
+  align-items: center;
+  background: var(--dos-titlebar);
+  color: var(--dos-ink-invert);
+  display: flex;
+  font-size: var(--dos-size-titlebar);
+  font-weight: 700;
+  justify-content: space-between;
+  padding: var(--dos-space-titlebar-y) var(--dos-space-3);
+}
+
+.close {
+  background: var(--dos-panel);
+  border: var(--dos-border-2) outset var(--dos-panel);
+  color: var(--dos-ink);
+  cursor: pointer;
+  font-weight: 700;
+  height: var(--dos-modal-close-height);
+  line-height: 1;
+  width: var(--dos-modal-close-width);
+}
+
+.close:active {
+  border-style: inset;
+}
+
+.body {
+  padding: var(--dos-space-6);
+}

@@ -1,0 +1,50 @@
+.button {
+  border: var(--dos-border-2) outset var(--dos-panel);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.button:active:not(:disabled),
+.pressed {
+  border-style: inset;
+}
+
+.button:disabled {
+  color: var(--dos-edge-dark);
+  cursor: default;
+}
+
+.primary {
+  background: var(--dos-accent);
+  color: var(--dos-ink);
+  font-size: var(--dos-size-body);
+  padding: var(--dos-space-2) var(--dos-space-5);
+}
+
+.primarySmall {
+  background: var(--dos-accent);
+  color: var(--dos-ink);
+  font-size: var(--dos-size-section);
+  padding: var(--dos-space-button-y) var(--dos-space-4);
+}
+
+.ghost {
+  background: var(--dos-panel);
+  color: var(--dos-ink);
+  font-size: var(--dos-size-section);
+  padding: var(--dos-space-2) var(--dos-space-5);
+}
+
+.ghostSmall {
+  background: var(--dos-panel);
+  color: var(--dos-ink);
+  font-size: var(--dos-size-meta);
+  padding: var(--dos-space-1) var(--dos-space-3);
+}
+
+.dangerSmall {
+  background: var(--dos-panel);
+  color: var(--dos-error);
+  font-size: var(--dos-size-meta);
+  padding: var(--dos-space-1) var(--dos-space-3);
+}

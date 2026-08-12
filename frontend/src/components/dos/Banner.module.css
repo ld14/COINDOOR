@@ -1,0 +1,7 @@
+.banner {
+  background: var(--dos-banner);
+  border: var(--dos-border-2) outset var(--dos-panel);
+  color: var(--dos-ink);
+  font-weight: 700;
+  padding: var(--dos-space-3);
+}

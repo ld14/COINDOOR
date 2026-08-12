@@ -1,0 +1,41 @@
+.catalog {
+  display: grid;
+  gap: var(--dos-space-7);
+}
+
+.grid {
+  display: grid;
+  gap: var(--dos-space-5);
+  grid-template-columns: repeat(auto-fit, minmax(var(--dos-catalog-min-column), 1fr));
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dos-space-3);
+}
+
+.row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dos-space-3);
+}
+
+.preview {
+  background: var(--dos-terminal);
+  border: var(--dos-px-1) inset var(--dos-panel);
+  color: var(--dos-ok-crt);
+  display: flex;
+  min-height: var(--dos-empty-min-height);
+  padding: var(--dos-space-3);
+}
+
+.menuPreview,
+.statusPreview {
+  overflow: hidden;
+}
+
+.statusPreview {
+  grid-column: span 2;
+}

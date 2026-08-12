@@ -1,0 +1,1463 @@
+<title>COINDOOR — Technical Architecture Recommendation</title>
+<style>
+  :root {
+    --dos-desktop:     #0000AA;
+    --dos-panel:       #C0C0C0;
+    --dos-panel-light: #FFFFFF;
+    --dos-titlebar:    #00007A;
+    --dos-accent:      #00AAAA;
+    --dos-terminal:    #000000;
+
+    --dos-ink:         #000000;
+    --dos-ink-soft:    #333333;
+    --dos-ink-muted:   #555555;
+    --dos-ink-invert:  #FFFFFF;
+
+    --dos-ok:          #006600;
+    --dos-warn:        #8A6D00;
+    --dos-error:       #AA0000;
+    --dos-info:        #005555;
+
+    --dos-ok-crt:      #55FF55;
+    --dos-warn-crt:    #FFFF55;
+    --dos-error-crt:   #FF5555;
+    --dos-info-crt:    #00AAAA;
+
+    --dos-banner:      #FFFF55;
+    --dos-edge-light:  #FFFFFF;
+    --dos-edge-dark:   #808080;
+    --dos-rule:        #AAAAAA;
+
+    --mono: 'Consolas', 'Menlo', 'DejaVu Sans Mono', 'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--dos-desktop);
+    color: var(--dos-ink);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .titlebar {
+    background: var(--dos-accent);
+    color: var(--dos-ink);
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+    padding: 4px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .titlebar .sysbox {
+    width: 14px; height: 14px;
+    background: var(--dos-panel);
+    border: 2px outset var(--dos-panel);
+    flex: none;
+  }
+  .titlebar .t { flex: 1; }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 14px 12px 40px;
+  }
+
+  .panel {
+    background: var(--dos-panel);
+    border: 2px outset var(--dos-panel);
+    padding: 20px 22px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  h1 {
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--dos-titlebar);
+    margin: 0;
+    text-wrap: balance;
+    line-height: 1.3;
+  }
+  .subtitle {
+    font-size: 12.5px;
+    color: var(--dos-ink-soft);
+    margin: 6px 0 0;
+  }
+
+  h2 {
+    background: var(--dos-titlebar);
+    color: var(--dos-ink-invert);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 4px 9px;
+    margin: 0 0 10px;
+    letter-spacing: 0.02em;
+    text-wrap: balance;
+  }
+  h3 {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--dos-titlebar);
+    margin: 16px 0 6px;
+    text-wrap: balance;
+  }
+  h4 {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 14px 0 4px;
+  }
+
+  section { display: block; }
+  section > .body {
+    background: var(--dos-panel-light);
+    border: 2px inset var(--dos-panel);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  section > .body > *:first-child { margin-top: 0; }
+  section > .body > *:last-child { margin-bottom: 0; }
+
+  p { margin: 0; max-width: 74ch; }
+  ul, ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 5px; max-width: 78ch; }
+  li { margin: 0; }
+  li > ul, li > ol { margin-top: 5px; }
+
+  a { color: var(--dos-info); }
+  a:focus-visible, button:focus-visible { outline: 1px dotted var(--dos-ink); outline-offset: 2px; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.94em;
+    background: #E4E4E4;
+    border: 1px solid #B0B0B0;
+    padding: 0 3px;
+  }
+
+  .term {
+    background: var(--dos-terminal);
+    color: var(--dos-ok-crt);
+    border: 2px inset var(--dos-panel);
+    padding: 12px 14px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 0;
+  }
+  .term code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+  .term .c { color: #00AAAA; }
+  .term .y { color: var(--dos-warn-crt); }
+  .term .r { color: var(--dos-error-crt); }
+  .term .w { color: #CCCCCC; }
+
+  .scroll { overflow-x: auto; border: 1px solid var(--dos-rule); }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12.5px;
+    background: var(--dos-panel-light);
+    font-variant-numeric: tabular-nums;
+  }
+  th, td {
+    border: 1px solid var(--dos-rule);
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--dos-titlebar);
+    color: var(--dos-ink-invert);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  tbody tr:nth-child(even) td { background: #F2F2F2; }
+  td strong { font-weight: 700; }
+
+  .badge {
+    background: var(--dos-terminal);
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    display: inline-block;
+    line-height: 1.5;
+  }
+  .b-conf { color: var(--dos-ok-crt);    border: 1px solid var(--dos-ok); }
+  .b-inf  { color: var(--dos-info-crt);  border: 1px solid var(--dos-info); }
+  .b-prop { color: var(--dos-warn-crt);  border: 1px solid var(--dos-warn); }
+  .b-pend { color: var(--dos-error-crt); border: 1px solid var(--dos-error); }
+
+  .banner {
+    background: var(--dos-banner);
+    border: 2px outset var(--dos-panel);
+    padding: 8px 12px;
+    font-size: 12.5px;
+    color: var(--dos-ink);
+  }
+  .banner strong { font-weight: 700; }
+
+  .index {
+    background: var(--dos-panel-light);
+    border: 2px inset var(--dos-panel);
+    padding: 12px 14px;
+  }
+  .index ol {
+    columns: 3;
+    column-gap: 22px;
+    padding-left: 20px;
+    font-size: 12.5px;
+    display: block;
+  }
+  .index li { break-inside: avoid; margin-bottom: 2px; }
+
+  .win {
+    background: var(--dos-panel);
+    border: 2px outset var(--dos-panel);
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+  }
+  .win > .wt {
+    background: var(--dos-titlebar);
+    color: var(--dos-ink-invert);
+    font-weight: 700;
+    font-size: 12.5px;
+    padding: 3px 9px;
+  }
+  .win > .wb { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .pick {
+    border-left: 6px solid var(--dos-ok);
+    background: #EAF3EA;
+    padding: 8px 12px;
+    font-size: 12.5px;
+  }
+  .pick strong { color: var(--dos-ok); }
+
+  .kv { font-size: 12.5px; display: flex; flex-direction: column; gap: 3px; }
+  .kv b { display: inline-block; min-width: 190px; }
+
+  .mermaid-box { background: var(--dos-panel-light); border: 2px inset var(--dos-panel); padding: 10px; overflow-x: auto; }
+  .mermaid { min-width: 640px; }
+  .mermaid rect, .mermaid polygon, .mermaid path.label-container { rx: 0 !important; ry: 0 !important; }
+  .mermaid .cluster rect { rx: 0 !important; ry: 0 !important; }
+
+  hr { border: 0; border-top: 1px solid var(--dos-rule); margin: 4px 0; }
+
+  .footbar {
+    background: var(--dos-terminal);
+    color: #CCCCCC;
+    font-size: 12px;
+    padding: 4px 12px;
+    margin-top: 14px;
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .footbar b { color: var(--dos-warn-crt); font-weight: 700; }
+
+  @media (max-width: 720px) {
+    .index ol { columns: 1; }
+    .kv b { min-width: 0; display: block; }
+    .panel { padding: 14px 12px 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="titlebar"><span class="sysbox"></span><span class="t">COINDOOR — Recomendación de arquitectura técnica</span></div>
+
+<div class="wrap">
+<div class="panel">
+
+  <header>
+    <h1>Technical Architecture Recommendation</h1>
+    <p class="subtitle">COINDOOR · 2026-08-11 · basado en <code>spec/constitution/</code>, los 6 ADRs, las features 001 y 002, <code>docs/claude_diseño/</code>, <code>docs/ux/</code> y verificación cruzada contra <code>../attract</code> (<code>cli.py</code>, <code>doctor.py</code>, <code>mcp_server.py</code>, <code>CONVENCION.md</code>, <code>goldnaxe/data.json</code>).</p>
+  </header>
+
+  <div class="banner">
+    <strong>Estado de las afirmaciones.</strong>
+    <span class="badge b-conf">CONFIRMADO</span> está escrito en la documentación ·
+    <span class="badge b-inf">INFERIDO</span> se deduce de los requisitos ·
+    <span class="badge b-prop">PROPUESTO</span> lo decido yo acá ·
+    <span class="badge b-pend">PENDIENTE</span> falta información.
+  </div>
+
+  <nav class="index">
+    <ol>
+      <li><a href="#s1">Executive Summary</a></li>
+      <li><a href="#s2">Project Understanding</a></li>
+      <li><a href="#s3">Functional Requirements</a></li>
+      <li><a href="#s4">Non-Functional Requirements</a></li>
+      <li><a href="#s5">Recommended Stack</a></li>
+      <li><a href="#s6">Architecture Overview</a></li>
+      <li><a href="#s7">Frontend Architecture</a></li>
+      <li><a href="#s8">Backend Architecture</a></li>
+      <li><a href="#s9">Data Architecture</a></li>
+      <li><a href="#s10">Authentication &amp; Authorization</a></li>
+      <li><a href="#s11">Security Considerations</a></li>
+      <li><a href="#s12">API Strategy</a></li>
+      <li><a href="#s13">Testing Strategy</a></li>
+      <li><a href="#s14">Infrastructure &amp; Deployment</a></li>
+      <li><a href="#s15">Alternatives Considered</a></li>
+      <li><a href="#s16">Risks &amp; Trade-offs</a></li>
+      <li><a href="#s17">Open Questions</a></li>
+      <li><a href="#s18">Final Recommendation</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1 -->
+  <section id="s1">
+    <h2>1 · Executive Summary</h2>
+    <div class="body">
+      <p>El frontend ya está decidido en la constitución y no lo toco: Vite + React 18 + TypeScript <code>strict</code> + TanStack Query v5, sin librerías de componentes. Lo revisé contra los requisitos y es la elección correcta. Lo que falta decidir es el backend, y la respuesta corta es:</p>
+
+      <div class="win">
+        <div class="wt">Stack recomendado</div>
+        <div class="wb">
+          <div class="kv">
+            <div><b>Backend</b> Python 3.12 · FastAPI + Uvicorn · Pydantic v2</div>
+            <div><b>Persistencia</b> <strong>sin base de datos</strong>: un <code>game.json</code> por juego, con su media al lado</div>
+            <div><b>API</b> REST/JSON sobre <code>/api</code>, OpenAPI automático</div>
+            <div><b>Jobs</b> <code>ThreadPoolExecutor</code> en proceso + registro en memoria. Sin colas, sin workers</div>
+            <div><b>HTTP saliente</b> httpx sincrónico, con una única capa de política de reintentos</div>
+            <div><b>Empaquetado</b> un solo proceso local escuchando en <code>127.0.0.1</code>, que sirve la API y el build del frontend</div>
+            <div><b>Infra</b> ninguna. Sin Docker, sin Redis, sin broker, sin object storage, sin CDN, sin monitoring</div>
+            <div><b>Herramientas</b> uv · ruff · mypy · pytest · Vitest · GitHub Actions</div>
+          </div>
+        </div>
+      </div>
+
+      <p>Las tres decisiones que cargan el peso, y por qué:</p>
+      <ul>
+        <li><strong>FastAPI, no Django ni Flask.</strong> Los tipos de Pydantic son el espejo exacto de los tipos TypeScript que el paquete de diseño ya escribió, y el contrato de API de <code>data-model.md</code> §6 más los deltas es todo lo que hay que construir. Django trae ORM, admin, auth y middleware de sesión que este proyecto tiene <em>prohibidos</em> por límite duro.</li>
+        <li><strong>Sin base de datos.</strong> Un juego es un documento y su media vive al lado; 200 documentos se leen enteros en milisegundos. Un <code>game.json</code> por carpeta elimina esquema, ORM, migraciones y SQL de un saque, y deja los datos legibles con un editor de texto — igual que ATTRACT, que es todo archivos.</li>
+        <li><strong>Un solo proceso local en loopback.</strong> No es una decisión de despliegue, es <em>la</em> decisión de seguridad: sin autenticación por límite duro, la única frontera posible es que nada fuera de la máquina pueda alcanzar el puerto.</li>
+      </ul>
+      <p>Y una regla que se sigue de todo lo anterior: <strong>nada de infraestructura.</strong> Un usuario, ~200 juegos, una máquina, sin concurrencia y con la latencia declarada explícitamente como no-problema. Cada componente que se agregue acá es coste puro.</p>
+
+      <p>Encontré <strong>siete contradicciones</strong> entre documentos y <strong>dos hallazgos técnicos</strong> en el código de ATTRACT que afectan directo a la feature 001. Están en §16 y §17, sin resolver en silencio.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="s2">
+    <h2>2 · Project Understanding</h2>
+    <div class="body">
+      <p>COINDOOR es <strong>la mitad conectada</strong> de un sistema de tres piezas. No es una app web multiusuario ni un producto SaaS; es una herramienta de escritorio para una persona que cuida su propia colección.</p>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Pieza</th><th>Qué hace</th><th>Red</th><th>Relación con COINDOOR</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Pegasus</strong></td><td>Frontend del gabinete, muestra los juegos al jugador</td><td>Offline</td><td>Ninguna. Consume el resultado final</td></tr>
+            <tr><td><strong>ATTRACT</strong></td><td>CLI Python stdlib-only que arma y valida la librería</td><td>Offline por diseño</td><td>Dueño del contrato de datos. Recibe bundles <code>.zip</code></td></tr>
+            <tr><td><strong>COINDOOR</strong></td><td>Prepara metadata, busca en fuentes externas, empaqueta</td><td>Conectado, solo a pedido</td><td>Este repo</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>El flujo completo, de punta a punta:</p>
+      <pre class="term"><span class="c">ROM en disco</span>  →  alta en COINDOOR  →  carga campo por campo (manual o sugerida)
+                 →  marcar como listo  →  export a <span class="y">&lt;set&gt;.coindoor.zip</span>
+                 →  pendrive  →  <span class="c">attract install</span>  →  librería  →  <span class="c">Pegasus</span></pre>
+
+      <p>Cinco propiedades del dominio condicionan toda decisión técnica:</p>
+      <ol>
+        <li><strong>El trabajo caro es humano, no computacional.</strong> Cargar un juego completo son 63 MB de material curado a mano. Nada de lo que hace el software es costoso en CPU salvo rasterizar un PDF.</li>
+        <li><strong>La incompletitud es el estado normal</strong>, no una falla. La mayoría de la colección se queda incompleta para siempre.</li>
+        <li><strong>Nada se decide automáticamente.</strong> Una carátula del juego equivocado queda permanente en el gabinete. Toda sugerencia la acepta una persona.</li>
+        <li><strong>El contrato es externo y no negociable.</strong> COINDOOR se adapta; ATTRACT es la autoridad.</li>
+        <li><strong>La latencia está declarada como no-problema.</strong> Está escrito en <code>tech-stack.md</code> §Convenciones y repetido en ADR-0006. Esto no es un detalle: elimina de un plumazo streaming, respuestas incrementales, caché de performance y buena parte de la complejidad asíncrona.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="s3">
+    <h2>3 · Functional Requirements Identified</h2>
+    <div class="body">
+      <h3>3.1 Módulos</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Módulo</th><th>Qué hace</th><th>Complejidad real</th><th>Fuente</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Sistemas</strong></td><td>CRUD mínimo de plataformas: nombre, shortName, <code>launchCmd</code> absoluto</td><td>Trivial. Validación de ruta absoluta es todo</td><td>UX §5.1</td></tr>
+            <tr><td><strong>Juegos</strong></td><td>Alta en dos pasos, lista con filtros y paginación, ficha</td><td>Baja. CRUD con estado derivado</td><td>UX §5.2–5.3</td></tr>
+            <tr><td><strong>Campos</strong></td><td>Carga/borrado por campo, con estado <code>empty/manual/suggested</code> y procedencia</td><td>Media. Máquina de estados por campo + confirmación de reemplazo</td><td>data-model §5.1</td></tr>
+            <tr><td><strong>Reseña y trucos</strong></td><td>Estructuras, no texto: <code>score</code> + <code>cats</code> parciales; grupos libres de trucos</td><td>Media. Editor anidado en el cliente</td><td>Delta D1</td></tr>
+            <tr><td><strong>Presentación</strong></td><td>Dos colores de acento + detección desde la carátula</td><td>Baja. Cuantización de imagen</td><td>Delta D2</td></tr>
+            <tr><td><strong>Manuales</strong></td><td>N PDF por juego, rasterizados a páginas PNG, con job cancelable</td><td><strong>Alta.</strong> Único proceso pesado en CPU</td><td>UX §5.6</td></tr>
+            <tr><td><strong>Sugerencias</strong></td><td>Orquestador de hasta 6 proveedores por campo, resultados parciales</td><td><strong>Alta.</strong> Riesgo técnico #1</td><td>Feature 002</td></tr>
+            <tr><td><strong>Revistas</strong></td><td>La IA sugiere en qué publicación pudo haber nota; se guarda la referencia</td><td>Baja. No descarga nada</td><td>Delta D3</td></tr>
+            <tr><td><strong>Export</strong></td><td>Staging → <code>attract doctor</code> → <code>.zip</code> con manifiesto</td><td><strong>Alta.</strong> Riesgo técnico #2</td><td>Feature 001</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>3.2 Actores y permisos</h3>
+      <p><span class="badge b-conf">CONFIRMADO</span> <strong>Un actor, sin permisos.</strong> <code>mission.md</code> y <code>tech-stack.md</code> §Límites duros: «Sin autenticación, usuarios, roles ni permisos. Un solo usuario, su máquina. Si aparece la necesidad, es un cambio de misión, no una feature.»</p>
+      <p>Esto no es una simplificación provisional que después se «endurece». Es constitucional, y de ahí se siguen: sin login, sin sesiones, sin CSRF tokens de formulario, sin tabla de usuarios, sin middleware de autorización, sin multi-tenancy en el modelo de datos.</p>
+
+      <h3>3.3 Reglas de negocio que el backend debe hacer cumplir</h3>
+      <ol>
+        <li><strong>Completitud con prioridad fija:</strong> <code>errors &gt; 0</code> → <code>error</code>; <code>missingRequired &gt; 0</code> → <code>incomplete</code>; si no → <code>ready</code>. Los tres estados no son intercambiables.</li>
+        <li><strong>Obligatorio es exactamente:</strong> 7 campos de identidad + carátula + póster + sinopsis + color de acento primario. Nada más bloquea nunca.</li>
+        <li><strong>Un campo <code>manual</code> nunca se pisa sin confirmación explícita</strong>, tampoco por procesos automáticos.</li>
+        <li><strong>El usuario nunca escribe un nombre de archivo.</strong> La identidad física sale del archivo o directorio real (<code>CONVENCION</code> §1.2) y la traducción UI→contrato (<code>caratula</code>→<code>boxFront</code>) ocurre solo al exportar.</li>
+        <li><strong>La procedencia no viaja al export</strong> (ADR-0002), ni tampoco <code>mags[]</code> (ADR-0003).</li>
+        <li><strong>Editar cualquier campo de identidad</strong> mueve el juego entero a <code>identidad.origen: declarada</code>. Es por juego, no por campo.</li>
+        <li><strong>Solo juegos <code>ready</code> son exportables</strong>, y lo obligatorio del export no se puede deseleccionar — es exactamente lo que hace <code>ready</code> a un juego.</li>
+        <li><strong>La identidad nunca la propone una IA</strong> (ADR-0004). La IA produce sinopsis, reseña y trucos, y nada más.</li>
+        <li><strong>Sin resultados ≠ sin cuota ≠ error.</strong> ADR-0006 y feature 002 lo repiten: confundirlos hace que el usuario cargue a mano algo que mañana estaría disponible.</li>
+      </ol>
+
+      <h3>3.4 Integraciones externas</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Servicio</th><th>Para qué</th><th>Tipo</th><th>Credencial</th><th>Modo de falla</th></tr></thead>
+          <tbody>
+            <tr><td>ScreenScraper</td><td>Imágenes, video, identidad por hash</td><td>API HTTP</td><td>Cuenta + cuota diaria</td><td>Cuota agotada, 429</td></tr>
+            <tr><td>MobyGames</td><td>Imágenes, metadata</td><td>API HTTP</td><td>Cuenta + cuota</td><td>Cuota agotada, 429</td></tr>
+            <tr><td>archive.org</td><td>Manuales PDF</td><td>API HTTP</td><td>No</td><td>Lento, 5xx</td></tr>
+            <tr><td>abandonsocios · myabandonware · replacementdocs · GameFAQs</td><td>Imágenes, manuales, trucos</td><td><strong>Scraping HTML</strong></td><td>No</td><td>Cambio de HTML, baneo por IP</td></tr>
+            <tr><td>YouTube</td><td>Video — <strong>solo referencia</strong>, nunca descarga</td><td>Búsqueda</td><td>Depende del método</td><td>Cuota si se usa la API oficial</td></tr>
+            <tr><td>Modelo de IA</td><td>Sinopsis, reseña, trucos. <strong>Nunca identidad</strong></td><td>API HTTP</td><td>API key + coste por token</td><td>Latencia de decenas de segundos, rate limit</td></tr>
+            <tr><td><code>mame</code> (binario local)</td><td><code>mame -listxml</code> para precargar identidad de arcade</td><td>Subproceso</td><td>No</td><td>No instalado → se degrada a declarada</td></tr>
+            <tr><td><code>attract</code> (binario local)</td><td><code>attract doctor</code> sobre el staging</td><td>Subproceso</td><td>No</td><td>No instalado → <code>no_verificado</code>, no falla</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><span class="badge b-inf">INFERIDO</span> Ocho integraciones, y <strong>ninguna es crítica</strong>: la aplicación tiene que arrancar y funcionar con las ocho caídas y sin una sola credencial configurada. Está escrito como tarea en <code>002/tasks.md</code> y es una restricción de diseño fuerte sobre el arranque.</p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="s4">
+    <h2>4 · Non-Functional Requirements</h2>
+    <div class="body">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Requisito</th><th>Qué exige la documentación</th><th>Consecuencia técnica</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Escala</strong></td>
+              <td>~200 juegos, un usuario, una máquina, sin carga masiva ni operaciones en lote</td>
+              <td>Alcanza con archivos. Paginar de a 50 es cortesía visual, no necesidad</td>
+              <td><span class="badge b-conf">CONFIRMADO</span></td>
+            </tr>
+            <tr>
+              <td><strong>Latencia</strong></td>
+              <td>«No es un problema de este producto. No se agrega complejidad para ahorrar segundos»</td>
+              <td>Sin streaming, sin respuestas incrementales, sin caché de performance. Timeouts generosos como guardia de liveness</td>
+              <td><span class="badge b-conf">CONFIRMADO</span></td>
+            </tr>
+            <tr>
+              <td><strong>Concurrencia</strong></td>
+              <td>Un usuario, un juego por vez</td>
+              <td>Sin locking optimista, sin transacciones distribuidas, sin pool de conexiones. Un <code>Lock</code> por juego alcanza de sobra</td>
+              <td><span class="badge b-inf">INFERIDO</span></td>
+            </tr>
+            <tr>
+              <td><strong>Offline</strong></td>
+              <td>«Cargar, editar y exportar funcionan sin internet. Solo las sugerencias salen a la red»</td>
+              <td>Validación contra <code>contract.json</code> local, nunca contra ATTRACT en runtime. Cero CDN, cero fuentes web, cero assets remotos</td>
+              <td><span class="badge b-conf">CONFIRMADO</span></td>
+            </tr>
+            <tr>
+              <td><strong>Archivos pesados</strong></td>
+              <td>Video de 53 MB, manuales de decenas de MB, ROMs de varios GB</td>
+              <td>Upload y copia en streaming, nunca <code>read()</code> completo en memoria. Staging temporal con limpieza garantizada</td>
+              <td><span class="badge b-conf">CONFIRMADO</span></td>
+            </tr>
+            <tr>
+              <td><strong>Durabilidad</strong></td>
+              <td>«Una colección se arma una vez y se cuida para siempre»</td>
+              <td>El directorio de datos debe ser <strong>una sola carpeta copiable</strong>. Escritura atómica y migración por documento, no destructiva</td>
+              <td><span class="badge b-inf">INFERIDO</span></td>
+            </tr>
+            <tr>
+              <td><strong>Seguridad</strong></td>
+              <td>Sin auth por límite duro; el backend lee rutas absolutas arbitrarias del disco</td>
+              <td>La frontera es el bind a loopback. Ver §11 — es el único punto de seguridad real del proyecto</td>
+              <td><span class="badge b-prop">PROPUESTO</span></td>
+            </tr>
+            <tr>
+              <td><strong>Observabilidad</strong></td>
+              <td>No mencionada en ningún documento</td>
+              <td>Un log de texto en el directorio de datos. Sin métricas, sin tracing, sin Sentry</td>
+              <td><span class="badge b-prop">PROPUESTO</span></td>
+            </tr>
+            <tr>
+              <td><strong>Procesamiento asíncrono</strong></td>
+              <td>«Sin trabajos en segundo plano, colas ni workers» — <em>pero</em> cuatro operaciones son jobs con polling y cancelación</td>
+              <td>Jobs en proceso, acotados y disparados por el usuario. Ver §8.4 — la reconciliación está escrita en la constitución, no la invento yo</td>
+              <td><span class="badge b-conf">CONFIRMADO</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Lo que <em>no</em> es un requisito, y conviene decirlo en voz alta:</strong> alta disponibilidad, tolerancia a fallos del propio servicio, escalado horizontal, tiempo de respuesta acotado, throughput, multi-región, auditoría, backups automáticos, y recuperación ante desastres. Ninguno aparece en la documentación y ninguno tiene sentido para una herramienta que corre en la laptop de una persona.</p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="s5">
+    <h2>5 · Recommended Stack</h2>
+    <div class="body">
+
+      <h3>Frontend</h3>
+      <p><span class="badge b-conf">CONFIRMADO</span> Todo lo de abajo ya está decidido en <code>spec/constitution/frontend-architecture.md</code>. Lo revisé contra los requisitos y <strong>no propongo cambiarlo</strong>: es coherente, está justificado y el look DOS lo hace casi inevitable.</p>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Capa</th><th>Elección</th><th>Por qué encaja acá</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Lenguaje</td><td>TypeScript <code>strict</code></td><td>El modelo tiene cinco uniones discriminadas (<code>FieldStatus</code>, <code>GameStatus</code>, <code>ManualStatus</code>, <code>IdentitySource</code>, <code>RomSource</code>). Sin <code>strict</code> se pierden en tiempo de ejecución</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Framework</td><td>React 18</td><td>Nada del diseño necesita React 19; mantener lo escrito</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>UI</td><td><strong>Ninguna librería.</strong> Primitivas propias en <code>components/dos/</code></td><td>Límite duro. Los bordes <code>outset</code>/<code>inset</code> y el <code>border-radius: 0</code> los rompe cualquier librería moderna</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Estado servidor</td><td>TanStack Query v5</td><td>Caché, invalidación por <code>queryKey</code> y polling de jobs — las tres cosas que el diseño necesita, en una sola librería</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Estado UI</td><td><code>useState</code> local + un <code>AppContext</code></td><td>El estado global real es el banner de contrato y poco más. Redux/Zustand no tienen nada que administrar</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Formularios</td><td>react-hook-form + zod</td><td>Validación al escribir (la ruta absoluta se valida en el campo tocado, no al enviar)</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>API</td><td><code>fetch</code> envuelto en <code>lib/api/client.ts</code></td><td>Nueve endpoints agrupados por recurso. Axios no aporta nada que <code>fetch</code> no tenga</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Routing</td><td>React Router v6</td><td>Cinco rutas, filtros en query string para sobrevivir al refresh</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Estilos</td><td>CSS Modules + <code>tokens.css</code></td><td>Sin Tailwind, por límite duro</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Testing</td><td>Vitest + Testing Library + <strong>MSW</strong></td><td>MSW ya está en el plan de fase 2 como mock server del seed</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Build</td><td>Vite</td><td>Dev server con proxy a <code>/api</code>; build estático que sirve el backend</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Configuración</td><td><code>import.meta.env</code>, prefijo <code>VITE_</code></td><td>En producción local la API es <code>/api</code> relativo: <strong>cero variables</strong>. En dev, solo la URL del proxy</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Autenticación</td><td><strong>Ninguna</strong></td><td>Límite duro. Sin token, sin interceptor 401, sin refresh, sin ruta de login</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Carpetas</td><td>La de <code>docs/claude_diseño/frontend-architecture.md</code> §2</td><td>Feature-first, con <code>lib/domain/</code> puro y testeable aparte</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Lo único que agrego al frontend</strong> <span class="badge b-prop">PROPUESTO</span>: que <code>fieldDefs</code> deje de ser un <code>.ts</code> y pase a ser <code>fielddefs.json</code>, importado por TypeScript y leído por Python. Razón en §9.4 — hoy la política de completitud se escribiría dos veces en dos lenguajes, que es exactamente el fallo que ADR-0001 existe para evitar.</p>
+
+      <h3>Backend</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Capa</th><th>Elección</th><th>Por qué</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Lenguaje</td><td><strong>Python 3.12</strong></td><td>Python está confirmado. 3.12 y no 3.13: <code>pymupdf</code> y <code>Pillow</code> tienen wheels maduras y es lo que corre ATTRACT al lado</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Framework</td><td><strong>FastAPI + Uvicorn</strong></td><td>Ver §15.1. Pydantic v2 es el espejo directo de los tipos TS del diseño</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Arquitectura</td><td>Monolito modular en capas: <code>api/ → services/ → store/</code> + <code>lib/</code> puro</td><td>Es la estructura del scaffold en <code>backend/CLAUDE.md</code>, con <code>store/</code> en el lugar de <code>repositories/</code></td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>API</td><td><strong>REST/JSON</strong></td><td>Ya está especificada endpoint por endpoint. Ver §12</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Base de datos</td><td><strong>Ninguna.</strong> Un <code>game.json</code> por juego en su carpeta</td><td>Ver §15.3. Un juego es un documento, no un grafo de tablas; su media ya está al lado</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>ORM</td><td><strong>Ninguno.</strong> <code>json</code> de stdlib + modelos Pydantic</td><td>Los DTO que ya hacen falta para la API sirven de esquema al cargar y al guardar. Cero mapeo extra</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Migraciones</td><td><strong>Un campo <code>version</code></strong> y una función que actualiza al leer</td><td>Un archivo viejo se migra cuando se abre y se reescribe. Sin herramienta, sin estado global, sin paso de despliegue</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Integridad de escritura</td><td>Escribir a un temporal y <code>os.replace()</code></td><td><strong>Es lo único que no se simplifica.</strong> Un <code>rename</code> es atómico: o está el archivo viejo o el nuevo, nunca uno a medias</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Auth</td><td><strong>Ninguna.</strong> Bind a <code>127.0.0.1</code> + validación de <code>Host</code></td><td>Ver §10 y §11</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Validación</td><td>Pydantic v2 en el borde; dominio en <code>lib/domain/</code> puro</td><td>Un solo lugar donde entra dato externo, un solo lugar donde vive la regla</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Errores</td><td>Jerarquía propia <code>CoindoorError</code> + un <code>exception_handler</code></td><td>El diseño exige códigos concretos: 409 con la lista de faltantes, 422 con el motivo de formato</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Logging</td><td><code>logging</code> de stdlib → consola + archivo rotativo en el directorio de datos</td><td>El log de proveedores es la única observabilidad que este proyecto necesita</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Testing</td><td>pytest + <code>TestClient</code> + <code>httpx.MockTransport</code></td><td><code>MockTransport</code> viene con httpx: cero dependencias nuevas para testear los seis proveedores</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Jobs</td><td><code>ThreadPoolExecutor</code> + registro en memoria + <code>threading.Event</code> para cancelar</td><td>Sin Celery, sin RQ, sin Redis. Ver §8.4</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Caché</td><td><code>dict</code> en memoria por <code>(set, campo)</code> + contador de cuota en <code>cuotas.json</code></td><td>La caché ahorra <em>cuota</em>, no tiempo. El contador debe sobrevivir al reinicio (riesgo explícito en 002)</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td>Archivos</td><td>Filesystem, en la misma carpeta que el <code>game.json</code> del juego</td><td>El dato y su media viajan juntos: copiar la carpeta copia el juego entero</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>HTTP saliente</td><td><strong>httpx</strong> sincrónico</td><td>Timeouts por fase, <code>MockTransport</code> para tests, una sola capa de política en <code>providers/http.py</code></td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>PDF → páginas</td><td><strong>pymupdf</strong></td><td>Es lo que usa <code>attract rasterize</code> (su ADR-0022). Misma librería, mismo resultado</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Imágenes</td><td><strong>Pillow</strong></td><td>Miniaturas <code>?thumb=80</code> y detección de los dos colores de acento por cuantización</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Doc de API</td><td>OpenAPI automático en <code>/api/docs</code></td><td>Sale gratis de FastAPI. <code>docs/api-reference.md</code> queda como plantilla hasta que exista</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Configuración</td><td><code>pydantic-settings</code> + <code>.env</code> en el directorio de datos, <strong>fuera del repo</strong></td><td>Tarea explícita en <code>002/tasks.md</code>: la app arranca sin credenciales</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Dependencias</td><td><strong>uv</strong></td><td>Lockfile real, gestiona la versión de Python, y es un binario sin bootstrap</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>Lint / tipos</td><td><strong>ruff</strong> (lint + format) + <strong>mypy</strong> en <code>lib/domain/</code> y <code>lib/providers/</code></td><td>mypy estricto solo donde vive la lógica, no en los routers</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Infrastructure</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Componente</th><th>Veredicto</th><th>Justificación</th></tr></thead>
+          <tbody>
+            <tr><td>Hosting</td><td><strong>La máquina del usuario.</strong> Un proceso en <code>127.0.0.1:8765</code></td><td>Necesita leer ROMs por ruta absoluta y ejecutar <code>mame</code> y <code>attract</code> locales. No hay nada que hostear</td></tr>
+            <tr><td>Containers</td><td><strong>No.</strong> Sin Docker</td><td>Docker rompe las tres cosas que el producto necesita: acceso al filesystem del usuario, el binario <code>mame</code> y el binario <code>attract</code>. Montar todo eso con volúmenes es más frágil que no usarlo</td></tr>
+            <tr><td>Cache</td><td><strong>No.</strong> Sin Redis, sin Memcached</td><td>Un <code>dict</code> por sesión y un <code>cuotas.json</code> cubren los dos casos reales (ahorro de cuota, contador diario)</td></tr>
+            <tr><td>Colas / broker</td><td><strong>No.</strong> Prohibido por límite duro</td><td>Cuatro jobs acotados, disparados por el usuario, en un proceso que ya está corriendo</td></tr>
+            <tr><td>Object storage</td><td><strong>No.</strong> Filesystem local</td><td>Los archivos ya viven en el disco del usuario y su destino es un pendrive</td></tr>
+            <tr><td>CDN</td><td><strong>No</strong></td><td>Todo es <code>localhost</code>. Además el diseño prohíbe fuentes web y no hay assets remotos</td></tr>
+            <tr><td>CI</td><td><strong>Sí.</strong> GitHub Actions</td><td>Un motivo concreto: ADR-0005 exige un test que falle cuando <code>contract.json</code> y la política de completitud divergen. Ese test sin CI no protege nada</td></tr>
+            <tr><td>CD</td><td><strong>No.</strong> No hay destino de despliegue</td><td>Como mucho, un artefacto de release cuando exista distribución. Ver §17</td></tr>
+            <tr><td>Observabilidad</td><td><strong>No.</strong> Un archivo de log</td><td>El usuario y el operador son la misma persona, sentada frente a la máquina</td></tr>
+            <tr><td>Monitoring / alertas</td><td><strong>No</strong></td><td>No hay SLA, no hay guardia, no hay nadie a quien despertar</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="s6">
+    <h2>6 · Architecture Overview</h2>
+    <div class="body">
+      <p>Una máquina, un proceso, un puerto de loopback. El navegador habla con FastAPI por <code>/api</code>; FastAPI es el único que toca el disco, la base y la red.</p>
+
+      <div class="mermaid-box">
+<pre class="mermaid">%%{init: {'theme':'base','themeVariables':{'primaryColor':'#C0C0C0','primaryTextColor':'#000000','primaryBorderColor':'#808080','lineColor':'#00007A','secondaryColor':'#FFFFFF','tertiaryColor':'#FFFFFF','fontFamily':'Consolas, Courier New, monospace','fontSize':'13px','clusterBkg':'#E8E8E8','clusterBorder':'#00007A'}}}%%
+flowchart TB
+  subgraph MAQ["MAQUINA DEL USUARIO  ·  127.0.0.1"]
+    direction TB
+    BR["Navegador<br/>React 18 + TanStack Query<br/>build estatico servido por el backend"]
+    subgraph PROC["Proceso unico  ·  Uvicorn + FastAPI"]
+      direction TB
+      API["api/  routers + DTOs Pydantic"]
+      SVC["services/  reglas de negocio"]
+      DOM["lib/domain/  completitud, validacion<br/>contract.json + fielddefs.json"]
+      JOBS["lib/jobs/  ThreadPoolExecutor<br/>manuales · export · sugerencias · revistas"]
+      PROV["lib/providers/  orquestador<br/>reintento · limite · cortocircuito"]
+      BUN["lib/bundle/  seleccion · staging<br/>datajson · verify · pack"]
+      REPO["store/  lectura y escritura atomica<br/>json + os.replace"]
+    end
+    DB[("juegos/&lt;set&gt;/game.json<br/>sistemas.json · cuotas.json")]
+    FS[("juegos/&lt;set&gt;/  media<br/>_manual/ · thumbs/ · tmp/")]
+    ROM[("ROMs del usuario<br/>ruta absoluta, no se copian")]
+    MAME["mame -listxml<br/>subproceso, opcional"]
+    ATT["attract doctor<br/>subproceso, opcional"]
+    ZIP["&lt;set&gt;.coindoor.zip"]
+  end
+
+  EXT["Fuentes externas  ·  solo a pedido del usuario<br/>ScreenScraper · MobyGames · archive.org<br/>scrapers · YouTube (referencia) · modelo de IA"]
+
+  BR -->|"HTTP/JSON  /api"| API
+  API --> SVC
+  SVC --> DOM
+  SVC --> REPO
+  SVC --> JOBS
+  JOBS --> PROV
+  JOBS --> BUN
+  REPO --> DB
+  SVC --> FS
+  BUN --> FS
+  BUN --> ATT
+  BUN --> ZIP
+  SVC --> MAME
+  SVC --> ROM
+  PROV -->|"httpx"| EXT
+
+  ZIP -.->|"pendrive"| GAB["Otra maquina<br/>attract install → libreria → Pegasus"]
+</pre>
+      </div>
+
+      <h3>Reglas de comunicación</h3>
+      <ol>
+        <li><strong>El navegador nunca habla con nada que no sea el backend.</strong> Ni con las fuentes externas, ni con el filesystem. Las claves de API viven solo del lado del servidor.</li>
+        <li><strong>Las operaciones largas se invierten:</strong> <code>POST</code> devuelve <code>jobId</code> y el cliente hace polling de <code>GET /jobs/:jobId</code> cada 500 ms. El progreso mostrado es el del job, nunca un timer del cliente.</li>
+        <li><strong>ATTRACT se invoca como subproceso, no como librería ni como servicio.</strong> Si el binario no está, el export sigue y avisa <code>no_verificado</code>.</li>
+        <li><strong>El bundle es la única superficie de integración con ATTRACT.</strong> No hay API entre ambos, y esto es una decisión tomada (ADR-0003), no una omisión.</li>
+        <li><strong>Las ROMs con <code>romSource: 'path'</code> se leen donde están y nunca se copian</strong> hasta el momento del export, si el usuario elige incluirlas.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="s7">
+    <h2>7 · Frontend Architecture</h2>
+    <div class="body">
+      <p>La estructura de carpetas ya está definida en <code>docs/claude_diseño/frontend-architecture.md</code> §2 y no la repito. Lo que sí vale la pena fijar son las cuatro decisiones estructurales que la sostienen.</p>
+
+      <h3>7.1 Tres capas, sin excepciones</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Capa</th><th>Qué vive ahí</th><th>Qué tiene prohibido</th></tr></thead>
+          <tbody>
+            <tr><td><code>lib/domain/</code></td><td>Funciones puras: <code>missingRequired</code>, <code>computeGameStatus</code>, esquemas zod, los dos archivos de datos del contrato</td><td>No importa React, no hace <code>fetch</code>, no conoce rutas. Es la parte 100% testeable sin DOM</td></tr>
+            <tr><td><code>components/dos/</code></td><td>Primitivas visuales: <code>Panel</code>, <code>SunkenBox</code>, <code>DosButton</code>, <code>StatusBadge</code>…</td><td>Cero lógica de negocio. No sabe qué es un juego</td></tr>
+            <tr><td><code>features/&lt;pantalla&gt;/</code></td><td>Composición: pantalla, sus secciones, sus modales</td><td>No escribe CSS crudo fuera de su módulo, no duplica reglas de dominio</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>7.2 Estado: solo dos clases y no se mezclan</h3>
+      <p>Todo dato de dominio viene del servidor por TanStack Query, con las <code>queryKey</code> ya definidas. El estado de React solo guarda efímeros de UI: qué modal está abierto, el texto del buscador, el paso del wizard, el valor del input HEX antes de validar.</p>
+      <p>Actualización optimista <strong>únicamente</strong> en <code>setField</code> y <code>setAccent</code>. El resto espera la respuesta — está en el diseño y es correcto: aplicar una sugerencia o marcar como listo pueden fallar del lado del servidor con un motivo que el cliente no puede predecir.</p>
+
+      <h3>7.3 Los filtros viven en la URL</h3>
+      <p><code>?q=&amp;sistema=&amp;estado=&amp;page=</code>. No es un capricho: la lista de juegos responde «¿qué me falta?» y esa vista tiene que sobrevivir a un refresh y ser compartible consigo mismo entre sesiones.</p>
+
+      <h3>7.4 La regla de completitud se replica, pero no se reescribe</h3>
+      <p><span class="badge b-prop">PROPUESTO</span> El cliente calcula el estado para dar feedback sin round-trip y el servidor lo calcula para hacerlo cumplir. Son dos implementaciones, y eso es aceptable <strong>solo si los datos que consumen son el mismo archivo</strong>. De ahí que <code>fieldDefs</code> pase a ser <code>fielddefs.json</code>:</p>
+      <pre class="term"><span class="w">lib/domain/</span>
+  contract.json     <span class="c">← vendoreado de ATTRACT. Nunca se edita a mano (ADR-0005)</span>
+  fielddefs.json    <span class="y">← politica de COINDOOR: label, ratio, required</span>
+  types.ts          <span class="c">← tipos TS, importan fielddefs.json con `as const`</span>
+  completeness.ts   <span class="c">← lee fielddefs.json</span>
+
+<span class="w">backend/lib/domain/</span>
+  completeness.py   <span class="y">← lee EL MISMO fielddefs.json</span>
+
+<span class="w">tests</span>
+  test_contract.py  <span class="c">← ninguna clave huerfana en ninguna direccion (ADR-0005)</span></pre>
+      <p>Sin esto, la política de completitud —el corazón del producto— se escribe dos veces en dos lenguajes, y diverge en silencio. Es el mismo fallo que ADR-0001 previene con ATTRACT, ocurriendo puertas adentro.</p>
+
+      <h3>7.5 Configuración</h3>
+      <p>En producción local el frontend se sirve desde el mismo origen que la API, así que la URL base es <code>/api</code> y <strong>no hay variables de entorno</strong>. En desarrollo, el proxy de Vite apunta a <code>http://127.0.0.1:8765</code>. Nada de claves de API del lado del cliente, nunca.</p>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section id="s8">
+    <h2>8 · Backend Architecture</h2>
+    <div class="body">
+      <h3>8.1 Estructura</h3>
+      <pre class="term"><span class="w">backend/</span>
+  main.py                   <span class="c">app FastAPI, montaje de estaticos, ciclo de vida</span>
+  config.py                 <span class="c">pydantic-settings: rutas, puerto, credenciales</span>
+  api/
+    systems.py  games.py  fields.py  suggestions.py
+    manuals.py  magazines.py  export.py  jobs.py
+    schemas.py              <span class="c">DTOs Pydantic — el espejo de types.ts</span>
+    errors.py               <span class="c">CoindoorError → respuesta HTTP</span>
+  services/
+    games.py  fields.py  identity.py  accent.py
+    manuals.py  export.py  suggestions.py
+  store/
+    archivo.py              <span class="c">leer/escribir JSON atomico (temp + os.replace)</span>
+    juegos.py  sistemas.py  cuotas.py
+    migracion.py            <span class="c">campo `version` → forma actual, al leer</span>
+  lib/
+    domain/
+      contract.json  fielddefs.json
+      completeness.py  validation.py  naming.py
+    providers/                          <span class="y">← feature 002, ya especificado</span>
+      base.py  registro.py  http.py  cortocircuito.py  orquestador.py
+      api/  scrape/  ia/prompts/
+    bundle/                             <span class="y">← feature 001, ya especificado</span>
+      seleccion.py  staging.py  datajson.py  verify.py  pack.py  manifest.py
+    jobs/
+      registro.py  ejecutor.py
+    media/
+      thumbs.py  accent.py  rasterize.py
+  tests/</pre>
+      <p>Los nombres de <code>lib/providers/</code> y <code>lib/bundle/</code> <strong>no los invento</strong>: están módulo por módulo en los <code>plan.md</code> de las features 001 y 002. Lo único que agrego es dónde cuelgan.</p>
+
+      <h3>8.2 Reglas de capa</h3>
+      <ul>
+        <li><strong>Los routers son finos.</strong> Validan, llaman a un servicio, serializan. Cero lógica.</li>
+        <li><strong><code>lib/</code> no conoce HTTP ni el almacenamiento.</strong> <code>bundle/staging.py</code> es una función pura sobre <code>(Game, selección)</code> — así está escrito en el plan y así hay que mantenerlo, porque es lo que lo hace testeable sin levantar la app.</li>
+        <li><strong>Un solo lugar por regla.</strong> Ningún proveedor implementa su propio reintento; ninguna función escribe formato Pegasus; ningún módulo salvo <code>datajson.py</code> conoce la forma de <code>data.json</code>.</li>
+      </ul>
+
+      <h3>8.3 Errores</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Situación</th><th>HTTP</th><th>Cuerpo</th><th>Origen</th></tr></thead>
+          <tbody>
+            <tr><td>Ruta de emulador relativa</td><td>422</td><td><code>{field, message}</code> con el texto exacto del diseño</td><td><code>data-model</code> §6</td></tr>
+            <tr><td><code>mark-ready</code> sobre un juego incompleto</td><td>409</td><td><code>{missing: [...]}</code> — la lista literal de faltantes</td><td><code>data-model</code> §6</td></tr>
+            <tr><td><code>accent/detect</code> sin carátula</td><td>409</td><td>Motivo</td><td><code>data-model</code> §6</td></tr>
+            <tr><td><code>apply-suggestion</code> sobre un candidato <code>referencia</code></td><td>409</td><td>«no hay nada que aplicar»</td><td>Feature 002</td></tr>
+            <tr><td><code>POST /export</code> que omite un campo obligatorio</td><td>422</td><td>Qué obligatorio falta</td><td>Feature 001 — <strong>test explícito</strong></td></tr>
+            <tr><td>Todos los proveedores caídos</td><td>200 + estado del job</td><td><code>{respondieron: 0, consultados: 6}</code></td><td>Feature 002</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Los tres últimos importan: <strong>una falla de fuente externa nunca es un error HTTP del job</strong>, y un export inválido tiene que fallar en la API, no solo en la UI. Está escrito como test en <code>001/tasks.md</code>: «un cliente viejo o una llamada directa producen bundles no-listos».</p>
+
+      <h3>8.4 Jobs — cómo se concilia con el límite duro</h3>
+      <p><span class="badge b-conf">CONFIRMADO</span> La constitución prohíbe colas y workers, <em>y</em> define cuatro operaciones como jobs con polling y cancelación. No es una contradicción: la reconciliación está escrita en <code>frontend-architecture.md</code> §Jobs y repetida en el plan de la feature 002 — «son tareas acotadas y en proceso, no infraestructura de procesamiento».</p>
+      <p><span class="badge b-prop">PROPUESTO</span> Implementación mínima que cumple los dos lados:</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Job</th><th>Qué hace</th><th>Cancelación</th><th>Duración típica</th></tr></thead>
+          <tbody>
+            <tr><td>Procesar manual</td><td>pymupdf: PDF → <code>pNNN.png</code></td><td>Sí — vuelve a <code>unprocessed</code>, no borra el archivo</td><td>Segundos a minutos</td></tr>
+            <tr><td>Exportar</td><td>staging → doctor → zip</td><td>No especificada, pero el staging se limpia siempre</td><td>Segundos (copia de 63 MB)</td></tr>
+            <tr><td>Sugerencias</td><td>Fan-out a N proveedores</td><td>Sí — <strong>debe interrumpir el backoff</strong>, no esperar a que termine</td><td>Decenas de segundos</td></tr>
+            <tr><td>Buscar revistas</td><td>Una llamada al modelo de IA</td><td>Sí</td><td>Decenas de segundos</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Un <code>ThreadPoolExecutor</code>, un <code>dict</code> de jobs con su <code>threading.Event</code> de cancelación, y polling que lee ese registro. El trabajo es I/O-bound (red, disco) salvo pymupdf, así que el GIL no molesta. <strong>Nada persiste entre reinicios</strong>, y está bien: un job en curso no sobrevive a cerrar la aplicación, y el <code>runId</code> solo tiene que sobrevivir a un refresh del navegador — que sí lo hace, porque el proceso sigue vivo.</p>
+
+      <h3>8.5 La capa de política HTTP se escribe primero</h3>
+      <p>El plan de la feature 002 lo marca y vale la pena repetirlo: <code>providers/http.py</code> —clasificación del error, backoff con jitter, <code>Retry-After</code>, token bucket de ritmo y contador persistente de cupo— <strong>va antes que el primer proveedor</strong>. Si llega después, cada proveedor ya trae su propio reintento a mano y son seis implementaciones que después nadie unifica.</p>
+      <p>La distinción que más cuota ahorra, y la más fácil de arruinar:</p>
+      <pre class="term"><span class="c">Se reintenta:</span>     timeout · corte de conexion · 5xx · 429
+<span class="y">No se reintenta:</span>  401/403 (credenciales) · 404 · sin resultados · HTML que no parsea
+
+<span class="r">"Este juego no esta en ScreenScraper" es una RESPUESTA, no una falla.</span></pre>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section id="s9">
+    <h2>9 · Data Architecture</h2>
+    <div class="body">
+      <h3>9.1 Un solo almacén: el filesystem</h3>
+      <p><span class="badge b-prop">PROPUESTO</span> No hay base de datos. Cada juego es <strong>una carpeta</strong> con su documento y su media adentro. La consecuencia de fondo: copiar la carpeta de un juego copia el juego entero, y el directorio de datos se abre con un explorador de archivos y se lee con un editor de texto — igual que ATTRACT, que es todo archivos.</p>
+
+      <pre class="term"><span class="w">~/.coindoor/            </span><span class="c">← el directorio de datos: ESTO es la unidad de backup</span>
+  juegos/
+    goldnaxe/
+      game.json         <span class="y">← el documento entero del juego</span>
+      boxFront.jpg  poster.jpg  marquee.jpeg  video.mp4
+      thumb.jpg
+      _manual/manual.pdf  p001.png … p026.png
+    sf2ce/
+      game.json  …
+  sistemas.json         <span class="c">4 sistemas. No justifica un archivo por sistema</span>
+  cuotas.json           <span class="y">← contador diario por proveedor. Sobrevive al reinicio</span>
+  .env                  <span class="y">← credenciales, fuera del repo</span>
+  coindoor.log
+  tmp/                  <span class="r">← staging del export. Se limpia SIEMPRE, incluso si falla</span>
+  export/               <span class="c">los .zip generados</span></pre>
+
+      <p><strong>La carpeta se llama como el <code>set</code></strong>, o sea como la identidad física que sale del archivo real en disco (<code>CONVENCION</code> §1.2). Así la clave del almacenamiento y la clave del contrato son la misma cosa, y desaparece el <code>gameId</code> sintético que no le servía a nadie.</p>
+
+      <h3>9.2 Forma de <code>game.json</code></h3>
+      <pre class="term">{
+  <span class="y">"version": 1,</span>                      <span class="c">← acá vive la migración</span>
+  "set": "goldnaxe",
+  "sistema": "arcade",
+
+  "identidad": { "title": "Golden Axe", "year": "1989", <span class="c">…los 7 campos</span> },
+  "identitySource": "catalog",
+  "romSource": "path",
+  "romRef": "/Users/…/roms/goldnaxe.zip",
+  "hashes": { "crc32": "…" },       <span class="c">perezoso: se calcula la 1ª vez que hace falta</span>
+
+  "campos": {
+    "caratula": { "status": "manual",    "file": "boxFront.jpg" },
+    "poster":   { "status": "suggested", "file": "poster.jpg",
+                  "source": "ScreenScraper" },
+    "sinopsis": { "status": "suggested", "value": "…",
+                  "source": "IA", <span class="y">"prompt": "sinopsis.v1", "modelo": "…"</span> }
+  },
+
+  "accent": "#d4a017",  "accent2": "#3d2f08",
+  "review": { "score": 88, "cats": { "graficos": 85, "adiccion": 92 } },
+  "cheats": { "combos": [ { "name": "…", "input": "…" } ] },
+  "manuales": [ { "file": "manual.pdf", "status": "processed", "pages": 26 } ],
+  "revista": { "nombre": "Micromanía", "numero": 34 },  <span class="r">← interno, NO se exporta</span>
+
+  "errors": [ ]
+}
+
+<span class="c">status (ready / incomplete / error) NO está acá: se calcula al leer.</span></pre>
+
+      <h3>9.3 Entidades, ahora que son documentos</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Entidad</th><th>Dónde vive</th><th>Nota de modelado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Sistema</strong></td><td>Una entrada en <code>sistemas.json</code></td><td>Son cuatro y se leen enteros en cada pantalla. <code>gameCount</code> se cuenta, no se guarda</td></tr>
+            <tr><td><strong>Juego</strong></td><td><code>juegos/&lt;set&gt;/game.json</code></td><td>La unidad de escritura. Todo lo del juego entra en un solo <code>os.replace()</code></td></tr>
+            <tr><td><strong>Identidad</strong></td><td>Clave <code>identidad</code> + <code>identitySource</code></td><td>Los 7 campos juntos. Editar cualquiera mueve el juego a <code>declarada</code> al exportar</td></tr>
+            <tr><td><strong>Campo</strong> (imagen, video, texto)</td><td>Clave <code>campos.&lt;key&gt;</code></td><td>Estado, procedencia y referencia al archivo, juntos. Agregar un campo al contrato no cambia ninguna estructura</td></tr>
+            <tr><td><strong>Reseña</strong></td><td>Clave <code>review</code></td><td><strong>Una categoría vacía es un valor legítimo</strong>, distinto de <code>score: null</code>. El JSON lo expresa tal cual</td></tr>
+            <tr><td><strong>Trucos</strong></td><td>Clave <code>cheats</code></td><td>Grupos de nombre libre (ADR-0020 de ATTRACT). Ya es la forma exacta del contrato</td></tr>
+            <tr><td><strong>Manuales</strong></td><td>Lista <code>manuales</code> + los PDF en <code>_manual/</code></td><td>N por juego, cada uno con su propio job</td></tr>
+            <tr><td><strong>Revista</strong></td><td>Clave <code>revista</code></td><td><strong>Dato interno. Nunca se exporta</strong> (D3)</td></tr>
+            <tr><td><strong>Cuota de proveedor</strong></td><td><code>cuotas.json</code></td><td>Fuera del juego, porque es global. <strong>Debe sobrevivir al reinicio</strong> — riesgo explícito en 002</td></tr>
+            <tr><td><strong>Texto generado por IA</strong></td><td>Dentro del propio campo</td><td>El prompt y el modelo viajan junto al texto que produjeron, no en un registro paralelo</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>9.4 Tres decisiones de modelado que no son obvias</h3>
+      <ol>
+        <li><strong><code>status</code> se calcula, nunca se guarda.</strong> Es función de <code>errors</code> + <code>missingRequired</code>, y las dos cambian cuando cambia el contrato o la política. Guardarlo dejaría archivos con un estado viejo tras editar <code>fielddefs.json</code>, sin que nada avise. Con 200 juegos, calcularlo al vuelo es gratis.</li>
+        <li><strong>La procedencia va dentro del campo</strong>, no en un registro de auditoría aparte. ADR-0002 la quiere para una sola cosa: proteger el trabajo manual dentro de la interfaz. No hace falta historial — «historial de versiones, papelera, deshacer entre sesiones» está fuera de alcance explícito.</li>
+        <li><strong>El documento es casi el <code>data.json</code> del contrato.</strong> <code>review</code>, <code>cheats</code>, <code>accent</code> y <code>accent2</code> ya tienen la forma exacta que espera ATTRACT. Exportar deja de ser una traducción y pasa a ser una proyección: quitar lo interno (procedencia, revista) y renombrar los archivos.</li>
+      </ol>
+
+      <h3>9.5 Cómo se resuelven las tres cosas que normalmente pide una base de datos</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Necesidad</th><th>Sin base de datos</th><th>Coste real</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Listar con filtro, orden y paginación</strong> (<code>GET /games</code>)</td>
+              <td>Un índice en memoria construido al arrancar y actualizado en cada escritura. Filtrar y paginar en Python</td>
+              <td>200 archivos de pocos KB: milisegundos al arranque. A 20.000 juegos habría que revisarlo, y este proyecto no va ahí</td>
+            </tr>
+            <tr>
+              <td><strong>Escribir sin corromper</strong></td>
+              <td>Serializar a <code>game.json.tmp</code>, <code>fsync</code>, y <code>os.replace()</code>. El rename es atómico en POSIX y en Windows</td>
+              <td>Diez líneas en <code>store/archivo.py</code>. <strong>Innegociable</strong>: es lo que separa «simple» de «frágil»</td>
+            </tr>
+            <tr>
+              <td><strong>Dos escrituras a la vez</strong> (el usuario guarda mientras un job termina)</td>
+              <td>Un <code>threading.Lock</code> por <code>set</code>. Un solo proceso, así que alcanza</td>
+              <td>Trivial. Con dos procesos haría falta otra cosa, y no hay dos procesos</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>9.6 Migraciones: un campo <code>version</code></h3>
+      <p>Cuando el contrato de ATTRACT cambie —y va a cambiar, ADR-0001 lo dice explícitamente— la migración es una función que recibe el documento, mira su <code>version</code>, lo lleva a la forma actual y lo reescribe al guardar. Sin herramienta, sin estado global, sin paso de despliegue.</p>
+      <p>Y sin la clase de fallo que asusta: <strong>un error de migración toca un juego, no la colección entera.</strong></p>
+      <p><strong>La única disciplina que exige:</strong> las funciones de migración se agregan y nunca se editan, y hay un test por salto de versión con un documento real de esa versión guardado como fixture. Es el mismo criterio que el repo ya aplica a los ADRs.</p>
+
+      <h3>9.7 Los dos archivos de contrato son datos, no código</h3>
+      <p>Ya está resuelto en ADR-0005 y solo agrego la precisión de que <code>fielddefs</code> sea JSON en vez de <code>.ts</code>, para que Python lo lea sin reescribirlo (§7.4). El test que los ata sigue siendo el mismo y sigue siendo el que hace cumplir ADR-0001 de verdad.</p>
+      <p>Con esta decisión aparece una coherencia que antes no estaba: <strong>el contrato es un archivo, la política es un archivo, y cada juego es un archivo.</strong> El proyecto entero se lee sin abrir una base de datos.</p>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section id="s10">
+    <h2>10 · Authentication &amp; Authorization</h2>
+    <div class="body">
+      <p><span class="badge b-conf">CONFIRMADO</span> <strong>No hay ninguna, y no debe haberla.</strong> <code>tech-stack.md</code> §Límites duros y UX §2 son explícitos: un usuario, su máquina, y si aparece la necesidad de más es un cambio de misión.</p>
+
+      <p>Consecuencias que hay que respetar activamente, porque el reflejo de todo backend es agregarlas:</p>
+      <ul>
+        <li>Sin tabla de usuarios, sin <code>owner_id</code> en ninguna entidad, sin sesiones, sin JWT, sin cookies de auth, sin OAuth.</li>
+        <li>Sin middleware de autorización ni decoradores de permisos.</li>
+        <li>Sin pantalla de login ni ruta protegida en el router del cliente.</li>
+        <li>Sin interceptor de 401 ni lógica de refresh en <code>lib/api/client.ts</code>.</li>
+      </ul>
+
+      <div class="banner">
+        <strong>Pero «sin autenticación» no significa «sin frontera».</strong> Significa que la frontera se mueve de la aplicación a la red: el proceso escucha solo en <code>127.0.0.1</code> y nada fuera de la máquina puede alcanzarlo. Esa decisión reemplaza a la autenticación y por eso es constitucional, no un detalle de despliegue. Ver §11.
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section id="s11">
+    <h2>11 · Security Considerations</h2>
+    <div class="body">
+      <p>Este proyecto tiene <strong>un</strong> problema de seguridad real, y no es el que se esperaría. No hay datos de terceros, no hay dinero, no hay PII. Lo que hay es una API sin autenticación con lectura arbitraria del filesystem y ejecución de subprocesos.</p>
+
+      <h3>11.1 El riesgo principal: una API local sin auth es alcanzable desde el navegador</h3>
+      <p><span class="badge b-prop">PROPUESTO</span> Si el usuario tiene COINDOOR corriendo y visita cualquier sitio web, ese sitio puede intentar hablar con <code>http://127.0.0.1:8765</code>. Con <code>romSource: 'path'</code> aceptando rutas absolutas, eso es lectura arbitraria de archivos del usuario. Tres mitigaciones, todas baratas:</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Mitigación</th><th>Contra qué</th><th>Coste</th></tr></thead>
+          <tbody>
+            <tr><td>Bind a <code>127.0.0.1</code>, <strong>nunca</strong> <code>0.0.0.0</code></td><td>Cualquier acceso desde la red local</td><td>Un parámetro</td></tr>
+            <tr><td><strong>Sin CORS permisivo.</strong> Mismo origen en producción; en dev, solo <code>http://localhost:5173</code></td><td>Que un sitio remoto <em>lea</em> las respuestas</td><td>Una lista</td></tr>
+            <tr><td>Validar el header <code>Host</code> contra <code>127.0.0.1</code> / <code>localhost</code></td><td><strong>DNS rebinding</strong>, que es lo que sortea el bind a loopback</td><td>Un middleware de diez líneas</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Las tres juntas son la sustitución completa de la autenticación. Sin la tercera, las dos primeras no alcanzan.</p>
+
+      <h3>11.2 El resto, por orden de importancia</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Riesgo</th><th>Mitigación</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Path traversal en <code>romRef</code> y en los <code>key</code> de campo</strong></td><td>Los nombres de archivo los genera el servidor, nunca el cliente. <code>key</code> se valida contra un enum de <code>fielddefs.json</code>. Toda ruta se resuelve y se comprueba que caiga dentro del directorio esperado</td><td><span class="badge b-conf">CONFIRMADO</span> (la regla, no la implementación)</td></tr>
+            <tr><td><strong>Credenciales en el repo</strong></td><td><code>.env</code> en el directorio de datos, nunca en el árbol de código. <code>.gitignore</code> desde el primer commit. La app arranca sin ellas</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td><strong>Subida de archivos</strong></td><td>Escritura en streaming a un temporal + <code>rename</code> atómico. Límite de tamaño configurable. Validar el tipo por contenido, no por extensión</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td><strong>Inyección en subprocesos</strong> (<code>mame</code>, <code>attract</code>)</td><td><code>subprocess</code> con lista de argumentos, jamás <code>shell=True</code></td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td><strong>Scraping abusivo</strong></td><td>Ritmo declarado por proveedor, <code>User-Agent</code> identificable, respeto de <code>robots.txt</code> y de <code>Retry-After</code></td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+            <tr><td><strong>Contenido scrapeado que llega al prompt de IA</strong></td><td>Riesgo bajo pero presente. Todo texto generado lo confirma una persona antes de marcar el juego como listo, y los textos de IA se muestran marcados</td><td><span class="badge b-inf">INFERIDO</span></td></tr>
+            <tr><td><strong>SSRF vía URL de candidato</strong></td><td>Las <code>previewUrl</code> las descarga el servidor. Restringir a http/https y a los dominios de los proveedores registrados</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td><strong>Zip-slip al instalar</strong></td><td><strong>No es nuestro problema, es de ATTRACT</strong>, pero conviene avisarlo: <code>tratamiento: descomprimir</code> hace que <code>attract install</code> descomprima un zip que puede venir de un tercero</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td><strong>Distribución de ROMs</strong></td><td>No es técnico: es la política del proyecto ya escrita en ADR-0003, y la razón por la que incluir los archivos del juego es una opción explícita y nunca un default</td><td><span class="badge b-conf">CONFIRMADO</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section id="s12">
+    <h2>12 · API Strategy</h2>
+    <div class="body">
+      <p><span class="badge b-conf">CONFIRMADO</span> <strong>REST/JSON.</strong> No es una decisión abierta: <code>data-model.md</code> §6 ya define ~25 endpoints con sus verbos, sus códigos de error y sus cuerpos, y las features 001 y 002 agregan los suyos. Elegir GraphQL ahora significaría reescribir la especificación completa del cliente.</p>
+
+      <h3>12.1 Por qué REST es además la elección correcta acá</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Estilo</th><th>A favor para este proyecto</th><th>En contra para este proyecto</th><th>Veredicto</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>REST/JSON</strong></td>
+              <td>Ya especificado. La ficha carga con un solo <code>GET /games/:id</code> con todo embebido. Multipart para archivos es nativo. OpenAPI gratis con FastAPI</td>
+              <td>Endpoints de acción (<code>mark-ready</code>, <code>apply-suggestion</code>) no son puramente REST</td>
+              <td><strong>Elegido</strong></td>
+            </tr>
+            <tr>
+              <td>GraphQL</td>
+              <td>Un cliente que pide exactamente lo que necesita</td>
+              <td>Un solo cliente, un solo consumidor, sin problema de over-fetching (la ficha quiere todo). Los uploads de 53 MB y los jobs con polling salen del modelo. Suma un runtime, un esquema y un resolver por campo</td>
+              <td>Descartado</td>
+            </tr>
+            <tr>
+              <td>RPC / tRPC</td>
+              <td>Tipos compartidos de punta a punta sin codegen</td>
+              <td>Ata el backend a TypeScript, y Python está confirmado. Además el bundle y los proveedores son Python por razones de ecosistema (pymupdf, subprocesos)</td>
+              <td>Descartado</td>
+            </tr>
+            <tr>
+              <td>WebSocket / SSE para jobs</td>
+              <td>Sin polling</td>
+              <td>El diseño <em>especifica</em> polling cada 500 ms y la latencia no importa. Un WebSocket agrega reconexión, heartbeat y estado en el cliente para ahorrar cuatro requests por minuto</td>
+              <td>Descartado</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>12.2 Convenciones</h3>
+      <ul>
+        <li><strong>Base <code>/api</code></strong>, sin versionado en la URL. Un solo cliente que se despliega junto al servidor: versionar es ceremonia sin consumidor.</li>
+        <li><strong>Un patrón de job, no cuatro.</strong> <code>POST</code> → <code>{jobId}</code>, <code>GET /jobs/:jobId</code>, <code>DELETE /jobs/:jobId</code>. Manuales, export, sugerencias y revistas usan el mismo.</li>
+        <li><strong>Multipart para binarios</strong>, JSON para el resto. <code>PUT /games/:id/fields/:key</code> acepta las dos formas según el campo.</li>
+        <li><strong>Los pesos los calcula el servidor</strong> (<code>GET /games/:id/export-options</code>). El plan de 001 es tajante: «un total mentiroso es peor que no mostrarlo, porque la decisión entera se toma mirando ese número».</li>
+        <li><strong>Documentación:</strong> OpenAPI generado, servido en <code>/api/docs</code>. <code>docs/api-reference.md</code> se completa desde ahí cuando exista algo que documentar.</li>
+      </ul>
+
+      <h3>12.3 Discrepancias del contrato de API que hay que resolver antes de codificar</h3>
+      <p>Ver §16.1 — hay tres endpoints donde <code>data-model.md</code> §6 y los deltas/features dicen cosas distintas.</p>
+    </div>
+  </section>
+
+  <!-- 13 -->
+  <section id="s13">
+    <h2>13 · Testing Strategy</h2>
+    <div class="body">
+      <p>Los <code>tasks.md</code> de las dos features ya listan ~40 tests concretos. La estrategia consiste en no diluirlos: <strong>cada test que ahí está escrito documenta un fallo caro y específico</strong>, no cobertura genérica.</p>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Nivel</th><th>Herramienta</th><th>Qué cubre</th><th>Por qué acá</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Dominio (front)</strong></td><td>Vitest</td><td><code>completeness</code>, <code>validation</code>, las máquinas de estado de campo</td><td>Funciones puras. Es donde más barato sale un test y más caro un bug</td></tr>
+            <tr><td><strong>Dominio (back)</strong></td><td>pytest</td><td>Lo mismo, del lado del servidor</td><td>Las dos implementaciones deben coincidir sobre los mismos datos</td></tr>
+            <tr><td><strong>Persistencia</strong></td><td>pytest</td><td>Escritura atómica (matar el proceso a mitad de guardar deja el archivo anterior intacto), y una migración por salto de <code>version</code> sobre un documento real guardado como fixture</td><td>Sin base de datos, el almacenamiento <em>es</em> código nuestro. Lo que en SQLite venía garantizado, acá se testea</td></tr>
+            <tr><td><strong>Contrato</strong></td><td>pytest</td><td><code>contract.json</code> ↔ <code>fielddefs.json</code>: sin huérfanos en ninguna dirección</td><td><strong>Exigido por ADR-0005.</strong> Es el test que hace cumplir ADR-0001</td></tr>
+            <tr><td><strong>Bundle</strong></td><td>pytest sobre <code>goldnaxe</code></td><td>El <code>data.json</code> generado equivale al real <strong>menos <code>mags[]</code></strong>; <code>copiar</code> vs <code>descomprimir</code>; identidad editada → <code>declarada</code></td><td>El bundle viaja a otras máquinas: un error acá se instala en otro lado</td></tr>
+            <tr><td><strong>Proveedores</strong></td><td>pytest + <code>httpx.MockTransport</code></td><td>Qué se reintenta y sobre todo <strong>qué no</strong>; <code>Retry-After</code>; cortocircuito sobre reintentos agotados; cuota persistida</td><td>Sin red en los tests. Cero dependencias nuevas</td></tr>
+            <tr><td><strong>Integración API</strong></td><td>pytest + <code>TestClient</code></td><td>Cada endpoint, con un directorio de datos temporal por test</td><td>Regla del scaffold: «todo endpoint nuevo necesita test de integración»</td></tr>
+            <tr><td><strong>Componentes</strong></td><td>Testing Library + MSW</td><td>Las cinco pantallas contra el seed de diez juegos</td><td>Los diez juegos del seed <strong>son</strong> el checklist de aceptación</td></tr>
+            <tr><td><strong>E2E</strong></td><td><strong>Ninguno automatizado</strong></td><td>—</td><td>Las dos pruebas finales que importan son manuales y están escritas: instalar un bundle a mano en una librería real y ver el juego en el gabinete; y comparar tres sinopsis generadas para ver si se leen con la misma voz. Un Playwright no puede juzgar ninguna de las dos</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Los cuatro tests que yo pondría primero</strong>, porque cada uno protege una decisión que después no se puede deshacer:</p>
+      <ol>
+        <li>Contrato ↔ política de completitud (ADR-0005).</li>
+        <li>Un romset de MAME sale <code>copiar</code> y una carpeta de MS-DOS sale <code>descomprimir</code> — «sin este test los dos <code>.zip</code> se tratan igual y el juego de DOS no arranca».</li>
+        <li>Un 404 o un «sin resultados» <strong>no</strong> se reintenta — es el que más cuota ahorra.</li>
+        <li>Un <code>POST /export</code> que omita la carátula es rechazado por la API, no solo por la UI.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 14 -->
+  <section id="s14">
+    <h2>14 · Infrastructure &amp; Deployment</h2>
+    <div class="body">
+      <h3>14.1 Producción = la laptop del usuario</h3>
+      <p><span class="badge b-prop">PROPUESTO</span> Un proceso Uvicorn que sirve dos cosas desde el mismo origen:</p>
+      <pre class="term"><span class="c">GET /api/*</span>     → los routers de FastAPI
+<span class="c">GET /media/*</span>   → estaticos del directorio de datos
+<span class="c">GET /*</span>         → frontend/dist (build de Vite), con fallback a index.html
+
+<span class="y">bind 127.0.0.1:8765  ·  un solo puerto  ·  mismo origen  ·  sin CORS</span></pre>
+      <p>Servir el frontend desde el backend no es comodidad: es lo que hace que el origen sea uno solo, y eso elimina CORS de la ecuación de seguridad. En desarrollo son dos procesos —Vite en 5173 con proxy a 8765— y esa es la única configuración que existe.</p>
+
+      <h3>14.2 Por qué no Docker</h3>
+      <p>Tres cosas concretas que COINDOOR necesita y que un contenedor rompe:</p>
+      <ol>
+        <li><strong>Leer ROMs por ruta absoluta arbitraria</strong> (<code>romSource: 'path'</code>, y el requisito explícito de no copiar el archivo). Habría que montar el disco entero.</li>
+        <li><strong>Ejecutar <code>mame -listxml</code></strong> del host para precargar la identidad de arcade.</li>
+        <li><strong>Ejecutar <code>attract doctor</code></strong> del host sobre el staging.</li>
+      </ol>
+      <p>Empaquetarlo igual y montar todo con volúmenes es más frágil que no usarlo, para una aplicación que corre en una máquina y no se despliega en ningún lado. <span class="badge b-pend">PENDIENTE</span> Si la distribución a otras personas entra en alcance, la respuesta no es Docker sino un ejecutable — ver §17.</p>
+
+      <h3>14.3 CI</h3>
+      <p>GitHub Actions, un workflow, cinco pasos: <code>ruff</code> · <code>mypy</code> · <code>pytest</code> · <code>tsc --noEmit</code> · <code>vitest</code>. La justificación no es proceso: es que el test de ADR-0005 tiene que correr en algún lado que no dependa de que alguien se acuerde. <strong>Sin CD</strong>, porque no hay destino de despliegue.</p>
+    </div>
+  </section>
+
+  <!-- 15 -->
+  <section id="s15">
+    <h2>15 · Technology Alternatives Considered</h2>
+    <div class="body">
+
+      <h3>15.1 Framework de backend</h3>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Criterio</th><th>FastAPI</th><th>Django + DRF</th><th>Flask</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Ventaja para este proyecto</strong></td><td>Pydantic v2 es el espejo directo de los tipos TS ya escritos. OpenAPI automático. Multipart, subprocesos y jobs en proceso son de primera clase</td><td>Admin, ORM, migraciones y auth listos. Ecosistema enorme</td><td>Mínimo. Solo lo que se agregue</td></tr>
+            <tr><td><strong>Desventaja para este proyecto</strong></td><td>Hay que ensamblar ORM y migraciones a mano</td><td><strong>El 70% de Django está prohibido acá:</strong> auth, sesiones, permisos, admin, middleware de usuario. Su ORM asume un servidor de base de datos. Es una app de contenido, y esto es una app de archivos</td><td>Validación, serialización y OpenAPI hay que traerlos (marshmallow/apispec) o escribirlos</td></tr>
+            <tr><td><strong>Complejidad</strong></td><td>Media-baja</td><td>Alta: convenciones, apps, settings</td><td>Baja al empezar, creciente después</td></tr>
+            <tr><td><strong>Performance</strong></td><td>Irrelevante — pero sobra</td><td>Irrelevante</td><td>Irrelevante</td></tr>
+            <tr><td><strong>Escalabilidad</strong></td><td>No es un requisito</td><td>No es un requisito</td><td>No es un requisito</td></tr>
+            <tr><td><strong>Mantenibilidad</strong></td><td><strong>Alta.</strong> Los DTO son ejecutables y verificables contra el contrato</td><td>Alta si se usa Django completo; <strong>baja si se pelea contra él</strong>, que es este caso</td><td>Media. Depende de la disciplina, no del framework</td></tr>
+            <tr><td><strong>Ecosistema</strong></td><td>Bueno y suficiente</td><td>El mejor de Python</td><td>Amplio</td></tr>
+            <tr><td><strong>Curva</strong></td><td>Baja si se conoce Python moderno con tipos</td><td>Media-alta</td><td>Muy baja</td></tr>
+            <tr><td><strong>Riesgos</strong></td><td>Tentación de usar <code>async</code> donde el código real es sincrónico (subprocesos, pymupdf, lectura de archivos)</td><td>Arrastrar una tabla de usuarios «por si acaso» y romper el límite duro</td><td>Reimplementar validación y documentación a mano</td></tr>
+            <tr><td><strong>Impacto futuro</strong></td><td>Sumar un proveedor o un campo es un archivo y una fila</td><td>Cada campo nuevo toca modelo, serializer, viewset y migración</td><td>Cada endpoint nuevo repite el andamiaje de validación</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pick"><strong>Elegido: FastAPI.</strong> El decisor no es la performance ni el ecosistema: es que <em>el contrato de API ya está escrito como tipos</em>, y FastAPI convierte esos tipos en la implementación en vez de obligar a traducirlos. Django pierde porque la mitad de lo que aporta está prohibido por límite duro y su ORM asume un servidor de base de datos que acá no existe. Flask pierde porque terminaría reimplementando lo que FastAPI trae, con menos rigor.</div>
+
+      <h3>15.2 Python vs Node para el backend</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Criterio</th><th>Python</th><th>Node + TypeScript</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Ventaja</strong></td><td>ATTRACT es Python: mismo lenguaje para leer su código, sus fixtures y su comportamiento. <code>pymupdf</code> es <em>la</em> librería de rasterizado y es la que ya usa <code>attract rasterize</code></td><td>Un solo lenguaje en todo el repo. Tipos compartidos sin duplicar</td></tr>
+            <tr><td><strong>Desventaja</strong></td><td>El dominio se escribe dos veces, en TS y en Python</td><td>Rasterizar PDF en Node es peor terreno. Y se pierde la afinidad con ATTRACT, que es el sistema con el que hay que hablar</td></tr>
+            <tr><td><strong>Riesgo</strong></td><td>Divergencia entre las dos implementaciones de completitud</td><td>Divergencia con el comportamiento real de ATTRACT, que es peor: se descubre en el gabinete</td></tr>
+            <tr><td><strong>Impacto futuro</strong></td><td>Si algún día conviene importar <code>attract.doctor</code> como librería, el camino está abierto</td><td>Toda interacción con ATTRACT queda para siempre como parseo de texto de subproceso</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pick"><strong>Elegido: Python</strong> — y además está confirmado en <code>tech-stack.md</code>. Lo listo igual porque el argumento de «un solo lenguaje» es real y merecía respuesta: el riesgo de divergencia con el dominio se mitiga con <code>fielddefs.json</code> compartido (§7.4); el riesgo de divergencia con ATTRACT no se mitiga con nada.</div>
+
+      <h3>15.3 Persistencia: archivos JSON vs SQLite</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Criterio</th><th>Un <code>game.json</code> por juego</th><th>SQLite (<code>sqlite3</code> de stdlib)</th><th>SQLite + SQLAlchemy + Alembic</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Ventaja para este proyecto</strong></td>
+              <td>Cero esquema, cero SQL, cero herramienta de migración. El dato y su media viven juntos: copiar la carpeta copia el juego. Inspeccionable con un editor de texto. Misma cultura de archivos que ATTRACT</td>
+              <td>Transacciones reales. Filtrar y paginar sin leer toda la colección. Un solo archivo</td>
+              <td>Migraciones con herramienta. Modelos tipados que mypy verifica</td>
+            </tr>
+            <tr>
+              <td><strong>Desventaja para este proyecto</strong></td>
+              <td>Sin transacciones entre archivos. Listar exige un índice en memoria. La escritura atómica hay que escribirla (diez líneas)</td>
+              <td>Hay un esquema que mantener y SQL que escribir, y <strong>la mitad del payload igual termina como columnas JSON</strong> — el modelo es documental, no relacional</td>
+              <td>Dos dependencias grandes para ~8 tablas de las cuales la mitad son documentos</td>
+            </tr>
+            <tr><td><strong>Complejidad</strong></td><td><strong>Mínima.</strong> <code>json</code> + <code>os.replace</code></td><td>Baja, pero con esquema</td><td>Media</td></tr>
+            <tr><td><strong>Performance</strong></td><td>200 documentos = milisegundos. Irrelevante</td><td>Mejor, y da igual a esta escala</td><td>Igual que la anterior</td></tr>
+            <tr><td><strong>Escalabilidad</strong></td><td>Degrada linealmente. A ~10.000 juegos habría que revisarla</td><td>Aguanta órdenes de magnitud más</td><td>Idem</td></tr>
+            <tr><td><strong>Mantenibilidad</strong></td><td><strong>Alta.</strong> Menos código que mantener y un formato que se lee sin herramientas</td><td>Media. Depende de que nadie improvise un <code>ALTER TABLE</code> en caliente</td><td>Alta si el esquema cambia seguido</td></tr>
+            <tr><td><strong>Curva</strong></td><td>Ninguna</td><td>Baja</td><td>Media</td></tr>
+            <tr>
+              <td><strong>Riesgo</strong></td>
+              <td>Escritura no atómica corrompe un juego. <strong>Mitigable por completo</strong> con temp + <code>os.replace()</code>, y el daño máximo es un juego</td>
+              <td>Una migración mal hecha toca la colección entera</td>
+              <td>Idem, con mejor red de contención</td>
+            </tr>
+            <tr>
+              <td><strong>Impacto futuro</strong></td>
+              <td>Agregar un campo al contrato es una clave más. Migrar es una función y un <code>version</code></td>
+              <td>Cada campo nuevo puede ser una migración de esquema</td>
+              <td>Idem, con la herramienta puesta</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pick"><strong>Elegido: un <code>game.json</code> por juego, sin base de datos.</strong> El decisor es que <em>el dominio ya es documental</em>: reseña, trucos, procedencia y manuales son estructuras anidadas que ninguna tabla mejora, y la media pesada ya vive en el filesystem al lado. Un juego es un documento y se guarda como un documento. Además el formato queda casi idéntico al <code>data.json</code> del contrato, así que exportar deja de ser una traducción. <strong>Lo único que no se simplifica es la escritura atómica</strong> — sin eso, «simple» pasa a ser «frágil». Y el límite honesto: esto vale hasta unos pocos miles de juegos; a partir de ahí, SQLite.</div>
+
+      <h3>15.4 Cómo verificar con ATTRACT</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Criterio</th><th>Subproceso <code>attract doctor</code></th><th>Importar <code>attract.doctor</code></th><th>Cliente MCP</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Ventaja</strong></td><td>Acoplamiento cero. Funciona con cualquier versión instalada. Degrada solo si el binario falta</td><td>Resultado <strong>estructurado</strong> (<code>revisar()</code> devuelve un <code>Reporte</code>), sin parsear texto</td><td>Salida estructurada sin importar nada (<code>mcp_server.py</code> ya expone <code>attract_doctor</code>)</td></tr>
+            <tr><td><strong>Desventaja</strong></td><td><strong><code>doctor</code> no tiene salida legible por máquina:</strong> imprime texto y devuelve 0 o 1</td><td>Convierte a ATTRACT en dependencia de código de otro repo, que no se publica como paquete</td><td>El SDK <code>mcp</code> es dependencia opcional de ATTRACT y el servidor bloquea por stdio: hay que gestionarle el ciclo de vida</td></tr>
+            <tr><td><strong>Riesgo</strong></td><td>Parsear su stdout es frágil y se rompe con cualquier cambio de formato</td><td>Acoplamiento fuerte entre dos repos con constituciones distintas</td><td>Complejidad de proceso para una llamada por export</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pick"><strong>Elegido: subproceso, usando el código de salida y mostrando el stdout literal, sin parsearlo.</strong> El veredicto binario lo da el exit code —que sí es contrato— y el detalle lo lee una persona, que es exactamente para quien está escrito ese texto. Si más adelante ATTRACT agrega <code>--json</code> a <code>doctor</code>, se cambia una función. Ver §16.2, que es un hallazgo relevante para la feature 001.</div>
+
+      <h3>15.5 Jobs</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Criterio</th><th><code>ThreadPoolExecutor</code> en proceso</th><th>Celery / RQ + Redis</th><th><code>BackgroundTasks</code> de FastAPI</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Ventaja</strong></td><td>Cero infraestructura. Cancelación con <code>threading.Event</code>. Progreso en un <code>dict</code> compartido</td><td>Durabilidad, reintentos, jobs que sobreviven al reinicio</td><td>Ya viene con el framework</td></tr>
+            <tr><td><strong>Desventaja</strong></td><td>Los jobs no sobreviven al reinicio del proceso</td><td><strong>Prohibido por límite duro.</strong> Un broker, un worker y un proceso más, para una app de escritorio de un usuario</td><td><strong>No se pueden consultar ni cancelar</strong> — que es justo lo que el diseño exige</td></tr>
+            <tr><td><strong>Riesgo</strong></td><td>Un job huérfano si la app muere a la mitad: el staging del export debe limpiarse siempre</td><td>Reintroduce lo que un ADR descartó</td><td>No cumple los requisitos</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pick"><strong>Elegido: <code>ThreadPoolExecutor</code>.</strong> Que un job no sobreviva al reinicio no es un problema: el usuario está sentado frente a la máquina y el requisito real es sobrevivir a un <em>refresh del navegador</em>, cosa que cumple. Lo único que sí debe persistir es el contador de cuota diaria, y eso va a <code>cuotas.json</code>.</div>
+
+      <h3>15.6 Descartes rápidos, con su motivo</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Tecnología</th><th>Por qué no</th></tr></thead>
+          <tbody>
+            <tr><td>PostgreSQL / MySQL</td><td>Un servidor que administrar, respaldar y arrancar, para un usuario y 200 documentos</td></tr>
+            <tr><td>Redis</td><td>Sus dos usos acá son un <code>dict</code> y un archivo JSON</td></tr>
+            <tr><td>Bases documentales (TinyDB, MongoDB, LiteDB…)</td><td>Una capa entre el código y unos archivos JSON que ya sabemos leer con <code>json.load</code>. Agrega API que aprender y no quita ningún problema</td></tr>
+            <tr><td>Electron / Tauri</td><td>Empaquetar es un problema de distribución, y la distribución no está definida (§17). Agregarlo ahora es resolver algo que nadie pidió</td></tr>
+            <tr><td>Server Components / Next.js</td><td>Vite + SPA ya está decidido, y el frontend es una herramienta local sin SEO ni SSR que ganar</td></tr>
+            <tr><td>Tailwind / MUI / shadcn</td><td>Límite duro. El look DOS lo prohíbe explícitamente</td></tr>
+            <tr><td>Zustand / Redux</td><td>TanStack Query cubre el estado de servidor y el de UI es local. No queda nada global que administrar</td></tr>
+            <tr><td><code>async</code> en todo el backend</td><td>Subprocesos, pymupdf y la lectura de archivos son sincrónicos. Routers <code>def</code> normales corren en threadpool y evitan bloquear el loop por accidente. <code>async</code> solo donde haya fan-out real de red</td></tr>
+            <tr><td>Codegen de tipos desde OpenAPI</td><td>Los tipos del cliente ya están escritos a mano en el paquete de diseño y son de dominio, no de transporte. Lo que sí hay que compartir es <code>fielddefs.json</code></td></tr>
+            <tr><td>Sentry / OpenTelemetry</td><td>No hay operación remota. El usuario ve el error en pantalla y el log al lado</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16 -->
+  <section id="s16">
+    <h2>16 · Risks &amp; Trade-offs</h2>
+    <div class="body">
+
+      <h3>16.1 Contradicciones entre documentos — sin resolver en silencio</h3>
+      <p>Siete. Para cada una digo cuál interpretación me parece la correcta, pero <strong>ninguna la aplico sin tu confirmación</strong>.</p>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>#</th><th>Contradicción</th><th>Dónde</th><th>Interpretación más probable</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>C1</strong></td>
+              <td><strong>Sugerencias: síncrono vs job.</strong> <code>data-model</code> §6 define <code>GET /games/:id/suggestions/:key</code> devolviendo candidatos directo. La feature 002 define <code>POST …/suggestions/:key → {jobId}</code> con polling y cancelación</td>
+              <td><code>data-model.md</code> §6 vs <code>002/plan.md</code></td>
+              <td><strong>Gana la feature 002.</strong> Un request sincrónico de decenas de segundos lo cortan proxies y navegadores, no se puede cancelar, y un refresh pierde el trabajo. Los tres problemas están escritos en el plan. <code>data-model</code> §6 quedó viejo</td>
+            </tr>
+            <tr>
+              <td><strong>C2</strong></td>
+              <td><strong>¿Es obligatoria la carátula?</strong> <code>fieldDefs</code> marca <code>caratula</code> y <code>poster</code> como <code>required: true</code>. UX §5.4 dice literalmente: «El diseño no debe marcar "falta la carátula" como si fuera un agujero si hay póster»</td>
+              <td><code>data-model</code> §2 vs <code>ux/requerimiento-funcional</code> §5.4</td>
+              <td><strong>Gana la política estricta</strong> (las dos obligatorias). <code>tech-stack.md</code> §Qué significa COMPLETO ya la asume y la declara deliberadamente más estricta que el contrato. <strong>Pero el párrafo de UX no está marcado como corregido</strong>, a diferencia del de revistas, que sí lo está. Conviene corregirlo o queda como argumento vivo para reabrirlo</td>
+            </tr>
+            <tr>
+              <td><strong>C3</strong></td>
+              <td><strong>Detección de acento devuelve uno o dos colores.</strong> <code>data-model</code> §6: <code>{color}</code>. Delta D2: <code>{color, color2}</code></td>
+              <td><code>data-model</code> §6 vs D2</td>
+              <td><strong>Gana D2.</strong> El contrato tiene <code>accent</code> y <code>accent2</code> y <code>goldnaxe</code> usa los dos</td>
+            </tr>
+            <tr>
+              <td><strong>C4</strong></td>
+              <td><strong>Revistas: <code>download-and-link</code> vs <code>link</code>,</strong> y el estado <code>broken</code> que D3 elimina pero sigue en <code>types.ts</code>, en la máquina de estados §5.3, en el seed (Contra) y en el checklist de aceptación</td>
+              <td><code>data-model</code> §1/§5.3/§6/§7 y <code>claude_diseño/README</code> vs D3</td>
+              <td><strong>Gana D3.</strong> Si la referencia nunca se exporta, no hay vínculo que pueda romperse. Hay <strong>cinco lugares</strong> del paquete de diseño que quedan obsoletos, incluido un juego del seed que ya no ejercita nada</td>
+            </tr>
+            <tr>
+              <td><strong>C5</strong></td>
+              <td><strong><code>identitySource</code> tiene dos valores, la realidad tiene tres.</strong> <code>types.ts</code>: <code>'catalog' | 'manual'</code>. ADR-0004: MAME, ScreenScraper por hash, y declarada. <code>bundle.json</code>: <code>'mame' | 'declarada'</code></td>
+              <td><code>data-model</code> §1 vs ADR-0004 vs ADR-0003</td>
+              <td><strong>Falta una decisión.</strong> Una identidad resuelta por ScreenScraper por hash es <code>catalog</code> en la UI, pero al exportar <em>tiene</em> que ser <code>declarada</code>, porque <code>install</code> solo sabe consultar MAME. La UI y el bundle usan ejes distintos y hay que escribir el mapeo</td>
+            </tr>
+            <tr>
+              <td><strong>C6</strong></td>
+              <td><strong>Tipos que no coinciden con el contrato.</strong> <code>Identity.players: string</code> pero <code>bundle.json</code> lleva <code>"players": 2</code>. La UI dice <code>year</code>, el contrato dice <code>release</code></td>
+              <td><code>data-model</code> §1 vs <code>ADR-0003</code></td>
+              <td><strong>Conversión explícita en el export</strong>, en el mismo módulo que traduce <code>caratula → boxFront</code>. Pero <code>players</code> con valores como «1-2» o «2 alternados» no es un entero: hay que decidir qué se escribe</td>
+            </tr>
+            <tr>
+              <td><strong>C7</strong></td>
+              <td><strong><code>MediaField.source</code> ejemplifica con «IGDB»</strong>, que no está en la tabla de proveedores de ADR-0006</td>
+              <td><code>data-model</code> §1 vs ADR-0006</td>
+              <td>Menor: ejemplo escrito antes del ADR. Solo confirma que <code>data-model</code> §1 y §6 son la parte más desactualizada del paquete</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="banner">
+        <strong>Patrón, más que siete casos sueltos.</strong> Las secciones §1 y §6 de <code>data-model.md</code> son anteriores a los deltas y a las dos features, y hoy contradicen a la constitución en cuatro puntos. La constitución ya dice que los deltas mandan, pero <code>data-model.md</code> se sigue leyendo como fuente de consulta. <strong>Recomiendo un aviso al principio de <code>docs/claude_diseño/data-model.md</code></strong> que liste qué quedó superado, en vez de esperar que cada lectura recuerde los cinco deltas.
+      </div>
+
+      <h3>16.2 Hallazgos técnicos en ATTRACT que afectan a la feature 001</h3>
+      <p>Los verifiqué leyendo el código, no la documentación.</p>
+
+      <div class="win">
+        <div class="wt">H1 · attract doctor no tiene salida legible por máquina</div>
+        <div class="wb">
+          <p><code>doctor.main()</code> imprime texto para humanos y devuelve <code>0 if rep.ok else 1</code>. No hay <code>--json</code>. La función <code>revisar()</code> <em>sí</em> devuelve un <code>Reporte</code> estructurado, y <code>mcp_server.py</code> lo serializa a <code>dict</code> — pero solo por MCP.</p>
+          <p><strong>Impacto:</strong> la feature 001 pide mostrar «el veredicto de ATTRACT con el detalle del motivo» y que «el veredicto de rechazo nombre el archivo y el motivo concreto». Con subproceso, el veredicto es fiable (exit code) pero el detalle solo se puede mostrar como texto literal.</p>
+          <p><strong>Recomendación:</strong> mostrar el stdout tal cual, sin parsear, y pedirle a ATTRACT un <code>doctor --json</code> — es una función que ya existe internamente y que serviría a los dos repos.</p>
+        </div>
+      </div>
+
+      <div class="win">
+        <div class="wt">H2 · El árbol de staging no tiene la forma que doctor sabe validar</div>
+        <div class="wb">
+          <p><code>001/plan.md</code> define el staging con forma de <em>bundle</em>: <code>media/…</code> y <code>_synopsis.json</code> en la raíz. <code>doctor</code> recorre con <code>rglob("*")</code> y aplica los chequeos universales a cualquier archivo, así que encoding, NFC, CRLF, nombres de Windows, JSON válido y el contrato de <code>data.json</code> <strong>sí se validan</strong>. Pero:</p>
+          <ul>
+            <li><code>chk_metadata</code> <strong>nunca corre</strong>: no hay ningún <code>*.pegasus.txt</code> en el bundle, por diseño (ADR-0003 lleva campos, no sintaxis).</li>
+            <li><code>_synopsis.json</code> en la raíz no es <code>_synopsis/&lt;set&gt;.json</code>, así que nada valida su ubicación ni su forma.</li>
+            <li><code>magazines_root_de()</code> sube cuatro niveles desde el <code>data.json</code>; en un staging plano resuelve a otro lado. Irrelevante en la práctica, porque el bundle nunca lleva <code>mags[]</code>.</li>
+          </ul>
+          <p><strong>Impacto:</strong> «verificado por doctor» cubre el eje VÁLIDA a nivel de archivo, <strong>no</strong> el bloque <code>game:</code>. El campo <code>verificado</code> del manifiesto promete más de lo que entrega.</p>
+          <p><strong>Recomendación:</strong> armar el staging con <strong>forma de librería</strong> (<code>&lt;sistema&gt;/media/&lt;set&gt;/</code>, <code>&lt;sistema&gt;/_synopsis/&lt;set&gt;.json</code>, y un <code>metadata.pegasus.txt</code> mínimo generado <em>solo para verificar</em> y descartado antes de comprimir), o bien acotar por escrito qué significa <code>verificado: true</code>. La primera opción da verificación real; la segunda es honesta y más barata. <strong>Es una decisión de la feature 001, no mía.</strong></p>
+        </div>
+      </div>
+
+      <h3>16.3 Riesgos técnicos del stack propuesto</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Riesgo</th><th>Probabilidad</th><th>Impacto</th><th>Mitigación</th></tr></thead>
+          <tbody>
+            <tr><td><strong>La lógica de completitud diverge entre TS y Python</strong></td><td>Alta si no se hace nada</td><td>Alto — es el corazón del producto</td><td><code>fielddefs.json</code> compartido + el test de ADR-0005 en CI</td></tr>
+            <tr><td><strong>Los scrapers se rompen en silencio</strong> y devuelven basura en vez de fallar</td><td>Alta</td><td>Alto — un candidato basura aceptado queda permanente</td><td>Ya está como test en 002: «HTML inesperado → falla explícito, nunca un candidato con datos basura»</td></tr>
+            <tr><td><strong>Staging huérfano de 63 MB</strong> tras un export interrumpido</td><td>Media</td><td>Medio — llena el disco despacio</td><td><code>try/finally</code> alrededor de todo el export + limpieza de <code>tmp/</code> al arrancar</td></tr>
+            <tr><td><strong>El contador de cuota se pierde al reiniciar</strong></td><td>Media</td><td>Medio — le pegamos a una API que ya nos cortó</td><td><code>cuotas.json</code> con fecha de reset, no memoria. Riesgo ya identificado en 002</td></tr>
+            <tr><td><strong>El bundle promete verificación que no tiene</strong></td><td>Alta</td><td>Medio</td><td>H2, arriba</td></tr>
+            <tr><td><strong><code>attract install</code> no existe</strong>, así que el export produce un archivo que nadie abre</td><td>Cierta</td><td>Alto para validar el formato</td><td>Ya previsto: la prueba de cierre de 001 es desarmar el zip a mano en una librería real. <strong>Hacerlo temprano</strong>, no al final</td></tr>
+            <tr><td><strong>pymupdf y su licencia AGPL</strong></td><td>Cierta</td><td>Bajo hoy, alto si se distribuye</td><td>ATTRACT ya la asumió (su ADR-0022). Si COINDOOR se distribuye a terceros, hay que mirarlo</td></tr>
+            <tr><td><strong>Sobre-uso de <code>async</code></strong> en un backend cuyo trabajo real es sincrónico</td><td>Media</td><td>Medio — bloqueos del event loop difíciles de diagnosticar</td><td>Routers <code>def</code> por defecto; <code>async</code> solo en el fan-out de proveedores</td></tr>
+            <tr><td><strong>Un <code>game.json</code> escrito a medias</strong> si el proceso muere durante el guardado</td><td>Baja</td><td><strong>Alto</strong> — un juego curado, ilegible</td><td>Temp + <code>fsync</code> + <code>os.replace()</code>, siempre. Es la única parte de la persistencia que no se simplifica</td></tr>
+            <tr><td><strong>Un <code>game.json</code> editado a mano queda inválido</strong> — el formato invita a tocarlo</td><td>Media</td><td>Medio — la ficha no carga</td><td>Validar con el modelo Pydantic al leer y mostrar el error nombrando el archivo, en vez de fallar con un <code>KeyError</code></td></tr>
+            <tr><td><strong>El índice en memoria se desincroniza</strong> del disco tras una escritura fallida</td><td>Baja</td><td>Bajo — la lista miente hasta reiniciar</td><td>El índice se actualiza <em>después</em> de que el <code>replace</code> tuvo éxito, nunca antes</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>16.4 Trade-offs asumidos a conciencia</h3>
+      <ul>
+        <li><strong>Dos implementaciones de la regla de completitud</strong> a cambio de feedback sin round-trip. Se mitiga con datos compartidos, no se elimina.</li>
+        <li><strong>Sin durabilidad de jobs</strong> a cambio de cero infraestructura. Aceptable porque el usuario está presente.</li>
+        <li><strong>Sin Docker</strong> a cambio de acceso real al filesystem, a <code>mame</code> y a <code>attract</code>. Traslada el coste a la instalación manual.</li>
+        <li><strong>Verificación por texto de subproceso</strong> a cambio de acoplamiento cero con ATTRACT.</li>
+        <li><strong>Sin autenticación</strong> a cambio de que la frontera sea la red. Solo es seguro si las tres mitigaciones de §11.1 están las tres.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 17 -->
+  <section id="s17">
+    <h2>17 · Open Questions</h2>
+    <div class="body">
+
+      <h3>17.1 Bloqueantes — hay que decidirlos antes de la primera línea de código</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>#</th><th>Pregunta</th><th>Por qué bloquea</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><strong>¿Se aceptan los seis ADRs?</strong> Los seis siguen en <code>proposed</code></td><td>Todo el diseño se apoya en ellos, y este documento también</td><td><span class="badge b-pend">PENDIENTE</span></td></tr>
+            <tr><td>2</td><td><strong>¿Se aprueba este stack de backend?</strong></td><td>Es el punto 2 de «Bloqueado» del roadmap y lo único que impide arrancar la Fase 1</td><td><span class="badge b-prop">PROPUESTO</span></td></tr>
+            <tr><td>3</td><td><strong><code>contract.json</code> no existe.</strong> ATTRACT todavía no lo publica</td><td>Sin él, ADR-0005 no tiene qué vendorear y el test que ata los dos archivos no puede existir</td><td><span class="badge b-pend">PENDIENTE</span></td></tr>
+            <tr><td>4</td><td><strong>¿Qué versión de contrato estampa <code>bundle.json</code></strong> hasta que exista el publicado?</td><td>Tarea explícita en <code>001/tasks.md</code>. Un placeholder acordado sirve</td><td><span class="badge b-pend">PENDIENTE</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>17.2 Bloquean la feature 002, no el arranque</h3>
+      <ul>
+        <li><strong>Credenciales y cuotas reales de ScreenScraper y MobyGames</strong>, verificadas contra su documentación actual, no contra lo que recordamos. <span class="badge b-pend">PENDIENTE</span></li>
+        <li><strong>Qué modelo de IA.</strong> Afecta al coste por juego, a la latencia y a la voz de los textos. El criterio de aceptación ya está escrito y es exigente: tres sinopsis de tres juegos distintos tienen que leerse como escritas por la misma persona. <span class="badge b-pend">PENDIENTE</span></li>
+        <li><strong>Cómo se busca en YouTube:</strong> API oficial con cuota, o scraping. Cambia el modo de falla y la necesidad de credencial. <span class="badge b-pend">PENDIENTE</span></li>
+      </ul>
+
+      <h3>17.3 Decisiones que propongo y quiero confirmadas</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Decisión</th><th>Mi propuesta</th><th>Alternativa razonable</th></tr></thead>
+          <tbody>
+            <tr><td><strong>¿Dónde vive el directorio de datos?</strong></td><td><code>~/.coindoor/</code>, configurable por variable de entorno</td><td>Junto al repo, más visible pero más fácil de borrar por accidente</td></tr>
+            <tr><td><strong>¿Cómo se arranca la aplicación?</strong></td><td>Un comando (<code>uv run coindoor</code>) que levanta el proceso y abre el navegador</td><td>Dos comandos en desarrollo y un script en producción</td></tr>
+            <tr><td><strong>¿Se distribuye a otras personas?</strong></td><td><strong>No por ahora.</strong> Si algún día sí, es un ejecutable, no Docker</td><td>Cambia empaquetado, licencia (AGPL de pymupdf) y política de secretos</td></tr>
+            <tr><td><strong>¿Base de datos o archivos?</strong></td><td><span class="badge b-conf">RESUELTO</span> Sin base de datos: un <code>game.json</code> por juego (§15.3)</td><td>SQLite, si algún día la colección crece a varios miles de juegos</td></tr>
+            <tr><td><strong>¿El staging del export tiene forma de librería?</strong></td><td>Sí, para que <code>doctor</code> verifique de verdad (H2)</td><td>Mantener el staging plano y acotar por escrito qué significa <code>verificado</code></td></tr>
+            <tr><td><strong>¿<code>fieldDefs</code> pasa a JSON?</strong></td><td>Sí — es lo que evita escribir la política dos veces</td><td>Mantenerlo <code>.ts</code> y duplicarlo en Python con un test que los compare</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>17.4 Supuestos que tuve que hacer</h3>
+      <ol>
+        <li><strong>El backend y el frontend corren en la misma máquina, siempre.</strong> Ningún documento lo dice explícitamente, pero se sigue de <code>romSource: 'path'</code> con rutas absolutas, de <code>mame -listxml</code> local y de <code>attract doctor</code> local. Si esto fuera falso, cambian el modelo de seguridad, el de archivos y el de subprocesos.</li>
+        <li><strong>El usuario sabe instalar Python y correr un comando.</strong> Es el dueño de un gabinete arcade que hoy usa una CLI: razonable, pero no está escrito.</li>
+        <li><strong>El volumen es ~200 juegos.</strong> Sale de «los 200 juegos de la colección» en ADR-0006. Si fueran 20.000, la paginación y el cálculo de <code>status</code> al vuelo habría que revisarlos.</li>
+        <li><strong>Un solo idioma en la interfaz</strong> (español). No se menciona i18n en ningún lado y los textos literales están en español.</li>
+        <li><strong><code>docs/CONVENCION.md</code> es autoritativo aunque siga marcado como plantilla.</strong> Su cabecera dice «🔴 PLANTILLA» y algunas secciones conservan huecos, pero §1.2, §2, §3 y §4 tienen contenido real y verificable contra <code>goldnaxe</code>. Verifiqué contra el código y los fixtures, no solo contra el documento.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 18 -->
+  <section id="s18">
+    <h2>18 · Final Recommendation</h2>
+    <div class="body">
+
+      <div class="win">
+        <div class="wt">Stack completo · COINDOOR</div>
+        <div class="wb">
+          <pre class="term"><span class="c">FRONTEND</span>  <span class="w">(ya decidido en la constitucion — confirmado, no modificado)</span>
+  TypeScript strict · React 18 · Vite
+  TanStack Query v5 · React Router v6 · react-hook-form + zod
+  CSS Modules + tokens.css · primitivas propias en components/dos/
+  Vitest + Testing Library + MSW
+  Sin librerias de componentes · sin Tailwind · sin auth
+
+<span class="c">BACKEND</span>
+  Python 3.12 · FastAPI + Uvicorn · Pydantic v2
+  <span class="y">Sin base de datos: un game.json por juego (json + os.replace)</span>
+  REST/JSON en /api · OpenAPI en /api/docs
+  httpx · pymupdf · Pillow
+  Jobs: ThreadPoolExecutor en proceso, cancelables
+  pytest + TestClient + httpx.MockTransport
+  uv · ruff · mypy
+
+<span class="c">DATOS</span>
+  ~/.coindoor/juegos/&lt;set&gt;/game.json + su media al lado
+  ~/.coindoor/  →  sistemas.json · cuotas.json · tmp/ · export/ · .env
+  lib/domain/contract.json   <span class="w">vendoreado de ATTRACT</span>
+  lib/domain/fielddefs.json  <span class="w">politica propia, compartida TS↔Python</span>
+
+<span class="c">INFRAESTRUCTURA</span>
+  Un proceso en 127.0.0.1:8765, sirve API + build del frontend
+  CI: GitHub Actions (ruff · mypy · pytest · tsc · vitest)
+  <span class="y">Sin Docker · sin Redis · sin colas · sin object storage</span>
+  <span class="y">Sin CDN · sin CD · sin monitoring · sin auth</span></pre>
+        </div>
+      </div>
+
+      <h3>Por qué este stack y no otro, en una línea cada uno</h3>
+      <ol>
+        <li><strong>FastAPI</strong> porque el contrato de API ya está escrito como tipos, y él los convierte en implementación en vez de obligar a traducirlos.</li>
+        <li><strong>Sin base de datos</strong> porque el dominio ya es documental y la media ya está en el disco: un juego es una carpeta, y copiarla lo copia entero.</li>
+        <li><strong>REST</strong> porque ya está especificado endpoint por endpoint, y porque uploads de 53 MB y jobs con polling no encajan en GraphQL.</li>
+        <li><strong>Jobs en proceso</strong> porque el límite duro prohíbe colas y las cuatro operaciones largas están acotadas y las dispara el usuario.</li>
+        <li><strong>Cero infraestructura</strong> porque cada componente agregado es coste permanente sin un requisito que lo pida.</li>
+        <li><strong>Loopback como frontera</strong> porque «sin autenticación» exige que la frontera exista en otro lado, y ese es el único lugar posible.</li>
+      </ol>
+
+      <h3>Qué pasa si aprobás</h3>
+      <p>Este documento se disuelve en la estructura del repo, tal como manda <code>spec/README.md</code> — <strong>no queda como un documento suelto</strong>:</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Destino</th><th>Contenido</th></tr></thead>
+          <tbody>
+            <tr><td><code>ADR-0007</code></td><td>Stack de backend: FastAPI + Uvicorn + Pydantic. Descarta Django, Flask, <code>http.server</code> y Node</td></tr>
+            <tr><td><code>ADR-0008</code></td><td>Persistencia en archivos: un <code>game.json</code> por juego, escritura atómica, migración por campo <code>version</code>. Descarta SQLite (con y sin ORM), bases documentales y el archivo único</td></tr>
+            <tr><td><code>ADR-0009</code></td><td>Un proceso local en loopback como sustituto de la autenticación. Descarta Docker, empaquetado de escritorio y escuchar en <code>0.0.0.0</code></td></tr>
+            <tr><td><code>ADR-0010</code></td><td>Jobs en proceso con <code>ThreadPoolExecutor</code>. Descarta Celery/RQ/Redis, <code>BackgroundTasks</code> y <code>multiprocessing</code></td></tr>
+            <tr><td><code>ADR-0011</code></td><td><code>fielddefs.json</code> como dato compartido TS↔Python. Precisa ADR-0005</td></tr>
+            <tr><td><code>ADR-0012</code></td><td>Verificación con ATTRACT por subproceso, usando el exit code y sin parsear stdout. Descarta parsear el texto, importar el módulo y MCP</td></tr>
+            <tr><td><code>tech-stack.md</code></td><td>Se completan las filas <code>&lt;PENDIENTE&gt;</code>, se suman los descartes a §Límites duros y las contradicciones abiertas del §16.1</td></tr>
+            <tr><td><code>roadmap.md</code></td><td>Se cierra «elegir el stack» y se mapea cada fase a su feature</td></tr>
+            <tr><td><code>backend/CLAUDE.md</code> · <code>frontend/CLAUDE.md</code></td><td>Se rellenan las plantillas con el stack real</td></tr>
+            <tr><td><code>features/003-005</code></td><td>Base del frontend · Dominio y contrato · Esqueleto del backend. Las fases 3 y 4 siguen sin carpeta</td></tr>
+            <tr><td><code>docs/arquitectura/</code></td><td>Este documento, que conserva la comparación de alternativas que el formato de ADR resume</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="banner">
+        <strong>No escribo código hasta tu aprobación.</strong> Y aunque apruebes el stack, la Fase 1 sigue bloqueada por dos cosas que no dependen de mí: los seis ADRs en <code>proposed</code>, y <code>contract.json</code>, que ATTRACT todavía no publica.
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="footbar">
+  <span><b>Fuentes</b> spec/constitution · spec/decisions (6 ADRs) · features 001 y 002 · docs/claude_diseño · docs/ux</span>
+  <span><b>Verificado contra</b> ../attract: cli.py · doctor.py · mcp_server.py · CONVENCION.md · goldnaxe/data.json</span>
+</div>
+
+</div>

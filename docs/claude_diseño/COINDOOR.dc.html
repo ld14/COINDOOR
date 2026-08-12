@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body{margin:0;background:#0000AA;}
+  ::-webkit-scrollbar{width:14px;height:14px;}
+  ::-webkit-scrollbar-thumb{background:#C0C0C0;border:2px outset #C0C0C0;}
+  ::-webkit-scrollbar-track{background:#0000AA;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  a{color:#00AAAA;}
+  a:hover{color:#55FFFF;}
+  * { box-sizing: border-box; }
+  textarea, input, select, button{font-family:'Consolas','Courier New',monospace;}
+</style>
+</helmet>
+<div style="display:flex;flex-direction:column;height:100vh;background:#0000AA;color:#FFFFFF;font-family:'Consolas','Courier New',monospace;font-size:14px;overflow:hidden;">
+
+  <div style="background:#00AAAA;color:#000000;text-align:center;padding:4px 0;font-weight:700;flex-shrink:0;position:relative;letter-spacing:0.02em;">
+    <span style="position:absolute;left:8px;top:4px;width:12px;height:12px;background:#C0C0C0;border:1px outset #C0C0C0;"></span>
+    COINDOOR — Carga de juegos retro
+  </div>
+
+  <div style="display:flex;flex:1;overflow:hidden;padding:10px;gap:10px;">
+
+    <div style="width:190px;flex-shrink:0;background:#C0C0C0;border:2px outset #C0C0C0;display:flex;flex-direction:column;">
+      <div style="background:#00007A;color:#FFFFFF;text-align:center;font-weight:700;padding:3px 0;">Main Menu</div>
+      <div style="display:flex;flex-direction:column;padding:8px;gap:2px;">
+        <div style="{{ navSystemsStyle }}" onClick="{{ goSystems }}"><u>S</u>istemas</div>
+        <div style="{{ navGamesStyle }}" onClick="{{ goGames }}"><u>J</u>uegos</div>
+        <div style="{{ navExportStyle }}" onClick="{{ goExport }}"><u>E</u>xportar</div>
+      </div>
+      <div style="margin-top:auto;padding:8px;border-top:1px solid #808080;color:#00007A;font-size:12px;line-height:1.7;">
+        <div>{{ totalGames }} juegos</div>
+        <div>{{ totalSystems }} sistemas</div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:#0000AA;">
+
+      <sc-if value="{{ showBanner }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 12px;background:#FFFF55;border:1px inset #FFFF55;color:#000000;font-size:13px;margin-bottom:8px;flex-shrink:0;">
+          <span style="font-weight:700;">¡ CONTRATO</span>
+          <span style="flex:1;">La copia local del contrato ATTRACT puede estar desactualizada. Los campos requeridos mostrados son de referencia.</span>
+          <span style="cursor:pointer;font-weight:700;padding:2px 6px;border:1px outset #FFFF55;" onClick="{{ dismissBanner }}">X</span>
+        </div>
+      </sc-if>
+
+      <div style="flex:1;overflow-y:auto;background:#C0C0C0;border:2px inset #C0C0C0;padding:18px 22px;color:#000000;">
+
+        <sc-if value="{{ isSystemsView }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;">
+              <h1 style="font-size:17px;font-weight:700;margin:0;color:#00007A;">Sistemas / Plataformas</h1>
+              <button style="{{ btnPrimary }}" style-active="border-style:inset;" onClick="{{ openNewSystem }}">+ Nuevo sistema</button>
+            </div>
+            <div style="color:#333333;font-size:13px;margin-bottom:18px;">Un juego siempre pertenece a un sistema. La ruta del comando de lanzamiento debe ser absoluta.</div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;">
+              <sc-for list="{{ systems }}" as="sys" hint-placeholder-count="4">
+                <div style="background:#FFFFFF;border:2px outset #C0C0C0;padding:12px;">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div>
+                      <div style="font-weight:700;font-size:14.5px;color:#00007A;">{{ sys.name }}</div>
+                      <div style="font-size:12px;color:#555555;margin-top:2px;">{{ sys.shortName }}</div>
+                    </div>
+                    <div style="{{ sys.badgeStyle }}">{{ sys.badgeLabel }}</div>
+                  </div>
+                  <div style="margin-top:8px;font-size:12.5px;">{{ sys.gameCount }} juegos</div>
+                  <div style="margin-top:8px;font-size:12px;background:#000000;color:#55FF55;padding:4px 6px;border:1px inset #C0C0C0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ sys.launchCmd }}</div>
+                  <sc-if value="{{ sys.hasError }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:8px;font-size:12.5px;color:#AA0000;font-weight:700;">X {{ sys.errorMsg }}</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGamesView }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;">
+              <h1 style="font-size:17px;font-weight:700;margin:0;color:#00007A;">Juegos</h1>
+              <button style="{{ btnPrimary }}" style-active="border-style:inset;" onClick="{{ openNewGame }}">+ Agregar juego</button>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-bottom:14px;">
+              <input placeholder="Buscar por nombre…" value="{{ searchQuery }}" onChange="{{ onSearchChange }}" style="flex:1;max-width:300px;background:#FFFFFF;border:2px inset #C0C0C0;padding:5px 8px;color:#000;font-size:13px;" />
+              <select value="{{ filterSystem }}" onChange="{{ onFilterSystemChange }}" style="background:#FFFFFF;border:2px inset #C0C0C0;padding:5px 6px;color:#000;font-size:13px;">
+                <option value="all">Todos los sistemas</option>
+                <sc-for list="{{ systems }}" as="sys" hint-placeholder-count="4">
+                  <option value="{{ sys.id }}">{{ sys.name }}</option>
+                </sc-for>
+              </select>
+              <select value="{{ filterStatus }}" onChange="{{ onFilterStatusChange }}" style="background:#FFFFFF;border:2px inset #C0C0C0;padding:5px 6px;color:#000;font-size:13px;">
+                <option value="all">Todos los estados</option>
+                <option value="ready">Listo</option>
+                <option value="incomplete">Incompleto</option>
+                <option value="error">Con errores</option>
+              </select>
+            </div>
+
+            <sc-if value="{{ hasGamesToShow }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;background:#FFFFFF;border:2px inset #C0C0C0;">
+                <sc-for list="{{ gamesFiltered }}" as="g" hint-placeholder-count="6">
+                  <div style="display:flex;align-items:center;gap:12px;padding:8px 10px;border-bottom:1px solid #AAAAAA;cursor:pointer;" onClick="{{ g.open }}" style-hover="background:#00AAAA;">
+                    <div style="{{ g.coverStyle }}">
+                      <div style="font-size:9px;color:#000;text-align:center;">{{ g.initials }}</div>
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-weight:700;font-size:13.5px;">{{ g.title }}</div>
+                      <div style="font-size:11.5px;color:#555;margin-top:2px;">{{ g.systemName }} · {{ g.year }} · {{ g.identityLabel }}</div>
+                    </div>
+                    <div style="{{ g.statusStyle }}">{{ g.statusLabel }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasNoGamesToShow }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:50px 20px;color:#555;font-size:13px;">Ningún juego coincide con la búsqueda o los filtros.</div>
+            </sc-if>
+            <sc-if value="{{ isEmptyLibrary }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:90px 20px;">
+                <div style="font-size:15px;font-weight:700;margin-bottom:10px;color:#00007A;">Todavía no hay juegos cargados</div>
+                <div style="color:#555;font-size:13px;margin-bottom:16px;">Agregá el primero para empezar a completar la biblioteca.</div>
+                <button style="{{ btnPrimary }}" style-active="border-style:inset;" onClick="{{ openNewGame }}">+ Agregar juego</button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isNewGameView }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:560px;">
+            <h1 style="font-size:17px;font-weight:700;margin:0 0 6px 0;color:#00007A;">Alta de un juego</h1>
+            <div style="color:#333;font-size:13px;margin-bottom:18px;">Se parte del archivo de ROM. Si el sistema lo reconoce, la identidad viene del catálogo; si no, se declara a mano.</div>
+
+            <sc-if value="{{ newGameStepPick }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:2px outset #C0C0C0;padding:18px;">
+                <div>
+                  <div style="font-size:12.5px;color:#333;margin-bottom:5px;">Sistema</div>
+                  <select value="{{ newGameSystemId }}" onChange="{{ onNewGameSystemChange }}" style="width:100%;background:#FFFFFF;border:2px inset #C0C0C0;padding:6px 8px;color:#000;font-size:13px;">
+                    <sc-for list="{{ systems }}" as="sys" hint-placeholder-count="4">
+                      <option value="{{ sys.id }}">{{ sys.name }}</option>
+                    </sc-for>
+                  </select>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;color:#333;margin-bottom:6px;">Origen del archivo</div>
+                  <div style="display:flex;gap:14px;font-size:12.5px;margin-bottom:8px;">
+                    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" checked="{{ romModeUpload }}" onChange="{{ setRomModeUpload }}" />Subir ROM</label>
+                    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" checked="{{ romModePath }}" onChange="{{ setRomModePath }}" />Indicar ruta (juegos pesados)</label>
+                  </div>
+                  <sc-if value="{{ romModeUpload }}" hint-placeholder-val="{{ true }}">
+                    <input placeholder="ej: sf2.zip" value="{{ newGameFilename }}" onChange="{{ onNewGameFilenameChange }}" style="width:100%;background:#FFFFFF;border:2px inset #C0C0C0;padding:6px 8px;color:#000;font-size:13px;" />
+                  </sc-if>
+                  <sc-if value="{{ romModePath }}" hint-placeholder-val="{{ false }}">
+                    <input placeholder="ej: /roms/arcade/sf2.zip" value="{{ newGameFilename }}" onChange="{{ onNewGameFilenameChange }}" style="width:100%;background:#FFFFFF;border:2px inset #C0C0C0;padding:6px 8px;color:#000;font-size:13px;" />
+                    <div style="font-size:11.5px;color:#555;margin-top:5px;">El archivo se queda donde está — no se copia. Útil para ROMs de varios GB.</div>
+                  </sc-if>
+                </div>
+                <button style="{{ btnPrimary }}align-self:flex-start;" style-active="border-style:inset;" onClick="{{ detectGame }}">Continuar</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ newGameStepIdentity }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <sc-if value="{{ newGameRecognized }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:inline-block;background:#000000;color:#55FF55;border:1px solid #55FF55;padding:4px 10px;font-size:12.5px;margin-bottom:12px;">✓ IDENTIDAD: CATÁLOGO — confirmá los datos</div>
+                </sc-if>
+                <sc-if value="{{ newGameManualIdentity }}" hint-placeholder-val="{{ true }}">
+                  <div style="margin-bottom:12px;">
+                    <div style="display:inline-block;background:#000000;color:#00AAAA;border:1px solid #00AAAA;padding:4px 10px;font-size:12.5px;">~ IDENTIDAD: DECLARADA A MANO</div>
+                    <div style="color:#333;font-size:12.5px;margin-top:8px;">Este sistema no tiene catálogo automático. Completá los datos vos.</div>
+                  </div>
+                </sc-if>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#FFFFFF;border:2px outset #C0C0C0;padding:18px;">
+                  <sc-for list="{{ identityFieldDefs }}" as="idf" hint-placeholder-count="7">
+                    <div style="{{ idf.gridStyle }}">
+                      <div style="font-size:12.5px;color:#333;margin-bottom:5px;">{{ idf.label }}</div>
+                      <input value="{{ idf.value }}" onChange="{{ idf.onChange }}" style="width:100%;background:#FFFFFF;border:2px inset #C0C0C0;padding:5px 8px;color:#000;font-size:13px;" />
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:14px;">
+                  <button style="{{ btnPrimary }}" style-active="border-style:inset;" onClick="{{ confirmCreateGame }}">Crear ficha</button>
+                  <button style="{{ btnGhost }}" onClick="{{ goGames }}">Cancelar</button>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGameView }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:900px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;position:sticky;top:-18px;background:#C0C0C0;padding:8px 0 14px 0;z-index:5;margin-top:-8px;">
+              <div>
+                <div style="font-size:12.5px;color:#333;cursor:pointer;margin-bottom:6px;text-decoration:underline;" onClick="{{ goGames }}">&lt;&lt; Juegos</div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <h1 style="font-size:16px;font-weight:700;margin:0;color:#00007A;">{{ selectedGame.title }}</h1>
+                  <div style="{{ selectedGame.identityBadgeStyle }}">{{ selectedGame.identityLabel }}</div>
+                </div>
+                <div style="color:#555;font-size:12.5px;margin-top:5px;">{{ selectedGame.systemName }} · {{ selectedGame.year }}</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;">
+                <div style="{{ selectedGame.statusStyle }}margin-left:auto;">{{ selectedGame.statusLabel }}</div>
+                <div style="font-size:11.5px;color:#555;margin-top:5px;">{{ selectedGame.completionSummary }}</div>
+                <button style="{{ btnPrimarySmall }}" style-active="border-style:inset;" onClick="{{ markReady }}">Marcar como listo</button>
+              </div>
+            </div>
+
+            <sc-if value="{{ readyErrorVisible }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#000000;border:2px solid #AA0000;padding:10px 12px;margin-bottom:16px;font-size:12.5px;">
+                <div style="font-weight:700;color:#FF5555;margin-bottom:6px;">NO SE PUEDE MARCAR COMO LISTO — faltan campos requeridos:</div>
+                <sc-for list="{{ selectedGame.missingList }}" as="m" hint-placeholder-count="2">
+                  <div style="color:#FFFFFF;padding:2px 0;">- {{ m }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ selectedGame.hasFormatErrors }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#000000;border:2px solid #AA0000;padding:10px 12px;margin-bottom:16px;">
+                <div style="font-weight:700;color:#FF5555;font-size:12.5px;margin-bottom:6px;">ERRORES DE FORMATO (bloquean el export):</div>
+                <sc-for list="{{ selectedGame.errors }}" as="err" hint-placeholder-count="1">
+                  <div style="font-size:12.5px;color:#FFFFFF;padding:2px 0;">- <b>{{ err.field }}</b> — {{ err.message }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <div style="display:grid;grid-template-columns:120px 1fr;gap:20px;">
+              <div style="display:flex;flex-direction:column;gap:2px;font-size:12.5px;position:sticky;top:70px;align-self:start;color:#333;">
+                <div style="padding:5px 6px;">Identidad</div>
+                <div style="padding:5px 6px;">Imágenes</div>
+                <div style="padding:5px 6px;">Video</div>
+                <div style="padding:5px 6px;">Textos</div>
+                <div style="padding:5px 6px;">Presentación</div>
+                <div style="padding:5px 6px;">Manual</div>
+                <div style="padding:5px 6px;">Revista</div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:20px;padding-bottom:50px;">
+
+                <div>
+                  <div style="background:#00007A;color:#FFFFFF;font-weight:700;font-size:12.5px;padding:3px 8px;margin-bottom:8px;">IDENTIDAD</div>
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:#FFFFFF;border:2px outset #C0C0C0;padding:14px;">
+                    <sc-for list="{{ selectedGame.identityDisplay }}" as="idv" hint-placeholder-count="7">
+                      <div>
+                        <div style="font-size:11px;color:#666;">{{ idv.label }}</div>
+                        <div style="font-size:13.5px;margin-top:2px;">{{ idv.value }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <div>
+                  <div style="background:#00007A;color:#FFFFFF;font-weight:700;font-size:12.5px;padding:3px 8px;margin-bottom:8px;">IMÁGENES</div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;">
+                    <sc-for list="{{ selectedGame.imageFields }}" as="f" hint-placeholder-count="5">
+                      <div style="background:#FFFFFF;border:2px outset #C0C0C0;padding:10px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                          <div style="font-size:12.5px;font-weight:700;">{{ f.label }}</div>
+                          <div style="{{ f.tagStyle }}">{{ f.tagLabel }}</div>
+                        </div>
+                        <div style="{{ f.previewStyle }}">
+                          <div style="font-size:10.5px;color:#55FF55;">{{ f.placeholderText }}</div>
+                        </div>
+                        <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
+                          <button style="{{ f.primaryBtnStyle }}" onClick="{{ f.onLoad }}">{{ f.primaryBtnLabel }}</button>
+                          <button style="{{ btnGhostSmall }}" onClick="{{ f.onSuggest }}">Sugerir</button>
+                          <sc-if value="{{ f.hasContent }}" hint-placeholder-val="{{ false }}">
+                            <button style="{{ btnGhostSmallDanger }}" onClick="{{ f.onClear }}">Borrar</button>
+                          </sc-if>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <div>
+                  <div style="background:#00007A;color:#FFFFFF;font-weight:700;font-size:12.5px;padding:3px 8px;margin-bottom:8px;">VIDEO</div>
+                  <sc-for list="{{ selectedGame.videoFields }}" as="f" hint-placeholder-count="1">
+                    <div style="background:#FFFFFF;border:2px outset #C0C0C0;padding:10px;max-width:350px;">
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <div style="font-size:12.5px;font-weight:700;">{{ f.label }}</div>
+                        <div style="{{ f.tagStyle }}">{{ f.tagLabel }}</div>
+                      </div>
+                      <div style="{{ f.previewStyle }}">
+                        <div style="font-size:10.5px;color:#55FF55;">{{ f.placeholderText }}</div>
+                      </div>
+                      <div style="display:flex;gap:5px;margin-top:8px;">
+                        <button style="{{ f.primaryBtnStyle }}" onClick="{{ f.onLoad }}">{{ f.primaryBtnLabel }}</button>
+                        <button style="{{ btnGhostSmall }}" onClick="{{ f.onSuggest }}">Sugerir</button>
+                        <sc-if value="{{ f.hasContent }}" hint-placeholder-val="{{ false }}">
+                          <button style="{{ btnGhostSmallDanger }}" onClick="{{ f.onClear }}">Borrar</button>
+                        </sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <div>
+                  <div style="background:#00007A;color:#FFFFFF;font-weight:700;font-size:12.5px;padding:3px 8px;margin-bottom:8px;">TEXTOS</div>
+                  <div style="display:flex;flex-direction:column;gap:8px;">
+                    <sc-for list="{{ selectedGame.textFields }}" as="f" hint-placeholder-count="3">
+                      <div style="background:#FFFFFF;border:2px outset #C0C0C0;padding:10px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                          <div style="font-size:12.5px;font-weight:700;">{{ f.label }}</div>
+                          <div style="{{ f.tagStyle }}">{{ f.tagLabel }}</div>
+                        </div>
+                        <textarea value="{{ f.text }}" onChange="{{ f.onChange }}" placeholder="Sin cargar…" style="width:100%;min-height:54px;background:#FFFFFF;border:2px inset #C0C0C0;padding:6px 8px;color:#000;font-size:13px;resize:vertical;"></textarea>
+                        <div style="display:flex;gap:5px;margin-top:8px;">
+                          <button style="{{ btnGhostSmall }}" onClick="{{ f.onSuggest }}">Sugerir</button>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <div>
+                  <div style="background:#00007A;color:#FFFFFF;font-weight:700;font-size:12.5px;padding:3px 8px;margin-bottom:8px;">PRESENTACIÓN</div>
+                  <div style="background:#FFFFFF;border:2px outset #C0C0C0;padding:14px;display:flex;flex-direction:column;gap:12px;">
+                    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                      <div style="font-size:12.5px;color:#333;">Color de acento</div>
+                      <div style="display:flex;gap:6px;">
+                        <sc-for list="{{ accentSwatches }}" as="sw" hint-placeholder-count="6">
+                          <div style="{{ sw.style }}" onClick="{{ sw.onClick }}"></div>
+                        </sc-for>
+                      </div>
+                      <div style="{{ selectedGame.accentTagStyle }}">{{ selectedGame.accentTagLabel }}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid #C0C0C0;padding-top:10px;">
+                      <div style="font-size:12px;color:#333;">Agregar color HEX:</div>
+                      <input placeholder="#RRGGBB" value="{{ hexInputValue }}" onChange="{{ onHexInputChange }}" style="width:100px;background:#FFFFFF;border:2px inset #C0C0C0;padding:4px 6px;color:#000;font-size:12.5px;" />
+                      <button style="{{ btnGhostSmall }}" onClick="{{ addHexAccent }}">Agregar</button>
+                      <sc-if value="{{ hexInputError }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:11px;color:#AA0000;">Formato inválido (ej: #2F6FED)</div>
+                      </sc-if>
+                      <button style="{{ btnGhostSmall }}margin-left:auto;" onClick="{{ detectAccentFromCover }}">Detectar de la carátula</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div style="background:#00007A;color:#FFFFFF;font-weight:700;font-size:12.5px;padding:3px 8px;margin-bottom:8px;">MANUAL</div>
+                  <div style="background:#FFFFFF;border:2px outset #C0C0C0;padding:14px;">
+                    <sc-if value="{{ selectedGame.manualsEmpty }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12.5px;color:#333;margin-bottom:10px;">Sin manuales todavía. Se pueden adjuntar varios (ej: manual + guía rápida); cada uno se procesa por separado.</div>
+                    </sc-if>
+                    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;">
+                      <sc-for list="{{ selectedGame.manualsList }}" as="man" hint-placeholder-count="1">
+                        <div style="border:1px solid #C0C0C0;padding:8px 10px;">
+                          <div style="font-size:12.5px;color:#333;margin-bottom:4px;">📎 {{ man.fileName }}</div>
+                          <sc-if value="{{ man.isProcessing }}" hint-placeholder-val="{{ false }}">
+                            <div style="font-size:12px;color:#005555;margin-bottom:6px;">Procesando páginas… {{ man.progress }}%</div>
+                            <div style="height:12px;background:#000000;overflow:hidden;margin-bottom:8px;border:2px inset #C0C0C0;">
+                              <div style="{{ man.progressBarStyle }}"></div>
+                            </div>
+                            <button style="{{ btnGhostSmall }}" onClick="{{ man.onCancel }}">Cancelar</button>
+                          </sc-if>
+                          <sc-if value="{{ man.isUnprocessed }}" hint-placeholder-val="{{ true }}">
+                            <div style="font-size:12px;color:#8A6D00;margin-bottom:8px;">Adjuntado, sin procesar todavía — estado intermedio, no es "sin manual".</div>
+                            <button style="{{ btnPrimarySmall }}" style-active="border-style:inset;" onClick="{{ man.onProcess }}">Procesar</button>
+                          </sc-if>
+                          <sc-if value="{{ man.isDone }}" hint-placeholder-val="{{ false }}">
+                            <div style="font-size:12px;color:#006600;margin-bottom:8px;">✓ {{ man.pageCount }} páginas generadas</div>
+                            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                              <sc-for list="{{ man.pages }}" as="p" hint-placeholder-count="6">
+                                <div style="width:32px;height:44px;background:#000000;border:1px inset #C0C0C0;"></div>
+                              </sc-for>
+                            </div>
+                          </sc-if>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <button style="{{ btnGhost }}" onClick="{{ attachManual }}">{{ selectedGame.attachButtonLabel }}</button>
+                  </div>
+                </div>
+
+                <div>
+                  <div style="background:#00007A;color:#FFFFFF;font-weight:700;font-size:12.5px;padding:3px 8px;margin-bottom:8px;">REVISTA</div>
+                  <div style="background:#FFFFFF;border:2px outset #C0C0C0;padding:14px;">
+                    <sc-if value="{{ selectedGame.magazineEmpty }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12.5px;color:#333;margin-bottom:8px;">No vinculada. La IA puede buscar revistas de la época que mencionen el juego y sugerirlas para descargar y guardar.</div>
+                      <button style="{{ btnGhost }}" onClick="{{ openMagazineSearch }}">Buscar con IA</button>
+                    </sc-if>
+                    <sc-if value="{{ selectedGame.magazineLinked }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="font-size:12.5px;">[R] {{ selectedGame.magazineName }}</div>
+                        <button style="background:transparent;border:none;color:#555;font-size:11.5px;cursor:pointer;text-decoration:underline;" onClick="{{ unlinkMagazine }}">Desvincular</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ selectedGame.magazineBroken }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12.5px;color:#8A6D00;margin-bottom:6px;">~ "{{ selectedGame.magazineName }}" — vínculo roto: no está en el repositorio (faltante, no error)</div>
+                      <button style="{{ btnGhost }}" onClick="{{ openMagazineSearch }}">Buscar otra</button>
+                    </sc-if>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isExportView }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:620px;">
+            <h1 style="font-size:17px;font-weight:700;margin:0 0 6px 0;color:#00007A;">Exportar a la librería</h1>
+            <div style="color:#333;font-size:13px;margin-bottom:18px;">Por el peso de los archivos, el export se hace de a un juego por vez. COINDOOR arma su estructura de archivos; ATTRACT la verifica y da el veredicto final.</div>
+
+            <div style="background:#FFFFFF;border:2px outset #C0C0C0;padding:14px;margin-bottom:16px;">
+              <div style="display:flex;gap:20px;font-size:13px;">
+                <div><span style="font-weight:700;color:#006600;">{{ exportReadyCount }}</span> listos</div>
+                <div><span style="font-weight:700;color:#8A6D00;">{{ exportIncompleteCount }}</span> incompletos (no exportables)</div>
+                <div><span style="font-weight:700;color:#AA0000;">{{ exportErrorCount }}</span> con errores (no exportables)</div>
+              </div>
+            </div>
+
+            <sc-if value="{{ exportShowList }}" hint-placeholder-val="{{ true }}">
+              <sc-if value="{{ exportHasReadyGames }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:12.5px;color:#333;margin-bottom:8px;">Elegí un juego listo para exportar:</div>
+                <input placeholder="Buscar por nombre…" value="{{ exportSearchQuery }}" onChange="{{ onExportSearchChange }}" style="width:100%;max-width:300px;background:#FFFFFF;border:2px inset #C0C0C0;padding:6px 8px;color:#000;font-size:13px;margin-bottom:10px;" />
+                <sc-if value="{{ exportHasFilteredGames }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;flex-direction:column;gap:6px;">
+                    <sc-for list="{{ exportReadyGamesFiltered }}" as="rg" hint-placeholder-count="2">
+                      <div style="display:flex;align-items:center;justify-content:space-between;background:#FFFFFF;border:2px outset #C0C0C0;padding:8px 12px;">
+                        <div style="font-size:13px;font-weight:700;">{{ rg.title }}</div>
+                        <button style="{{ btnPrimarySmall }}" style-active="border-style:inset;" onClick="{{ rg.onExport }}">Exportar</button>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ exportNoFilteredGames }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12.5px;color:#555;">Ningún juego listo coincide con la búsqueda.</div>
+                </sc-if>
+              </sc-if>
+              <sc-if value="{{ exportNoReadyGames }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12.5px;color:#555;">No hay juegos listos para exportar todavía.</div>
+              </sc-if>
+            </sc-if>
+            <sc-if value="{{ exportArmando }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#00007A;">
+                <div style="width:13px;height:13px;border:2px solid #00007A;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                Armando estructura de archivos de "{{ exportCurrentTitle }}"…
+              </div>
+            </sc-if>
+            <sc-if value="{{ exportVerificando }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#00007A;">
+                <div style="width:13px;height:13px;border:2px solid #00007A;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                ATTRACT verificando "{{ exportCurrentTitle }}"…
+              </div>
+            </sc-if>
+            <sc-if value="{{ exportDone }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="background:#00007A;color:#FFFFFF;font-weight:700;font-size:12.5px;padding:3px 8px;margin-bottom:8px;">RESULTADO DE LA VERIFICACIÓN</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <sc-for list="{{ exportResults }}" as="r" hint-placeholder-count="1">
+                    <div style="background:#FFFFFF;border:2px outset #C0C0C0;padding:8px 12px;">
+                      <div style="display:flex;justify-content:space-between;font-size:13px;">
+                        <div style="font-weight:700;">{{ r.title }}</div>
+                        <div style="{{ r.style }}">{{ r.verdict }}</div>
+                      </div>
+                      <sc-if value="{{ r.hasDetail }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:11.5px;color:#555;margin-top:4px;">{{ r.detail }}</div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+                  <button style="{{ btnGhost }}" onClick="{{ backToExportList }}">Volver a la lista</button>
+                  <div style="font-size:11.5px;color:#555;">Sin ediciones nuevas, correrlo de nuevo no cambia el resultado.</div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#000000;color:#FFFFFF;display:flex;flex-shrink:0;font-size:13px;padding:3px 6px;gap:2px;flex-wrap:wrap;">
+    <span><span style="color:#FFFF55;">F1</span> Ayuda</span>
+    <span><span style="color:#FFFF55;">F2</span> Sistemas</span>
+    <span><span style="color:#FFFF55;">F3</span> Juegos</span>
+    <span><span style="color:#FFFF55;">F4</span> Exportar</span>
+    <span><span style="color:#FFFF55;">Esc</span> Cerrar</span>
+  </div>
+
+  <sc-if value="{{ newSystemModalOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:50;" onClick="{{ closeNewSystemBackdrop }}">
+      <div style="background:#C0C0C0;border:2px outset #C0C0C0;padding:0;width:420px;" onClick="{{ stopProp }}">
+        <div style="background:#00007A;color:#FFFFFF;font-weight:700;padding:4px 10px;font-size:13.5px;">Nuevo sistema</div>
+        <div style="padding:18px;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="font-size:12.5px;color:#333;margin-bottom:4px;">Nombre visible</div>
+            <input value="{{ newSystemName }}" onChange="{{ onNewSystemNameChange }}" style="width:100%;background:#FFFFFF;border:2px inset #C0C0C0;padding:6px 8px;color:#000;font-size:13px;" />
+          </div>
+          <div>
+            <div style="font-size:12.5px;color:#333;margin-bottom:4px;">Nombre corto</div>
+            <input value="{{ newSystemShort }}" onChange="{{ onNewSystemShortChange }}" style="width:100%;background:#FFFFFF;border:2px inset #C0C0C0;padding:6px 8px;color:#000;font-size:13px;" />
+          </div>
+          <div>
+            <div style="font-size:12.5px;color:#333;margin-bottom:4px;">Comando de lanzamiento del emulador</div>
+            <input value="{{ newSystemCmd }}" onChange="{{ onNewSystemCmdChange }}" placeholder="/opt/emulador/bin %rom%" style="width:100%;background:#FFFFFF;border:2px inset #C0C0C0;padding:6px 8px;color:#000;font-size:12.5px;" />
+            <sc-if value="{{ newSystemCmdError }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11.5px;color:#AA0000;margin-top:5px;">La ruta debe ser absoluta (ej: /opt/emulador/bin o C:\Emuladores\bin.exe). Si no, el juego no arranca en el gabinete sin avisar.</div>
+            </sc-if>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:18px;">
+          <button style="{{ newSystemSubmitStyle }}" style-active="border-style:inset;" onClick="{{ submitNewSystem }}">Crear sistema</button>
+          <button style="{{ btnGhost }}" onClick="{{ closeNewSystem }}">Cancelar</button>
+        </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ suggestOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:60;" onClick="{{ closeSuggest }}">
+      <div style="background:#C0C0C0;border:2px outset #C0C0C0;width:620px;max-height:80vh;overflow-y:auto;" onClick="{{ stopProp }}">
+        <div style="background:#00007A;color:#FFFFFF;font-weight:700;padding:4px 10px;font-size:13.5px;display:flex;justify-content:space-between;">
+          <span>Sugerencias — {{ suggestFieldLabel }}</span>
+          <span style="cursor:pointer;" onClick="{{ closeSuggest }}">X</span>
+        </div>
+        <div style="padding:18px;">
+        <div style="font-size:12.5px;color:#333;margin-bottom:14px;">Elegí una opción. Lo que ya tenés cargado cuenta como candidato — quedárselo es el default.</div>
+
+        <sc-if value="{{ suggestLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#00007A;padding:26px 0;justify-content:center;">
+            <div style="width:15px;height:15px;border:2px solid #00007A;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+            Buscando en fuentes externas…
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ suggestEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:26px 10px;">
+            <div style="font-size:14px;font-weight:700;margin-bottom:6px;">SIN RESULTADOS</div>
+            <div style="font-size:12.5px;color:#333;margin-bottom:14px;">Pasa seguido con juegos oscuros. Podés reintentar, ajustar la búsqueda o cargar a mano.</div>
+            <div style="display:flex;gap:8px;justify-content:center;">
+              <button style="{{ btnPrimarySmall }}" style-active="border-style:inset;" onClick="{{ retrySuggest }}">Reintentar</button>
+              <button style="{{ btnGhost }}" onClick="{{ loadManualFromSuggest }}">Cargar a mano</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ suggestError }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:26px 10px;">
+            <div style="font-size:14px;font-weight:700;color:#AA0000;margin-bottom:6px;">ERROR DE LA FUENTE EXTERNA</div>
+            <div style="font-size:12.5px;color:#333;margin-bottom:14px;">Problema temporal y ajeno a tu juego. Reintentá en vez de abandonar.</div>
+            <button style="{{ btnPrimarySmall }}" style-active="border-style:inset;" onClick="{{ retrySuggest }}">Reintentar</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ suggestResults }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;">
+            <sc-for list="{{ suggestCandidates }}" as="c" hint-placeholder-count="4">
+              <div style="{{ c.cardStyle }}" onClick="{{ c.onPick }}">
+                <div style="{{ c.previewStyle }}">
+                  <div style="font-size:10px;color:#55FF55;">{{ c.placeholderText }}</div>
+                </div>
+                <div style="font-size:12.5px;margin-top:5px;font-weight:700;">{{ c.name }}</div>
+                <div style="font-size:11px;color:#555;">{{ c.source }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ suggestConfirmReplace }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#000000;border:2px solid #AA0000;padding:12px;margin-top:12px;">
+            <div style="font-size:12.5px;color:#FFF;margin-bottom:10px;">Este campo fue cargado a mano. ¿Reemplazarlo por la sugerencia elegida?</div>
+            <div style="display:flex;gap:8px;">
+              <button style="background:#AA0000;color:#FFFFFF;border:2px outset #C0C0C0;padding:6px 12px;font-weight:700;font-size:12.5px;cursor:pointer;" onClick="{{ confirmReplace }}">Sí, reemplazar</button>
+              <button style="{{ btnGhost }}" onClick="{{ cancelReplace }}">Cancelar</button>
+            </div>
+          </div>
+        </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ magazineModalOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:60;" onClick="{{ closeMagazineSearch }}">
+      <div style="background:#C0C0C0;border:2px outset #C0C0C0;width:460px;" onClick="{{ stopProp }}">
+        <div style="background:#00007A;color:#FFFFFF;font-weight:700;padding:4px 10px;font-size:13.5px;display:flex;justify-content:space-between;">
+          <span>Buscar revista con IA</span>
+          <span style="cursor:pointer;" onClick="{{ closeMagazineSearch }}">X</span>
+        </div>
+        <div style="padding:16px;">
+        <sc-if value="{{ magazineSearching }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;color:#00007A;padding:20px 0;justify-content:center;">
+            <div style="width:14px;height:14px;border:2px solid #00007A;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+            La IA está buscando revistas de la época que mencionen este juego…
+          </div>
+        </sc-if>
+        <sc-if value="{{ magazineResultsReady }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12.5px;color:#333;margin-bottom:10px;">Encontradas por IA — pueden mencionar el juego en reseñas, tapas o publicidades. Elegí cuáles descargar y guardar en el repositorio.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <sc-for list="{{ magazineCandidates }}" as="mg" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#FFFFFF;border:2px outset #C0C0C0;padding:8px 10px;">
+              <div>
+                <div style="font-size:12.5px;">[R] {{ mg.name }}</div>
+                <div style="font-size:10.5px;color:#555;margin-top:2px;">{{ mg.reason }}</div>
+              </div>
+              <button style="{{ btnGhostSmall }}" onClick="{{ mg.onPick }}">Descargar y guardar</button>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+        <sc-if value="{{ magazineNoResults }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:20px 10px;font-size:12.5px;color:#333;">La IA no encontró revistas que mencionen este juego.</div>
+        </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1440, &quot;height&quot;: 900}, &quot;showContractBanner&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Reglas de completitud&quot;}, &quot;suggestOutcome&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;resultados&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;resultados&quot;, &quot;sin_resultados&quot;, &quot;error&quot;], &quot;section&quot;: &quot;Sugerencias (demo)&quot;}}">
+const SYSTEM_SEED = [
+  { id: 'arcade', name: 'Arcade / MAME', shortName: 'arcade', launchCmd: '/opt/mame/mame64 %rom%', valid: true },
+  { id: 'nes', name: 'NES', shortName: 'nes', launchCmd: '/opt/emulators/nestopia/nestopia %rom%', valid: true },
+  { id: 'genesis', name: 'Genesis / Mega Drive', shortName: 'genesis', launchCmd: '/opt/emulators/genesisplusgx/retroarch %rom%', valid: true },
+  { id: 'snes', name: 'SNES', shortName: 'snes', launchCmd: 'emulators/snes9x/snes9x %rom%', valid: false, errorMsg: 'La ruta del comando de lanzamiento debe ser absoluta.' },
+];
+
+const IMAGE_DEFS = [
+  { key: 'caratula', label: 'Carátula', ratio: '3:4', required: true },
+  { key: 'marquesina', label: 'Marquesina', ratio: '4:1', required: false },
+  { key: 'poster', label: 'Póster', ratio: '2:3', required: true },
+  { key: 'logo', label: 'Logo', ratio: '16:9', required: false },
+  { key: 'captura', label: 'Captura de pantalla', ratio: '16:9', required: false },
+];
+const VIDEO_DEFS = [{ key: 'video', label: 'Video de gameplay', ratio: '16:9', required: false }];
+const TEXT_DEFS = [
+  { key: 'sinopsis', label: 'Sinopsis', required: true },
+  { key: 'resena', label: 'Reseña', required: false },
+  { key: 'trucos', label: 'Trucos', required: false },
+];
+
+const GAME_SEED = [
+  { id: 'g1', systemId: 'genesis', title: 'Sonic the Hedgehog', year: '1991', developer: 'Sega', publisher: 'Sega', genre: 'Plataformas', players: '1', format: 'Cartucho', identitySource: 'manual', errors: [],
+    fields: { caratula: 'manual', marquesina: 'suggested', poster: 'manual', logo: 'suggested', captura: 'manual', video: 'manual', sinopsis: 'manual', resena: 'suggested', trucos: 'empty' },
+    accent: 'manual', accentValue: '#2f6fed', manuals: [{ id: 'm1', fileName: 'manual.pdf', status: 'processed', pages: 6 }], magazine: 'linked', magazineName: 'Mean Machines #14' },
+  { id: 'g2', systemId: 'arcade', title: 'Street Fighter II', year: '1991', developer: 'Capcom', publisher: 'Capcom', genre: 'Lucha', players: '2', format: 'Arcade', identitySource: 'catalog', errors: [],
+    fields: { caratula: 'manual', marquesina: 'empty', poster: 'empty', logo: 'empty', captura: 'manual', video: 'empty', sinopsis: 'manual', resena: 'empty', trucos: 'empty' },
+    accent: 'manual', accentValue: '#e0433a', manuals: [], magazine: 'empty', magazineName: '' },
+  { id: 'g3', systemId: 'arcade', title: 'Metal Slug', year: '1996', developer: 'Nazca', publisher: 'SNK', genre: 'Run and gun', players: '2', format: 'Arcade', identitySource: 'catalog', errors: [],
+    fields: { caratula: 'empty', marquesina: 'empty', poster: 'empty', logo: 'empty', captura: 'empty', video: 'empty', sinopsis: 'empty', resena: 'empty', trucos: 'empty' },
+    accent: 'empty', accentValue: '', manuals: [], magazine: 'empty', magazineName: '' },
+  { id: 'g4', systemId: 'arcade', title: 'Pac-Man', year: '1980', developer: 'Namco', publisher: 'Namco', genre: 'Laberinto', players: '2', format: 'Arcade', identitySource: 'catalog', errors: [],
+    fields: { caratula: 'suggested', marquesina: 'manual', poster: 'empty', logo: 'empty', captura: 'empty', video: 'suggested', sinopsis: 'manual', resena: 'empty', trucos: 'empty' },
+    accent: 'manual', accentValue: '#ffb703', manuals: [{ id: 'm1', fileName: 'manual.pdf', status: 'processed', pages: 4 }], magazine: 'linked', magazineName: 'Arcade Express #3' },
+  { id: 'g5', systemId: 'arcade', title: 'Donkey Kong', year: '197X', developer: 'Nintendo', publisher: 'Nintendo', genre: 'Plataformas', players: '2', format: 'Arcade', identitySource: 'catalog',
+    errors: [{ field: 'Año', message: 'Debe ser un número de 4 dígitos (contrato ATTRACT).' }],
+    fields: { caratula: 'manual', marquesina: 'manual', poster: 'empty', logo: 'empty', captura: 'manual', video: 'manual', sinopsis: 'manual', resena: 'empty', trucos: 'empty' },
+    accent: 'manual', accentValue: '#e0433a', manuals: [], magazine: 'empty', magazineName: '' },
+  { id: 'g6', systemId: 'nes', title: 'Super Mario Bros.', year: '1985', developer: 'Nintendo', publisher: 'Nintendo', genre: 'Plataformas', players: '2', format: 'Cartucho', identitySource: 'manual', errors: [],
+    fields: { caratula: 'manual', marquesina: 'manual', poster: 'manual', logo: 'suggested', captura: 'manual', video: 'manual', sinopsis: 'manual', resena: 'empty', trucos: 'suggested' },
+    accent: 'manual', accentValue: '#e0433a', manuals: [{ id: 'm1', fileName: 'manual.pdf', status: 'unprocessed', pages: 0 }], magazine: 'empty', magazineName: '' },
+  { id: 'g7', systemId: 'nes', title: 'The Legend of Zelda', year: '1986', developer: 'Nintendo', publisher: 'Nintendo', genre: 'Aventura', players: '1', format: 'Cartucho', identitySource: 'manual',
+    errors: [{ field: 'Formato', message: '"Cartucho JP" no es un valor aceptado por el contrato.' }],
+    fields: { caratula: 'manual', marquesina: 'manual', poster: 'manual', logo: 'manual', captura: 'suggested', video: 'manual', sinopsis: 'manual', resena: 'manual', trucos: 'empty' },
+    accent: 'manual', accentValue: '#ffb703', manuals: [{ id: 'm1', fileName: 'manual.pdf', status: 'processed', pages: 8 }], magazine: 'linked', magazineName: 'Club Nintendo #2' },
+  { id: 'g8', systemId: 'nes', title: 'Contra', year: '1987', developer: 'Konami', publisher: 'Konami', genre: 'Run and gun', players: '2', format: 'Cartucho', identitySource: 'manual', errors: [],
+    fields: { caratula: 'manual', marquesina: 'empty', poster: 'empty', logo: 'empty', captura: 'manual', video: 'empty', sinopsis: 'manual', resena: 'empty', trucos: 'empty' },
+    accent: 'manual', accentValue: '#2f6fed', manuals: [], magazine: 'broken', magazineName: 'Nintendo Power #9' },
+  { id: 'g9', systemId: 'genesis', title: 'Streets of Rage 2', year: '1992', developer: 'Sega', publisher: 'Sega', genre: 'Beat em up', players: '2', format: 'Cartucho', identitySource: 'manual', errors: [],
+    fields: { caratula: 'manual', marquesina: 'suggested', poster: 'manual', logo: 'manual', captura: 'manual', video: 'manual', sinopsis: 'manual', resena: 'suggested', trucos: 'manual' },
+    accent: 'manual', accentValue: '#2f6fed', manuals: [{ id: 'm1', fileName: 'manual.pdf', status: 'processed', pages: 10 }], magazine: 'linked', magazineName: 'Mean Machines #21' },
+  { id: 'g10', systemId: 'snes', title: 'Super Metroid', year: '1994', developer: 'Nintendo', publisher: 'Nintendo', genre: 'Aventura', players: '1', format: 'Cartucho', identitySource: 'manual', errors: [],
+    fields: { caratula: 'manual', marquesina: 'empty', poster: 'empty', logo: 'empty', captura: 'empty', video: 'empty', sinopsis: 'empty', resena: 'empty', trucos: 'empty' },
+    accent: 'empty', accentValue: '', manuals: [], magazine: 'empty', magazineName: '' },
+];
+
+const ACCENT_PRESETS = ['#e0433a', '#ffb703', '#2f6fed', '#7c5cff', '#2dd4a7'];
+const MAG_POOL = [
+  { name: 'Mean Machines #14', issue: '1991' }, { name: 'Club Nintendo #2', issue: '1990' },
+  { name: 'Arcade Express #3', issue: '1993' }, { name: 'Retro Gamer #58', issue: '2009' },
+];
+
+const BTN_PRIMARY = "background:#00AAAA;color:#000000;border:2px outset #C0C0C0;padding:6px 14px;font-weight:700;font-size:13px;cursor:pointer;";
+const BTN_PRIMARY_SMALL = "background:#00AAAA;color:#000000;border:2px outset #C0C0C0;padding:5px 10px;font-weight:700;font-size:12.5px;cursor:pointer;";
+const BTN_GHOST = "background:#C0C0C0;color:#000000;border:2px outset #C0C0C0;padding:6px 14px;font-size:12.5px;cursor:pointer;";
+const BTN_GHOST_SMALL = "background:#C0C0C0;border:2px outset #C0C0C0;color:#000000;padding:4px 8px;font-size:11.5px;cursor:pointer;";
+const BTN_GHOST_SMALL_DANGER = "background:#C0C0C0;border:2px outset #C0C0C0;color:#AA0000;padding:4px 8px;font-size:11.5px;cursor:pointer;";
+
+function statusColorFor(status) {
+  if (status === 'error') return { bg: '#000000', fg: '#FF5555', border: '#AA0000' };
+  if (status === 'incomplete') return { bg: '#000000', fg: '#FFFF55', border: '#8A6D00' };
+  return { bg: '#000000', fg: '#55FF55', border: '#006600' };
+}
+function statusLabelFor(status) {
+  return status === 'error' ? 'CON ERRORES' : status === 'incomplete' ? 'INCOMPLETO' : 'LISTO';
+}
+function badgeStyle(c) {
+  return `padding:3px 9px;font-size:11.5px;font-weight:700;background:${c.bg};color:${c.fg};border:1px solid ${c.border};white-space:nowrap;`;
+}
+
+class Component extends DCLogic {
+  state = {
+    view: 'games',
+    systems: SYSTEM_SEED.map(s => ({ ...s })),
+    games: GAME_SEED.map(g => ({ ...g })),
+    showBanner: true,
+    searchQuery: '', filterSystem: 'all', filterStatus: 'all',
+    selectedGameId: null,
+    newSystemModalOpen: false, newSystemName: '', newSystemShort: '', newSystemCmd: '', newSystemTouched: false,
+    newGame: { step: 'pick', systemId: 'arcade', filename: '', romMode: 'upload', recognized: false, form: null },
+    suggest: null,
+    editingField: null,
+    manualUploads: {},
+    manualFileNames: {},
+    hexInputValue: '', hexInputError: false,
+    magazineSearch: null,
+    exportFlow: { stage: 'idle', results: [], currentGameId: null },
+    exportSearchQuery: '',
+  };
+
+  computeGameStatus(g) {
+    if (g.errors && g.errors.length) return 'error';
+    if (this.missingRequired(g).length) return 'incomplete';
+    return 'ready';
+  }
+
+  missingRequired(g) {
+    const missing = [];
+    ['title', 'year', 'developer', 'publisher', 'genre', 'players', 'format'].forEach(k => { if (!g[k]) missing.push('Identidad: ' + k); });
+    IMAGE_DEFS.filter(f => f.required).forEach(f => { if (g.fields[f.key] === 'empty') missing.push(f.label); });
+    VIDEO_DEFS.filter(f => f.required).forEach(f => { if (g.fields[f.key] === 'empty') missing.push(f.label); });
+    TEXT_DEFS.filter(f => f.required).forEach(f => { if (g.fields[f.key] === 'empty') missing.push(f.label); });
+    if (g.accent === 'empty') missing.push('Presentación: color de acento');
+    return missing;
+  }
+
+  getGame(id) { return this.state.games.find(g => g.id === id); }
+  updateGame(id, patch) { this.setState(s => ({ games: s.games.map(g => g.id === id ? { ...g, ...patch } : g) })); }
+  updateGameField(id, key, value) { this.setState(s => ({ games: s.games.map(g => g.id === id ? { ...g, fields: { ...g.fields, [key]: value } } : g) })); }
+
+  goSystems = () => this.setState({ view: 'systems' });
+  goGames = () => this.setState({ view: 'games' });
+  goExport = () => this.setState({ view: 'export' });
+  dismissBanner = () => this.setState({ showBanner: false });
+  stopProp = (e) => e.stopPropagation();
+
+  openNewSystem = () => this.setState({ newSystemModalOpen: true, newSystemName: '', newSystemShort: '', newSystemCmd: '', newSystemTouched: false });
+  closeNewSystem = () => this.setState({ newSystemModalOpen: false });
+  closeNewSystemBackdrop = () => this.setState({ newSystemModalOpen: false });
+  onNewSystemNameChange = (e) => this.setState({ newSystemName: e.target.value });
+  onNewSystemShortChange = (e) => this.setState({ newSystemShort: e.target.value });
+  onNewSystemCmdChange = (e) => this.setState({ newSystemCmd: e.target.value, newSystemTouched: true });
+  submitNewSystem = () => {
+    const cmd = this.state.newSystemCmd;
+    const isAbsolute = /^\//.test(cmd) || /^[A-Za-z]:\\/.test(cmd);
+    if (!cmd || !isAbsolute || !this.state.newSystemName) { this.setState({ newSystemTouched: true }); return; }
+    const id = 'sys-' + Date.now();
+    this.setState(s => ({
+      systems: [...s.systems, { id, name: s.newSystemName, shortName: s.newSystemShort || s.newSystemName.toLowerCase(), launchCmd: cmd, valid: true }],
+      newSystemModalOpen: false,
+    }));
+  };
+
+  openNewGame = () => this.setState({ view: 'newGame', newGame: { step: 'pick', systemId: this.state.systems[0].id, filename: '', romMode: 'upload', recognized: false, form: null } });
+  onNewGameSystemChange = (e) => this.setState(s => ({ newGame: { ...s.newGame, systemId: e.target.value } }));
+  onNewGameFilenameChange = (e) => this.setState(s => ({ newGame: { ...s.newGame, filename: e.target.value } }));
+  setRomModeUpload = () => this.setState(s => ({ newGame: { ...s.newGame, romMode: 'upload', filename: '' } }));
+  setRomModePath = () => this.setState(s => ({ newGame: { ...s.newGame, romMode: 'path', filename: '' } }));
+  detectGame = () => {
+    const sys = this.state.systems.find(s => s.id === this.state.newGame.systemId);
+    const recognized = sys && sys.shortName === 'arcade';
+    const base = (this.state.newGame.filename || 'juego').replace(/\.(zip|rom|nes|smc|md)$/i, '');
+    const form = recognized
+      ? { title: base.toUpperCase(), year: '19XX', developer: 'Detectado', publisher: 'Detectado', genre: 'Acción', players: '2', format: 'Arcade' }
+      : { title: '', year: '', developer: '', publisher: '', genre: '', players: '', format: '' };
+    this.setState(s => ({ newGame: { ...s.newGame, step: 'identity', recognized, form } }));
+  };
+  onNewGameFormChange = (key) => (e) => this.setState(s => ({ newGame: { ...s.newGame, form: { ...s.newGame.form, [key]: e.target.value } } }));
+  confirmCreateGame = () => {
+    const ng = this.state.newGame;
+    const sys = this.state.systems.find(s => s.id === ng.systemId);
+    const id = 'g-' + Date.now();
+    const emptyFields = {};
+    [...IMAGE_DEFS, ...VIDEO_DEFS, ...TEXT_DEFS].forEach(f => emptyFields[f.key] = 'empty');
+    const newGame = {
+      id, systemId: ng.systemId, ...ng.form,
+      identitySource: ng.recognized ? 'catalog' : 'manual', errors: [],
+      fields: emptyFields, accent: 'empty', accentValue: '', manuals: [], magazine: 'empty', magazineName: '',
+    };
+    this.setState(s => ({ games: [...s.games, newGame], view: 'game', selectedGameId: id }));
+  };
+
+  markReady = () => {
+    const g = this.getGame(this.state.selectedGameId);
+    if (this.missingRequired(g).length === 0) this.updateGame(g.id, { markedReady: true, _readyAttempted: false });
+    else this.updateGame(g.id, { _readyAttempted: true });
+  };
+
+  loadField = (gameId, key) => () => this.updateGameField(gameId, key, 'manual');
+  clearField = (gameId, key) => () => this.updateGameField(gameId, key, 'empty');
+  onTextChange = (gameId, key) => (e) => this.setState(s => ({
+    games: s.games.map(g => g.id === gameId ? { ...g, fields: { ...g.fields, [key]: e.target.value ? 'manual' : 'empty' }, [`_text_${key}`]: e.target.value } : g)
+  }));
+
+  openSuggest = (gameId, key, label) => () => {
+    this.setState({ suggest: { gameId, key, label, phase: 'loading', pendingPick: null } });
+    this.runSuggestSearch();
+  };
+  runSuggestSearch = () => {
+    const outcome = this.props.suggestOutcome || 'resultados';
+    clearTimeout(this._suggestTimer);
+    this._suggestTimer = setTimeout(() => {
+      this.setState(s => {
+        if (!s.suggest) return null;
+        let phase = 'results';
+        if (outcome === 'sin_resultados') phase = 'empty';
+        else if (outcome === 'error') phase = 'error';
+        const sources = ['IGDB', 'MobyGames', 'TheGamesDB', 'Arcade Archive'];
+        const candidates = phase === 'results' ? [0, 1, 2, 3].map(i => ({
+          id: i, name: `Candidato ${i + 1}`, source: sources[i], swatch: ['#e0433a', '#ffb703', '#2f6fed', '#2dd4a7'][i],
+        })) : [];
+        return { suggest: { ...s.suggest, phase, candidates } };
+      });
+    }, 1000);
+  };
+  retrySuggest = () => { this.setState(s => ({ suggest: { ...s.suggest, phase: 'loading' } })); this.runSuggestSearch(); };
+  closeSuggest = () => { clearTimeout(this._suggestTimer); this.setState({ suggest: null }); };
+  loadManualFromSuggest = () => {
+    const s = this.state.suggest;
+    this.updateGameField(s.gameId, s.key, 'manual');
+    this.closeSuggest();
+  };
+  TEXT_KEYS = ['sinopsis', 'resena', 'trucos'];
+  applySuggestion = (gameId, key, candId) => {
+    if (this.TEXT_KEYS.includes(key)) {
+      const cand = (this.state.suggest.candidates || []).find(c => c.id === candId);
+      const label = this.state.suggest.label;
+      const sample = `Texto sugerido para ${label.toLowerCase()} — fuente: ${cand ? cand.source : 'externa'}. (Editable: se vuelve "manual" en cuanto lo tocás.)`;
+      this.updateGame(gameId, { fields: { ...this.getGame(gameId).fields, [key]: 'suggested' }, [`_text_${key}`]: sample });
+    } else {
+      this.updateGameField(gameId, key, 'suggested');
+    }
+  };
+  pickCandidate = (candId) => () => {
+    const s = this.state.suggest;
+    const g = this.getGame(s.gameId);
+    if (g.fields[s.key] === 'manual') { this.setState({ suggest: { ...s, pendingPick: candId } }); return; }
+    this.applySuggestion(s.gameId, s.key, candId);
+    this.closeSuggest();
+  };
+  confirmReplace = () => {
+    const s = this.state.suggest;
+    this.applySuggestion(s.gameId, s.key, s.pendingPick);
+    this.closeSuggest();
+  };
+  cancelReplace = () => this.setState(s => ({ suggest: { ...s.suggest, pendingPick: null } }));
+
+  attachManual = () => {
+    const gid = this.state.selectedGameId;
+    const g = this.getGame(gid);
+    const n = (g.manuals || []).length + 1;
+    const mid = 'man-' + Date.now();
+    this.updateGame(gid, { manuals: [...(g.manuals || []), { id: mid, fileName: `manual-${n}.pdf`, status: 'unprocessed', pages: 0 }] });
+  };
+  processManual = (manualId) => () => {
+    const gid = this.state.selectedGameId;
+    const key = gid + '_' + manualId;
+    this._manualTimers = this._manualTimers || {};
+    this._manualTimers[key] = setInterval(() => {
+      this.setState(s => {
+        const cur = (s.manualUploads[key] || 0) + 12;
+        if (cur >= 100) {
+          clearInterval(this._manualTimers[key]);
+          const g = this.getGame(gid);
+          this.updateGame(gid, { manuals: g.manuals.map(m => m.id === manualId ? { ...m, status: 'processed', pages: 6 } : m) });
+          return { manualUploads: { ...s.manualUploads, [key]: 100 } };
+        }
+        return { manualUploads: { ...s.manualUploads, [key]: cur } };
+      });
+    }, 220);
+  };
+  cancelManualUpload = (manualId) => () => {
+    const gid = this.state.selectedGameId;
+    const key = gid + '_' + manualId;
+    if (this._manualTimers) clearInterval(this._manualTimers[key]);
+    this.setState(s => ({ manualUploads: { ...s.manualUploads, [key]: 0 } }));
+  };
+
+  setAccent = (gameId, hex) => () => this.updateGame(gameId, { accent: 'manual', accentValue: hex });
+  onHexInputChange = (e) => this.setState({ hexInputValue: e.target.value, hexInputError: false });
+  addHexAccent = () => {
+    const v = this.state.hexInputValue.trim();
+    if (!/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/.test(v)) { this.setState({ hexInputError: true }); return; }
+    this.updateGame(this.state.selectedGameId, { accent: 'manual', accentValue: v });
+    this.setState({ hexInputValue: '', hexInputError: false });
+  };
+  detectAccentFromCover = () => {
+    const g = this.getGame(this.state.selectedGameId);
+    if (!g || g.fields.caratula === 'empty') return;
+    const palette = ['#e0433a', '#2f6fed', '#ffb703', '#2dd4a7', '#7c5cff'];
+    const detected = palette[g.title.length % palette.length];
+    this.updateGame(g.id, { accent: 'suggested', accentValue: detected });
+  };
+
+  openMagazineSearch = () => {
+    this.setState({ magazineSearch: { gameId: this.state.selectedGameId, phase: 'searching', results: [] } });
+    setTimeout(() => {
+      const g = this.getGame(this.state.selectedGameId);
+      const found = MAG_POOL.map((m, i) => ({ ...m, reason: ['Menciona el juego en la reseña de tapa', 'Publicidad de página completa', 'Aparece en el ranking de ese número'][i % 3] }));
+      this.setState(s => ({ magazineSearch: s.magazineSearch ? { ...s.magazineSearch, phase: found.length ? 'results' : 'empty', results: found } : null }));
+    }, 1400);
+  };
+  closeMagazineSearch = () => this.setState({ magazineSearch: null });
+  pickMagazine = (name) => () => { this.updateGame(this.state.magazineSearch.gameId, { magazine: 'linked', magazineName: name }); this.closeMagazineSearch(); };
+  unlinkMagazine = () => this.updateGame(this.state.selectedGameId, { magazine: 'empty', magazineName: '' });
+
+  startExport = (gameId) => () => {
+    const g = this.getGame(gameId);
+    this.setState({ exportFlow: { stage: 'armando', results: [], currentGameId: gameId } });
+    setTimeout(() => {
+      this.setState(s => ({ exportFlow: { ...s.exportFlow, stage: 'verificando' } }));
+      setTimeout(() => {
+        const rejected = g.title === 'Pac-Man';
+        const results = [rejected
+          ? { title: g.title, verdict: 'Rechazado por ATTRACT', style: badgeStyle({ bg: '#000000', fg: '#FF5555', border: '#AA0000' }), hasDetail: true, detail: `${g.title}/marquesina.png — nombre de archivo con mayúscula inválida (contrato es case-sensitive).` }
+          : { title: g.title, verdict: 'Verificado', style: badgeStyle(statusColorFor('ready')), hasDetail: false, detail: '' }];
+        this.setState(s => ({ exportFlow: { ...s.exportFlow, stage: 'done', results } }));
+      }, 1200);
+    }, 900);
+  };
+  backToExportList = () => this.setState({ exportFlow: { stage: 'idle', results: [], currentGameId: null } });
+
+  renderVals() {
+    const st = this.state;
+    const systems = st.systems.map(s => {
+      const count = st.games.filter(g => g.systemId === s.id).length;
+      return {
+        ...s, gameCount: count,
+        borderColor: s.valid ? '#C0C0C0' : '#AA0000',
+        hasError: !s.valid, errorMsg: s.errorMsg || '',
+        badgeStyle: s.valid ? 'font-size:11px;color:#666;' : 'font-size:11px;color:#AA0000;font-weight:700;',
+        badgeLabel: s.valid ? '' : 'CABECERA INVÁLIDA',
+      };
+    });
+
+    const gamesWithMeta = st.games.map(g => {
+      const status = this.computeGameStatus(g);
+      const sys = st.systems.find(s => s.id === g.systemId);
+      return { ...g, status, sysName: sys ? sys.name : '' };
+    });
+
+    let filtered = gamesWithMeta.filter(g => {
+      if (st.searchQuery && !g.title.toLowerCase().includes(st.searchQuery.toLowerCase())) return false;
+      if (st.filterSystem !== 'all' && g.systemId !== st.filterSystem) return false;
+      if (st.filterStatus !== 'all' && g.status !== st.filterStatus) return false;
+      return true;
+    });
+
+    const gamesFiltered = filtered.map(g => {
+      const c = statusColorFor(g.status);
+      return {
+        id: g.id, title: g.title, year: g.year, systemName: g.sysName,
+        identityLabel: g.identitySource === 'catalog' ? 'catálogo' : 'manual',
+        initials: g.title.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(),
+        coverStyle: 'width:34px;height:44px;flex-shrink:0;background:#000000;border:1px inset #C0C0C0;display:flex;align-items:center;justify-content:center;',
+        statusStyle: badgeStyle(c), statusLabel: statusLabelFor(g.status),
+        open: () => this.setState({ view: 'game', selectedGameId: g.id }),
+      };
+    });
+
+    const g = st.selectedGameId ? gamesWithMeta.find(x => x.id === st.selectedGameId) : null;
+    let selectedGame = null;
+    if (g) {
+      const missing = this.missingRequired(g);
+      const c = statusColorFor(g.status);
+      const identityDisplay = [
+        { label: 'Título', value: g.title }, { label: 'Año', value: g.year }, { label: 'Desarrollador', value: g.developer },
+        { label: 'Editor', value: g.publisher }, { label: 'Género', value: g.genre }, { label: 'Jugadores', value: g.players }, { label: 'Formato', value: g.format },
+      ];
+      const fieldTag = (status) => {
+        if (status === 'manual') return { tagLabel: '● MANUAL', tagStyle: 'font-size:10.5px;color:#006600;' };
+        if (status === 'suggested') return { tagLabel: '◔ SUGERIDO', tagStyle: 'font-size:10.5px;color:#005555;' };
+        return { tagLabel: '○ VACÍO', tagStyle: 'font-size:10.5px;color:#888;' };
+      };
+      const previewStyle = (status) => `aspect-ratio:1.3;border:1px inset #C0C0C0;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;background:#000000;`;
+      const mkField = (def) => {
+        const status = g.fields[def.key];
+        const tag = fieldTag(status);
+        return {
+          key: def.key, label: def.label,
+          ...tag,
+          previewStyle: previewStyle(status),
+          placeholderText: status === 'empty' ? `${def.label.toLowerCase()} · ${def.ratio}` : `${def.label.toLowerCase()} · ${def.ratio}\n(preview)`,
+          hasContent: status !== 'empty',
+          primaryBtnLabel: status === 'empty' ? 'Cargar' : 'Reemplazar',
+          primaryBtnStyle: "background:#C0C0C0;color:#000000;border:2px outset #C0C0C0;padding:4px 8px;font-size:11.5px;cursor:pointer;",
+          onLoad: this.loadField(g.id, def.key), onClear: this.clearField(g.id, def.key), onSuggest: this.openSuggest(g.id, def.key, def.label),
+        };
+      };
+      const mkTextField = (def) => {
+        const status = g.fields[def.key];
+        const tag = fieldTag(status);
+        return { key: def.key, label: def.label, ...tag, text: g['_text_' + def.key] || '', onChange: this.onTextChange(g.id, def.key), onSuggest: this.openSuggest(g.id, def.key, def.label) };
+      };
+
+      selectedGame = {
+        title: g.title, year: g.year, systemName: g.sysName,
+        identityLabel: g.identitySource === 'catalog' ? '✓ CATÁLOGO' : '~ DECLARADA A MANO',
+        identityBadgeStyle: g.identitySource === 'catalog' ? 'font-size:11px;padding:3px 9px;background:#000000;color:#55FF55;border:1px solid #006600;' : 'font-size:11px;padding:3px 9px;background:#000000;color:#00AAAA;border:1px solid #005555;',
+        statusStyle: badgeStyle(c) + 'display:inline-block;', statusLabel: statusLabelFor(g.status),
+        completionSummary: g.status === 'error' ? `${g.errors.length} error(es) de formato` : `${missing.length} campo(s) faltante(s)`,
+        missingList: missing, hasFormatErrors: g.errors.length > 0, errors: g.errors,
+        identityDisplay,
+        imageFields: IMAGE_DEFS.map(mkField),
+        videoFields: VIDEO_DEFS.map(mkField),
+        textFields: TEXT_DEFS.map(mkTextField),
+        accentTagLabel: g.accent === 'empty' ? 'sin definir' : (g.accent === 'manual' ? 'cargado' : 'sugerido'),
+        accentTagStyle: 'font-size:12.5px;color:#555;margin-left:auto;',
+        manualsList: (g.manuals || []).map(m => {
+          const key = g.id + '_' + m.id;
+          const progress = st.manualUploads[key] || 0;
+          const processing = m.status === 'unprocessed' && progress > 0;
+          return {
+            id: m.id, fileName: m.fileName,
+            isUnprocessed: m.status === 'unprocessed' && !processing,
+            isProcessing: processing,
+            isDone: m.status === 'processed',
+            progress, progressBarStyle: `height:100%;width:${progress}%;background:#00AAAA;`,
+            pageCount: m.pages, pages: Array.from({ length: m.pages }, (_, i) => ({ i })),
+            onProcess: this.processManual(m.id), onCancel: this.cancelManualUpload(m.id),
+          };
+        }),
+        manualsEmpty: !(g.manuals || []).length,
+        attachButtonLabel: (g.manuals || []).length ? '+ Adjuntar otro PDF' : 'Adjuntar PDF',
+        magazineEmpty: g.magazine === 'empty', magazineLinked: g.magazine === 'linked', magazineBroken: g.magazine === 'broken', magazineName: g.magazineName,
+      };
+      if (g.manual === 'unprocessed' && st.manualUploads[g.id] > 0) { selectedGame.manualUnprocessed = false; selectedGame.manualProcessing = true; }
+    }
+
+    const accentSwatches = ACCENT_PRESETS.map(hex => ({
+      style: `width:22px;height:22px;background:${hex};cursor:pointer;border:2px ${g && g.accentValue === hex ? 'inset' : 'outset'} #C0C0C0;`,
+      onClick: g ? this.setAccent(g.id, hex) : () => {},
+    }));
+
+    const suggest = st.suggest;
+    const suggestCandidates = suggest && suggest.candidates ? suggest.candidates.map(c => ({
+      ...c,
+      cardStyle: 'background:#FFFFFF;border:2px outset #C0C0C0;padding:8px;cursor:pointer;',
+      previewStyle: `aspect-ratio:1.3;border:1px inset #C0C0C0;display:flex;align-items:center;justify-content:center;background:#000000;`,
+      placeholderText: suggest.label.toLowerCase(),
+      onPick: this.pickCandidate(c.id),
+    })) : [];
+    if (suggest && suggest.phase === 'results' && g) {
+      const current = g.fields[suggest.key];
+      if (current !== 'empty') {
+        suggestCandidates.unshift({
+          id: 'own', name: 'Tu archivo actual', source: current === 'manual' ? 'cargado a mano' : 'sugerido antes',
+          cardStyle: 'background:#EFFFEF;border:2px outset #C0C0C0;padding:8px;cursor:pointer;',
+          previewStyle: 'aspect-ratio:1.3;border:1px inset #C0C0C0;display:flex;align-items:center;justify-content:center;background:#000000;',
+          placeholderText: 'default — quedarse con esto',
+          onPick: this.closeSuggest,
+        });
+      }
+    }
+
+    const ms = st.magazineSearch;
+    const magazineCandidates = ms && ms.results ? ms.results.map(m => ({ ...m, onPick: this.pickMagazine(m.name) })) : [];
+
+    const ef = st.exportFlow;
+    const readyCount = gamesWithMeta.filter(x => x.status === 'ready').length;
+    const incompleteCount = gamesWithMeta.filter(x => x.status === 'incomplete').length;
+    const errorCount = gamesWithMeta.filter(x => x.status === 'error').length;
+
+    const navItemStyle = (active) => `padding:5px 8px;font-size:13px;cursor:pointer;color:#000000;${active ? 'background:#00AAAA;font-weight:700;' : ''}`;
+
+    return {
+      isSystemsView: st.view === 'systems', isGamesView: st.view === 'games', isNewGameView: st.view === 'newGame', isGameView: st.view === 'game', isExportView: st.view === 'export',
+      navSystemsStyle: navItemStyle(st.view === 'systems'), navGamesStyle: navItemStyle(st.view === 'games'), navExportStyle: navItemStyle(st.view === 'export'),
+      totalGames: st.games.length, totalSystems: st.systems.length,
+      showBanner: st.showBanner && (this.props.showContractBanner ?? true), dismissBanner: this.dismissBanner,
+      systems, goSystems: this.goSystems, goGames: this.goGames, goExport: this.goExport, openNewSystem: this.openNewSystem, openNewGame: this.openNewGame,
+
+      btnPrimary: BTN_PRIMARY, btnPrimarySmall: BTN_PRIMARY_SMALL, btnGhost: BTN_GHOST, btnGhostSmall: BTN_GHOST_SMALL, btnGhostSmallDanger: BTN_GHOST_SMALL_DANGER,
+
+      searchQuery: st.searchQuery, filterSystem: st.filterSystem, filterStatus: st.filterStatus,
+      onSearchChange: (e) => this.setState({ searchQuery: e.target.value }),
+      onFilterSystemChange: (e) => this.setState({ filterSystem: e.target.value }),
+      onFilterStatusChange: (e) => this.setState({ filterStatus: e.target.value }),
+      gamesFiltered, hasGamesToShow: filtered.length > 0 && st.games.length > 0, hasNoGamesToShow: filtered.length === 0 && st.games.length > 0, isEmptyLibrary: st.games.length === 0,
+
+      newGameStepPick: st.newGame.step === 'pick', newGameStepIdentity: st.newGame.step === 'identity',
+      newGameSystemId: st.newGame.systemId, onNewGameSystemChange: this.onNewGameSystemChange,
+      newGameFilename: st.newGame.filename, onNewGameFilenameChange: this.onNewGameFilenameChange, detectGame: this.detectGame,
+      romModeUpload: st.newGame.romMode === 'upload', romModePath: st.newGame.romMode === 'path', setRomModeUpload: this.setRomModeUpload, setRomModePath: this.setRomModePath,
+      newGameRecognized: st.newGame.recognized, newGameManualIdentity: !st.newGame.recognized,
+      identityFieldDefs: st.newGame.form ? [
+        { label: 'Título', value: st.newGame.form.title, onChange: this.onNewGameFormChange('title'), gridStyle: 'grid-column:span 2;' },
+        { label: 'Año', value: st.newGame.form.year, onChange: this.onNewGameFormChange('year'), gridStyle: '' },
+        { label: 'Desarrollador', value: st.newGame.form.developer, onChange: this.onNewGameFormChange('developer'), gridStyle: '' },
+        { label: 'Editor', value: st.newGame.form.publisher, onChange: this.onNewGameFormChange('publisher'), gridStyle: '' },
+        { label: 'Género', value: st.newGame.form.genre, onChange: this.onNewGameFormChange('genre'), gridStyle: '' },
+        { label: 'Jugadores', value: st.newGame.form.players, onChange: this.onNewGameFormChange('players'), gridStyle: '' },
+        { label: 'Formato', value: st.newGame.form.format, onChange: this.onNewGameFormChange('format'), gridStyle: '' },
+      ] : [],
+      confirmCreateGame: this.confirmCreateGame,
+
+      selectedGame, readyErrorVisible: g ? (this.missingRequired(g).length > 0 && g._readyAttempted) : false, markReady: this.markReady,
+      accentSwatches,
+
+      attachManual: this.attachManual,
+      openMagazineSearch: this.openMagazineSearch, unlinkMagazine: this.unlinkMagazine,
+      hexInputValue: st.hexInputValue, hexInputError: st.hexInputError, onHexInputChange: this.onHexInputChange, addHexAccent: this.addHexAccent, detectAccentFromCover: this.detectAccentFromCover,
+
+      newSystemModalOpen: st.newSystemModalOpen, newSystemName: st.newSystemName, newSystemShort: st.newSystemShort, newSystemCmd: st.newSystemCmd,
+      onNewSystemNameChange: this.onNewSystemNameChange, onNewSystemShortChange: this.onNewSystemShortChange, onNewSystemCmdChange: this.onNewSystemCmdChange,
+      newSystemCmdError: st.newSystemTouched && st.newSystemCmd && !(/^\//.test(st.newSystemCmd) || /^[A-Za-z]:\\/.test(st.newSystemCmd)),
+      newSystemSubmitStyle: BTN_PRIMARY,
+      submitNewSystem: this.submitNewSystem, closeNewSystem: this.closeNewSystem, closeNewSystemBackdrop: this.closeNewSystemBackdrop,
+
+      suggestOpen: !!suggest, suggestFieldLabel: suggest ? suggest.label : '',
+      suggestLoading: suggest && suggest.phase === 'loading', suggestEmpty: suggest && suggest.phase === 'empty',
+      suggestError: suggest && suggest.phase === 'error', suggestResults: suggest && suggest.phase === 'results' && !suggest.pendingPick,
+      suggestConfirmReplace: suggest && !!suggest.pendingPick,
+      suggestCandidates, retrySuggest: this.retrySuggest, closeSuggest: this.closeSuggest, loadManualFromSuggest: this.loadManualFromSuggest,
+      confirmReplace: this.confirmReplace, cancelReplace: this.cancelReplace,
+
+      magazineModalOpen: !!st.magazineSearch, magazineCandidates,
+      magazineSearching: ms && ms.phase === 'searching', magazineResultsReady: ms && ms.phase === 'results', magazineNoResults: ms && ms.phase === 'empty',
+      closeMagazineSearch: this.closeMagazineSearch,
+
+      exportReadyCount: readyCount, exportIncompleteCount: incompleteCount, exportErrorCount: errorCount,
+      exportShowList: ef.stage === 'idle', exportArmando: ef.stage === 'armando', exportVerificando: ef.stage === 'verificando', exportDone: ef.stage === 'done',
+      exportSearchQuery: st.exportSearchQuery, onExportSearchChange: (e) => this.setState({ exportSearchQuery: e.target.value }),
+      exportReadyGamesFiltered: gamesWithMeta.filter(x => x.status === 'ready' && x.title.toLowerCase().includes(st.exportSearchQuery.toLowerCase())).map(rg => ({ title: rg.title, onExport: this.startExport(rg.id) })),
+      exportHasReadyGames: readyCount > 0, exportNoReadyGames: readyCount === 0,
+      exportHasFilteredGames: gamesWithMeta.filter(x => x.status === 'ready' && x.title.toLowerCase().includes(st.exportSearchQuery.toLowerCase())).length > 0,
+      exportNoFilteredGames: readyCount > 0 && gamesWithMeta.filter(x => x.status === 'ready' && x.title.toLowerCase().includes(st.exportSearchQuery.toLowerCase())).length === 0,
+      exportCurrentTitle: ef.currentGameId ? (this.getGame(ef.currentGameId) || {}).title : '',
+      exportResults: ef.results, backToExportList: this.backToExportList,
+
+      stopProp: this.stopProp,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

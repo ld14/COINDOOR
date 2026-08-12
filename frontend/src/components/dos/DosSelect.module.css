@@ -1,0 +1,8 @@
+.select {
+  background: var(--dos-panel-light);
+  border: var(--dos-border-2) inset var(--dos-panel);
+  color: var(--dos-ink);
+  min-height: var(--dos-control-height);
+  padding: var(--dos-space-1) var(--dos-space-3);
+  width: 100%;
+}

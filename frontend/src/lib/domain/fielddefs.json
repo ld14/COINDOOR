@@ -1,0 +1,31 @@
+{
+  "identity": [
+    { "key": "title", "label": "Título", "required": true, "contractField": "game" },
+    { "key": "year", "label": "Año", "required": true, "contractField": "release" },
+    { "key": "developer", "label": "Desarrollador", "required": true, "contractField": "developer" },
+    { "key": "publisher", "label": "Editor", "required": true, "contractField": "publisher" },
+    { "key": "genre", "label": "Género", "required": true, "contractField": "genre" },
+    { "key": "players", "label": "Jugadores", "required": true, "contractField": "players" },
+    { "key": "format", "label": "Formato", "required": true, "contractField": "x-formato" }
+  ],
+  "images": [
+    { "key": "caratula", "label": "Carátula", "ratio": "3:4", "required": true, "contractAsset": "boxFront" },
+    { "key": "marquesina", "label": "Marquesina", "ratio": "4:1", "required": false, "contractAsset": "marquee" },
+    { "key": "poster", "label": "Póster", "ratio": "2:3", "required": true, "contractAsset": "poster" },
+    { "key": "logo", "label": "Logo", "ratio": "16:9", "required": false, "contractAsset": "logo" },
+    { "key": "captura", "label": "Captura de pantalla", "ratio": "16:9", "required": false, "contractAsset": "screenshot" }
+  ],
+  "videos": [
+    { "key": "video", "label": "Video de gameplay", "ratio": "16:9", "required": false, "contractAsset": "video" }
+  ],
+  "texts": [
+    { "key": "sinopsis", "label": "Sinopsis", "required": true, "contractField": "summary" }
+  ],
+  "rich": [
+    { "key": "review", "label": "Reseña", "required": false, "contractField": "review" },
+    { "key": "cheats", "label": "Trucos", "required": false, "contractField": "cheats" },
+    { "key": "accent", "label": "Color de acento primario", "required": true, "contractField": "accent" },
+    { "key": "accent2", "label": "Color de acento secundario", "required": false, "contractField": "accent2" },
+    { "key": "manual", "label": "Manuales", "required": false, "contractField": "manual" }
+  ]
+}

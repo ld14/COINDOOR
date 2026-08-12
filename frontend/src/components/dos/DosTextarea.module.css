@@ -1,0 +1,9 @@
+.textarea {
+  background: var(--dos-panel-light);
+  border: var(--dos-border-2) inset var(--dos-panel);
+  color: var(--dos-ink);
+  min-height: 9var(--dos-border-2);
+  padding: var(--dos-space-3);
+  resize: vertical;
+  width: 100%;
+}

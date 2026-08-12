@@ -1,0 +1,5 @@
+.box {
+  background: var(--dos-panel-light);
+  border: var(--dos-border-2) inset var(--dos-panel);
+  padding: var(--dos-space-5);
+}

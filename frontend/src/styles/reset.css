@@ -1,0 +1,32 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--dos-desktop);
+  color: var(--dos-ink);
+  font-family: var(--dos-font-family);
+  font-size: var(--dos-size-body);
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: var(--dos-focus-outline);
+  outline-offset: 1px;
+}
+
+a {
+  color: inherit;
+}

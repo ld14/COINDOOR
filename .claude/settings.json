@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(rtk ls *)",
+      "Read(//Users/familyhouse/workplace/attract/**)",
+      "Bash(tail -n +26 \"$HOME/Library/Application Support/rtk/tee/1786453321_grep_0_coindoor_stack_html.log\")",
+      "Read(//Users/familyhouse/Library/Application Support/rtk/tee/**)",
+      "Bash(rtk git *)",
+      "Bash(env)",
+      "Bash(gh auth *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Bash(git push:*)",
+      "Bash(rm -rf:*)"
+    ]
+  }
+}

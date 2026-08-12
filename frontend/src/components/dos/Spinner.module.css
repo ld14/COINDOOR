@@ -1,0 +1,13 @@
+.spinner {
+  animation: dos-spin 0.8s steps(8, end) infinite;
+  border: var(--dos-border-2) solid var(--dos-edge-dark);
+  border-top-color: var(--dos-accent);
+  border-radius: 50%;
+  display: inline-block;
+  height: var(--dos-spinner-size);
+  width: var(--dos-spinner-size);
+}
+
+@keyframes dos-spin {
+  to { transform: rotate(360deg); }
+}

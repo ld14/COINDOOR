@@ -1,0 +1,15 @@
+.bar {
+  align-items: center;
+  background: var(--dos-terminal);
+  color: var(--dos-ink-invert);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dos-space-3);
+  min-height: var(--dos-control-height);
+  padding: var(--dos-space-2) var(--dos-space-3);
+}
+
+.key {
+  color: var(--dos-warn-crt);
+  font-weight: 700;
+}

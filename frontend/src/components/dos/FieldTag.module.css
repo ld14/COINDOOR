@@ -1,0 +1,15 @@
+.tag {
+  font-size: var(--dos-size-field-tag);
+}
+
+.manual {
+  color: var(--dos-ok);
+}
+
+.suggested {
+  color: var(--dos-info);
+}
+
+.empty {
+  color: var(--dos-field-empty);
+}

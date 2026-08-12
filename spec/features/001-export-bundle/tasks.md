@@ -1,0 +1,62 @@
+# 001 · Export a bundle — Tareas
+
+## Antes de tocar código
+
+- [ ] Confirmar la versión de contrato que estampa `bundle.json`. Hecho cuando: existe el
+      contrato publicado por ATTRACT ([`ADR-0001`](../../decisions/0001-contrato-coindoor-attract.md))
+      o se acuerda un placeholder explícito hasta que exista.
+- [ ] Acordar con ATTRACT el nombre y la firma de `attract install <bundle>.zip`. No hace
+      falta que esté implementado, sí que el formato no cambie después.
+
+## Implementación
+
+- [ ] `bundle/seleccion.py` — tabla `(campo, obligatorio, disponible, bytes)` + el total.
+      Hecho cuando: lo obligatorio sale de la misma función que decide `ready`, no de una
+      lista escrita aparte.
+- [ ] `bundle/datajson.py` — serializa `accent`, `accent2`, `review`, `cheats` y
+      `manual[]`. Hecho cuando: el `data.json` generado para `goldnaxe` es equivalente al
+      de `library/arcade/media/goldnaxe/data.json` **menos `mags[]`**.
+- [ ] `bundle/staging.py` — árbol temporal con los nombres del contrato, respetando la
+      selección. Hecho cuando: `caratula` sale como `boxFront`, `captura` como
+      `screenshot`, y correrlo dos veces sobre el mismo juego produce árboles idénticos.
+- [ ] `bundle/manifest.py` — `bundle.json` con identidad, artefactos, `incluye[]` y
+      `verificado`. Hecho cuando: un juego con identidad editada sale con
+      `origen: declarada`, y un bundle sin verificar lo declara.
+- [ ] `bundle/verify.py` — `attract doctor` sobre el staging, con degradación si el binario
+      falta. Hecho cuando: en una máquina sin ATTRACT devuelve `no_verificado` y no lanza.
+- [ ] `bundle/pack.py` — `ZIP_STORED`, y limpieza del staging pase lo que pase.
+- [ ] API: `POST /export`, `GET /export/:runId`. Hecho cuando: el polling reporta las tres
+      etapas y el `runId` sobrevive a un refresh de la pantalla.
+- [ ] API: `GET /games/:id/export-options` con los pesos calculados en el servidor.
+- [ ] UI: panel "Qué incluir" — bloque obligatorio bloqueado, opcionales con su peso,
+      vacíos deshabilitados con `—`, y el total en vivo.
+- [ ] UI: pantalla de resultado con el archivo generado, su peso y qué lleva adentro.
+
+## Tests
+
+- [ ] `goldnaxe` completo → bundle con `bundle.json`, `media/`, `_synopsis.json` y
+      `juego/`. Es el caso de referencia.
+- [ ] Romset de MAME → `tratamiento: copiar`. Carpeta de MS-DOS → `descomprimir`.
+      **Sin este test los dos `.zip` se tratan igual y el juego de DOS no arranca.**
+- [ ] `incluir video = no` → ni el archivo ni la referencia en `data.json`.
+- [ ] `incluir juego = no` → `artefactos: []` y el `.zip` sin la carpeta `juego/`.
+- [ ] **Intentar deseleccionar un obligatorio → rechazado**, tanto en la UI como en la API.
+      Un `POST /export` que omita la carátula no puede generar bundle: sin este test, un
+      cliente viejo o una llamada directa producen bundles no-listos.
+- [ ] Un juego con revista vinculada → el `data.json` del bundle **no tiene `mags[]`**.
+- [ ] Un campo opcional vacío → llega como `disponible: false` y no se puede marcar.
+- [ ] Identidad editada → `origen: declarada`. Sin editar y con catálogo → `mame`.
+- [ ] `review: null` se escribe como `null`; una `cats` parcial no se completa con ceros.
+- [ ] `cheats` con un grupo de nombre inventado sobrevive el viaje con su nombre.
+- [ ] `doctor` con error → **no se genera el `.zip`** y el staging queda limpio.
+- [ ] Sin `attract` en el `PATH` → el `.zip` se genera y el resultado dice `no verificado`.
+- [ ] Export interrumpido a la mitad → no queda staging huérfano.
+- [ ] Dos exports seguidos sin editar → bundles equivalentes.
+
+## Cierre
+
+- [ ] Validar contra todos los criterios de aceptación de `spec.md`.
+- [ ] Instalar un bundle a mano en una librería real —desarmando el `.zip` con las reglas
+      de `bundle.json`— y ver el juego en el gabinete. Es la única prueba de que el formato
+      sirve antes de que `attract install` exista.
+- [ ] Actualizar `roadmap.md`.

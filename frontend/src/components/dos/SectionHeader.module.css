@@ -1,0 +1,9 @@
+.header {
+  background: var(--dos-titlebar);
+  color: var(--dos-ink-invert);
+  font-size: var(--dos-size-section);
+  font-weight: 700;
+  margin-bottom: var(--dos-space-3);
+  padding: var(--dos-space-titlebar-y) var(--dos-space-3);
+  width: 100%;
+}
