@@ -1,0 +1,43 @@
+from __future__ import annotations
+
+import json
+from collections.abc import Mapping
+from functools import lru_cache
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parents[3]
+FIELDDEFS_PATH = ROOT / "frontend" / "src" / "lib" / "domain" / "fielddefs.json"
+
+
+@lru_cache(maxsize=1)
+def _load() -> Mapping[str, Any]:
+    with FIELDDEFS_PATH.open(encoding="utf-8") as file:
+        value = json.load(file)
+    if not isinstance(value, Mapping):
+        raise TypeError("fielddefs.json must contain an object")
+    return value
+
+
+def _keys(section: str) -> frozenset[str]:
+    return frozenset(str(field["key"]) for field in _load()[section])
+
+
+def identity_keys() -> frozenset[str]:
+    return _keys("identity")
+
+
+def image_keys() -> frozenset[str]:
+    return _keys("images")
+
+
+def video_keys() -> frozenset[str]:
+    return _keys("videos")
+
+
+def text_keys() -> frozenset[str]:
+    return _keys("texts")
+
+
+def rich_keys() -> frozenset[str]:
+    return _keys("rich")

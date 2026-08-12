@@ -5,7 +5,8 @@ from pathlib import Path
 
 from backend.api.errors import NotFound
 from backend.api.schemas import CreateGame, GameOut, PatchGame, StoredGame
-from backend.store.archivo import escribir_json, leer_json
+from backend.lib.domain.fielddefs import image_keys, text_keys, video_keys
+from backend.store.archivo import escribir_json, leer_json, safe_id
 
 
 class GamesStore:
@@ -33,7 +34,7 @@ class GamesStore:
 
     def create(self, payload: CreateGame) -> StoredGame:
         game = StoredGame(
-            id=_safe_id(payload.identity.title),
+            id=safe_id(payload.identity.title),
             systemId=payload.systemId,
             identity=payload.identity,
             romSource=payload.romSource,
@@ -61,11 +62,11 @@ class GamesStore:
     def delete_field(self, game_id: str, key: str) -> StoredGame:
         game = self.get(game_id)
         data = game.model_dump()
-        if key in data["images"]:
+        if key in image_keys():
             data["images"][key] = {"status": "empty"}
-        elif key in data["video"]:
+        elif key in video_keys():
             data["video"][key] = {"status": "empty"}
-        elif key in data["texts"]:
+        elif key in text_keys():
             data["texts"][key] = {"status": "empty", "value": ""}
         elif key == "accent":
             data["accent"] = "empty"
@@ -81,9 +82,22 @@ class GamesStore:
     def set_text_field(self, game_id: str, key: str, value: str) -> StoredGame:
         game = self.get(game_id)
         data = game.model_dump()
-        if key not in data["texts"]:
+        if key not in text_keys():
             raise NotFound(f"Campo no encontrado: {key}")
         data["texts"][key] = {"status": "manual", "value": value}
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def set_media_field(self, game_id: str, key: str, url: str) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        if key in image_keys():
+            data["images"][key] = {"status": "manual", "url": url}
+        elif key in video_keys():
+            data["video"][key] = {"status": "manual", "url": url}
+        else:
+            raise NotFound(f"Campo no encontrado: {key}")
         updated = StoredGame.model_validate(data)
         self.save(updated)
         return updated
@@ -96,13 +110,7 @@ class GamesStore:
         return lock
 
     def _path(self, game: StoredGame) -> Path:
-        return self.root / _safe_id(game.systemId) / _safe_id(game.id) / "game.json"
-
-
-def _safe_id(value: str) -> str:
-    cleaned = "".join(char.lower() if char.isalnum() else "-" for char in value.strip())
-    cleaned = "-".join(part for part in cleaned.split("-") if part)
-    return cleaned or "juego"
+        return self.root / safe_id(game.systemId) / safe_id(game.id) / "game.json"
 
 
 def to_out(game: StoredGame) -> GameOut:

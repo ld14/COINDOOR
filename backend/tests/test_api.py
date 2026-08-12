@@ -85,3 +85,60 @@ def test_docs_and_openapi_exist(tmp_path: Path) -> None:
     api = client(tmp_path)
     assert api.get("/api/docs").status_code == 200
     assert api.get("/api/openapi.json").status_code == 200
+
+
+def _create_arcade_game(api: TestClient) -> str:
+    api.post("/api/systems", json={"name": "Arcade", "shortName": "arcade", "launchCmd": "/usr/local/bin/mame"})  # noqa: E501
+    created = api.post(
+        "/api/games",
+        json={
+            "systemId": "arcade",
+            "romSource": "path",
+            "romRef": "/roms/goldnaxe.zip",
+            "identity": {
+                "title": "Golden Axe", "year": "1989", "developer": "Sega",
+                "publisher": "Sega", "genre": "Beat em up", "players": "2",
+                "format": "Arcade",
+            },
+        },
+    ).json()
+    return str(created["id"])
+
+
+def test_media_upload_sets_field_and_serves_file(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+
+    response = api.put(
+        f"/api/games/{game_id}/media/caratula",
+        files={"file": ("boxfront.jpg", b"\xff\xd8\xff\xe0fake-jpeg-bytes", "image/jpeg")},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["images"]["caratula"]["status"] == "manual"
+    url = body["images"]["caratula"]["url"]
+    assert url.endswith("/media/arcade/golden-axe/caratula.jpg")
+
+    served = api.get(url)
+    assert served.status_code == 200
+    assert served.content == b"\xff\xd8\xff\xe0fake-jpeg-bytes"
+
+
+def test_media_upload_rejects_unknown_key(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    response = api.put(
+        f"/api/games/{game_id}/media/sinopsis",
+        files={"file": ("x.jpg", b"data", "image/jpeg")},
+    )
+    assert response.status_code == 422
+
+
+def test_media_upload_rejects_empty_file(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    response = api.put(
+        f"/api/games/{game_id}/media/caratula",
+        files={"file": ("x.jpg", b"", "image/jpeg")},
+    )
+    assert response.status_code == 422

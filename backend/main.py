@@ -11,6 +11,7 @@ from backend.api.errors import install_error_handlers
 from backend.api.fields import router as fields_router
 from backend.api.games import router as games_router
 from backend.api.jobs import router as jobs_router
+from backend.api.media import router as media_router
 from backend.api.systems import router as systems_router
 from backend.config import Settings, ensure_data_dirs, get_settings
 from backend.store.cuotas import QuotasStore
@@ -32,6 +33,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(systems_router)
     app.include_router(games_router)
     app.include_router(fields_router)
+    app.include_router(media_router)
     app.include_router(jobs_router)
     app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")
 
