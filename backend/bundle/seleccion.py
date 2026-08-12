@@ -8,6 +8,7 @@ from typing import Any
 
 from backend.config import Settings
 from backend.lib.domain import fielddefs
+from backend.store.archivo import media_path
 
 Medir = Callable[[Settings, Mapping[str, Any], str], tuple[bool, int]]
 
@@ -65,9 +66,9 @@ def _medir_media(section: str) -> Medir:
         if not isinstance(field, Mapping) or field.get("status") == "empty":
             return False, 0
         url = field.get("url")
-        if not isinstance(url, str) or not url.startswith("/media/"):
+        path = media_path(settings.media_dir, url) if isinstance(url, str) else None
+        if path is None:
             return True, 0
-        path = settings.media_dir / Path(url[len("/media/") :])
         return True, _path_size(path)
 
     return probe

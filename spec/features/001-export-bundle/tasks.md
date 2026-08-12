@@ -37,9 +37,12 @@
       dependencia de `../attract` en tiempo de test) — coincide exacto, menos `mags[]`.
       `manual[].pages` deriva nombres `pNNN.png` por convención de ATTRACT (mismo hueco
       de rasterizado pendiente que ya marca `seleccion.py`).
-- [ ] `bundle/staging.py` — árbol temporal con los nombres del contrato, respetando la
-      selección. Hecho cuando: `caratula` sale como `boxFront`, `captura` como
-      `screenshot`, y correrlo dos veces sobre el mismo juego produce árboles idénticos.
+- [x] `bundle/staging.py` — árbol temporal con los nombres del contrato, respetando la
+      selección. `caratula`→`boxFront`, `captura`→`screenshot` vía `contractAsset` de
+      `fielddefs.json`. Dos corridas producen árboles equivalentes (test con
+      `filecmp.dircmp`). `manual` se descarta siempre de `incluir` antes de armar
+      `data.json` — mismo hueco de rasterizado marcado en `seleccion.py`/`datajson.py`,
+      acá con la consecuencia real: nunca miente sobre páginas que el zip no trae.
 - [ ] `bundle/manifest.py` — `bundle.json` con identidad, artefactos, `incluye[]` y
       `verificado`. Hecho cuando: un juego con identidad editada sale con
       `origen: declarada`, y un bundle sin verificar lo declara.

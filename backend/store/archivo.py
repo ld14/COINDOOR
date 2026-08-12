@@ -39,6 +39,13 @@ def safe_id(value: str) -> str:
     return cleaned or "juego"
 
 
+def media_path(media_dir: Path, url: str) -> Path | None:
+    prefix = "/media/"
+    if not url.startswith(prefix):
+        return None
+    return media_dir / Path(url[len(prefix) :])
+
+
 def escribir_binario(path: Path, data: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
