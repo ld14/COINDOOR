@@ -12,13 +12,15 @@
       "Read(//Users/familyhouse/Library/Application Support/rtk/tee/**)",
       "Bash(rtk git *)",
       "Bash(env)",
-      "Bash(gh auth *)"
+      "Bash(gh auth *)",
+      "Bash(git commit -m ' *)",
+      "Bash(rtk gh *)",
+      "Bash(git push *)"
     ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./secrets/**)",
-      "Bash(git push:*)",
       "Bash(rm -rf:*)"
     ]
   }
