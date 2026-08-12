@@ -4,7 +4,7 @@ export const FIELDDEFS = fielddefs;
 
 export type FieldStatus = 'empty' | 'manual' | 'suggested';
 export type GameStatus = 'ready' | 'incomplete' | 'error';
-export type IdentitySource = 'catalog' | 'manual';
+export type IdentitySource = 'mame' | 'screenscraper' | 'manual';
 export type MagazineLink = 'empty' | 'linked';
 export type ManualStatus = 'unprocessed' | 'processing' | 'processed' | 'failed';
 export type RomSource = 'upload' | 'path';

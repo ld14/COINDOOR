@@ -8,7 +8,7 @@ from backend.lib.domain.completeness import compute_game_status
 
 FieldStatus = Literal["empty", "manual", "suggested"]
 GameStatus = Literal["ready", "incomplete", "error"]
-IdentitySource = Literal["catalog", "manual"]
+IdentitySource = Literal["mame", "screenscraper", "manual"]
 MagazineLink = Literal["empty", "linked"]
 ManualStatus = Literal["unprocessed", "processing", "processed", "failed"]
 RomSource = Literal["upload", "path"]
