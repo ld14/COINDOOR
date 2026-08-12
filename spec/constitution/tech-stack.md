@@ -362,12 +362,14 @@ resumen accionable:
 | `texts.resena` / `texts.trucos` como texto | Estructuras `ReviewField` / `CheatsField` (delta D1) |
 | `fieldDefs.ts` | `fielddefs.json` ([`ADR-0011`](../decisions/0011-fielddefs-json-compartido.md)) |
 
-**Sin decidir todavía**, y hace falta antes de la feature 001:
+**Ya no bloquea**, resuelto para arrancar la feature 001 (detalle en
+[`001/spec.md`](../features/001-export-bundle/spec.md#decisiones-resueltas-antes-de-implementar)):
 
-- **`identitySource` tiene dos valores y la realidad tiene tres.** `types.ts` dice
+- **`identitySource` tenía dos valores y la realidad tiene tres.** `types.ts` decía
   `'catalog' | 'manual'`; [`ADR-0004`](../decisions/0004-coindoor-fuente-identidad-no-mame.md)
-  reconoce MAME, ScreenScraper por hash y declarada; el bundle usa `'mame' | 'declarada'`.
-  Una identidad resuelta por hash es `catalog` en la UI pero **tiene que exportarse como
-  `declarada`**, porque `install` solo sabe consultar MAME. Falta escribir ese mapeo.
+  reconoce MAME, ScreenScraper por hash y declarada. Pasa a
+  `'mame' | 'screenscraper' | 'manual'`. Mapeo al exportar: `mame` → `mame`;
+  `screenscraper` y `manual` → `declarada`, porque `install` solo sabe consultar MAME.
 - **`players` es `string` en la UI y número en el bundle.** Valores como `"1-2"` o
-  `"2 alternados"` no son enteros: hay que decidir qué se escribe en `x-formato`.
+  `"2 alternados"` no son enteros. Mismo criterio que ATTRACT (`CONVENCION.md` Nota 1):
+  si no parsea limpio, se escribe `1`.

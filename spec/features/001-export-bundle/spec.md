@@ -1,6 +1,6 @@
 # 001 · Export a bundle instalable
 
-**Estado:** borrador
+**Estado:** aprobada
 
 ## Qué hace
 
@@ -37,9 +37,10 @@ de cargar un juego quedaría encerrado en una instalación.
 - [ ] Dado un romset de MAME, su `tratamiento` es `copiar`; dada una carpeta de MS-DOS,
       es `descomprimir`. **Los dos son `.zip` y por la extensión no se distinguen.**
 - [ ] **El bundle nunca lleva `mags[]`**, esté o no vinculada una revista.
-- [ ] Dado un juego cuya identidad no fue editada y cuyo sistema tiene catálogo,
+- [ ] Dado un juego cuya identidad no fue editada y su `identitySource` es `mame`,
       `identidad.origen` es `mame`. Si el usuario editó **cualquier** campo de identidad,
-      es `declarada`.
+      o si `identitySource` es `screenscraper` o `manual`, `identidad.origen` es
+      `declarada` — `attract install` solo sabe consultar MAME.
 - [ ] El `data.json` del bundle es JSON válido y conforme al contrato: `accent` y
       `accent2` presentes, `review` con `score` y `cats` parciales o `null`, `cheats` con
       sus grupos, `manual[]` con sus páginas.
@@ -51,6 +52,27 @@ de cargar un juego quedaría encerrado en una instalación.
 - [ ] Exportar dos veces el mismo juego sin editarlo produce un bundle equivalente.
 - [ ] Si el árbol preparado no pasa `doctor`, **no se genera el `.zip`**: fallo explícito,
       nunca un bundle a medias.
+
+## Decisiones resueltas antes de implementar
+
+Los cuatro puntos que bloqueaban el arranque (ver `tech-stack.md` §Contradicciones
+abiertas y `roadmap.md` §Bloqueado), ya resueltos:
+
+- **`contrato` en `bundle.json`** — placeholder `"1"` hasta que ATTRACT publique su
+  propia versión ([`ADR-0001`](../../decisions/0001-contrato-coindoor-attract.md)). No
+  se encontró ningún campo de versión en `../attract` a la fecha de esta decisión.
+- **Firma de `attract install`** — `attract install <bundle>.zip`, un solo argumento
+  posicional. Confirmado como provisional: el comando no existe todavía en
+  `attract/src/attract/cli.py`, pero el formato no debería cambiar cuando se implemente.
+- **`IdentitySource` pasa de 2 a 3 valores** — `'mame' | 'screenscraper' | 'manual'` en
+  `types.ts` (hoy solo `'catalog' | 'manual'`). Sigue a
+  [`ADR-0004`](../../decisions/0004-coindoor-fuente-identidad-no-mame.md), que ya define
+  tres orígenes reales y exige que se vean distintos en pantalla. Mapeo a
+  `identidad.origen`: `mame` → `mame`; `screenscraper` y `manual` → `declarada`, porque
+  `attract install` solo sabe consultar MAME.
+- **`players` no entero** (`"1-2"`, `"2 alternados"`) — mismo criterio que ATTRACT
+  (`CONVENCION.md` Nota 1): si no parsea a entero limpio, se escribe `1`. ATTRACT ya
+  acepta esa imprecisión sin distinguir "no sé" de "es de 1 de verdad".
 
 ## Fuera de alcance
 

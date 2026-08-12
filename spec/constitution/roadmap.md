@@ -49,11 +49,11 @@ demás.
 1. **Credenciales y cuotas de ScreenScraper y MobyGames**, verificadas contra su
    documentación actual. Bloquea la feature 002, no el arranque.
 2. **Elegir el modelo de IA** y escribir `sinopsis.v1.md`. Bloquea la feature 002.
-3. **Resolver dos huecos del contrato** antes de la feature 001: el mapeo de
-   `identitySource` a `identidad.origen`, y qué se escribe en `players` cuando el valor no
-   es un entero. Ver `tech-stack.md` §Contradicciones abiertas.
 
-**Ya no bloquea:** el stack. La Fase 1 puede arrancar.
+**Ya no bloquea:** el stack. **Ni los dos huecos del contrato** que bloqueaban la
+feature 001 (mapeo de `identitySource` a `identidad.origen`, y `players` no entero) —
+resueltos, ver [`001/spec.md`](../features/001-export-bundle/spec.md#decisiones-resueltas-antes-de-implementar).
+La feature 001 puede arrancar.
 
 ## Siguiente 🔜
 

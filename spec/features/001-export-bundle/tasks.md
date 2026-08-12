@@ -2,14 +2,22 @@
 
 ## Antes de tocar código
 
-- [ ] Confirmar la versión de contrato que estampa `bundle.json`. Hecho cuando: existe el
-      contrato publicado por ATTRACT ([`ADR-0001`](../../decisions/0001-contrato-coindoor-attract.md))
-      o se acuerda un placeholder explícito hasta que exista.
-- [ ] Acordar con ATTRACT el nombre y la firma de `attract install <bundle>.zip`. No hace
-      falta que esté implementado, sí que el formato no cambie después.
+- [x] Confirmar la versión de contrato que estampa `bundle.json`. Placeholder `"1"` hasta
+      que ATTRACT publique el suyo — ver spec.md §Decisiones resueltas.
+- [x] Acordar con ATTRACT el nombre y la firma de `attract install <bundle>.zip`.
+      Confirmado como provisional: `attract install <bundle>.zip`, un solo argumento
+      posicional.
+- [x] Resolver el mapeo `identitySource` → `identidad.origen` (bloqueaba en
+      `roadmap.md`). `IdentitySource` pasa a `'mame' | 'screenscraper' | 'manual'`.
+- [x] Resolver qué se escribe en `players` cuando no es un entero limpio (bloqueaba en
+      `roadmap.md`). Mismo criterio que ATTRACT: default `1`.
 
 ## Implementación
 
+- [ ] `frontend/src/lib/domain/types.ts` — ampliar `IdentitySource` a
+      `'mame' | 'screenscraper' | 'manual'`. Revisar todo lugar que hoy asuma
+      `'catalog' | 'manual'` (UI de identidad, `fielddefs.json` si aplica) antes de tocar
+      el bundle: es el tipo que `bundle/manifest.py` va a leer.
 - [ ] `bundle/seleccion.py` — tabla `(campo, obligatorio, disponible, bytes)` + el total.
       Hecho cuando: lo obligatorio sale de la misma función que decide `ready`, no de una
       lista escrita aparte.
