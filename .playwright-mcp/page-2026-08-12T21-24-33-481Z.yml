@@ -1,0 +1,630 @@
+- table [ref=f15e2]:
+  - rowgroup [ref=f15e3]:
+    - row [ref=f15e4]:
+      - cell [ref=f15e5]
+      - cell [ref=f15e7]:
+        - table [ref=f15e8]:
+          - rowgroup [ref=f15e9]:
+            - row [ref=f15e10]:
+              - cell [ref=f15e11]:
+                - table [ref=f15e13]:
+                  - rowgroup [ref=f15e14]:
+                    - row [ref=f15e15]:
+                      - cell "HOME" [ref=f15e16] [cursor=pointer]
+                      - cell "FORUM" [ref=f15e18] [cursor=pointer]
+                      - cell "DISCORD" [ref=f15e20] [cursor=pointer]
+                      - cell "SOCIAL" [ref=f15e22] [cursor=pointer]
+                      - cell "SUPPORT US" [ref=f15e24] [cursor=pointer]
+                      - cell [ref=f15e26]
+                      - cell "RECALBOX" [ref=f15e27] [cursor=pointer]
+                      - cell "SKRAPER" [ref=f15e29] [cursor=pointer]
+                - table [ref=f15e32]:
+                  - rowgroup [ref=f15e33]:
+                    - row [ref=f15e34]:
+                      - cell [ref=f15e35]:
+                        - table [ref=f15e36]:
+                          - rowgroup [ref=f15e37]:
+                            - row [ref=f15e38]:
+                              - cell [ref=f15e39]:
+                                - link [ref=f15e40] [cursor=pointer]:
+                                  - /url: index.php
+                              - cell [ref=f15e42]:
+                                - link [ref=f15e43] [cursor=pointer]:
+                                  - /url: index.php
+                              - cell [ref=f15e45]:
+                                - link [ref=f15e46] [cursor=pointer]:
+                                  - /url: index.php
+                            - row [ref=f15e48]:
+                              - cell [ref=f15e49]
+                            - row
+                            - row [ref=f15e51]:
+                              - cell [ref=f15e52]:
+                                - table [ref=f15e54]:
+                                  - rowgroup [ref=f15e55]:
+                                    - row [ref=f15e56]:
+                                      - cell "Language :" [ref=f15e57]
+                                      - cell [ref=f15e58]:
+                                        - link [ref=f15e59] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=de
+                                          - img "Allemand" [ref=f15e60]
+                                      - cell [ref=f15e61]:
+                                        - link [ref=f15e62] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=en
+                                          - img "Anglais" [ref=f15e63]
+                                      - cell [ref=f15e64]:
+                                        - link [ref=f15e65] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=es
+                                          - img "Espagnol" [ref=f15e66]
+                                      - cell [ref=f15e67]:
+                                        - link [ref=f15e68] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=fr
+                                          - img "Français" [ref=f15e69]
+                                      - cell [ref=f15e70]:
+                                        - link [ref=f15e71] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=it
+                                          - img "Italien" [ref=f15e72]
+                                      - cell [ref=f15e73]:
+                                        - link [ref=f15e74] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=pt
+                                          - img "Portugais" [ref=f15e75]
+                                    - row [ref=f15e76]:
+                                      - cell "Translate W.I.P." [ref=f15e77]
+                                      - cell "98%" [ref=f15e78]
+                                      - cell "71%" [ref=f15e79]
+                                      - cell "92%" [ref=f15e80]
+                                      - cell [ref=f15e81]
+                                      - cell "77%" [ref=f15e82]
+                                      - cell "94%" [ref=f15e83]
+                                    - row [ref=f15e84]:
+                                      - cell "Preferred region :" [ref=f15e85]
+                                      - cell [ref=f15e86]:
+                                        - link [ref=f15e87] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=fr&gameid=0&plateforme=0
+                                          - img "France" [ref=f15e88]
+                                      - cell [ref=f15e89]:
+                                        - link [ref=f15e90] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=eu&gameid=0&plateforme=0
+                                          - img "Europe" [ref=f15e91]
+                                      - cell [ref=f15e92]:
+                                        - link [ref=f15e93] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=us&gameid=0&plateforme=0
+                                          - img "USA" [ref=f15e94]
+                                      - cell [ref=f15e95]:
+                                        - link [ref=f15e96] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=jp&gameid=0&plateforme=0
+                                          - img "Japan" [ref=f15e97]
+                            - row
+                      - cell [ref=f15e98]:
+                        - table [ref=f15e99]:
+                          - rowgroup [ref=f15e100]:
+                            - row [ref=f15e101]:
+                              - cell "Community" [ref=f15e102]
+                              - cell [ref=f15e103]
+                              - cell "API" [ref=f15e105]
+                              - cell [ref=f15e106]
+                              - cell "Infrastructure" [ref=f15e108]
+                            - row [ref=f15e109]:
+                              - cell [ref=f15e110]
+                            - row [ref=f15e112]:
+                              - cell [ref=f15e113]:
+                                - table [ref=f15e115]:
+                                  - rowgroup [ref=f15e116]:
+                                    - row [ref=f15e117]:
+                                      - cell "Members :" [ref=f15e118]
+                                      - cell "939.107" [ref=f15e119]
+                                    - row [ref=f15e120]:
+                                      - cell "Admins :" [ref=f15e121]
+                                      - cell "12" [ref=f15e122]
+                                    - row [ref=f15e123]:
+                                      - cell "Last Update :" [ref=f15e124]
+                                      - cell "26-08-12" [ref=f15e125]
+                                    - row [ref=f15e126]:
+                                      - cell "Last Comment :" [ref=f15e127]
+                                      - cell "26-08-12" [ref=f15e128]
+                                    - row [ref=f15e129]:
+                                      - cell "Yesterday's API Access :" [ref=f15e130]
+                                      - cell "44.030.232" [ref=f15e131]
+                                    - row [ref=f15e132]:
+                                      - cell "Today's API Access :" [ref=f15e133]
+                                      - cell "32.727.269" [ref=f15e134]
+                              - cell [ref=f15e135]
+                              - cell [ref=f15e136]:
+                                - table [ref=f15e138]:
+                                  - rowgroup [ref=f15e139]:
+                                    - row [ref=f15e140]:
+                                      - cell "threads /min. :" [ref=f15e141]
+                                      - cell "3892" [ref=f15e142]
+                                    - row [ref=f15e143]:
+                                      - cell "threads open :" [ref=f15e144]
+                                      - cell "197 / 4096" [ref=f15e145]
+                                    - row [ref=f15e146]:
+                                      - cell "guest threads open :" [ref=f15e147]
+                                      - cell "50 / 256" [ref=f15e148]
+                                    - row [ref=f15e149]:
+                                      - cell [ref=f15e150]
+                                    - row [ref=f15e152]:
+                                      - cell "scrapers :" [ref=f15e153]
+                                      - cell "472" [ref=f15e154]
+                                    - row [ref=f15e155]:
+                                      - cell "guest scrapers :" [ref=f15e156]
+                                      - cell "135" [ref=f15e157]
+                                    - row [ref=f15e158]:
+                                      - cell [ref=f15e159]
+                                    - row [ref=f15e161]:
+                                      - cell "guests :" [ref=f15e162]
+                                      - cell [ref=f15e163]
+                                    - row [ref=f15e165]:
+                                      - cell "registered :" [ref=f15e166]
+                                      - cell [ref=f15e167]
+                                    - row [ref=f15e169]:
+                                      - cell "contributors :" [ref=f15e170]
+                                      - cell [ref=f15e171]
+                              - cell [ref=f15e173]
+                              - cell [ref=f15e174]:
+                                - table [ref=f15e175]:
+                                  - rowgroup [ref=f15e176]:
+                                    - row [ref=f15e177]:
+                                      - cell "Servers :" [ref=f15e178]
+                                      - cell "CPU 1" [ref=f15e179]
+                                      - cell "CPU 2" [ref=f15e180]
+                                      - cell "CPU 3" [ref=f15e181]
+                                    - row [ref=f15e182]:
+                                      - cell "CPU Usage :" [ref=f15e183]
+                                      - cell "8%" [ref=f15e184]
+                                      - cell "39%" [ref=f15e185]
+                                      - cell "33%" [ref=f15e186]
+                                    - row:
+                                      - cell
+                                    - row [ref=f15e187]:
+                                      - cell "API calls /min. :" [ref=f15e188]
+                                      - cell "62" [ref=f15e189]
+                                      - cell "2904" [ref=f15e190]
+                                      - cell "699" [ref=f15e191]
+                                    - row [ref=f15e192]:
+                                      - cell "Average processing time" [ref=f15e193]
+                                    - row [ref=f15e194]:
+                                      - cell "Game Info OK :" [ref=f15e195]
+                                      - cell "1.28s" [ref=f15e196]
+                                      - cell [ref=f15e197]
+                                      - cell "1.55s" [ref=f15e198]
+                                    - row [ref=f15e199]:
+                                      - cell "Game Info KO :" [ref=f15e200]
+                                      - cell "0.47s" [ref=f15e201]
+                                      - cell [ref=f15e202]
+                                      - cell "0.96s" [ref=f15e203]
+                                    - row [ref=f15e204]:
+                                      - cell "Game Search :" [ref=f15e205]
+                                      - cell "1.25s" [ref=f15e206]
+                                      - cell [ref=f15e207]
+                                      - cell "1.44s" [ref=f15e208]
+                                    - row [ref=f15e209]:
+                                      - cell "Game Media :" [ref=f15e210]
+                                      - cell [ref=f15e211]
+                                      - cell "0.15s" [ref=f15e212]
+                                      - cell "0.34s" [ref=f15e213]
+                                    - row [ref=f15e214]:
+                                      - cell "Game Video :" [ref=f15e215]
+                                      - cell [ref=f15e216]
+                                      - cell "0.19s" [ref=f15e217]
+                                      - cell [ref=f15e218]
+                      - cell [ref=f15e219]:
+                        - table [ref=f15e220]:
+                          - rowgroup [ref=f15e221]:
+                            - row [ref=f15e222]:
+                              - cell [ref=f15e223]
+                            - row
+                            - row [ref=f15e224]:
+                              - cell "User/Email :" [ref=f15e225]
+                              - cell [ref=f15e226]:
+                                - textbox [ref=f15e227]
+                            - row [ref=f15e228]:
+                              - cell "Password :" [ref=f15e229]
+                              - cell [ref=f15e230]:
+                                - textbox [ref=f15e231]
+                            - row [ref=f15e232]:
+                              - cell [ref=f15e233]:
+                                - link "Register" [ref=f15e234] [cursor=pointer]:
+                                  - /url: membreinscription.php
+                                - button "login" [ref=f15e235]
+                        - table [ref=f15e236]:
+                          - rowgroup [ref=f15e237]:
+                            - row [ref=f15e238]:
+                              - cell "Forgot your password? Enter your email address" [ref=f15e239]
+                            - row [ref=f15e240]:
+                              - cell [ref=f15e241]:
+                                - textbox [ref=f15e242]
+                              - cell [ref=f15e243]:
+                                - button "send" [ref=f15e244]
+                - generic [ref=f15e245]:
+                  - table [ref=f15e246]:
+                    - rowgroup [ref=f15e247]:
+                      - row [ref=f15e248]:
+                        - cell "PLATFORMS" [ref=f15e249] [cursor=pointer]
+                        - cell "GAMES" [ref=f15e251] [cursor=pointer]
+                        - cell "ROMS" [ref=f15e253] [cursor=pointer]
+                        - cell "COMPANIES" [ref=f15e255] [cursor=pointer]
+                        - cell "GROUPS" [ref=f15e256] [cursor=pointer]
+                  - table
+                - table [ref=f15e258]:
+                  - rowgroup [ref=f15e259]:
+                    - row [ref=f15e260]:
+                      - cell [ref=f15e261]:
+                        - link [ref=f15e262] [cursor=pointer]:
+                          - /url: /?i=1&action=openclosezoneclose&zone=helpzone#zoneopenclosehelpzone
+                      - cell "Help us out!" [ref=f15e264]
+                - generic [ref=f15e265]:
+                  - table [ref=f15e267]:
+                    - rowgroup [ref=f15e268]:
+                      - row [ref=f15e269]:
+                        - cell [ref=f15e270]:
+                          - text: Help us to cover development costs for ScreenScraper!
+                          - table [ref=f15e271]:
+                            - rowgroup [ref=f15e272]:
+                              - row [ref=f15e273]:
+                                - cell [ref=f15e274]:
+                                  - table [ref=f15e275]:
+                                    - rowgroup [ref=f15e276]:
+                                      - row [ref=f15e277]:
+                                        - cell [ref=f15e278]
+                                        - 'cell "1 Euro: Thank you!" [ref=f15e280]'
+                                      - row [ref=f15e281]:
+                                        - cell "For $1 a month, you're supporting the existence and development of ScreenScraper, and we can't thank you enough! 50.000 scrape requests maximum per day Give us your ScreenScraper username to receive the \"Bronze Financial Contributor\" award, which can be seen on the Member page!" [ref=f15e282]
+                                - cell [ref=f15e283]:
+                                  - table [ref=f15e284]:
+                                    - rowgroup [ref=f15e285]:
+                                      - row [ref=f15e286]:
+                                        - cell [ref=f15e287]
+                                        - 'cell "2 euros: Thank you so much!" [ref=f15e289]'
+                                      - row [ref=f15e290]:
+                                        - cell "For $2 a month, you're supporting the existence and development of ScreenScraper, and we can't thank you enough! 50.000 scrape requests maximum per day Give us your ScreenScraper username to receive the \"Silver Financial Contributor\" award, which can be seen on the Member page!" [ref=f15e291]
+                                - cell [ref=f15e292]:
+                                  - table [ref=f15e293]:
+                                    - rowgroup [ref=f15e294]:
+                                      - row [ref=f15e295]:
+                                        - cell [ref=f15e296]
+                                        - 'cell "5 euros: 1 extra thread!" [ref=f15e298]'
+                                      - row [ref=f15e299]:
+                                        - cell "For $5, get 1 extra thread for faster scraping, in addition to giving your support to the improvement of ScreenScraper. We can't thank you enough! 100.000 scrape requests maximum per day Give us your ScreenScraper username to receive the \"Gold Financial Contributor\" award, which can be seen on the Member page!" [ref=f15e300]
+                                - cell [ref=f15e301]:
+                                  - table [ref=f15e302]:
+                                    - rowgroup [ref=f15e303]:
+                                      - row [ref=f15e304]:
+                                        - cell [ref=f15e305]
+                                        - 'cell "10 euros: 5 extra threads!" [ref=f15e307]'
+                                      - row [ref=f15e308]:
+                                        - cell "For $10, get 5 extra threads for scraping nearly 5 times faster, and give your support to the improvement of ScreenScraper! We can't thank you enough! 100.000 scrape requests maximum per day Give us your ScreenScraper username to receive the \"Carbon Financial Contributor\" award, which can be seen on the Member page!" [ref=f15e309]
+                                - cell [ref=f15e310]:
+                                  - table [ref=f15e311]:
+                                    - rowgroup [ref=f15e312]:
+                                      - row [ref=f15e313]:
+                                        - cell [ref=f15e314]:
+                                          - text: A huge THANK YOU to...
+                                          - table [ref=f15e316]:
+                                            - rowgroup [ref=f15e317]:
+                                              - row [ref=f15e318]:
+                                                - cell [ref=f15e319]
+                                                - cell "Reihar" [ref=f15e321]
+                                              - row [ref=f15e322]:
+                                                - cell [ref=f15e323]
+                                                - cell "nico713" [ref=f15e325]
+                                              - row [ref=f15e326]:
+                                                - cell [ref=f15e327]
+                                                - cell "OKAMIaniki" [ref=f15e329]
+                                              - row [ref=f15e330]:
+                                                - cell [ref=f15e331]
+                                                - cell "qwark" [ref=f15e333]
+                                              - row [ref=f15e334]:
+                                                - cell [ref=f15e335]
+                                                - cell "pwnedbygary" [ref=f15e337]
+                                              - row [ref=f15e338]:
+                                                - cell [ref=f15e339]
+                                                - cell "Mtech" [ref=f15e341]
+                                              - row [ref=f15e342]:
+                                                - cell [ref=f15e343]
+                                                - cell "SteamingChuck" [ref=f15e345]
+                                              - row [ref=f15e346]:
+                                                - cell [ref=f15e347]
+                                                - cell "pdi192" [ref=f15e349]
+                                              - row [ref=f15e350]:
+                                                - cell [ref=f15e351]
+                                                - cell "iangray71uk" [ref=f15e353]
+                                              - row [ref=f15e354]:
+                                                - cell [ref=f15e355]
+                                                - cell "cerberii" [ref=f15e357]
+                                              - row [ref=f15e358]:
+                                                - cell [ref=f15e359]
+                                                - cell "julioloera" [ref=f15e361]
+                                              - row [ref=f15e362]:
+                                                - cell [ref=f15e363]
+                                                - cell "DEMONAZOZ" [ref=f15e365]
+                                              - row [ref=f15e366]:
+                                                - cell [ref=f15e367]
+                                                - cell "Xeowulf" [ref=f15e369]
+                                              - row [ref=f15e370]:
+                                                - cell [ref=f15e371]
+                                                - cell "shauncasey86" [ref=f15e373]
+                                              - row [ref=f15e374]:
+                                                - cell [ref=f15e375]
+                                                - cell "4ourty2" [ref=f15e377]
+                                              - row [ref=f15e378]:
+                                                - cell [ref=f15e379]
+                                                - cell "bryankan20" [ref=f15e381]
+                                              - row [ref=f15e382]:
+                                                - cell [ref=f15e383]
+                                                - cell "CRAZYEmil" [ref=f15e385]
+                                              - row [ref=f15e386]:
+                                                - cell [ref=f15e387]
+                                                - cell "ogwam" [ref=f15e389]
+                                              - row [ref=f15e390]:
+                                                - cell [ref=f15e391]
+                                                - cell "zirbs04" [ref=f15e393]
+                                              - row [ref=f15e394]:
+                                                - cell [ref=f15e395]
+                                                - cell "Jam555s" [ref=f15e397]
+                                              - row [ref=f15e398]:
+                                                - cell [ref=f15e399]
+                                                - cell "hillyhil" [ref=f15e401]
+                                              - row [ref=f15e402]:
+                                                - cell [ref=f15e403]
+                                                - cell "julesstiev" [ref=f15e405]
+                                              - row [ref=f15e406]:
+                                                - cell [ref=f15e407]
+                                                - cell "cteets3" [ref=f15e409]
+                                              - row [ref=f15e410]:
+                                                - cell [ref=f15e411]
+                                                - cell "mrmcmuffinz" [ref=f15e413]
+                                              - row [ref=f15e414]:
+                                                - cell [ref=f15e415]
+                                                - cell "jackmorts123" [ref=f15e417]
+                          - table [ref=f15e418]:
+                            - rowgroup [ref=f15e419]:
+                              - row [ref=f15e420]:
+                                - 'cell "To make sure everything goes smoothly, follow these steps... 1. Create your screenscraper account 2. Make your donation on one of the donation platforms 3. Log in to the ScreenScraper website and then go to your ScreenScraper member account page (click on your username at the top of the page). You can then link your Patreon or Tipeee account to your ScreenScraper account. 4. If after 24 hours your account has not been updated, contact us on our discord and follow the instructions available on the pinned topics of the #support room." [ref=f15e421]'
+                          - table [ref=f15e422]:
+                            - rowgroup [ref=f15e423]:
+                              - row [ref=f15e424]:
+                                - cell "Fund ScreenScraper on..." [ref=f15e425]
+                                - cell [ref=f15e426]
+                                - cell [ref=f15e428]:
+                                  - link [ref=f15e429] [cursor=pointer]:
+                                    - /url: https://www.tipeee.com/screenscraper
+                                - cell [ref=f15e431]
+                                - cell [ref=f15e433]:
+                                  - link [ref=f15e434] [cursor=pointer]:
+                                    - /url: https://www.patreon.com/screenscraper
+                                - cell [ref=f15e436]
+                  - table [ref=f15e438]:
+                    - rowgroup [ref=f15e439]:
+                      - row [ref=f15e440]:
+                        - cell [ref=f15e441]
+                        - cell "Are you bilingual? Translate game descriptions! Are you a platform specialist? Check the accuracy of ScreenScraper's data or associate orphaned ROMs to a game! Are you a graphic designer? Create the logos of missing games, and reproduce, touch up, or create box art! Are you a collector? Scan your box cover or cartridge labels! Are you a gamer? Capture video for a game that doesn't have any! We need all the help we can get to complete ScreenScraper's database and media. Together, we can do it! So if you want your frontend to be as beautiful and as complete as possible, register now" [ref=f15e443]:
+                          - text: Are you bilingual? Translate game descriptions! Are you a platform specialist? Check the accuracy of ScreenScraper's data or associate orphaned ROMs to a game! Are you a graphic designer? Create the logos of missing games, and reproduce, touch up, or create box art! Are you a collector? Scan your box cover or cartridge labels! Are you a gamer? Capture video for a game that doesn't have any! We need all the help we can get to complete ScreenScraper's database and media.
+                          - generic [ref=f15e444]: Together, we can do it!
+                          - text: So if you want your frontend to be as beautiful and as complete as possible,
+                          - link "register" [ref=f15e445] [cursor=pointer]:
+                            - /url: membreinscription.php
+                          - text: now
+                  - generic [ref=f15e446]: Recently added platform media
+                  - table [ref=f15e448]:
+                    - rowgroup [ref=f15e449]:
+                      - row [ref=f15e450]:
+                        - cell [ref=f15e451]:
+                          - table [ref=f15e452]:
+                            - rowgroup [ref=f15e453]:
+                              - row [ref=f15e454]:
+                                - cell "02 August 2026 - 3 Contributions" [ref=f15e455]
+                      - row [ref=f15e458]:
+                        - cell "Date Member Validated by" [ref=f15e459]: DateMemberValidated by
+                        - cell "Platform" [ref=f15e460]
+                        - cell "Type" [ref=f15e461]
+                        - cell "Media" [ref=f15e462]
+                        - cell [ref=f15e463]
+                        - cell "Date Member Validated by" [ref=f15e464]: DateMemberValidated by
+                        - cell "Platform" [ref=f15e465]
+                        - cell "Type Country" [ref=f15e466]: TypeCountry
+                        - cell "Media" [ref=f15e467]
+                      - row [ref=f15e468]:
+                        - cell [ref=f15e469]:
+                          - text: 26-08-02 08:49
+                          - generic [ref=f15e470]:
+                            - img "Almighty God - Financial contributor" [ref=f15e471]
+                            - link "marblemad" [ref=f15e472] [cursor=pointer]:
+                              - /url: membreinfos.php?membreid=1
+                          - text: marblemad
+                        - cell [ref=f15e473]:
+                          - table [ref=f15e474]:
+                            - rowgroup [ref=f15e475]:
+                              - row [ref=f15e476]:
+                                - cell [ref=f15e477]
+                                - cell [ref=f15e479]:
+                                  - link [ref=f15e480] [cursor=pointer]:
+                                    - /url: systemeinfos.php?plateforme=253
+                                    - img "FM Towns" [ref=f15e481]
+                        - cell "3D Blank Box Japan" [ref=f15e482]
+                        - cell [ref=f15e484]
+                        - cell [ref=f15e486]
+                        - cell [ref=f15e487]:
+                          - text: 26-08-02 08:45
+                          - generic [ref=f15e488]:
+                            - img "Almighty God - Financial contributor" [ref=f15e489]
+                            - link "marblemad" [ref=f15e490] [cursor=pointer]:
+                              - /url: membreinfos.php?membreid=1
+                          - text: marblemad
+                        - cell [ref=f15e491]:
+                          - table [ref=f15e492]:
+                            - rowgroup [ref=f15e493]:
+                              - row [ref=f15e494]:
+                                - cell [ref=f15e495]
+                                - cell [ref=f15e497]:
+                                  - link [ref=f15e498] [cursor=pointer]:
+                                    - /url: systemeinfos.php?plateforme=253
+                                    - img "FM Towns" [ref=f15e499]
+                        - cell "Blank Edge Japan" [ref=f15e500]
+                        - cell [ref=f15e502]
+                      - row [ref=f15e504]:
+                        - cell [ref=f15e505]:
+                          - text: 26-08-02 08:41
+                          - generic [ref=f15e506]:
+                            - img "Almighty God - Financial contributor" [ref=f15e507]
+                            - link "marblemad" [ref=f15e508] [cursor=pointer]:
+                              - /url: membreinfos.php?membreid=1
+                          - text: marblemad
+                        - cell [ref=f15e509]:
+                          - table [ref=f15e510]:
+                            - rowgroup [ref=f15e511]:
+                              - row [ref=f15e512]:
+                                - cell [ref=f15e513]
+                                - cell [ref=f15e515]:
+                                  - link [ref=f15e516] [cursor=pointer]:
+                                    - /url: systemeinfos.php?plateforme=253
+                                    - img "FM Towns" [ref=f15e517]
+                        - cell "Case Template Japan" [ref=f15e518]
+                        - cell [ref=f15e520]
+                        - cell [ref=f15e522]
+                      - row [ref=f15e523]:
+                        - cell [ref=f15e524]:
+                          - table [ref=f15e525]:
+                            - rowgroup [ref=f15e526]:
+                              - row [ref=f15e527]:
+                                - cell "09 July 2026 - 8 Contributions" [ref=f15e528]
+                      - row [ref=f15e531]:
+                        - cell "Date Member Validated by" [ref=f15e532]: DateMemberValidated by
+                        - cell "Platform" [ref=f15e533]
+                        - cell "Type" [ref=f15e534]
+                        - cell "Media" [ref=f15e535]
+                        - cell [ref=f15e536]
+                        - cell "Date Member Validated by" [ref=f15e537]: DateMemberValidated by
+                        - cell "Platform" [ref=f15e538]
+                        - cell "Type Country" [ref=f15e539]: TypeCountry
+                        - cell "Media" [ref=f15e540]
+                      - row [ref=f15e541]:
+                        - cell [ref=f15e542]:
+                          - text: 26-07-09 18:45
+                          - generic [ref=f15e543]:
+                            - img "Great Guru Graphic Designer Contributor" [ref=f15e544]
+                            - link "mikael42" [ref=f15e545] [cursor=pointer]:
+                              - /url: membreinfos.php?membreid=33743
+                          - text: zwabiksoki
+                        - cell [ref=f15e546]:
+                          - table [ref=f15e547]:
+                            - rowgroup [ref=f15e548]:
+                              - row [ref=f15e549]:
+                                - cell [ref=f15e550]
+                                - cell [ref=f15e552]:
+                                  - link [ref=f15e553] [cursor=pointer]:
+                                    - /url: systemeinfos.php?plateforme=3
+                                    - img "NES" [ref=f15e554]
+                        - cell "Illustration Asia" [ref=f15e555]
+                        - cell [ref=f15e557]
+                      - row [ref=f15e559]:
+                        - cell [ref=f15e560]:
+                          - text: 26-07-09 18:43
+                          - generic [ref=f15e561]:
+                            - img "Great Guru Graphic Designer Contributor" [ref=f15e562]
+                            - link "mikael42" [ref=f15e563] [cursor=pointer]:
+                              - /url: membreinfos.php?membreid=33743
+                          - text: zwabiksoki
+                        - cell [ref=f15e564]:
+                          - table [ref=f15e565]:
+                            - rowgroup [ref=f15e566]:
+                              - row [ref=f15e567]:
+                                - cell [ref=f15e568]
+                                - cell [ref=f15e570]:
+                                  - link [ref=f15e571] [cursor=pointer]:
+                                    - /url: systemeinfos.php?plateforme=106
+                                    - img "Family Computer Disk System" [ref=f15e572]
+                        - cell "Illustration Japan" [ref=f15e573]
+                        - cell [ref=f15e575]
+                        - cell [ref=f15e577]
+                        - cell [ref=f15e578]:
+                          - text: 26-07-09 13:14
+                          - generic [ref=f15e579]:
+                            - img "Almighty God - Financial contributor" [ref=f15e580]
+                            - link "marblemad" [ref=f15e581] [cursor=pointer]:
+                              - /url: membreinfos.php?membreid=1
+                          - text: marblemad
+                        - cell [ref=f15e582]:
+                          - table [ref=f15e583]:
+                            - rowgroup [ref=f15e584]:
+                              - row [ref=f15e585]:
+                                - cell [ref=f15e586]
+                                - cell [ref=f15e588]:
+                                  - link [ref=f15e589] [cursor=pointer]:
+                                    - /url: systemeinfos.php?plateforme=323
+                                    - img "M5" [ref=f15e590]
+                        - cell "Blank HD Logo Custom" [ref=f15e591]
+                        - cell [ref=f15e593]
+            - row [ref=f15e595]:
+              - cell [ref=f15e596]:
+                - generic [ref=f15e597]:
+                  - table [ref=f15e598]:
+                    - rowgroup [ref=f15e599]:
+                      - row [ref=f15e600]:
+                        - cell [ref=f15e601]:
+                          - iframe
+                          - iframe
+                          - link [ref=f15e602] [cursor=pointer]:
+                            - /url: http://creativecommons.org/licenses/by-nc-sa/4.0/
+                            - img "Licence Creative Commons" [ref=f15e603]
+                        - cell [ref=f15e604]:
+                          - text: licensed under the terms of
+                          - link "Creative Commons" [ref=f15e605] [cursor=pointer]:
+                            - /url: http://creativecommons.org/licenses/by-nc-sa/4.0/
+                          - text: Attribution-NonCommercial-ShareAlike 4.0 International
+                  - table [ref=f15e606]:
+                    - rowgroup [ref=f15e607]:
+                      - row [ref=f15e608]:
+                        - cell [ref=f15e609]:
+                          - text: "General credits : Hereafter, sources 'Creative Commons' of information and media providers. Infos : Community ScreenScraper."
+                          - link "Wikipedia" [ref=f15e610] [cursor=pointer]:
+                            - /url: https://fr.wikipedia.org
+                          - text: .
+                          - link "Gamefaqs" [ref=f15e611] [cursor=pointer]:
+                            - /url: http://www.gamefaqs.com/
+                          - text: .
+                          - link "jeuxvideo" [ref=f15e612] [cursor=pointer]:
+                            - /url: http://www.jeuxvideo.com/
+                          - text: .
+                          - link "gametronik" [ref=f15e613] [cursor=pointer]:
+                            - /url: http://www.gametronik.com/
+                          - text: .
+                          - link "gametdb" [ref=f15e614] [cursor=pointer]:
+                            - /url: http://www.gametdb.com/
+                          - text: .
+                          - link "mobygames" [ref=f15e615] [cursor=pointer]:
+                            - /url: http://www.mobygames.com/
+                          - text: ". Boxes Texture : Community ScreenScraper . Community"
+                          - link "The Cover Project" [ref=f15e616] [cursor=pointer]:
+                            - /url: http://www.thecoverproject.net/
+                          - text: . Community
+                          - link "gbatemp" [ref=f15e617] [cursor=pointer]:
+                            - /url: https://gbatemp.net
+                          - text: . Community
+                          - link "Hyperspin" [ref=f15e618] [cursor=pointer]:
+                            - /url: http://www.hyperspin-fe.com/
+                          - text: .
+                          - link "Southtown-Homebrew" [ref=f15e619] [cursor=pointer]:
+                            - /url: http://southtown-homebrew.com/
+                          - text: ". 2D / 3D Boxes : Community ScreenScraper . Community"
+                          - link "Hyperspin" [ref=f15e620] [cursor=pointer]:
+                            - /url: http://www.hyperspin-fe.com/
+                          - text: . Community
+                          - link "Emumovies" [ref=f15e621] [cursor=pointer]:
+                            - /url: http://emumovies.com/forums/page/portal
+                          - text: .
+                          - link "gametdb" [ref=f15e622] [cursor=pointer]:
+                            - /url: http://www.gametdb.com/
+                          - text: .
+                          - link "flyers.arcade-museum.com" [ref=f15e623] [cursor=pointer]:
+                            - /url: http://flyers.arcade-museum.com
+                          - text: ". videos : Community ScreenScraper . Community"
+                          - link "Emumovies" [ref=f15e624] [cursor=pointer]:
+                            - /url: http://emumovies.com/forums/page/portal
+                          - text: "Screenshots / Marquees : ScreenScraper ."
+                          - link "Progetto Snaps" [ref=f15e625] [cursor=pointer]:
+                            - /url: http://www.progettosnaps.net/marquees/
+                          - text: .
+                          - link "musee des jeux video" [ref=f15e626] [cursor=pointer]:
+                            - /url: https://www.musee-des-jeux-video.com/fr
+                          - text: .
+      - cell [ref=f15e627]

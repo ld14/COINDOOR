@@ -1,0 +1,1166 @@
+- table [ref=f27e2]:
+  - rowgroup [ref=f27e3]:
+    - row [ref=f27e4]:
+      - cell [ref=f27e5]
+      - cell [ref=f27e7]:
+        - table [ref=f27e8]:
+          - rowgroup [ref=f27e9]:
+            - row [ref=f27e10]:
+              - cell [ref=f27e11]:
+                - table [ref=f27e13]:
+                  - rowgroup [ref=f27e14]:
+                    - row [ref=f27e15]:
+                      - cell "ACCUEIL" [ref=f27e16] [cursor=pointer]
+                      - cell "FORUM" [ref=f27e18] [cursor=pointer]
+                      - cell "DISCORD" [ref=f27e20] [cursor=pointer]
+                      - cell "R.SOCIAUX" [ref=f27e22] [cursor=pointer]
+                      - cell "SOUTENEZ-NOUS" [ref=f27e24] [cursor=pointer]
+                      - cell [ref=f27e26]
+                      - cell "RECALBOX" [ref=f27e27] [cursor=pointer]
+                      - cell "SKRAPER" [ref=f27e29] [cursor=pointer]
+                - table [ref=f27e32]:
+                  - rowgroup [ref=f27e33]:
+                    - row [ref=f27e34]:
+                      - cell [ref=f27e35]:
+                        - table [ref=f27e36]:
+                          - rowgroup [ref=f27e37]:
+                            - row [ref=f27e38]:
+                              - cell [ref=f27e39]:
+                                - link [ref=f27e40] [cursor=pointer]:
+                                  - /url: index.php
+                              - cell [ref=f27e42]:
+                                - link [ref=f27e43] [cursor=pointer]:
+                                  - /url: index.php
+                              - cell [ref=f27e45]:
+                                - link [ref=f27e46] [cursor=pointer]:
+                                  - /url: index.php
+                            - row [ref=f27e48]:
+                              - cell [ref=f27e49]
+                            - row
+                            - row [ref=f27e51]:
+                              - cell [ref=f27e52]:
+                                - table [ref=f27e54]:
+                                  - rowgroup [ref=f27e55]:
+                                    - row [ref=f27e56]:
+                                      - cell "Langue :" [ref=f27e57]
+                                      - cell [ref=f27e58]:
+                                        - link [ref=f27e59] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=de
+                                          - img "Allemand" [ref=f27e60]
+                                      - cell [ref=f27e61]:
+                                        - link [ref=f27e62] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=en
+                                          - img "Anglais" [ref=f27e63]
+                                      - cell [ref=f27e64]:
+                                        - link [ref=f27e65] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=es
+                                          - img "Espagnol" [ref=f27e66]
+                                      - cell [ref=f27e67]:
+                                        - link [ref=f27e68] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=fr
+                                          - img "Français" [ref=f27e69]
+                                      - cell [ref=f27e70]:
+                                        - link [ref=f27e71] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=it
+                                          - img "Italien" [ref=f27e72]
+                                      - cell [ref=f27e73]:
+                                        - link [ref=f27e74] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=pt
+                                          - img "Portugais" [ref=f27e75]
+                                    - row [ref=f27e76]:
+                                      - cell "Translate W.I.P." [ref=f27e77]
+                                      - cell "98%" [ref=f27e78]
+                                      - cell "71%" [ref=f27e79]
+                                      - cell "92%" [ref=f27e80]
+                                      - cell [ref=f27e81]
+                                      - cell "77%" [ref=f27e82]
+                                      - cell "94%" [ref=f27e83]
+                                    - row [ref=f27e84]:
+                                      - cell "Région préférée :" [ref=f27e85]
+                                      - cell [ref=f27e86]:
+                                        - link [ref=f27e87] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=fr&gameid=0&plateforme=0
+                                          - img "France" [ref=f27e88]
+                                      - cell [ref=f27e89]:
+                                        - link [ref=f27e90] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=eu&gameid=0&plateforme=0
+                                          - img "Europe" [ref=f27e91]
+                                      - cell [ref=f27e92]:
+                                        - link [ref=f27e93] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=us&gameid=0&plateforme=0
+                                          - img "USA" [ref=f27e94]
+                                      - cell [ref=f27e95]:
+                                        - link [ref=f27e96] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=jp&gameid=0&plateforme=0
+                                          - img "Japon" [ref=f27e97]
+                            - row
+                      - cell [ref=f27e98]:
+                        - table [ref=f27e99]:
+                          - rowgroup [ref=f27e100]:
+                            - row [ref=f27e101]:
+                              - cell "Communauté" [ref=f27e102]
+                              - cell [ref=f27e103]
+                              - cell "API" [ref=f27e105]
+                              - cell [ref=f27e106]
+                              - cell "Infrastructure" [ref=f27e108]
+                            - row [ref=f27e109]:
+                              - cell [ref=f27e110]
+                            - row [ref=f27e112]:
+                              - cell [ref=f27e113]:
+                                - table [ref=f27e115]:
+                                  - rowgroup [ref=f27e116]:
+                                    - row [ref=f27e117]:
+                                      - cell "Membres :" [ref=f27e118]
+                                      - cell "939.107" [ref=f27e119]
+                                    - row [ref=f27e120]:
+                                      - cell "Admins :" [ref=f27e121]
+                                      - cell "12" [ref=f27e122]
+                                    - row [ref=f27e123]:
+                                      - cell "Dernière Mise a Jour :" [ref=f27e124]
+                                      - cell "12/08/26" [ref=f27e125]
+                                    - row [ref=f27e126]:
+                                      - cell "Dernier commentaire :" [ref=f27e127]
+                                      - cell "12/08/26" [ref=f27e128]
+                                    - row [ref=f27e129]:
+                                      - cell "Accés API Hier :" [ref=f27e130]
+                                      - cell "44.030.232" [ref=f27e131]
+                                    - row [ref=f27e132]:
+                                      - cell "Accés API aujourd'hui :" [ref=f27e133]
+                                      - cell "32.838.370" [ref=f27e134]
+                              - cell [ref=f27e135]
+                              - cell [ref=f27e136]:
+                                - table [ref=f27e138]:
+                                  - rowgroup [ref=f27e139]:
+                                    - row [ref=f27e140]:
+                                      - cell "nb. threads / min. :" [ref=f27e141]
+                                      - cell "3914" [ref=f27e142]
+                                    - row [ref=f27e143]:
+                                      - cell "nb. threads ouvert :" [ref=f27e144]
+                                      - cell "189 / 4096" [ref=f27e145]
+                                    - row [ref=f27e146]:
+                                      - cell "nb. threads ouv. n.i. :" [ref=f27e147]
+                                      - cell "40 / 256" [ref=f27e148]
+                                    - row [ref=f27e149]:
+                                      - cell [ref=f27e150]
+                                    - row [ref=f27e152]:
+                                      - cell "nb. scrapeurs :" [ref=f27e153]
+                                      - cell "475" [ref=f27e154]
+                                    - row [ref=f27e155]:
+                                      - cell "nb. non inscrits :" [ref=f27e156]
+                                      - cell "138" [ref=f27e157]
+                                    - row [ref=f27e158]:
+                                      - cell [ref=f27e159]
+                                    - row [ref=f27e161]:
+                                      - cell "non inscrits :" [ref=f27e162]
+                                      - cell [ref=f27e163]
+                                    - row [ref=f27e165]:
+                                      - cell "inscrits :" [ref=f27e166]
+                                      - cell [ref=f27e167]
+                                    - row [ref=f27e169]:
+                                      - cell "contributeurs :" [ref=f27e170]
+                                      - cell [ref=f27e171]
+                              - cell [ref=f27e173]
+                              - cell [ref=f27e174]:
+                                - table [ref=f27e175]:
+                                  - rowgroup [ref=f27e176]:
+                                    - row [ref=f27e177]:
+                                      - cell "Serveurs :" [ref=f27e178]
+                                      - cell "CPU 1" [ref=f27e179]
+                                      - cell "CPU 2" [ref=f27e180]
+                                      - cell "CPU 3" [ref=f27e181]
+                                    - row [ref=f27e182]:
+                                      - cell "Occupation CPU :" [ref=f27e183]
+                                      - cell "9%" [ref=f27e184]
+                                      - cell "33%" [ref=f27e185]
+                                      - cell "25%" [ref=f27e186]
+                                    - row:
+                                      - cell
+                                    - row [ref=f27e187]:
+                                      - cell "Nb accés API/Min. :" [ref=f27e188]
+                                      - cell "80" [ref=f27e189]
+                                      - cell "3029" [ref=f27e190]
+                                      - cell "801" [ref=f27e191]
+                                    - row [ref=f27e192]:
+                                      - cell "Temps moyen traitement" [ref=f27e193]
+                                    - row [ref=f27e194]:
+                                      - cell "jeuInfo OK :" [ref=f27e195]
+                                      - cell "1.23s" [ref=f27e196]
+                                      - cell [ref=f27e197]
+                                      - cell "1.60s" [ref=f27e198]
+                                    - row [ref=f27e199]:
+                                      - cell "jeuInfo KO :" [ref=f27e200]
+                                      - cell "0.50s" [ref=f27e201]
+                                      - cell [ref=f27e202]
+                                      - cell "0.93s" [ref=f27e203]
+                                    - row [ref=f27e204]:
+                                      - cell "jeuRecherche :" [ref=f27e205]
+                                      - cell "0.52s" [ref=f27e206]
+                                      - cell [ref=f27e207]
+                                      - cell "1.15s" [ref=f27e208]
+                                    - row [ref=f27e209]:
+                                      - cell "mediaJeu :" [ref=f27e210]
+                                      - cell [ref=f27e211]
+                                      - cell "0.14s" [ref=f27e212]
+                                      - cell "0.38s" [ref=f27e213]
+                                    - row [ref=f27e214]:
+                                      - cell "mediaVideoJeu :" [ref=f27e215]
+                                      - cell [ref=f27e216]
+                                      - cell "0.18s" [ref=f27e217]
+                                      - cell [ref=f27e218]
+                      - cell [ref=f27e219]:
+                        - table [ref=f27e220]:
+                          - rowgroup [ref=f27e221]:
+                            - row [ref=f27e222]:
+                              - cell [ref=f27e223]:
+                                - text: "Membre :"
+                                - link "mataderos14" [ref=f27e224] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=29271437
+                            - row [ref=f27e225]:
+                              - 'cell "Membre (1) 1 Threads Propositions en attente : 0 / 5 Propositions média en attente : 0 / 5 Nb Scrape Aujourd''hui : 0 / 20000 Nb Scrape KO Aujourd''hui : 0 / 2000 0 Message. 0 Commentaire(s) non clos / 2" [ref=f27e226]'
+                            - row [ref=f27e227]:
+                              - cell [ref=f27e228]:
+                                - button "deconnexion" [ref=f27e229]
+                - generic [ref=f27e230]:
+                  - table [ref=f27e231]:
+                    - rowgroup [ref=f27e232]:
+                      - row [ref=f27e233]:
+                        - cell "SYSTEMES" [ref=f27e234] [cursor=pointer]
+                        - cell "JEUX" [ref=f27e236] [cursor=pointer]
+                        - cell "ROMS" [ref=f27e238] [cursor=pointer]
+                        - cell "P2K" [ref=f27e240] [cursor=pointer]
+                        - cell "DERNIERS AJOUTS ..." [ref=f27e241]
+                        - cell [ref=f27e242] [cursor=pointer]:
+                          - table [ref=f27e243]:
+                            - rowgroup [ref=f27e244]:
+                              - row [ref=f27e245]:
+                                - cell "...ROMS" [ref=f27e246]
+                        - cell "...JEUX" [ref=f27e247] [cursor=pointer]
+                        - cell [ref=f27e248]
+                        - cell "COMPAGNIES" [ref=f27e249] [cursor=pointer]
+                        - cell "GROUPES" [ref=f27e250] [cursor=pointer]
+                        - cell "CHANTIERS" [ref=f27e251] [cursor=pointer]
+                        - cell "WEBAPI" [ref=f27e252]
+                        - cell [ref=f27e253] [cursor=pointer]:
+                          - img "French Only" [ref=f27e254]
+                          - text: v2
+                  - table [ref=f27e255]:
+                    - rowgroup [ref=f27e256]:
+                      - row [ref=f27e257]:
+                        - cell "COMMUNAUTE" [ref=f27e258]
+                        - cell [ref=f27e259] [cursor=pointer]:
+                          - table [ref=f27e260]:
+                            - rowgroup [ref=f27e261]:
+                              - row [ref=f27e262]:
+                                - cell "COMMENTAIRES" [ref=f27e263]
+                                - cell [ref=f27e264]
+                                - cell
+                        - cell "NOTES" [ref=f27e265] [cursor=pointer]
+                        - cell "FORUM" [ref=f27e266] [cursor=pointer]
+                        - cell "F.A.Q." [ref=f27e267] [cursor=pointer]
+                        - cell [ref=f27e268] [cursor=pointer]:
+                          - img "French Only" [ref=f27e269]
+                          - text: LIENS
+                - table [ref=f27e271]:
+                  - rowgroup [ref=f27e272]:
+                    - row [ref=f27e273]:
+                      - cell "Rechercher un jeu :" [ref=f27e274]
+                      - 'cell "Système : Tous les systèmes" [ref=f27e275]':
+                        - text: "Système :"
+                        - combobox [ref=f27e276]:
+                          - option "Tous les systèmes" [selected]
+                          - option "3DO"
+                          - option "Aamber Pegasus"
+                          - option "Acclaim"
+                          - option "Action Max"
+                          - option "Adam"
+                          - option "Adventure Vision"
+                          - option "Alice"
+                          - option "Alpha Denshi Co."
+                          - option "Amcoe"
+                          - option "American Laser Games"
+                          - option "Amiga"
+                          - option "Amiga (AGA)"
+                          - option "Amiga CD"
+                          - option "Amiga CD32"
+                          - option "Amiga CD32 (hack)"
+                          - option "Amiga CDTV"
+                          - option "Android"
+                          - option "Apple II"
+                          - option "Apple IIGS"
+                          - option "Arcadia 2001"
+                          - option "Archimedes"
+                          - option "Arduboy"
+                          - option "Astrocade"
+                          - option "Atari 2600"
+                          - option "Atari 2600 Supercharger"
+                          - option "Atari 5200"
+                          - option "Atari 7800"
+                          - option "Atari 8bit"
+                          - option "Atari Classics"
+                          - option "Atari ST"
+                          - option "Atlus"
+                          - option "Atom"
+                          - option "Atomiswave"
+                          - option "Banpresto"
+                          - option "BBC Micro"
+                          - option "BK"
+                          - option "Camputers Lynx"
+                          - option "Capcom Classics"
+                          - option "Capcom Play System"
+                          - option "Capcom Play System 2"
+                          - option "Capcom Play System 3"
+                          - option "Cassette Vision"
+                          - option "Cave"
+                          - option "CD-i"
+                          - option "Century Electronics"
+                          - option "Channel F"
+                          - option "Cinematronics"
+                          - option "Coleco"
+                          - option "Colecovision"
+                          - option "Comad"
+                          - option "Commodore 64"
+                          - option "CoreGrafX"
+                          - option "CPC"
+                          - option "CreatiVision"
+                          - option "Daphne"
+                          - option "Data East Classics"
+                          - option "Dragon 32/64"
+                          - option "Dreamcast"
+                          - option "Dynax"
+                          - option "EasyRPG"
+                          - option "EG2000 Colour Genie"
+                          - option "Eighting / Raizing"
+                          - option "Electron"
+                          - option "Exidy"
+                          - option "EXL 100"
+                          - option "Family Computer Disk System"
+                          - option "Flipper"
+                          - option "FM Towns"
+                          - option "FM-7"
+                          - option "Future Pinball"
+                          - option "Gaelco"
+                          - option "Gamate"
+                          - option "Game & Watch"
+                          - option "Game Boy"
+                          - option "Game Boy Advance"
+                          - option "Game Boy Color"
+                          - option "Game Gear"
+                          - option "Game Master"
+                          - option "Game Pocket Computer"
+                          - option "Game.com"
+                          - option "Gamecube"
+                          - option "GBA e-Reader"
+                          - option "Gottlieb"
+                          - option "GP32"
+                          - option "GX4000"
+                          - option "Hikaru"
+                          - option "IGS"
+                          - option "Incredible Technologies"
+                          - option "Intellivision"
+                          - option "Irem Classics"
+                          - option "J2ME"
+                          - option "Jaguar"
+                          - option "Jaguar CD"
+                          - option "Jaleco"
+                          - option "Jupiter Ace"
+                          - option "Kaneko"
+                          - option "Konami Classics"
+                          - option "Linux"
+                          - option "Loopy"
+                          - option "LowRes NX"
+                          - option "Lutro"
+                          - option "Lynx"
+                          - option "M5"
+                          - option "Mac OS"
+                          - option "Mame"
+                          - option "Master System"
+                          - option "Mega Duck"
+                          - option "Mega-CD"
+                          - option "Mega-Play"
+                          - option "Mega-Tech"
+                          - option "Megadrive"
+                          - option "Megadrive - Sonic The Hedgehog 2 Hacks"
+                          - option "Megadrive 32X"
+                          - option "MGT SAM Coupé"
+                          - option "Midway Classics"
+                          - option "Mikrosha"
+                          - option "Mitchell"
+                          - option "Model 2"
+                          - option "Model 3"
+                          - option "MSU-MD"
+                          - option "MSX"
+                          - option "MSX Turbo R"
+                          - option "MSX2"
+                          - option "MSX2+"
+                          - option "My Vision"
+                          - option "N-Gage"
+                          - option "Namco Classics"
+                          - option "Namco System 22"
+                          - option "Naomi"
+                          - option "Naomi 2"
+                          - option "Naomi GD-ROM"
+                          - option "NEC PC-8801"
+                          - option "NEC PC-9801"
+                          - option "Neo-Geo"
+                          - option "Neo-Geo CD"
+                          - option "Neo-Geo MVS"
+                          - option "Neo-Geo Pocket"
+                          - option "Neo-Geo Pocket Color"
+                          - option "NES"
+                          - option "Nes - Super Mario Bros. Hacks"
+                          - option "Nichibutsu"
+                          - option "Nintendo 3DS"
+                          - option "Nintendo 64"
+                          - option "Nintendo 64DD"
+                          - option "Nintendo Classics"
+                          - option "Nintendo DS"
+                          - option "Nintendo Power"
+                          - option "NMK"
+                          - option "non Jeu"
+                          - option "OpenBOR"
+                          - option "Oric 1 / Atmos"
+                          - option "P2000T"
+                          - option "Palm OS"
+                          - option "PC Dos"
+                          - option "PC Engine"
+                          - option "PC Engine CD-Rom"
+                          - option "PC Engine SuperGrafx"
+                          - option "PC Win3.xx"
+                          - option "PC Win9X"
+                          - option "PC Windows"
+                          - option "PC-FX"
+                          - option "Pecom 64"
+                          - option "PET"
+                          - option "Philips VG 5000"
+                          - option "Pico-8"
+                          - option "Pinball FX2"
+                          - option "Pinball FX3"
+                          - option "PlayChoice"
+                          - option "Playstation"
+                          - option "Playstation 2"
+                          - option "Playstation 3"
+                          - option "Playstation 4"
+                          - option "Playstation 5"
+                          - option "Playstation minis"
+                          - option "Plus/4"
+                          - option "Pocket Challenge V2"
+                          - option "Pokémon mini"
+                          - option "PrBoom"
+                          - option "PS Vita"
+                          - option "Psikyo"
+                          - option "PSP"
+                          - option "PV-1000"
+                          - option "Sammy Classics"
+                          - option "Satellaview"
+                          - option "Saturn"
+                          - option "ScummVM"
+                          - option "Sega Classics"
+                          - option "Sega Pico"
+                          - option "Sega ST-V"
+                          - option "Seibu Kaihatsu"
+                          - option "SemiCom"
+                          - option "Seta"
+                          - option "SG-1000"
+                          - option "Sharp MZ"
+                          - option "Sharp X1"
+                          - option "Sharp X68000"
+                          - option "Snes - Super Mario World Hacks"
+                          - option "SNK Classics"
+                          - option "Solarus"
+                          - option "Spectravideo"
+                          - option "Sufami Turbo"
+                          - option "Super A'can"
+                          - option "Super Cassette Vision"
+                          - option "Super Game Boy"
+                          - option "Super Game Boy 2"
+                          - option "Super Nintendo"
+                          - option "Super Nintendo MSU-1"
+                          - option "Switch"
+                          - option "Switch 2"
+                          - option "Taito Classics"
+                          - option "Taito G-Net"
+                          - option "Tamagotchi"
+                          - option "Technos"
+                          - option "Tecmo"
+                          - option "TeknoParrot"
+                          - option "the Pinball Arcade"
+                          - option "Thomson MO/TO"
+                          - option "TI-99/4A"
+                          - option "TIC-80"
+                          - option "Toaplan"
+                          - option "TRS-80 Color Computer"
+                          - option "Tutor"
+                          - option "Type X"
+                          - option "Universal"
+                          - option "Uzebox"
+                          - option "V.Smile"
+                          - option "V.Smile Pro"
+                          - option "VC 4000"
+                          - option "Vectrex"
+                          - option "Vic-20"
+                          - option "Video System Co."
+                          - option "Videopac G7000"
+                          - option "Vircon32"
+                          - option "Virtual Boy"
+                          - option "Visco"
+                          - option "Visual Pinball"
+                          - option "Voxatron"
+                          - option "VZ200 / Laser310"
+                          - option "WASM-4"
+                          - option "Watara Supervision"
+                          - option "Wii"
+                          - option "Wii U"
+                          - option "WonderSwan"
+                          - option "WonderSwan Color"
+                          - option "Xbox"
+                          - option "Xbox 360"
+                          - option "Xbox One"
+                          - option "Z-Machine"
+                          - option "ZX Spectrum"
+                          - option "ZX81"
+                      - 'cell "Genre : Tous les genres" [ref=f27e277]':
+                        - text: "Genre :"
+                        - combobox [ref=f27e278]:
+                          - option "Tous les genres" [selected]
+                          - option "Action"
+                          - option "-->Action / Aventure"
+                          - option "-->Action / Casse briques"
+                          - option "-->Action / Escalade"
+                          - option "-->Action / Labyrinthe"
+                          - option "Adulte"
+                          - option "Aventure"
+                          - option "-->Aventure / 3D Temps Réel"
+                          - option "-->Aventure / Film Interactif"
+                          - option "-->Aventure / Graphique"
+                          - option "-->Aventure / Point and Click"
+                          - option "-->Aventure / Roman Visuel"
+                          - option "-->Aventure / Survival Horror"
+                          - option "-->Aventure / Texte"
+                          - option "Beat'em All"
+                          - option "Casino"
+                          - option "-->Casino / Cartes"
+                          - option "-->Casino / Course"
+                          - option "-->Casino / Loterie"
+                          - option "-->Casino / Machine a sous"
+                          - option "-->Casino / Roulette"
+                          - option "Casual Game"
+                          - option "Chasse et Peche"
+                          - option "-->Chasse"
+                          - option "-->Peche"
+                          - option "Combat"
+                          - option "-->Combat / 2.5D"
+                          - option "-->Combat / 2D"
+                          - option "-->Combat / 3D"
+                          - option "-->Combat / Versus"
+                          - option "-->Combat / Versus Co-op"
+                          - option "-->Combat / Vertical"
+                          - option "Compilation"
+                          - option "Course, Conduite"
+                          - option "-->Course de Moto vue 1er pers."
+                          - option "-->Course de Moto vue 3eme pers."
+                          - option "-->Course vue 1ere pers."
+                          - option "-->Course vue 3eme pers."
+                          - option "-->Course, Conduite / Avion"
+                          - option "-->Course, Conduite / Bateau"
+                          - option "-->Course, Conduite / Course"
+                          - option "-->Course, Conduite / Deltaplane"
+                          - option "-->Course, Conduite / Moto"
+                          - option "Demo"
+                          - option "Divers"
+                          - option "-->Divers / Electro-mecanique"
+                          - option "-->Divers / Print Club"
+                          - option "-->Divers / Système"
+                          - option "-->Divers / Utilitaires"
+                          - option "Flipper"
+                          - option "Jeu de cartes"
+                          - option "Jeu de rôles"
+                          - option "-->Action RPG"
+                          - option "-->Dungeon RPG"
+                          - option "-->Jeu de Rôle Japonais"
+                          - option "-->Jeu de Rôle Tactique"
+                          - option "-->Jeu de rôles en équipe"
+                          - option "-->MMORPG"
+                          - option "Jeu de societe / plateau"
+                          - option "Jeu de societe asiatique"
+                          - option "-->Go"
+                          - option "-->Hanafuda"
+                          - option "-->Mahjong"
+                          - option "-->Othello"
+                          - option "-->Renju"
+                          - option "-->Shougi"
+                          - option "Ludo-Educatif"
+                          - option "Musique et Danse"
+                          - option "-->Chant"
+                          - option "-->Danse"
+                          - option "-->Musique"
+                          - option "-->Rythme"
+                          - option "N/A"
+                          - option "Plateforme"
+                          - option "-->Plateforme / Fighter Scrolling"
+                          - option "-->Plateforme / Run & Jump"
+                          - option "-->Plateforme / Run & Jump Scrolling"
+                          - option "-->Plateforme / Shooter Scrolling"
+                          - option "Puzzle-Game"
+                          - option "-->Puzzle-Game / Egaler"
+                          - option "-->Puzzle-Game / Glisser"
+                          - option "-->Puzzle-Game / Lancer"
+                          - option "-->Puzzle-Game / Tomber"
+                          - option "Quiz"
+                          - option "-->Quiz / Allemand"
+                          - option "-->Quiz / Anglais"
+                          - option "-->Quiz / Coréen"
+                          - option "-->Quiz / Espagnol"
+                          - option "-->Quiz / Français"
+                          - option "-->Quiz / Italien"
+                          - option "-->Quiz / Japonais"
+                          - option "-->Quiz / Musical Anglais"
+                          - option "-->Quiz / Musical Japonais"
+                          - option "Réflexion"
+                          - option "Shoot'em Up"
+                          - option "-->Shoot'em up / Diagonal"
+                          - option "-->Shoot'em up / Horizontal"
+                          - option "-->Shoot'em up / Vertical"
+                          - option "Simulation"
+                          - option "-->Construction & Management"
+                          - option "-->Simulation / Science Fiction"
+                          - option "-->Simulation / Véhicules"
+                          - option "-->Simulation / Vie"
+                          - option "Sport"
+                          - option "-->Sport / Automobile"
+                          - option "-->Sport / Baseball"
+                          - option "-->Sport / Basketball"
+                          - option "-->Sport / Billard"
+                          - option "-->Sport / Bowling"
+                          - option "-->Sport / Boxe"
+                          - option "-->Sport / Bras de fer"
+                          - option "-->Sport / Combat"
+                          - option "-->Sport / Course a pied"
+                          - option "-->Sport / Cyclisme"
+                          - option "-->Sport / Dodgeball"
+                          - option "-->Sport / Extrême"
+                          - option "-->Sport / Fitness"
+                          - option "-->Sport / Flechette"
+                          - option "-->Sport / Football"
+                          - option "-->Sport / Football Américain"
+                          - option "-->Sport / Golf"
+                          - option "-->Sport / Handball"
+                          - option "-->Sport / Hockey"
+                          - option "-->Sport / Jeu de palet"
+                          - option "-->Sport / Lutte"
+                          - option "-->Sport / Multisports"
+                          - option "-->Sport / Natation"
+                          - option "-->Sport / Nautique"
+                          - option "-->Sport / Parachutisme"
+                          - option "-->Sport / Ping pong"
+                          - option "-->Sport / Rugby"
+                          - option "-->Sport / Skateboard"
+                          - option "-->Sport / Ski"
+                          - option "-->Sport / Sumo"
+                          - option "-->Sport / Tennis"
+                          - option "-->Sport / Volleyball"
+                          - option "Sport avec animaux"
+                          - option "-->Course de chevaux"
+                          - option "Stratégie"
+                          - option "Tir"
+                          - option "-->Tir / 1ere Personne"
+                          - option "-->Tir / 3eme Personne"
+                          - option "-->Tir / Avion"
+                          - option "-->Tir / Avion, 1ere personne"
+                          - option "-->Tir / Avion, 3eme personne"
+                          - option "-->Tir / Horizontal"
+                          - option "-->Tir / Missile Command Like"
+                          - option "-->Tir / Run and Gun"
+                          - option "-->Tir / Space Invaders Like"
+                          - option "-->Tir / Véhicule, 1ere personne"
+                          - option "-->Tir / Vehicule, 3eme personne"
+                          - option "-->Tir / Véhicule, Diagonal"
+                          - option "-->Tir / Véhicule, Horizontal"
+                          - option "-->Tir / Véhicule, Vertical"
+                          - option "-->Tir / Vertical"
+                          - option "-->Tir / Vue de dessus"
+                          - option "Tir avec accessoire"
+                      - 'cell "Critère : Contenant..." [ref=f27e279]':
+                        - text: "Critère :"
+                        - combobox [ref=f27e280]:
+                          - option "Contenant..." [selected]
+                          - option "Commence par..."
+                          - option "Fini par..."
+                          - option "Exactement pareil que..."
+                      - cell [ref=f27e281]:
+                        - textbox [ref=f27e282]
+                      - cell [ref=f27e283]:
+                        - button "Rechercher" [ref=f27e284] [cursor=pointer]
+                - table [ref=f27e286]:
+                  - rowgroup [ref=f27e287]:
+                    - row [ref=f27e288]:
+                      - cell "Rechercher un fichier roms/isos/... :" [ref=f27e289]
+                      - cell "Systèmes :" [ref=f27e290]
+                      - cell "Tous les systèmes" [ref=f27e291]:
+                        - combobox [ref=f27e292]:
+                          - option "Tous les systèmes" [selected]
+                          - option "3DO"
+                          - option "Aamber Pegasus"
+                          - option "Acclaim"
+                          - option "Action Max"
+                          - option "Adam"
+                          - option "Adventure Vision"
+                          - option "Alice"
+                          - option "Alpha Denshi Co."
+                          - option "Amcoe"
+                          - option "American Laser Games"
+                          - option "Amiga"
+                          - option "Amiga (AGA)"
+                          - option "Amiga CD"
+                          - option "Amiga CD32"
+                          - option "Amiga CD32 (hack)"
+                          - option "Amiga CDTV"
+                          - option "Android"
+                          - option "Apple II"
+                          - option "Apple IIGS"
+                          - option "Arcadia 2001"
+                          - option "Archimedes"
+                          - option "Arduboy"
+                          - option "Astrocade"
+                          - option "Atari 2600"
+                          - option "Atari 2600 Supercharger"
+                          - option "Atari 5200"
+                          - option "Atari 7800"
+                          - option "Atari 8bit"
+                          - option "Atari Classics"
+                          - option "Atari ST"
+                          - option "Atlus"
+                          - option "Atom"
+                          - option "Atomiswave"
+                          - option "Banpresto"
+                          - option "BBC Micro"
+                          - option "BK"
+                          - option "Camputers Lynx"
+                          - option "Capcom Classics"
+                          - option "Capcom Play System"
+                          - option "Capcom Play System 2"
+                          - option "Capcom Play System 3"
+                          - option "Cassette Vision"
+                          - option "Cave"
+                          - option "CD-i"
+                          - option "Century Electronics"
+                          - option "Channel F"
+                          - option "Cinematronics"
+                          - option "Coleco"
+                          - option "Colecovision"
+                          - option "Comad"
+                          - option "Commodore 64"
+                          - option "CoreGrafX"
+                          - option "CPC"
+                          - option "CreatiVision"
+                          - option "Daphne"
+                          - option "Data East Classics"
+                          - option "Dragon 32/64"
+                          - option "Dreamcast"
+                          - option "Dynax"
+                          - option "EasyRPG"
+                          - option "EG2000 Colour Genie"
+                          - option "Eighting / Raizing"
+                          - option "Electron"
+                          - option "Exidy"
+                          - option "EXL 100"
+                          - option "Family Computer Disk System"
+                          - option "Flipper"
+                          - option "FM Towns"
+                          - option "FM-7"
+                          - option "Future Pinball"
+                          - option "Gaelco"
+                          - option "Gamate"
+                          - option "Game & Watch"
+                          - option "Game Boy"
+                          - option "Game Boy Advance"
+                          - option "Game Boy Color"
+                          - option "Game Gear"
+                          - option "Game Master"
+                          - option "Game Pocket Computer"
+                          - option "Game.com"
+                          - option "Gamecube"
+                          - option "GBA e-Reader"
+                          - option "Gottlieb"
+                          - option "GP32"
+                          - option "GX4000"
+                          - option "Hikaru"
+                          - option "IGS"
+                          - option "Incredible Technologies"
+                          - option "Intellivision"
+                          - option "Irem Classics"
+                          - option "J2ME"
+                          - option "Jaguar"
+                          - option "Jaguar CD"
+                          - option "Jaleco"
+                          - option "Jupiter Ace"
+                          - option "Kaneko"
+                          - option "Konami Classics"
+                          - option "Linux"
+                          - option "Loopy"
+                          - option "LowRes NX"
+                          - option "Lutro"
+                          - option "Lynx"
+                          - option "M5"
+                          - option "Mac OS"
+                          - option "Mame"
+                          - option "Master System"
+                          - option "Mega Duck"
+                          - option "Mega-CD"
+                          - option "Mega-Play"
+                          - option "Mega-Tech"
+                          - option "Megadrive"
+                          - option "Megadrive - Sonic The Hedgehog 2 Hacks"
+                          - option "Megadrive 32X"
+                          - option "MGT SAM Coupé"
+                          - option "Midway Classics"
+                          - option "Mikrosha"
+                          - option "Mitchell"
+                          - option "Model 2"
+                          - option "Model 3"
+                          - option "MSU-MD"
+                          - option "MSX"
+                          - option "MSX Turbo R"
+                          - option "MSX2"
+                          - option "MSX2+"
+                          - option "My Vision"
+                          - option "N-Gage"
+                          - option "Namco Classics"
+                          - option "Namco System 22"
+                          - option "Naomi"
+                          - option "Naomi 2"
+                          - option "Naomi GD-ROM"
+                          - option "NEC PC-8801"
+                          - option "NEC PC-9801"
+                          - option "Neo-Geo"
+                          - option "Neo-Geo CD"
+                          - option "Neo-Geo MVS"
+                          - option "Neo-Geo Pocket"
+                          - option "Neo-Geo Pocket Color"
+                          - option "NES"
+                          - option "Nes - Super Mario Bros. Hacks"
+                          - option "Nichibutsu"
+                          - option "Nintendo 3DS"
+                          - option "Nintendo 64"
+                          - option "Nintendo 64DD"
+                          - option "Nintendo Classics"
+                          - option "Nintendo DS"
+                          - option "Nintendo Power"
+                          - option "NMK"
+                          - option "non Jeu"
+                          - option "OpenBOR"
+                          - option "Oric 1 / Atmos"
+                          - option "P2000T"
+                          - option "Palm OS"
+                          - option "PC Dos"
+                          - option "PC Engine"
+                          - option "PC Engine CD-Rom"
+                          - option "PC Engine SuperGrafx"
+                          - option "PC Win3.xx"
+                          - option "PC Win9X"
+                          - option "PC Windows"
+                          - option "PC-FX"
+                          - option "Pecom 64"
+                          - option "PET"
+                          - option "Philips VG 5000"
+                          - option "Pico-8"
+                          - option "Pinball FX2"
+                          - option "Pinball FX3"
+                          - option "PlayChoice"
+                          - option "Playstation"
+                          - option "Playstation 2"
+                          - option "Playstation 3"
+                          - option "Playstation 4"
+                          - option "Playstation 5"
+                          - option "Playstation minis"
+                          - option "Plus/4"
+                          - option "Pocket Challenge V2"
+                          - option "Pokémon mini"
+                          - option "PrBoom"
+                          - option "PS Vita"
+                          - option "Psikyo"
+                          - option "PSP"
+                          - option "PV-1000"
+                          - option "Sammy Classics"
+                          - option "Satellaview"
+                          - option "Saturn"
+                          - option "ScummVM"
+                          - option "Sega Classics"
+                          - option "Sega Pico"
+                          - option "Sega ST-V"
+                          - option "Seibu Kaihatsu"
+                          - option "SemiCom"
+                          - option "Seta"
+                          - option "SG-1000"
+                          - option "Sharp MZ"
+                          - option "Sharp X1"
+                          - option "Sharp X68000"
+                          - option "Snes - Super Mario World Hacks"
+                          - option "SNK Classics"
+                          - option "Solarus"
+                          - option "Spectravideo"
+                          - option "Sufami Turbo"
+                          - option "Super A'can"
+                          - option "Super Cassette Vision"
+                          - option "Super Game Boy"
+                          - option "Super Game Boy 2"
+                          - option "Super Nintendo"
+                          - option "Super Nintendo MSU-1"
+                          - option "Switch"
+                          - option "Switch 2"
+                          - option "Taito Classics"
+                          - option "Taito G-Net"
+                          - option "Tamagotchi"
+                          - option "Technos"
+                          - option "Tecmo"
+                          - option "TeknoParrot"
+                          - option "the Pinball Arcade"
+                          - option "Thomson MO/TO"
+                          - option "TI-99/4A"
+                          - option "TIC-80"
+                          - option "Toaplan"
+                          - option "TRS-80 Color Computer"
+                          - option "Tutor"
+                          - option "Type X"
+                          - option "Universal"
+                          - option "Uzebox"
+                          - option "V.Smile"
+                          - option "V.Smile Pro"
+                          - option "VC 4000"
+                          - option "Vectrex"
+                          - option "Vic-20"
+                          - option "Video System Co."
+                          - option "Videopac G7000"
+                          - option "Vircon32"
+                          - option "Virtual Boy"
+                          - option "Visco"
+                          - option "Visual Pinball"
+                          - option "Voxatron"
+                          - option "VZ200 / Laser310"
+                          - option "WASM-4"
+                          - option "Watara Supervision"
+                          - option "Wii"
+                          - option "Wii U"
+                          - option "WonderSwan"
+                          - option "WonderSwan Color"
+                          - option "Xbox"
+                          - option "Xbox 360"
+                          - option "Xbox One"
+                          - option "Z-Machine"
+                          - option "ZX Spectrum"
+                          - option "ZX81"
+                      - cell [ref=f27e293]:
+                        - textbox [ref=f27e294]
+                      - cell [ref=f27e295]:
+                        - button "Rechercher" [ref=f27e296] [cursor=pointer]
+                - table [ref=f27e298]:
+                  - rowgroup [ref=f27e299]:
+                    - row [ref=f27e300]:
+                      - cell "ACCUEIL" [ref=f27e301]
+                      - cell [ref=f27e303]
+                      - cell "Forum" [ref=f27e305]
+                      - cell [ref=f27e307]
+                      - cell "WebAPI ScreenScraper" [ref=f27e309]
+                      - cell [ref=f27e311]
+                      - cell "API access request — GameAlfa, a self-hosted cat..." [ref=f27e313]
+                      - cell [ref=f27e315]
+                - generic [ref=f27e316]: API access request — GameAlfa, a self-hosted catalogue for physical game collections
+                - table [ref=f27e318]:
+                  - rowgroup [ref=f27e319]:
+                    - row [ref=f27e320]:
+                      - cell "Répondre" [ref=f27e321]
+                      - cell [ref=f27e322]:
+                        - textbox [ref=f27e323]
+                      - cell [ref=f27e324]:
+                        - button "Rechercher" [ref=f27e325] [cursor=pointer]
+                      - cell [ref=f27e326]
+                      - cell "1 Message" [ref=f27e327]
+                - table [ref=f27e329]:
+                  - rowgroup [ref=f27e330]:
+                    - row [ref=f27e331]:
+                      - cell "Infos" [ref=f27e332]
+                      - cell "Message" [ref=f27e333]
+                    - row [ref=f27e334]:
+                      - cell [ref=f27e335]:
+                        - generic [ref=f27e336]:
+                          - img "Membre" [ref=f27e337]
+                          - link "alfaalex" [ref=f27e338] [cursor=pointer]:
+                            - /url: membreinfos.php?membreid=29270585
+                        - text: Membre
+                        - table [ref=f27e339]:
+                          - rowgroup [ref=f27e340]:
+                            - row [ref=f27e341]:
+                              - cell "Inscrit le :" [ref=f27e342]
+                              - cell "12/08/26" [ref=f27e343]
+                            - row [ref=f27e344]:
+                              - cell "Derniére visite :" [ref=f27e345]
+                              - cell "12/08/26 22:42" [ref=f27e346]
+                            - row [ref=f27e347]:
+                              - cell "Nb. visites :" [ref=f27e348]
+                              - cell "2" [ref=f27e349]
+                        - text: Barrette de Succès
+                        - table [ref=f27e350]:
+                          - rowgroup [ref=f27e351]:
+                            - row [ref=f27e352]:
+                              - cell [ref=f27e353]:
+                                - table [ref=f27e354]:
+                                  - rowgroup [ref=f27e355]:
+                                    - row [ref=f27e356]:
+                                      - cell [ref=f27e357]:
+                                        - img "0 contrib.financier" [ref=f27e358]
+                                      - cell [ref=f27e359]:
+                                        - img "0 asso." [ref=f27e360]
+                                      - cell [ref=f27e361]:
+                                        - img "0 infos" [ref=f27e362]
+                                      - cell [ref=f27e363]:
+                                        - img "0 médias" [ref=f27e364]
+                                      - cell [ref=f27e365]:
+                                        - img "0 médias sys." [ref=f27e366]
+                                      - cell [ref=f27e367]:
+                                        - img "0 logo HD" [ref=f27e368]
+                                      - cell [ref=f27e369]:
+                                        - img "0 scans" [ref=f27e370]
+                                      - cell [ref=f27e371]:
+                                        - img "0 boitiers" [ref=f27e372]
+                                      - cell [ref=f27e373]:
+                                        - img "0 supports" [ref=f27e374]
+                                      - cell [ref=f27e375]:
+                                        - img "0 sc.marquee" [ref=f27e376]
+                                      - cell [ref=f27e377]:
+                                        - img "0 vidéos" [ref=f27e378]
+                                      - cell [ref=f27e379]:
+                                        - img "since 2026" [ref=f27e380]
+                      - cell [ref=f27e381]:
+                        - table [ref=f27e382]:
+                          - rowgroup [ref=f27e383]:
+                            - row [ref=f27e384]:
+                              - cell "API access request — GameAlfa, a self-hosted catalogue for physical game collections" [ref=f27e385]
+                              - cell "Suivre" [ref=f27e386]
+                              - cell "Repondre" [ref=f27e387]
+                              - cell "Citer" [ref=f27e388]
+                        - text: de
+                        - generic [ref=f27e389]:
+                          - img "Membre" [ref=f27e390]
+                          - link "alfaalex" [ref=f27e391] [cursor=pointer]:
+                            - /url: membreinfos.php?membreid=29270585
+                        - text: le 12/08/26 17:27
+                        - table [ref=f27e392]:
+                          - rowgroup [ref=f27e393]:
+                            - row [ref=f27e394]:
+                              - cell [ref=f27e395]:
+                                - iframe [ref=f27e397]:
+                                  - generic [ref=f30e1]:
+                                    - generic [ref=f30e2]: Hello,
+                                    - generic [ref=f30e6]: I'd like to introduce the software I'm building and ask for developer credentials for the API.
+                                    - generic [ref=f30e10]: "GameAlfa is a self-hosted web application for cataloguing physical video game collections, boxed cartridges and discs sitting on a shelf. For every copy they own, users record the specific regional edition, its condition and completeness, what came in the box, and their own photographs of the actual item. Around that there is a small community layer: collectors follow each other, comment on games, keep a public profile of their shelf, and maintain topic pages about specific systems or series."
+                                    - generic [ref=f30e14]: It is non-commercial. No advertising, no paid tiers, no resale or redistribution of third-party data. It runs on a single self-hosted server (NestJS + PostgreSQL) and is used by a small community of collectors.
+                                    - generic [ref=f30e19]: "It has nothing to do with ROMs, I want to be explicit about this, because I understand it is the main concern around API access. GameAlfa has no connection to emulation. It does not store, index, scan, distribute or link to ROM files, and there is no ROM-scanning workflow in it, nothing in the application reads a directory of dumps. The unit of data is a physical edition: country of release, region, product code (SLES-xxxxx, WUP-xxx…), barcode, publisher, year of release."
+                                    - generic [ref=f30e23]: Why I'm asking for ScreenScraper?
+                                    - generic [ref=f30e26]: "The catalogue is currently built from IGDB (about 31,000 games and 78,000 editions) and enriched from MobyGames. Both are weak on the two things that matter most for physical European collections:"
+                                    - generic [ref=f30e30]: 1. Regional titles, the name actually printed on the PAL box. Out of ~31,000 games we currently have an Italian title for only 428 of them. A collector in Italy searching for "Il potere della Forza" does not find their own copy.
+                                    - generic [ref=f30e33]: 2. Region-specific release data for European editions.
+                                    - generic [ref=f30e36]: From what I can see, ScreenScraper is the best free source for per-region names of European releases, which is exactly the gap I cannot close with the sources I already use.
+                                    - generic [ref=f30e40]: "How I would use the API:"
+                                    - generic [ref=f30e43]:
+                                      - generic [ref=f30e44]: jeuRecherche.php
+                                      - generic [ref=f30e46]: with
+                                      - generic [ref=f30e48]: recherche
+                                      - generic [ref=f30e50]: (title) +
+                                      - generic [ref=f30e52]: systemeid
+                                      - generic [ref=f30e54]: ", to match one of our games to its ScreenScraper entry. The search is always restricted to a single system."
+                                    - generic [ref=f30e56]:
+                                      - generic [ref=f30e57]: jeuInfos.php
+                                      - generic [ref=f30e59]: on the matched game, to read its regional names.
+                                    - generic [ref=f30e62]:
+                                      - generic [ref=f30e63]: No CRC / MD5 / SHA1 lookups. I have no ROM files, so the checksum path, the one your documentation shows as the normal way to scrape,
+                                      - generic [ref=f30e65]: "simply does not apply to my case. I am aware this makes matching harder on my side, and I have already implemented a conservative matching policy: normalised title comparison, mandatory system match, a required margin over the runner-up candidate, and a release-year check. When the result is ambiguous, my code imports nothing rather than guessing."
+                                    - generic [ref=f30e67]: Volumes are low and bursty rather than continuous. Enrichment runs only for games that a user actually owns or has opened, never as a bulk sweep of the whole catalogue. Every response is stored in our database and never requested a second time.
+                                    - generic [ref=f30e73]: "What I'm happy to commit to:"
+                                    - generic [ref=f30e76]: "- one request at a time (a single thread), with a configurable rate limit"
+                                    - generic [ref=f30e79]: "- permanent local caching, so any given game is looked up exactly once"
+                                    - generic [ref=f30e82]: "- visible attribution to ScreenScraper on every field that comes from you, with a link back to the corresponding page"
+                                    - generic [ref=f30e85]: "-throttling or stopping entirely on request."
+                                    - generic [ref=f30e89]: Thank you for your time, and for the work you put into the database.
+                - table [ref=f27e399]:
+                  - rowgroup [ref=f27e400]:
+                    - row [ref=f27e401]:
+                      - cell "Répondre" [ref=f27e402]
+                      - cell [ref=f27e403]:
+                        - textbox [ref=f27e404]
+                      - cell [ref=f27e405]:
+                        - button "Rechercher" [ref=f27e406] [cursor=pointer]
+                      - cell [ref=f27e407]
+                      - cell "1 Message" [ref=f27e408]
+            - row [ref=f27e409]:
+              - cell [ref=f27e410]:
+                - generic [ref=f27e411]:
+                  - table [ref=f27e412]:
+                    - rowgroup [ref=f27e413]:
+                      - row [ref=f27e414]:
+                        - cell [ref=f27e415]:
+                          - iframe
+                          - iframe
+                          - link [ref=f27e416] [cursor=pointer]:
+                            - /url: http://creativecommons.org/licenses/by-nc-sa/4.0/
+                            - img "Licence Creative Commons" [ref=f27e417]
+                        - cell [ref=f27e418]:
+                          - text: mise à disposition selon les termes de la
+                          - link "Licence Creative Commons Attribution" [ref=f27e419] [cursor=pointer]:
+                            - /url: http://creativecommons.org/licenses/by-nc-sa/4.0/
+                          - text: Pas d'Utilisation Commerciale - Partage dans les Mêmes Conditions 4.0 International.
+                  - table [ref=f27e420]:
+                    - rowgroup [ref=f27e421]:
+                      - row [ref=f27e422]:
+                        - cell [ref=f27e423]:
+                          - text: "Crédits généraux : Si dessous, les sources 'Creative Commons' de récupération des différentes informations et médias. Infos : Communauté ScreenScraper."
+                          - link "Wikipedia" [ref=f27e424] [cursor=pointer]:
+                            - /url: https://fr.wikipedia.org
+                          - text: .
+                          - link "Gamefaqs" [ref=f27e425] [cursor=pointer]:
+                            - /url: http://www.gamefaqs.com/
+                          - text: .
+                          - link "jeuxvideo" [ref=f27e426] [cursor=pointer]:
+                            - /url: http://www.jeuxvideo.com/
+                          - text: .
+                          - link "gametronik" [ref=f27e427] [cursor=pointer]:
+                            - /url: http://www.gametronik.com/
+                          - text: .
+                          - link "gametdb" [ref=f27e428] [cursor=pointer]:
+                            - /url: http://www.gametdb.com/
+                          - text: .
+                          - link "mobygames" [ref=f27e429] [cursor=pointer]:
+                            - /url: http://www.mobygames.com/
+                          - text: ". Boxes Texture : Communauté ScreenScraper . Communauté"
+                          - link "The Cover Project" [ref=f27e430] [cursor=pointer]:
+                            - /url: http://www.thecoverproject.net/
+                          - text: . Communauté
+                          - link "gbatemp" [ref=f27e431] [cursor=pointer]:
+                            - /url: https://gbatemp.net
+                          - text: . Communauté
+                          - link "Hyperspin" [ref=f27e432] [cursor=pointer]:
+                            - /url: http://www.hyperspin-fe.com/
+                          - text: .
+                          - link "Southtown-Homebrew" [ref=f27e433] [cursor=pointer]:
+                            - /url: http://southtown-homebrew.com/
+                          - text: ". Boxes 2D / 3D : Communauté ScreenScraper . Communauté"
+                          - link "Hyperspin" [ref=f27e434] [cursor=pointer]:
+                            - /url: http://www.hyperspin-fe.com/
+                          - text: . Communauté
+                          - link "Emumovies" [ref=f27e435] [cursor=pointer]:
+                            - /url: http://emumovies.com/forums/page/portal
+                          - text: .
+                          - link "gametdb" [ref=f27e436] [cursor=pointer]:
+                            - /url: http://www.gametdb.com/
+                          - text: .
+                          - link "flyers.arcade-museum.com" [ref=f27e437] [cursor=pointer]:
+                            - /url: http://flyers.arcade-museum.com
+                          - text: ". Vidéos : Communauté ScreenScraper . Communauté"
+                          - link "Emumovies" [ref=f27e438] [cursor=pointer]:
+                            - /url: http://emumovies.com/forums/page/portal
+                          - text: "Screenshots / Marquees : ScreenScraper ."
+                          - link "Progetto Snaps" [ref=f27e439] [cursor=pointer]:
+                            - /url: http://www.progettosnaps.net/marquees/
+                          - text: .
+                          - link "musee des jeux video" [ref=f27e440] [cursor=pointer]:
+                            - /url: https://www.musee-des-jeux-video.com/fr
+                          - text: .
+      - cell [ref=f27e441]

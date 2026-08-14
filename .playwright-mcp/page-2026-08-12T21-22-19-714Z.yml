@@ -1,0 +1,20 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - heading "www.mobygames.com" [level=1] [ref=e5]
+      - heading "Verificación de seguridad en curso" [level=2] [ref=e6]
+      - paragraph [ref=e7]: Este sitio web utiliza un servicio de seguridad para protegerse contra bots maliciosos. Esta página se muestra mientras el sitio web verifica que tú no eres un bot.
+  - contentinfo [ref=e8]:
+    - generic [ref=e10]:
+      - generic [ref=e12]:
+        - text: "Ray ID:"
+        - code [ref=e13]: a2a288e0bb6e9434
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - text: Rendimiento y seguridad de
+          - link "Cloudflare, se abre en una pestaña nueva" [ref=e16] [cursor=pointer]:
+            - /url: https://www.cloudflare.com?utm_source=challenge&utm_campaign=m
+            - text: Cloudflare
+        - link "Privacidad, se abre en una pestaña nueva" [ref=e18] [cursor=pointer]:
+          - /url: https://www.cloudflare.com/es-es/privacypolicy/
+          - text: Privacidad

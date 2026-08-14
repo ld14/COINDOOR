@@ -1,7 +1,8 @@
 .button {
-  border: var(--dos-border-2) outset var(--dos-panel);
+  border: var(--dos-border-2) solid var(--dos-edge-dark);
   cursor: pointer;
   font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .button:active:not(:disabled),
@@ -29,21 +30,21 @@
 }
 
 .ghost {
-  background: var(--dos-panel);
+  background: var(--dos-panel-light);
   color: var(--dos-ink);
   font-size: var(--dos-size-section);
   padding: var(--dos-space-2) var(--dos-space-5);
 }
 
 .ghostSmall {
-  background: var(--dos-panel);
+  background: var(--dos-panel-light);
   color: var(--dos-ink);
   font-size: var(--dos-size-meta);
   padding: var(--dos-space-1) var(--dos-space-3);
 }
 
 .dangerSmall {
-  background: var(--dos-panel);
+  background: var(--dos-panel-light);
   color: var(--dos-error);
   font-size: var(--dos-size-meta);
   padding: var(--dos-space-1) var(--dos-space-3);

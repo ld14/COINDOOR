@@ -1,0 +1,192 @@
+- generic [ref=f13e2]:
+  - banner [ref=f13e3]:
+    - navigation [ref=f13e4]:
+      - list [ref=f13e5]:
+        - listitem [ref=f13e6]:
+          - link [ref=f13e7] [cursor=pointer]:
+            - /url: /
+            - img "mobygames logo" [ref=f13e8]
+        - listitem [ref=f13e9]:
+          - searchbox "Search" [ref=f13e14]
+        - listitem [ref=f13e15]:
+          - list [ref=f13e16]:
+            - listitem [ref=f13e17]:
+              - link [ref=f13e20] [cursor=pointer]:
+                - /url: /mobyplus/
+                - img "Moby Plus" [ref=f13e21]
+            - listitem [ref=f13e22]:
+              - link "API" [ref=f13e25] [cursor=pointer]:
+                - /url: /api/subscribe/
+            - listitem [ref=f13e26]:
+              - generic [ref=f13e27]: Browse
+              - list [ref=f13e29]:
+                - listitem [ref=f13e30]:
+                  - link "Random" [ref=f13e31] [cursor=pointer]:
+                    - /url: /random/
+                - listitem [ref=f13e32]:
+                  - link "Platforms" [ref=f13e33] [cursor=pointer]:
+                    - /url: /platform/
+                - listitem [ref=f13e34]:
+                  - link "Games" [ref=f13e35] [cursor=pointer]:
+                    - /url: /game/
+                - listitem [ref=f13e36]:
+                  - link "Companies" [ref=f13e37] [cursor=pointer]:
+                    - /url: /company/
+                - listitem [ref=f13e38]:
+                  - link "People" [ref=f13e39] [cursor=pointer]:
+                    - /url: /person/
+                - listitem [ref=f13e40]:
+                  - link "Groups" [ref=f13e41] [cursor=pointer]:
+                    - /url: /group/
+                - listitem [ref=f13e42]:
+                  - link "Genres" [ref=f13e43] [cursor=pointer]:
+                    - /url: /genre/
+                - listitem [ref=f13e44]:
+                  - link "Attributes" [ref=f13e45] [cursor=pointer]:
+                    - /url: /attributes/tech-specs/
+                - listitem [ref=f13e46]:
+                  - link "Critics" [ref=f13e47] [cursor=pointer]:
+                    - /url: /critic/
+                - listitem [ref=f13e48]:
+                  - link "This Day" [ref=f13e49] [cursor=pointer]:
+                    - /url: /this-day-in-gaming/
+                - listitem [ref=f13e50]:
+                  - link "Stats" [ref=f13e51] [cursor=pointer]:
+                    - /url: /stats/
+            - listitem [ref=f13e52]:
+              - generic [ref=f13e53]: Contribute
+              - list [ref=f13e55]:
+                - listitem [ref=f13e56]:
+                  - link "Most Wanted" [ref=f13e57] [cursor=pointer]:
+                    - /url: /most-wanted/
+                - listitem [ref=f13e58]:
+                  - link "Missing Games" [ref=f13e59] [cursor=pointer]:
+                    - /url: /contribute/missing-games/
+                - listitem [ref=f13e60]:
+                  - link "Add Game" [ref=f13e61] [cursor=pointer]:
+                    - /url: /contribute/game/
+                - listitem [ref=f13e62]:
+                  - link "Instructions" [ref=f13e63] [cursor=pointer]:
+                    - /url: /info/contribute/
+                - listitem [ref=f13e64]:
+                  - link "Standards" [ref=f13e65] [cursor=pointer]:
+                    - /url: /info/standards/
+                - listitem [ref=f13e66]:
+                  - link "Style Guide" [ref=f13e67] [cursor=pointer]:
+                    - /url: /info/style-guide/
+                - listitem [ref=f13e68]
+                - listitem [ref=f13e69]:
+                  - link [ref=f13e70] [cursor=pointer]:
+                    - /url: /mobyplus/modal/contribution-progress
+                    - img "Moby Plus" [ref=f13e71]
+                    - text: Get MobyPlus Free
+            - listitem [ref=f13e72]:
+              - generic [ref=f13e73]: Community
+              - list [ref=f13e75]:
+                - listitem [ref=f13e76]:
+                  - link "Contributors" [ref=f13e77] [cursor=pointer]:
+                    - /url: /leaderboard/
+                - listitem [ref=f13e78]:
+                  - link "Forums" [ref=f13e79] [cursor=pointer]:
+                    - /url: /forum/
+                - listitem [ref=f13e80]:
+                  - link "Reviews" [ref=f13e81] [cursor=pointer]:
+                    - /url: /feed/player-reviews/
+                - listitem [ref=f13e82]:
+                  - link "Discord" [ref=f13e83] [cursor=pointer]:
+                    - /url: https://discord.gg/8zWGTQp
+                - listitem [ref=f13e84]:
+                  - link "Twitter" [ref=f13e85] [cursor=pointer]:
+                    - /url: https://twitter.com/MobyGames
+                - listitem [ref=f13e86]:
+                  - link "Bluesky" [ref=f13e87] [cursor=pointer]:
+                    - /url: https://bsky.app/profile/mobygames.com
+            - listitem [ref=f13e88]:
+              - link [ref=f13e89] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f13e91]:
+              - generic [ref=f13e92]:
+                - link [ref=f13e93] [cursor=pointer]:
+                  - /url: https://www.mobygames.com/user/1007192/mataderos14/
+                  - img "user avatar" [ref=f13e94]
+                - generic [ref=f13e96]:
+                  - link "Mataderos14" [ref=f13e97] [cursor=pointer]:
+                    - /url: https://www.mobygames.com/user/1007192/mataderos14/
+                  - link "0" [ref=f13e98] [cursor=pointer]:
+                    - /url: /user/1007192/mataderos14/contributions/
+                  - link "0" [ref=f13e100] [cursor=pointer]:
+                    - /url: /user/1007192/mataderos14/notifications/
+              - list [ref=f13e102]:
+                - listitem [ref=f13e103]:
+                  - link "Profile" [ref=f13e104] [cursor=pointer]:
+                    - /url: https://www.mobygames.com/user/1007192/mataderos14/
+                - listitem [ref=f13e105]:
+                  - link "Contributions" [ref=f13e106] [cursor=pointer]:
+                    - /url: /user/1007192/mataderos14/contributions/
+                - listitem [ref=f13e107]:
+                  - link "Collection" [ref=f13e108] [cursor=pointer]:
+                    - /url: /user/1007192/mataderos14/collection/
+                - listitem [ref=f13e109]:
+                  - link "Notifications" [ref=f13e110] [cursor=pointer]:
+                    - /url: /user/1007192/mataderos14/notifications/
+                - listitem [ref=f13e111]:
+                  - link "Messages" [ref=f13e112] [cursor=pointer]:
+                    - /url: /user/messages/
+                - listitem [ref=f13e113]:
+                  - link "Account Settings" [ref=f13e114] [cursor=pointer]:
+                    - /url: /user/1007192/mataderos14/edit/
+                - listitem [ref=f13e115]:
+                  - link "Logout" [ref=f13e116] [cursor=pointer]:
+                    - /url: /user/logout/
+      - text: ×
+  - main [ref=f13e119]:
+    - heading "API Access Request" [level=1] [ref=f13e120]
+    - paragraph [ref=f13e121]: "Instructions: Complimentary Hobbyist API subscriptions are available to qualified students, researchers, and non-profit entities. Please explain below what information you need, for what purpose, and why you qualify for a complimentary subscription. If you need access to our API for personal use, such as for use with a game launcher or to manage your personal collection, you may subscribe to the Hobbyist tier for full access to core data on all games in our database."
+    - generic [ref=f13e122]:
+      - generic [ref=f13e123]:
+        - generic [ref=f13e124]: What will you use the API for?
+        - textbox "HTML code is not allowed" [ref=f13e126]
+      - generic [ref=f13e127]:
+        - generic [ref=f13e128]: Why do you qualify for research access?
+        - textbox "HTML code is not allowed" [ref=f13e130]
+      - generic [ref=f13e132]:
+        - generic [ref=f13e133]: How long do you need access to the APIs (in months)?
+        - spinbutton [ref=f13e134]
+      - button "Submit" [ref=f13e136] [cursor=pointer]
+  - separator [ref=f13e137]
+  - contentinfo [ref=f13e138]:
+    - paragraph [ref=f13e139]:
+      - link "About" [ref=f13e140] [cursor=pointer]:
+        - /url: /info/about/
+      - text: ·
+      - link "FAQ" [ref=f13e141] [cursor=pointer]:
+        - /url: /info/faq/
+      - text: ·
+      - link "MobyPlus" [ref=f13e142] [cursor=pointer]:
+        - /url: /mobyplus/
+      - text: ·
+      - link "Stats" [ref=f13e143] [cursor=pointer]:
+        - /url: /stats/
+      - text: ·
+      - link "Standards" [ref=f13e144] [cursor=pointer]:
+        - /url: /info/standards/
+      - text: ·
+      - link "Style Guide" [ref=f13e145] [cursor=pointer]:
+        - /url: /info/style-guide/
+      - text: ·
+      - link "API" [ref=f13e146] [cursor=pointer]:
+        - /url: /api/subscribe/
+      - text: ·
+      - link "Contact" [ref=f13e147] [cursor=pointer]:
+        - /url: /info/contact/
+      - text: ·
+      - link "Change Log" [ref=f13e148] [cursor=pointer]:
+        - /url: /changelog/
+      - text: ·
+      - link "Privacy Policy" [ref=f13e149] [cursor=pointer]:
+        - /url: /info/privacy/
+      - text: ·
+      - link "Terms of Use" [ref=f13e150] [cursor=pointer]:
+        - /url: /info/terms/
+    - paragraph [ref=f13e151]: © 1999–2026 MobyGames ™
+    - paragraph [ref=f13e152]: v20260730

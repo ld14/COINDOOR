@@ -69,6 +69,7 @@ const game = (overrides: Partial<Game> & { id: string; title: string; systemId?:
     manuals: [],
     magazine: 'empty',
     magazineName: '',
+    provenance: {},
     ...rest,
   };
 };

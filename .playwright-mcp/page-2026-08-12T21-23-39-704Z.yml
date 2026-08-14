@@ -1,0 +1,289 @@
+- generic [ref=f11e2]:
+  - banner [ref=f11e3]:
+    - navigation [ref=f11e4]:
+      - list [ref=f11e5]:
+        - listitem [ref=f11e6]:
+          - link [ref=f11e7] [cursor=pointer]:
+            - /url: /
+            - img "mobygames logo" [ref=f11e8]
+        - listitem [ref=f11e9]:
+          - searchbox "Search" [ref=f11e14]
+        - listitem [ref=f11e15]:
+          - list [ref=f11e16]:
+            - listitem [ref=f11e17]:
+              - link [ref=f11e20] [cursor=pointer]:
+                - /url: /mobyplus/
+                - img "Moby Plus" [ref=f11e21]
+            - listitem [ref=f11e22]:
+              - link "API" [ref=f11e25] [cursor=pointer]:
+                - /url: /api/subscribe/
+            - listitem [ref=f11e26]:
+              - generic [ref=f11e27]: Browse
+              - list [ref=f11e29]:
+                - listitem [ref=f11e30]:
+                  - link "Random" [ref=f11e31] [cursor=pointer]:
+                    - /url: /random/
+                - listitem [ref=f11e32]:
+                  - link "Platforms" [ref=f11e33] [cursor=pointer]:
+                    - /url: /platform/
+                - listitem [ref=f11e34]:
+                  - link "Games" [ref=f11e35] [cursor=pointer]:
+                    - /url: /game/
+                - listitem [ref=f11e36]:
+                  - link "Companies" [ref=f11e37] [cursor=pointer]:
+                    - /url: /company/
+                - listitem [ref=f11e38]:
+                  - link "People" [ref=f11e39] [cursor=pointer]:
+                    - /url: /person/
+                - listitem [ref=f11e40]:
+                  - link "Groups" [ref=f11e41] [cursor=pointer]:
+                    - /url: /group/
+                - listitem [ref=f11e42]:
+                  - link "Genres" [ref=f11e43] [cursor=pointer]:
+                    - /url: /genre/
+                - listitem [ref=f11e44]:
+                  - link "Attributes" [ref=f11e45] [cursor=pointer]:
+                    - /url: /attributes/tech-specs/
+                - listitem [ref=f11e46]:
+                  - link "Critics" [ref=f11e47] [cursor=pointer]:
+                    - /url: /critic/
+                - listitem [ref=f11e48]:
+                  - link "This Day" [ref=f11e49] [cursor=pointer]:
+                    - /url: /this-day-in-gaming/
+                - listitem [ref=f11e50]:
+                  - link "Stats" [ref=f11e51] [cursor=pointer]:
+                    - /url: /stats/
+            - listitem [ref=f11e52]:
+              - generic [ref=f11e53]: Contribute
+              - list [ref=f11e55]:
+                - listitem [ref=f11e56]:
+                  - link "Most Wanted" [ref=f11e57] [cursor=pointer]:
+                    - /url: /most-wanted/
+                - listitem [ref=f11e58]:
+                  - link "Missing Games" [ref=f11e59] [cursor=pointer]:
+                    - /url: /contribute/missing-games/
+                - listitem [ref=f11e60]:
+                  - link "Add Game" [ref=f11e61] [cursor=pointer]:
+                    - /url: /contribute/game/
+                - listitem [ref=f11e62]:
+                  - link "Instructions" [ref=f11e63] [cursor=pointer]:
+                    - /url: /info/contribute/
+                - listitem [ref=f11e64]:
+                  - link "Standards" [ref=f11e65] [cursor=pointer]:
+                    - /url: /info/standards/
+                - listitem [ref=f11e66]:
+                  - link "Style Guide" [ref=f11e67] [cursor=pointer]:
+                    - /url: /info/style-guide/
+                - listitem [ref=f11e68]
+                - listitem [ref=f11e69]:
+                  - link [ref=f11e70] [cursor=pointer]:
+                    - /url: /mobyplus/
+                    - img "Moby Plus" [ref=f11e71]
+                    - text: Get MobyPlus Free
+            - listitem [ref=f11e72]:
+              - generic [ref=f11e73]: Community
+              - list [ref=f11e75]:
+                - listitem [ref=f11e76]:
+                  - link "Contributors" [ref=f11e77] [cursor=pointer]:
+                    - /url: /leaderboard/
+                - listitem [ref=f11e78]:
+                  - link "Forums" [ref=f11e79] [cursor=pointer]:
+                    - /url: /forum/
+                - listitem [ref=f11e80]:
+                  - link "Reviews" [ref=f11e81] [cursor=pointer]:
+                    - /url: /feed/player-reviews/
+                - listitem [ref=f11e82]:
+                  - link "Discord" [ref=f11e83] [cursor=pointer]:
+                    - /url: https://discord.gg/8zWGTQp
+                - listitem [ref=f11e84]:
+                  - link "Twitter" [ref=f11e85] [cursor=pointer]:
+                    - /url: https://twitter.com/MobyGames
+                - listitem [ref=f11e86]:
+                  - link "Bluesky" [ref=f11e87] [cursor=pointer]:
+                    - /url: https://bsky.app/profile/mobygames.com
+            - listitem [ref=f11e88]:
+              - link [ref=f11e89] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f11e91]:
+              - generic [ref=f11e93]:
+                - img "user avatar" [ref=f11e94]
+                - text: Login
+              - list [ref=f11e95]:
+                - listitem [ref=f11e96]:
+                  - link "Login" [ref=f11e97] [cursor=pointer]:
+                    - /url: /user/login/
+                - listitem [ref=f11e98]:
+                  - link "Register" [ref=f11e99] [cursor=pointer]:
+                    - /url: /user/register/
+      - text: ×
+  - main [ref=f11e102]:
+    - heading "MobyGames API" [level=1] [ref=f11e103]
+    - paragraph [ref=f11e104]:
+      - generic [ref=f11e105]:
+        - radio "Monthly" [checked] [ref=f11e106]
+        - text: Monthly
+      - generic [ref=f11e107]:
+        - radio "Annual (2 months free)" [ref=f11e108]
+        - text: Annual (2 months free)
+    - generic [ref=f11e109]:
+      - generic [ref=f11e110]:
+        - heading "Hobbyist" [level=2] [ref=f11e111]
+        - paragraph [ref=f11e112]: 1 requests/sec
+        - paragraph [ref=f11e113]: $9.99/mo
+        - paragraph [ref=f11e114]:
+          - button "Subscribe Now" [ref=f11e115] [cursor=pointer]
+        - list [ref=f11e116]:
+          - listitem [ref=f11e117]: Platforms
+          - listitem [ref=f11e118]: Games & Add-ons
+          - listitem [ref=f11e119]: Descriptions
+          - listitem [ref=f11e120]: Release dates
+          - listitem [ref=f11e121]: Developers & Publishers
+          - listitem [ref=f11e122]: Genres
+          - listitem [ref=f11e123]: Cover Images
+          - listitem [ref=f11e124]: Screenshots
+          - listitem [ref=f11e125]: Moby Score
+          - listitem [ref=f11e126]: Official URLs
+          - listitem [ref=f11e127]:
+            - strong [ref=f11e128]: For non-commercial use only
+      - generic [ref=f11e129]:
+        - 'heading "Bundle: MobyPlus + Hobbyist API" [level=2] [ref=f11e130]'
+        - paragraph [ref=f11e131]: 0.2 requests/sec
+        - paragraph [ref=f11e132]: $12.99/mo
+        - paragraph [ref=f11e133]:
+          - button "Subscribe Now" [ref=f11e134] [cursor=pointer]
+        - generic [ref=f11e135]:
+          - list [ref=f11e136]:
+            - listitem [ref=f11e137]:
+              - strong [ref=f11e138]: Access to MobyPlus
+            - listitem [ref=f11e139]: Platforms
+            - listitem [ref=f11e140]: Games & Add-ons
+            - listitem [ref=f11e141]: Descriptions
+            - listitem [ref=f11e142]: Release dates
+            - listitem [ref=f11e143]: Developers & Publishers
+            - listitem [ref=f11e144]: Genres
+            - listitem [ref=f11e145]: Cover Images
+            - listitem [ref=f11e146]: Screenshots
+            - listitem [ref=f11e147]: Moby Score
+            - listitem [ref=f11e148]: Official URLs
+            - listitem [ref=f11e149]:
+              - strong [ref=f11e150]: For non-commercial use only
+          - generic [ref=f11e151]:
+            - text: "MobyPlus includes:"
+            - list [ref=f11e152]:
+              - listitem [ref=f11e153]: New! Price history charts
+              - listitem [ref=f11e154]: Unlimited paging on game browser and platform game lists
+              - listitem [ref=f11e155]: Full resolution images of all covers, cases, discs, screenshots and promo images
+              - listitem [ref=f11e156]:
+                - text: Game lists in CSV/JSON format for every platform (includes ability to export customized
+                - link "game browser" [ref=f11e157] [cursor=pointer]:
+                  - /url: /game/
+                - text: results)
+              - listitem [ref=f11e158]: Moby the Whale on your profile
+              - listitem [ref=f11e159]: First to get access to new features
+              - listitem [ref=f11e160]:
+                - link "And more!" [ref=f11e161] [cursor=pointer]:
+                  - /url: /mobyplus/
+    - generic [ref=f11e162]:
+      - generic [ref=f11e163]:
+        - heading "Bronze" [level=2] [ref=f11e164]
+        - paragraph [ref=f11e165]: 1 requests/sec
+        - paragraph [ref=f11e166]: $99.99/mo
+        - paragraph [ref=f11e167]:
+          - button "Subscribe Now" [ref=f11e168] [cursor=pointer]
+        - list [ref=f11e169]:
+          - listitem [ref=f11e170]: Platforms
+          - listitem [ref=f11e171]: Games & Add-ons
+          - listitem [ref=f11e172]: Descriptions
+          - listitem [ref=f11e173]: Release dates
+          - listitem [ref=f11e174]: Genres
+          - listitem [ref=f11e175]: Companies
+          - listitem [ref=f11e176]: Cover Images
+          - listitem [ref=f11e177]: Screenshots
+          - listitem [ref=f11e178]: Promo Images
+          - listitem [ref=f11e179]: Video Links
+          - listitem [ref=f11e181]: Moby Score, Critic Score, Player Score
+          - listitem [ref=f11e182]: Official URLs
+          - listitem [ref=f11e183]:
+            - strong [ref=f11e184]: Commercial use allowed
+      - generic [ref=f11e185]:
+        - heading "Silver" [level=2] [ref=f11e186]
+        - paragraph [ref=f11e187]: 4 requests/sec
+        - paragraph [ref=f11e188]: $499.99/mo
+        - paragraph [ref=f11e189]:
+          - button "Subscribe Now" [ref=f11e190] [cursor=pointer]
+        - paragraph [ref=f11e191]: "Everything in Bronze, plus:"
+        - list [ref=f11e192]:
+          - listitem [ref=f11e193]: Customer Support
+          - listitem [ref=f11e194]: Groups
+          - listitem [ref=f11e195]: Identifiers
+          - listitem [ref=f11e196]: Product Codes
+          - listitem [ref=f11e197]: AKAs
+          - listitem [ref=f11e198]: Original full sized images
+          - listitem [ref=f11e199]: Critic reviews
+          - listitem [ref=f11e200]: Tech specs / ratings
+          - listitem [ref=f11e201]: Related Sites
+      - generic [ref=f11e202]:
+        - heading "Gold" [level=2] [ref=f11e203]
+        - paragraph [ref=f11e204]: 8 requests/sec
+        - paragraph [ref=f11e205]: $4,999.99/mo
+        - paragraph [ref=f11e206]:
+          - button "Subscribe Now" [ref=f11e207] [cursor=pointer]
+        - paragraph [ref=f11e208]: "Everything in Silver, plus:"
+        - list [ref=f11e209]:
+          - listitem [ref=f11e210]: Credits for 1.1M People
+          - listitem [ref=f11e211]: Game Trivia
+          - listitem [ref=f11e212]: Player Reviews
+    - heading "FAQ" [level=2] [ref=f11e213]
+    - generic [ref=f11e214]:
+      - group [ref=f11e215]:
+        - generic "Where can I find detailed information about the API?" [ref=f11e216] [cursor=pointer]
+      - group [ref=f11e217]:
+        - generic "What are the requirements and usage limitations?" [ref=f11e218] [cursor=pointer]
+      - group [ref=f11e219]:
+        - generic "How can I cancel?" [ref=f11e220] [cursor=pointer]
+      - group [ref=f11e221]:
+        - generic "Can I store data on my server?" [ref=f11e222] [cursor=pointer]
+      - group [ref=f11e223]:
+        - generic "Can I get free access to the API for non-commercial research purposes?" [active] [ref=f11e224] [cursor=pointer]
+        - paragraph [ref=f11e241]:
+          - text: Yes, to request free API access for non-commercial research purposes, please complete
+          - link "this form" [ref=f11e242] [cursor=pointer]:
+            - /url: /subscription-request-form
+          - text: with details about your project and the data you require.
+  - separator [ref=f11e225]
+  - contentinfo [ref=f11e226]:
+    - paragraph [ref=f11e227]:
+      - link "About" [ref=f11e228] [cursor=pointer]:
+        - /url: /info/about/
+      - text: ·
+      - link "FAQ" [ref=f11e229] [cursor=pointer]:
+        - /url: /info/faq/
+      - text: ·
+      - link "MobyPlus" [ref=f11e230] [cursor=pointer]:
+        - /url: /mobyplus/
+      - text: ·
+      - link "Stats" [ref=f11e231] [cursor=pointer]:
+        - /url: /stats/
+      - text: ·
+      - link "Standards" [ref=f11e232] [cursor=pointer]:
+        - /url: /info/standards/
+      - text: ·
+      - link "Style Guide" [ref=f11e233] [cursor=pointer]:
+        - /url: /info/style-guide/
+      - text: ·
+      - link "API" [ref=f11e234] [cursor=pointer]:
+        - /url: /api/subscribe/
+      - text: ·
+      - link "Contact" [ref=f11e235] [cursor=pointer]:
+        - /url: /info/contact/
+      - text: ·
+      - link "Change Log" [ref=f11e236] [cursor=pointer]:
+        - /url: /changelog/
+      - text: ·
+      - link "Privacy Policy" [ref=f11e237] [cursor=pointer]:
+        - /url: /info/privacy/
+      - text: ·
+      - link "Terms of Use" [ref=f11e238] [cursor=pointer]:
+        - /url: /info/terms/
+    - paragraph [ref=f11e239]: © 1999–2026 MobyGames ™
+    - paragraph [ref=f11e240]: v20260730

@@ -6,9 +6,10 @@ Un **orquestador** y N **proveedores** que no se conocen entre sí. El orquestad
 proveedores atienden cada campo, los lanza en paralelo, y devuelve lo que haya llegado.
 
 La regla que ordena todo el diseño: **un proveedor es una fuente de fallas, no de
-garantías.** APIs con cuota, sitios que cambian su HTML sin aviso, modelos que tardan
+garantías.** modelos gratuitos con cupo variable y llamadas que tardan
 treinta segundos. El sistema se diseña asumiendo que en cada búsqueda alguno va a fallar, y
-que eso es normal y no se muestra.
+que eso es normal y no se muestra. El scraping HTML queda fuera del plan: si no hay API o
+modelo usable, el candidato será `referencia` o carga manual.
 
 ## El contrato del proveedor
 
@@ -46,34 +47,26 @@ Agregar una fuente es una clase nueva y una fila en la tabla de prioridad. Nada 
 
 ## Los proveedores
 
-```
+```text
 lib/providers/
   base.py                    # Protocol + Consulta + Candidato + Limite
   registro.py                # tabla campo → [proveedores, en orden]
   orquestador.py
   http.py                    # reintentos, backoff, Retry-After, ritmo y cupo
   cortocircuito.py
-  api/
-    screenscraper.py         # imágenes, video, identidad por hash
-    mobygames.py             # imágenes, metadata
-    archive_org.py           # manuales
-  scrape/
-    abandonsocios.py
-    myabandonware.py
-    replacementdocs.py
-    gamefaqs.py              # trucos
-    youtube.py               # SOLO referencias
   ia/
-    generador.py
+    generador.py             # modelos gratuitos para textos y candidatos no autoritativos
     prompts/
       sinopsis.v1.md
       resena.v1.md
       trucos.v1.md
+  referencia/
+    youtube.py               # SOLO referencias
 ```
 
-Los de `scrape/` van **últimos** en toda tabla de prioridad, pero por calidad del dato, no
-por velocidad: parsean HTML que puede cambiar cualquier día. Su caída es esperable, no un
-bug.
+No hay `scrape/` ni sustituto basado en HTML: COINDOOR no parsea ScreenScraper, MobyGames
+ni sitios de terceros. La información que antes se pensaba obtener por scraping pasa a
+salir del proveedor de IA, marcada como IA y nunca usada para identidad.
 
 ## Decisiones
 
@@ -128,14 +121,14 @@ acotadas y en proceso, no infraestructura de procesamiento.
 Se confunden fácil y resuelven cosas diferentes:
 
 | Capa | Contra qué protege | Alcance |
-|---|---|---|
+| --- | --- | --- |
 | **Reintento** | Un fallo pasajero: timeout, corte de conexión, 5xx, 429 | Una llamada |
 | **Límite propio** | Que nos baneen o que se agote la cuota | Todas las llamadas a ese proveedor |
 | **Cortocircuito** | Una fuente que está muerta de verdad | El resto de la sesión |
 
 #### Reintento: lo que importa es qué **no** se reintenta
 
-```
+```text
 Se reintenta:     timeout · error de conexión · 5xx · 429
 No se reintenta:  401/403 (credenciales) · 404 · sin resultados · HTML que no parsea
 ```
@@ -164,10 +157,13 @@ class Limite:
 Cada proveedor declara el suyo como **dato**; el orquestador lo aplica. Un token bucket para
 el ritmo, un contador persistente para el cupo diario.
 
-- Las APIs con cuenta (ScreenScraper, MobyGames) tienen sobre todo **cupo diario**.
-- Los scrapers no tienen cuota publicada, pero sí un límite de cortesía: pausa entre
-  llamadas al mismo dominio, `User-Agent` identificable y respeto de `robots.txt`. No es
-  formalismo — es lo que evita que nos bloqueen el sitio entero.
+- Los modelos gratuitos tienen sobre todo **cupo diario o mensual**, y pueden cambiarlo sin
+  aviso.
+- Las fuentes `referencia/` no descargan ni parsean HTML: devuelven enlaces o pistas para que
+  el usuario consiga el material y lo suba a mano.
+- ScreenScraper y MobyGames quedan fuera del camino principal. Si algún día vuelven por API
+  oficial, requieren verificación de términos/cuotas y una decisión explícita antes de
+  escribir código.
 
 **Agotar el cupo no es una falla que se reintente.** Es un "volvé mañana": el proveedor
 queda fuera hasta que resetee, y la pantalla lo dice con esas palabras. Confundirlo con "sin
@@ -199,14 +195,12 @@ minutos de espera pura por algo que nunca va a responder.
 Clave `(set, campo)`. ScreenScraper y MobyGames tienen cuota diaria, y volver a abrir el
 mismo modal no debería gastarla. Se invalida al reintentar explícitamente.
 
-### El hash se calcula una vez y perezosamente
+### Sin identidad por IA
 
-ScreenScraper identifica por CRC32/MD5/SHA1, que es lo que lo vuelve autoridad para consolas
-([`ADR-0004`](../../decisions/0004-coindoor-fuente-identidad-no-mame.md)). Pero un `.bin` de
-PSX son varios GB y hashearlo tarda.
-
-Se calcula la primera vez que hace falta y se guarda con el juego. Para `romSource: 'path'`
-se lee el archivo donde esté, sin copiarlo.
+La IA puede proponer textos, trucos y pistas de búsqueda. No decide identidad, año, sistema ni
+campos que el contrato use como identificadores. Esos datos quedan en MAME para arcade o en
+la persona que carga el juego, como ya exige
+[`ADR-0004`](../../decisions/0004-coindoor-fuente-identidad-no-mame.md).
 
 ## Implementación
 
@@ -219,12 +213,12 @@ se lee el archivo donde esté, sin copiarlo.
    cada uno ya trae su propio reintento a mano.
 4. `lib/providers/orquestador.py` — fan-out con timeout individual, aislamiento de fallas,
    cortocircuito sobre reintentos agotados, caché y conteo.
-5. Un proveedor real de punta a punta (**ScreenScraper**) antes que cualquier otro: valida
-   el contrato contra una fuente que existe, no contra una imaginada.
-6. `lib/providers/ia/generador.py` + los prompts `.v1`.
-7. El resto de los proveedores, uno por uno.
-8. API:
-   ```
+5. `lib/providers/ia/generador.py` + los prompts `.v1` como primer proveedor real: valida
+   el contrato contra el camino principal nuevo, no contra ScreenScraper ni MobyGames.
+6. `lib/providers/referencia/` para enlaces que el usuario aplica a mano.
+7. API:
+
+   ```text
    POST   /games/:id/suggestions/:key        → { jobId }
    GET    /jobs/:jobId                       → { status,
                                                  candidatos: [...],   # completos, al final
@@ -242,8 +236,10 @@ se lee el archivo donde esté, sin copiarlo.
 - **El cortocircuito puede esconder una caída permanente.** Si una fuente muere para
   siempre, el usuario solo ve que aparecen menos resultados. El conteo
   `respondieron / consultados` es lo único que lo hace visible.
-- **El contador de cupo diario tiene que sobrevivir al reinicio de la app.** Si vive en
-  memoria, reiniciar lo pone en cero y volvemos a pegarle a una API que ya nos cortó. Va
+- **El contador de cupo tiene que sobrevivir al reinicio de la app.** Si vive en memoria,
+  reiniciar lo pone en cero y volvemos a pegarle a un proveedor que ya nos cortó. Va
   persistido, con la fecha de reseteo.
-- **Los scrapers dependen de HTML ajeno.** Se van a romper. El diseño lo asume; el riesgo
-  real es que se rompan *en silencio* devolviendo basura en vez de fallar.
+- **Los modelos gratuitos pueden cambiar límites o desaparecer.** El respaldo y el salto
+  limpio del proveedor son parte del diseño, no optimización futura.
+- **Una respuesta inválida de IA se puede ver convincente.** Tiene que fallar explícito,
+  nunca convertirse en candidato con datos basura.

@@ -1,0 +1,2992 @@
+- table [ref=f18e2]:
+  - rowgroup [ref=f18e3]:
+    - row [ref=f18e4]:
+      - cell [ref=f18e5]
+      - cell [ref=f18e7]:
+        - table [ref=f18e8]:
+          - rowgroup [ref=f18e9]:
+            - row [ref=f18e10]:
+              - cell [ref=f18e11]:
+                - table [ref=f18e13]:
+                  - rowgroup [ref=f18e14]:
+                    - row [ref=f18e15]:
+                      - cell "ACCUEIL" [ref=f18e16] [cursor=pointer]
+                      - cell "FORUM" [ref=f18e18] [cursor=pointer]
+                      - cell "DISCORD" [ref=f18e20] [cursor=pointer]
+                      - cell "R.SOCIAUX" [ref=f18e22] [cursor=pointer]
+                      - cell "SOUTENEZ-NOUS" [ref=f18e24] [cursor=pointer]
+                      - cell [ref=f18e26]
+                      - cell "RECALBOX" [ref=f18e27] [cursor=pointer]
+                      - cell "SKRAPER" [ref=f18e29] [cursor=pointer]
+                - table [ref=f18e32]:
+                  - rowgroup [ref=f18e33]:
+                    - row [ref=f18e34]:
+                      - cell [ref=f18e35]:
+                        - table [ref=f18e36]:
+                          - rowgroup [ref=f18e37]:
+                            - row [ref=f18e38]:
+                              - cell [ref=f18e39]:
+                                - link [ref=f18e40] [cursor=pointer]:
+                                  - /url: index.php
+                              - cell [ref=f18e42]:
+                                - link [ref=f18e43] [cursor=pointer]:
+                                  - /url: index.php
+                              - cell [ref=f18e45]:
+                                - link [ref=f18e46] [cursor=pointer]:
+                                  - /url: index.php
+                            - row [ref=f18e48]:
+                              - cell [ref=f18e49]
+                            - row
+                            - row [ref=f18e51]:
+                              - cell [ref=f18e52]:
+                                - table [ref=f18e54]:
+                                  - rowgroup [ref=f18e55]:
+                                    - row [ref=f18e56]:
+                                      - cell "Langue :" [ref=f18e57]
+                                      - cell [ref=f18e58]:
+                                        - link [ref=f18e59] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=de
+                                          - img "Allemand" [ref=f18e60]
+                                      - cell [ref=f18e61]:
+                                        - link [ref=f18e62] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=en
+                                          - img "Anglais" [ref=f18e63]
+                                      - cell [ref=f18e64]:
+                                        - link [ref=f18e65] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=es
+                                          - img "Espagnol" [ref=f18e66]
+                                      - cell [ref=f18e67]:
+                                        - link [ref=f18e68] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=fr
+                                          - img "Français" [ref=f18e69]
+                                      - cell [ref=f18e70]:
+                                        - link [ref=f18e71] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=it
+                                          - img "Italien" [ref=f18e72]
+                                      - cell [ref=f18e73]:
+                                        - link [ref=f18e74] [cursor=pointer]:
+                                          - /url: index.php?action=changelangue&langue=pt
+                                          - img "Portugais" [ref=f18e75]
+                                    - row [ref=f18e76]:
+                                      - cell "Translate W.I.P." [ref=f18e77]
+                                      - cell "98%" [ref=f18e78]
+                                      - cell "71%" [ref=f18e79]
+                                      - cell "92%" [ref=f18e80]
+                                      - cell [ref=f18e81]
+                                      - cell "77%" [ref=f18e82]
+                                      - cell "94%" [ref=f18e83]
+                                    - row [ref=f18e84]:
+                                      - cell "Région préférée :" [ref=f18e85]
+                                      - cell [ref=f18e86]:
+                                        - link [ref=f18e87] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=fr&gameid=0&plateforme=0
+                                          - img "France" [ref=f18e88]
+                                      - cell [ref=f18e89]:
+                                        - link [ref=f18e90] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=eu&gameid=0&plateforme=0
+                                          - img "Europe" [ref=f18e91]
+                                      - cell [ref=f18e92]:
+                                        - link [ref=f18e93] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=us&gameid=0&plateforme=0
+                                          - img "USA" [ref=f18e94]
+                                      - cell [ref=f18e95]:
+                                        - link [ref=f18e96] [cursor=pointer]:
+                                          - /url: index.php?action=changeregion&region=jp&gameid=0&plateforme=0
+                                          - img "Japon" [ref=f18e97]
+                            - row
+                      - cell [ref=f18e98]:
+                        - table [ref=f18e99]:
+                          - rowgroup [ref=f18e100]:
+                            - row [ref=f18e101]:
+                              - cell "Communauté" [ref=f18e102]
+                              - cell [ref=f18e103]
+                              - cell "API" [ref=f18e105]
+                              - cell [ref=f18e106]
+                              - cell "Infrastructure" [ref=f18e108]
+                            - row [ref=f18e109]:
+                              - cell [ref=f18e110]
+                            - row [ref=f18e112]:
+                              - cell [ref=f18e113]:
+                                - table [ref=f18e115]:
+                                  - rowgroup [ref=f18e116]:
+                                    - row [ref=f18e117]:
+                                      - cell "Membres :" [ref=f18e118]
+                                      - cell "939.107" [ref=f18e119]
+                                    - row [ref=f18e120]:
+                                      - cell "Admins :" [ref=f18e121]
+                                      - cell "12" [ref=f18e122]
+                                    - row [ref=f18e123]:
+                                      - cell "Dernière Mise a Jour :" [ref=f18e124]
+                                      - cell "12/08/26" [ref=f18e125]
+                                    - row [ref=f18e126]:
+                                      - cell "Dernier commentaire :" [ref=f18e127]
+                                      - cell "12/08/26" [ref=f18e128]
+                                    - row [ref=f18e129]:
+                                      - cell "Accés API Hier :" [ref=f18e130]
+                                      - cell "44.030.232" [ref=f18e131]
+                                    - row [ref=f18e132]:
+                                      - cell "Accés API aujourd'hui :" [ref=f18e133]
+                                      - cell "32.727.269" [ref=f18e134]
+                              - cell [ref=f18e135]
+                              - cell [ref=f18e136]:
+                                - table [ref=f18e138]:
+                                  - rowgroup [ref=f18e139]:
+                                    - row [ref=f18e140]:
+                                      - cell "nb. threads / min. :" [ref=f18e141]
+                                      - cell "4071" [ref=f18e142]
+                                    - row [ref=f18e143]:
+                                      - cell "nb. threads ouvert :" [ref=f18e144]
+                                      - cell "189 / 4096" [ref=f18e145]
+                                    - row [ref=f18e146]:
+                                      - cell "nb. threads ouv. n.i. :" [ref=f18e147]
+                                      - cell "40 / 256" [ref=f18e148]
+                                    - row [ref=f18e149]:
+                                      - cell [ref=f18e150]
+                                    - row [ref=f18e152]:
+                                      - cell "nb. scrapeurs :" [ref=f18e153]
+                                      - cell "472" [ref=f18e154]
+                                    - row [ref=f18e155]:
+                                      - cell "nb. non inscrits :" [ref=f18e156]
+                                      - cell "138" [ref=f18e157]
+                                    - row [ref=f18e158]:
+                                      - cell [ref=f18e159]
+                                    - row [ref=f18e161]:
+                                      - cell "non inscrits :" [ref=f18e162]
+                                      - cell [ref=f18e163]
+                                    - row [ref=f18e165]:
+                                      - cell "inscrits :" [ref=f18e166]
+                                      - cell [ref=f18e167]
+                                    - row [ref=f18e169]:
+                                      - cell "contributeurs :" [ref=f18e170]
+                                      - cell [ref=f18e171]
+                              - cell [ref=f18e173]
+                              - cell [ref=f18e174]:
+                                - table [ref=f18e175]:
+                                  - rowgroup [ref=f18e176]:
+                                    - row [ref=f18e177]:
+                                      - cell "Serveurs :" [ref=f18e178]
+                                      - cell "CPU 1" [ref=f18e179]
+                                      - cell "CPU 2" [ref=f18e180]
+                                      - cell "CPU 3" [ref=f18e181]
+                                    - row [ref=f18e182]:
+                                      - cell "Occupation CPU :" [ref=f18e183]
+                                      - cell "8%" [ref=f18e184]
+                                      - cell "35%" [ref=f18e185]
+                                      - cell "29%" [ref=f18e186]
+                                    - row:
+                                      - cell
+                                    - row [ref=f18e187]:
+                                      - cell "Nb accés API/Min. :" [ref=f18e188]
+                                      - cell "62" [ref=f18e189]
+                                      - cell "2765" [ref=f18e190]
+                                      - cell "773" [ref=f18e191]
+                                    - row [ref=f18e192]:
+                                      - cell "Temps moyen traitement" [ref=f18e193]
+                                    - row [ref=f18e194]:
+                                      - cell "jeuInfo OK :" [ref=f18e195]
+                                      - cell "1.54s" [ref=f18e196]
+                                      - cell [ref=f18e197]
+                                      - cell "1.58s" [ref=f18e198]
+                                    - row [ref=f18e199]:
+                                      - cell "jeuInfo KO :" [ref=f18e200]
+                                      - cell "0.60s" [ref=f18e201]
+                                      - cell [ref=f18e202]
+                                      - cell "0.93s" [ref=f18e203]
+                                    - row [ref=f18e204]:
+                                      - cell "jeuRecherche :" [ref=f18e205]
+                                      - cell "3.42s" [ref=f18e206]
+                                      - cell [ref=f18e207]
+                                      - cell "1.15s" [ref=f18e208]
+                                    - row [ref=f18e209]:
+                                      - cell "mediaJeu :" [ref=f18e210]
+                                      - cell [ref=f18e211]
+                                      - cell "0.13s" [ref=f18e212]
+                                      - cell "0.38s" [ref=f18e213]
+                                    - row [ref=f18e214]:
+                                      - cell "mediaVideoJeu :" [ref=f18e215]
+                                      - cell [ref=f18e216]
+                                      - cell "0.19s" [ref=f18e217]
+                                      - cell [ref=f18e218]
+                      - cell [ref=f18e219]:
+                        - table [ref=f18e220]:
+                          - rowgroup [ref=f18e221]:
+                            - row [ref=f18e222]:
+                              - cell [ref=f18e223]:
+                                - text: "Membre :"
+                                - link "mataderos14" [ref=f18e224] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=29271437
+                            - row [ref=f18e225]:
+                              - 'cell "Membre (1) 1 Threads Propositions en attente : 0 / 5 Propositions média en attente : 0 / 5 Nb Scrape Aujourd''hui : 0 / 20000 Nb Scrape KO Aujourd''hui : 0 / 2000 0 Message. 0 Commentaire(s) non clos / 2" [ref=f18e226]'
+                            - row [ref=f18e227]:
+                              - cell [ref=f18e228]:
+                                - button "deconnexion" [ref=f18e229]
+                - generic [ref=f18e230]:
+                  - table [ref=f18e231]:
+                    - rowgroup [ref=f18e232]:
+                      - row [ref=f18e233]:
+                        - cell "SYSTEMES" [ref=f18e234] [cursor=pointer]
+                        - cell "JEUX" [ref=f18e236] [cursor=pointer]
+                        - cell "ROMS" [ref=f18e238] [cursor=pointer]
+                        - cell "P2K" [ref=f18e240] [cursor=pointer]
+                        - cell "DERNIERS AJOUTS ..." [ref=f18e241]
+                        - cell [ref=f18e242] [cursor=pointer]:
+                          - table [ref=f18e243]:
+                            - rowgroup [ref=f18e244]:
+                              - row [ref=f18e245]:
+                                - cell "...ROMS" [ref=f18e246]
+                        - cell "...JEUX" [ref=f18e247] [cursor=pointer]
+                        - cell [ref=f18e248]
+                        - cell "COMPAGNIES" [ref=f18e249] [cursor=pointer]
+                        - cell "GROUPES" [ref=f18e250] [cursor=pointer]
+                        - cell "CHANTIERS" [ref=f18e251] [cursor=pointer]
+                        - cell "WEBAPI" [ref=f18e252]
+                        - cell [ref=f18e253] [cursor=pointer]:
+                          - img "French Only" [ref=f18e254]
+                          - text: v2
+                  - table [ref=f18e255]:
+                    - rowgroup [ref=f18e256]:
+                      - row [ref=f18e257]:
+                        - cell "COMMUNAUTE" [ref=f18e258]
+                        - cell [ref=f18e259] [cursor=pointer]:
+                          - table [ref=f18e260]:
+                            - rowgroup [ref=f18e261]:
+                              - row [ref=f18e262]:
+                                - cell "COMMENTAIRES" [ref=f18e263]
+                                - cell [ref=f18e264]
+                                - cell
+                        - cell "NOTES" [ref=f18e265] [cursor=pointer]
+                        - cell "FORUM" [ref=f18e266] [cursor=pointer]
+                        - cell "F.A.Q." [ref=f18e267] [cursor=pointer]
+                        - cell [ref=f18e268] [cursor=pointer]:
+                          - img "French Only" [ref=f18e269]
+                          - text: LIENS
+                - table [ref=f18e271]:
+                  - rowgroup [ref=f18e272]:
+                    - row [ref=f18e273]:
+                      - cell "Rechercher un jeu :" [ref=f18e274]
+                      - 'cell "Système : Tous les systèmes" [ref=f18e275]':
+                        - text: "Système :"
+                        - combobox [ref=f18e276]:
+                          - option "Tous les systèmes" [selected]
+                          - option "3DO"
+                          - option "Aamber Pegasus"
+                          - option "Acclaim"
+                          - option "Action Max"
+                          - option "Adam"
+                          - option "Adventure Vision"
+                          - option "Alice"
+                          - option "Alpha Denshi Co."
+                          - option "Amcoe"
+                          - option "American Laser Games"
+                          - option "Amiga"
+                          - option "Amiga (AGA)"
+                          - option "Amiga CD"
+                          - option "Amiga CD32"
+                          - option "Amiga CD32 (hack)"
+                          - option "Amiga CDTV"
+                          - option "Android"
+                          - option "Apple II"
+                          - option "Apple IIGS"
+                          - option "Arcadia 2001"
+                          - option "Archimedes"
+                          - option "Arduboy"
+                          - option "Astrocade"
+                          - option "Atari 2600"
+                          - option "Atari 2600 Supercharger"
+                          - option "Atari 5200"
+                          - option "Atari 7800"
+                          - option "Atari 8bit"
+                          - option "Atari Classics"
+                          - option "Atari ST"
+                          - option "Atlus"
+                          - option "Atom"
+                          - option "Atomiswave"
+                          - option "Banpresto"
+                          - option "BBC Micro"
+                          - option "BK"
+                          - option "Camputers Lynx"
+                          - option "Capcom Classics"
+                          - option "Capcom Play System"
+                          - option "Capcom Play System 2"
+                          - option "Capcom Play System 3"
+                          - option "Cassette Vision"
+                          - option "Cave"
+                          - option "CD-i"
+                          - option "Century Electronics"
+                          - option "Channel F"
+                          - option "Cinematronics"
+                          - option "Coleco"
+                          - option "Colecovision"
+                          - option "Comad"
+                          - option "Commodore 64"
+                          - option "CoreGrafX"
+                          - option "CPC"
+                          - option "CreatiVision"
+                          - option "Daphne"
+                          - option "Data East Classics"
+                          - option "Dragon 32/64"
+                          - option "Dreamcast"
+                          - option "Dynax"
+                          - option "EasyRPG"
+                          - option "EG2000 Colour Genie"
+                          - option "Eighting / Raizing"
+                          - option "Electron"
+                          - option "Exidy"
+                          - option "EXL 100"
+                          - option "Family Computer Disk System"
+                          - option "Flipper"
+                          - option "FM Towns"
+                          - option "FM-7"
+                          - option "Future Pinball"
+                          - option "Gaelco"
+                          - option "Gamate"
+                          - option "Game & Watch"
+                          - option "Game Boy"
+                          - option "Game Boy Advance"
+                          - option "Game Boy Color"
+                          - option "Game Gear"
+                          - option "Game Master"
+                          - option "Game Pocket Computer"
+                          - option "Game.com"
+                          - option "Gamecube"
+                          - option "GBA e-Reader"
+                          - option "Gottlieb"
+                          - option "GP32"
+                          - option "GX4000"
+                          - option "Hikaru"
+                          - option "IGS"
+                          - option "Incredible Technologies"
+                          - option "Intellivision"
+                          - option "Irem Classics"
+                          - option "J2ME"
+                          - option "Jaguar"
+                          - option "Jaguar CD"
+                          - option "Jaleco"
+                          - option "Jupiter Ace"
+                          - option "Kaneko"
+                          - option "Konami Classics"
+                          - option "Linux"
+                          - option "Loopy"
+                          - option "LowRes NX"
+                          - option "Lutro"
+                          - option "Lynx"
+                          - option "M5"
+                          - option "Mac OS"
+                          - option "Mame"
+                          - option "Master System"
+                          - option "Mega Duck"
+                          - option "Mega-CD"
+                          - option "Mega-Play"
+                          - option "Mega-Tech"
+                          - option "Megadrive"
+                          - option "Megadrive - Sonic The Hedgehog 2 Hacks"
+                          - option "Megadrive 32X"
+                          - option "MGT SAM Coupé"
+                          - option "Midway Classics"
+                          - option "Mikrosha"
+                          - option "Mitchell"
+                          - option "Model 2"
+                          - option "Model 3"
+                          - option "MSU-MD"
+                          - option "MSX"
+                          - option "MSX Turbo R"
+                          - option "MSX2"
+                          - option "MSX2+"
+                          - option "My Vision"
+                          - option "N-Gage"
+                          - option "Namco Classics"
+                          - option "Namco System 22"
+                          - option "Naomi"
+                          - option "Naomi 2"
+                          - option "Naomi GD-ROM"
+                          - option "NEC PC-8801"
+                          - option "NEC PC-9801"
+                          - option "Neo-Geo"
+                          - option "Neo-Geo CD"
+                          - option "Neo-Geo MVS"
+                          - option "Neo-Geo Pocket"
+                          - option "Neo-Geo Pocket Color"
+                          - option "NES"
+                          - option "Nes - Super Mario Bros. Hacks"
+                          - option "Nichibutsu"
+                          - option "Nintendo 3DS"
+                          - option "Nintendo 64"
+                          - option "Nintendo 64DD"
+                          - option "Nintendo Classics"
+                          - option "Nintendo DS"
+                          - option "Nintendo Power"
+                          - option "NMK"
+                          - option "non Jeu"
+                          - option "OpenBOR"
+                          - option "Oric 1 / Atmos"
+                          - option "P2000T"
+                          - option "Palm OS"
+                          - option "PC Dos"
+                          - option "PC Engine"
+                          - option "PC Engine CD-Rom"
+                          - option "PC Engine SuperGrafx"
+                          - option "PC Win3.xx"
+                          - option "PC Win9X"
+                          - option "PC Windows"
+                          - option "PC-FX"
+                          - option "Pecom 64"
+                          - option "PET"
+                          - option "Philips VG 5000"
+                          - option "Pico-8"
+                          - option "Pinball FX2"
+                          - option "Pinball FX3"
+                          - option "PlayChoice"
+                          - option "Playstation"
+                          - option "Playstation 2"
+                          - option "Playstation 3"
+                          - option "Playstation 4"
+                          - option "Playstation 5"
+                          - option "Playstation minis"
+                          - option "Plus/4"
+                          - option "Pocket Challenge V2"
+                          - option "Pokémon mini"
+                          - option "PrBoom"
+                          - option "PS Vita"
+                          - option "Psikyo"
+                          - option "PSP"
+                          - option "PV-1000"
+                          - option "Sammy Classics"
+                          - option "Satellaview"
+                          - option "Saturn"
+                          - option "ScummVM"
+                          - option "Sega Classics"
+                          - option "Sega Pico"
+                          - option "Sega ST-V"
+                          - option "Seibu Kaihatsu"
+                          - option "SemiCom"
+                          - option "Seta"
+                          - option "SG-1000"
+                          - option "Sharp MZ"
+                          - option "Sharp X1"
+                          - option "Sharp X68000"
+                          - option "Snes - Super Mario World Hacks"
+                          - option "SNK Classics"
+                          - option "Solarus"
+                          - option "Spectravideo"
+                          - option "Sufami Turbo"
+                          - option "Super A'can"
+                          - option "Super Cassette Vision"
+                          - option "Super Game Boy"
+                          - option "Super Game Boy 2"
+                          - option "Super Nintendo"
+                          - option "Super Nintendo MSU-1"
+                          - option "Switch"
+                          - option "Switch 2"
+                          - option "Taito Classics"
+                          - option "Taito G-Net"
+                          - option "Tamagotchi"
+                          - option "Technos"
+                          - option "Tecmo"
+                          - option "TeknoParrot"
+                          - option "the Pinball Arcade"
+                          - option "Thomson MO/TO"
+                          - option "TI-99/4A"
+                          - option "TIC-80"
+                          - option "Toaplan"
+                          - option "TRS-80 Color Computer"
+                          - option "Tutor"
+                          - option "Type X"
+                          - option "Universal"
+                          - option "Uzebox"
+                          - option "V.Smile"
+                          - option "V.Smile Pro"
+                          - option "VC 4000"
+                          - option "Vectrex"
+                          - option "Vic-20"
+                          - option "Video System Co."
+                          - option "Videopac G7000"
+                          - option "Vircon32"
+                          - option "Virtual Boy"
+                          - option "Visco"
+                          - option "Visual Pinball"
+                          - option "Voxatron"
+                          - option "VZ200 / Laser310"
+                          - option "WASM-4"
+                          - option "Watara Supervision"
+                          - option "Wii"
+                          - option "Wii U"
+                          - option "WonderSwan"
+                          - option "WonderSwan Color"
+                          - option "Xbox"
+                          - option "Xbox 360"
+                          - option "Xbox One"
+                          - option "Z-Machine"
+                          - option "ZX Spectrum"
+                          - option "ZX81"
+                      - 'cell "Genre : Tous les genres" [ref=f18e277]':
+                        - text: "Genre :"
+                        - combobox [ref=f18e278]:
+                          - option "Tous les genres" [selected]
+                          - option "Action"
+                          - option "-->Action / Aventure"
+                          - option "-->Action / Casse briques"
+                          - option "-->Action / Escalade"
+                          - option "-->Action / Labyrinthe"
+                          - option "Adulte"
+                          - option "Aventure"
+                          - option "-->Aventure / 3D Temps Réel"
+                          - option "-->Aventure / Film Interactif"
+                          - option "-->Aventure / Graphique"
+                          - option "-->Aventure / Point and Click"
+                          - option "-->Aventure / Roman Visuel"
+                          - option "-->Aventure / Survival Horror"
+                          - option "-->Aventure / Texte"
+                          - option "Beat'em All"
+                          - option "Casino"
+                          - option "-->Casino / Cartes"
+                          - option "-->Casino / Course"
+                          - option "-->Casino / Loterie"
+                          - option "-->Casino / Machine a sous"
+                          - option "-->Casino / Roulette"
+                          - option "Casual Game"
+                          - option "Chasse et Peche"
+                          - option "-->Chasse"
+                          - option "-->Peche"
+                          - option "Combat"
+                          - option "-->Combat / 2.5D"
+                          - option "-->Combat / 2D"
+                          - option "-->Combat / 3D"
+                          - option "-->Combat / Versus"
+                          - option "-->Combat / Versus Co-op"
+                          - option "-->Combat / Vertical"
+                          - option "Compilation"
+                          - option "Course, Conduite"
+                          - option "-->Course de Moto vue 1er pers."
+                          - option "-->Course de Moto vue 3eme pers."
+                          - option "-->Course vue 1ere pers."
+                          - option "-->Course vue 3eme pers."
+                          - option "-->Course, Conduite / Avion"
+                          - option "-->Course, Conduite / Bateau"
+                          - option "-->Course, Conduite / Course"
+                          - option "-->Course, Conduite / Deltaplane"
+                          - option "-->Course, Conduite / Moto"
+                          - option "Demo"
+                          - option "Divers"
+                          - option "-->Divers / Electro-mecanique"
+                          - option "-->Divers / Print Club"
+                          - option "-->Divers / Système"
+                          - option "-->Divers / Utilitaires"
+                          - option "Flipper"
+                          - option "Jeu de cartes"
+                          - option "Jeu de rôles"
+                          - option "-->Action RPG"
+                          - option "-->Dungeon RPG"
+                          - option "-->Jeu de Rôle Japonais"
+                          - option "-->Jeu de Rôle Tactique"
+                          - option "-->Jeu de rôles en équipe"
+                          - option "-->MMORPG"
+                          - option "Jeu de societe / plateau"
+                          - option "Jeu de societe asiatique"
+                          - option "-->Go"
+                          - option "-->Hanafuda"
+                          - option "-->Mahjong"
+                          - option "-->Othello"
+                          - option "-->Renju"
+                          - option "-->Shougi"
+                          - option "Ludo-Educatif"
+                          - option "Musique et Danse"
+                          - option "-->Chant"
+                          - option "-->Danse"
+                          - option "-->Musique"
+                          - option "-->Rythme"
+                          - option "N/A"
+                          - option "Plateforme"
+                          - option "-->Plateforme / Fighter Scrolling"
+                          - option "-->Plateforme / Run & Jump"
+                          - option "-->Plateforme / Run & Jump Scrolling"
+                          - option "-->Plateforme / Shooter Scrolling"
+                          - option "Puzzle-Game"
+                          - option "-->Puzzle-Game / Egaler"
+                          - option "-->Puzzle-Game / Glisser"
+                          - option "-->Puzzle-Game / Lancer"
+                          - option "-->Puzzle-Game / Tomber"
+                          - option "Quiz"
+                          - option "-->Quiz / Allemand"
+                          - option "-->Quiz / Anglais"
+                          - option "-->Quiz / Coréen"
+                          - option "-->Quiz / Espagnol"
+                          - option "-->Quiz / Français"
+                          - option "-->Quiz / Italien"
+                          - option "-->Quiz / Japonais"
+                          - option "-->Quiz / Musical Anglais"
+                          - option "-->Quiz / Musical Japonais"
+                          - option "Réflexion"
+                          - option "Shoot'em Up"
+                          - option "-->Shoot'em up / Diagonal"
+                          - option "-->Shoot'em up / Horizontal"
+                          - option "-->Shoot'em up / Vertical"
+                          - option "Simulation"
+                          - option "-->Construction & Management"
+                          - option "-->Simulation / Science Fiction"
+                          - option "-->Simulation / Véhicules"
+                          - option "-->Simulation / Vie"
+                          - option "Sport"
+                          - option "-->Sport / Automobile"
+                          - option "-->Sport / Baseball"
+                          - option "-->Sport / Basketball"
+                          - option "-->Sport / Billard"
+                          - option "-->Sport / Bowling"
+                          - option "-->Sport / Boxe"
+                          - option "-->Sport / Bras de fer"
+                          - option "-->Sport / Combat"
+                          - option "-->Sport / Course a pied"
+                          - option "-->Sport / Cyclisme"
+                          - option "-->Sport / Dodgeball"
+                          - option "-->Sport / Extrême"
+                          - option "-->Sport / Fitness"
+                          - option "-->Sport / Flechette"
+                          - option "-->Sport / Football"
+                          - option "-->Sport / Football Américain"
+                          - option "-->Sport / Golf"
+                          - option "-->Sport / Handball"
+                          - option "-->Sport / Hockey"
+                          - option "-->Sport / Jeu de palet"
+                          - option "-->Sport / Lutte"
+                          - option "-->Sport / Multisports"
+                          - option "-->Sport / Natation"
+                          - option "-->Sport / Nautique"
+                          - option "-->Sport / Parachutisme"
+                          - option "-->Sport / Ping pong"
+                          - option "-->Sport / Rugby"
+                          - option "-->Sport / Skateboard"
+                          - option "-->Sport / Ski"
+                          - option "-->Sport / Sumo"
+                          - option "-->Sport / Tennis"
+                          - option "-->Sport / Volleyball"
+                          - option "Sport avec animaux"
+                          - option "-->Course de chevaux"
+                          - option "Stratégie"
+                          - option "Tir"
+                          - option "-->Tir / 1ere Personne"
+                          - option "-->Tir / 3eme Personne"
+                          - option "-->Tir / Avion"
+                          - option "-->Tir / Avion, 1ere personne"
+                          - option "-->Tir / Avion, 3eme personne"
+                          - option "-->Tir / Horizontal"
+                          - option "-->Tir / Missile Command Like"
+                          - option "-->Tir / Run and Gun"
+                          - option "-->Tir / Space Invaders Like"
+                          - option "-->Tir / Véhicule, 1ere personne"
+                          - option "-->Tir / Vehicule, 3eme personne"
+                          - option "-->Tir / Véhicule, Diagonal"
+                          - option "-->Tir / Véhicule, Horizontal"
+                          - option "-->Tir / Véhicule, Vertical"
+                          - option "-->Tir / Vertical"
+                          - option "-->Tir / Vue de dessus"
+                          - option "Tir avec accessoire"
+                      - 'cell "Critère : Contenant..." [ref=f18e279]':
+                        - text: "Critère :"
+                        - combobox [ref=f18e280]:
+                          - option "Contenant..." [selected]
+                          - option "Commence par..."
+                          - option "Fini par..."
+                          - option "Exactement pareil que..."
+                      - cell [ref=f18e281]:
+                        - textbox [ref=f18e282]
+                      - cell [ref=f18e283]:
+                        - button "Rechercher" [ref=f18e284] [cursor=pointer]
+                - table [ref=f18e286]:
+                  - rowgroup [ref=f18e287]:
+                    - row [ref=f18e288]:
+                      - cell "Rechercher un fichier roms/isos/... :" [ref=f18e289]
+                      - cell "Systèmes :" [ref=f18e290]
+                      - cell "Tous les systèmes" [ref=f18e291]:
+                        - combobox [ref=f18e292]:
+                          - option "Tous les systèmes" [selected]
+                          - option "3DO"
+                          - option "Aamber Pegasus"
+                          - option "Acclaim"
+                          - option "Action Max"
+                          - option "Adam"
+                          - option "Adventure Vision"
+                          - option "Alice"
+                          - option "Alpha Denshi Co."
+                          - option "Amcoe"
+                          - option "American Laser Games"
+                          - option "Amiga"
+                          - option "Amiga (AGA)"
+                          - option "Amiga CD"
+                          - option "Amiga CD32"
+                          - option "Amiga CD32 (hack)"
+                          - option "Amiga CDTV"
+                          - option "Android"
+                          - option "Apple II"
+                          - option "Apple IIGS"
+                          - option "Arcadia 2001"
+                          - option "Archimedes"
+                          - option "Arduboy"
+                          - option "Astrocade"
+                          - option "Atari 2600"
+                          - option "Atari 2600 Supercharger"
+                          - option "Atari 5200"
+                          - option "Atari 7800"
+                          - option "Atari 8bit"
+                          - option "Atari Classics"
+                          - option "Atari ST"
+                          - option "Atlus"
+                          - option "Atom"
+                          - option "Atomiswave"
+                          - option "Banpresto"
+                          - option "BBC Micro"
+                          - option "BK"
+                          - option "Camputers Lynx"
+                          - option "Capcom Classics"
+                          - option "Capcom Play System"
+                          - option "Capcom Play System 2"
+                          - option "Capcom Play System 3"
+                          - option "Cassette Vision"
+                          - option "Cave"
+                          - option "CD-i"
+                          - option "Century Electronics"
+                          - option "Channel F"
+                          - option "Cinematronics"
+                          - option "Coleco"
+                          - option "Colecovision"
+                          - option "Comad"
+                          - option "Commodore 64"
+                          - option "CoreGrafX"
+                          - option "CPC"
+                          - option "CreatiVision"
+                          - option "Daphne"
+                          - option "Data East Classics"
+                          - option "Dragon 32/64"
+                          - option "Dreamcast"
+                          - option "Dynax"
+                          - option "EasyRPG"
+                          - option "EG2000 Colour Genie"
+                          - option "Eighting / Raizing"
+                          - option "Electron"
+                          - option "Exidy"
+                          - option "EXL 100"
+                          - option "Family Computer Disk System"
+                          - option "Flipper"
+                          - option "FM Towns"
+                          - option "FM-7"
+                          - option "Future Pinball"
+                          - option "Gaelco"
+                          - option "Gamate"
+                          - option "Game & Watch"
+                          - option "Game Boy"
+                          - option "Game Boy Advance"
+                          - option "Game Boy Color"
+                          - option "Game Gear"
+                          - option "Game Master"
+                          - option "Game Pocket Computer"
+                          - option "Game.com"
+                          - option "Gamecube"
+                          - option "GBA e-Reader"
+                          - option "Gottlieb"
+                          - option "GP32"
+                          - option "GX4000"
+                          - option "Hikaru"
+                          - option "IGS"
+                          - option "Incredible Technologies"
+                          - option "Intellivision"
+                          - option "Irem Classics"
+                          - option "J2ME"
+                          - option "Jaguar"
+                          - option "Jaguar CD"
+                          - option "Jaleco"
+                          - option "Jupiter Ace"
+                          - option "Kaneko"
+                          - option "Konami Classics"
+                          - option "Linux"
+                          - option "Loopy"
+                          - option "LowRes NX"
+                          - option "Lutro"
+                          - option "Lynx"
+                          - option "M5"
+                          - option "Mac OS"
+                          - option "Mame"
+                          - option "Master System"
+                          - option "Mega Duck"
+                          - option "Mega-CD"
+                          - option "Mega-Play"
+                          - option "Mega-Tech"
+                          - option "Megadrive"
+                          - option "Megadrive - Sonic The Hedgehog 2 Hacks"
+                          - option "Megadrive 32X"
+                          - option "MGT SAM Coupé"
+                          - option "Midway Classics"
+                          - option "Mikrosha"
+                          - option "Mitchell"
+                          - option "Model 2"
+                          - option "Model 3"
+                          - option "MSU-MD"
+                          - option "MSX"
+                          - option "MSX Turbo R"
+                          - option "MSX2"
+                          - option "MSX2+"
+                          - option "My Vision"
+                          - option "N-Gage"
+                          - option "Namco Classics"
+                          - option "Namco System 22"
+                          - option "Naomi"
+                          - option "Naomi 2"
+                          - option "Naomi GD-ROM"
+                          - option "NEC PC-8801"
+                          - option "NEC PC-9801"
+                          - option "Neo-Geo"
+                          - option "Neo-Geo CD"
+                          - option "Neo-Geo MVS"
+                          - option "Neo-Geo Pocket"
+                          - option "Neo-Geo Pocket Color"
+                          - option "NES"
+                          - option "Nes - Super Mario Bros. Hacks"
+                          - option "Nichibutsu"
+                          - option "Nintendo 3DS"
+                          - option "Nintendo 64"
+                          - option "Nintendo 64DD"
+                          - option "Nintendo Classics"
+                          - option "Nintendo DS"
+                          - option "Nintendo Power"
+                          - option "NMK"
+                          - option "non Jeu"
+                          - option "OpenBOR"
+                          - option "Oric 1 / Atmos"
+                          - option "P2000T"
+                          - option "Palm OS"
+                          - option "PC Dos"
+                          - option "PC Engine"
+                          - option "PC Engine CD-Rom"
+                          - option "PC Engine SuperGrafx"
+                          - option "PC Win3.xx"
+                          - option "PC Win9X"
+                          - option "PC Windows"
+                          - option "PC-FX"
+                          - option "Pecom 64"
+                          - option "PET"
+                          - option "Philips VG 5000"
+                          - option "Pico-8"
+                          - option "Pinball FX2"
+                          - option "Pinball FX3"
+                          - option "PlayChoice"
+                          - option "Playstation"
+                          - option "Playstation 2"
+                          - option "Playstation 3"
+                          - option "Playstation 4"
+                          - option "Playstation 5"
+                          - option "Playstation minis"
+                          - option "Plus/4"
+                          - option "Pocket Challenge V2"
+                          - option "Pokémon mini"
+                          - option "PrBoom"
+                          - option "PS Vita"
+                          - option "Psikyo"
+                          - option "PSP"
+                          - option "PV-1000"
+                          - option "Sammy Classics"
+                          - option "Satellaview"
+                          - option "Saturn"
+                          - option "ScummVM"
+                          - option "Sega Classics"
+                          - option "Sega Pico"
+                          - option "Sega ST-V"
+                          - option "Seibu Kaihatsu"
+                          - option "SemiCom"
+                          - option "Seta"
+                          - option "SG-1000"
+                          - option "Sharp MZ"
+                          - option "Sharp X1"
+                          - option "Sharp X68000"
+                          - option "Snes - Super Mario World Hacks"
+                          - option "SNK Classics"
+                          - option "Solarus"
+                          - option "Spectravideo"
+                          - option "Sufami Turbo"
+                          - option "Super A'can"
+                          - option "Super Cassette Vision"
+                          - option "Super Game Boy"
+                          - option "Super Game Boy 2"
+                          - option "Super Nintendo"
+                          - option "Super Nintendo MSU-1"
+                          - option "Switch"
+                          - option "Switch 2"
+                          - option "Taito Classics"
+                          - option "Taito G-Net"
+                          - option "Tamagotchi"
+                          - option "Technos"
+                          - option "Tecmo"
+                          - option "TeknoParrot"
+                          - option "the Pinball Arcade"
+                          - option "Thomson MO/TO"
+                          - option "TI-99/4A"
+                          - option "TIC-80"
+                          - option "Toaplan"
+                          - option "TRS-80 Color Computer"
+                          - option "Tutor"
+                          - option "Type X"
+                          - option "Universal"
+                          - option "Uzebox"
+                          - option "V.Smile"
+                          - option "V.Smile Pro"
+                          - option "VC 4000"
+                          - option "Vectrex"
+                          - option "Vic-20"
+                          - option "Video System Co."
+                          - option "Videopac G7000"
+                          - option "Vircon32"
+                          - option "Virtual Boy"
+                          - option "Visco"
+                          - option "Visual Pinball"
+                          - option "Voxatron"
+                          - option "VZ200 / Laser310"
+                          - option "WASM-4"
+                          - option "Watara Supervision"
+                          - option "Wii"
+                          - option "Wii U"
+                          - option "WonderSwan"
+                          - option "WonderSwan Color"
+                          - option "Xbox"
+                          - option "Xbox 360"
+                          - option "Xbox One"
+                          - option "Z-Machine"
+                          - option "ZX Spectrum"
+                          - option "ZX81"
+                      - cell [ref=f18e293]:
+                        - textbox [ref=f18e294]
+                      - cell [ref=f18e295]:
+                        - button "Rechercher" [ref=f18e296] [cursor=pointer]
+                - table [ref=f18e298]:
+                  - rowgroup [ref=f18e299]:
+                    - row [ref=f18e300]:
+                      - cell [ref=f18e301]:
+                        - link [ref=f18e302] [cursor=pointer]:
+                          - /url: /index.php?&action=openclosezoneclose&zone=indexinfosperso#zoneopencloseindexinfosperso
+                      - cell "Votre activité récente sur ScreenScraper" [ref=f18e304]
+                - generic [ref=f18e305]:
+                  - table [ref=f18e307]:
+                    - rowgroup [ref=f18e308]:
+                      - row [ref=f18e309]:
+                        - cell [ref=f18e310]:
+                          - link [ref=f18e311] [cursor=pointer]:
+                            - /url: /index.php?&action=openclosezoneclose&zone=happybirthday#zoneopenclosehappybirthday
+                        - cell "Sorties du jour... mais pas de la même année" [ref=f18e313]
+                  - generic [ref=f18e314]:
+                    - table [ref=f18e317]:
+                      - rowgroup [ref=f18e318]:
+                        - row [ref=f18e319]:
+                          - cell [ref=f18e320]
+                          - cell [ref=f18e322]
+                          - cell [ref=f18e324]:
+                            - table [ref=f18e325]:
+                              - rowgroup [ref=f18e326]:
+                                - row [ref=f18e327]:
+                                  - cell "Nom du jeu Nom du jeu (par Région)" [ref=f18e328]
+                          - cell "Système" [ref=f18e329]
+                          - cell [ref=f18e330]:
+                            - link [ref=f18e332] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=edev
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e333]
+                          - cell [ref=f18e336]:
+                            - link [ref=f18e337] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=joueurs
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e338]
+                          - cell [ref=f18e341]:
+                            - link [ref=f18e342] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=note
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e343]
+                          - cell [ref=f18e346]:
+                            - link [ref=f18e347] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=classification
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e348]
+                          - cell [ref=f18e351]:
+                            - link [ref=f18e352] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=genre
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e353]
+                          - cell [ref=f18e356]:
+                            - link [ref=f18e357] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=date
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e358]
+                          - cell [ref=f18e361]:
+                            - link [ref=f18e362] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=synopsis
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e363]
+                          - cell [ref=f18e366]:
+                            - link [ref=f18e367] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=video
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e368]
+                            - link [ref=f18e369] [cursor=pointer]:
+                              - /url: index.php?action=preview&preview=video
+                              - img "afficher / masquer l'aperçu" [ref=f18e370]
+                          - cell [ref=f18e372]:
+                            - link [ref=f18e373] [cursor=pointer]:
+                              - /url: index.php?action=preview&preview=videonormalized
+                              - img "afficher / masquer l'aperçu" [ref=f18e374]
+                          - cell [ref=f18e376]:
+                            - link [ref=f18e377] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=wheel
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e378]
+                            - link [ref=f18e379] [cursor=pointer]:
+                              - /url: index.php?action=preview&preview=wheel
+                              - img "afficher / masquer l'aperçu" [ref=f18e380]
+                          - cell [ref=f18e382]:
+                            - link [ref=f18e383] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=ss
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e384]
+                            - link [ref=f18e385] [cursor=pointer]:
+                              - /url: index.php?action=preview&preview=ss
+                              - img "afficher / masquer l'aperçu" [ref=f18e386]
+                          - cell [ref=f18e388]:
+                            - link [ref=f18e389] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=sstitle
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e390]
+                            - link [ref=f18e391] [cursor=pointer]:
+                              - /url: index.php?action=preview&preview=sstitle
+                              - img "afficher / masquer l'aperçu" [ref=f18e392]
+                          - cell [ref=f18e394]:
+                            - link [ref=f18e395] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=box-texture
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e396]
+                            - link [ref=f18e397] [cursor=pointer]:
+                              - /url: index.php?action=preview&preview=boxtexture
+                              - img "afficher / masquer l'aperçu" [ref=f18e398]
+                          - cell [ref=f18e400]:
+                            - link [ref=f18e401] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=support-texture
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e402]
+                            - link [ref=f18e403] [cursor=pointer]:
+                              - /url: index.php?action=preview&preview=supporttexture
+                              - img "afficher / masquer l'aperçu" [ref=f18e404]
+                          - cell [ref=f18e406]:
+                            - link [ref=f18e407] [cursor=pointer]:
+                              - /url: index.php?action=manque&manque=fanart
+                              - img "Tous les afficher / Afficher uniquement les manquants" [ref=f18e408]
+                            - link [ref=f18e409] [cursor=pointer]:
+                              - /url: index.php?action=preview&preview=fanart
+                              - img "afficher / masquer l'aperçu" [ref=f18e410]
+                        - row [ref=f18e412]:
+                          - cell [ref=f18e413]:
+                            - table [ref=f18e415]:
+                              - rowgroup [ref=f18e416]:
+                                - row [ref=f18e417]:
+                                  - cell [ref=f18e418]:
+                                    - img "Japon" [ref=f18e419]
+                                  - cell "32 ans" [ref=f18e420]
+                          - cell [ref=f18e422]
+                          - cell [ref=f18e423]:
+                            - table [ref=f18e424]:
+                              - rowgroup [ref=f18e425]:
+                                - row [ref=f18e426]:
+                                  - cell [ref=f18e427]:
+                                    - link:
+                                      - /url: gameinfos.php?plateforme=4&gameid=2252
+                                    - generic [ref=f18e428]:
+                                      - link "Wild Guns" [ref=f18e429] [cursor=pointer]:
+                                        - /url: gameinfos.php?plateforme=4&gameid=2252
+                                      - generic:
+                                        - link:
+                                          - /url: gameinfos.php?plateforme=4&gameid=2252
+                                  - cell [ref=f18e430]:
+                                    - img "TOP Staff" [ref=f18e431]
+                            - table [ref=f18e433]:
+                              - rowgroup [ref=f18e434]:
+                                - row [ref=f18e435]:
+                                  - cell [ref=f18e436]
+                                  - cell "Wild Guns" [ref=f18e438]
+                                - row [ref=f18e439]:
+                                  - cell [ref=f18e440]
+                                  - cell "Wild Guns" [ref=f18e442]
+                                - row [ref=f18e443]:
+                                  - cell [ref=f18e444]
+                                  - cell "Wild Guns" [ref=f18e446]
+                          - cell [ref=f18e447]:
+                            - link [ref=f18e448] [cursor=pointer]:
+                              - /url: systemeinfos.php?plateforme=4
+                              - img "Super Nintendo" [ref=f18e449]
+                          - cell [ref=f18e450]:
+                            - img "Titus" [ref=f18e451]
+                            - img "Natsume" [ref=f18e452]
+                          - cell [ref=f18e453]:
+                            - table [ref=f18e455]:
+                              - rowgroup [ref=f18e456]:
+                                - row [ref=f18e457]:
+                                  - cell [ref=f18e458]:
+                                    - img "1-2" [ref=f18e460]
+                          - cell [ref=f18e461]:
+                            - table [ref=f18e463]:
+                              - rowgroup [ref=f18e464]:
+                                - row [ref=f18e465]:
+                                  - cell [ref=f18e466]:
+                                    - img "17/20" [ref=f18e468]
+                          - cell [ref=f18e469]:
+                            - img "13 ans et plus" [ref=f18e470]
+                          - cell [ref=f18e471]:
+                            - table [ref=f18e473]:
+                              - rowgroup [ref=f18e474]:
+                                - row [ref=f18e475]:
+                                  - cell [ref=f18e476]:
+                                    - generic [ref=f18e477]:
+                                      - img "Tir / 3eme Personne" [ref=f18e478]
+                                      - img "Tir" [ref=f18e480]
+                          - cell [ref=f18e481]:
+                            - table [ref=f18e483]:
+                              - rowgroup [ref=f18e484]:
+                                - row [ref=f18e485]:
+                                  - cell [ref=f18e486]:
+                                    - img "Japon" [ref=f18e487]
+                                  - cell "12/08/1994" [ref=f18e488]
+                            - table [ref=f18e490]:
+                              - rowgroup [ref=f18e491]:
+                                - row [ref=f18e492]:
+                                  - cell [ref=f18e493]:
+                                    - img "USA" [ref=f18e494]
+                                  - cell "01/08/1995" [ref=f18e495]
+                            - table [ref=f18e497]:
+                              - rowgroup [ref=f18e498]:
+                                - row [ref=f18e499]:
+                                  - cell [ref=f18e500]:
+                                    - img "Europe" [ref=f18e501]
+                                  - cell "31/10/1996" [ref=f18e502]
+                          - cell [ref=f18e503]:
+                            - table [ref=f18e504]:
+                              - rowgroup [ref=f18e505]:
+                                - row [ref=f18e506]:
+                                  - cell [ref=f18e507]
+                                  - cell [ref=f18e509]:
+                                    - img "Wild Guns sur Super Nintendo est un jeu de tir qui mélange un univers western avec de la science-fiction. Le joueur peut choisir entre Clint et Annie. L'histoire commence à Carson City et s'étalera sur six niveaux (qui sont divisés en trois sous-niveaux chacun). Il est possible de ramasser des bonus tout au long du jeu pour améliorer ses armes. Le joueur devra faire preuve d'adresse pour viser juste tout en évitant les tirs ennemis." [ref=f18e510]
+                                  - cell [ref=f18e511]
+                                - row [ref=f18e513]:
+                                  - cell [ref=f18e514]
+                                  - cell [ref=f18e516]:
+                                    - img [ref=f18e517]
+                                  - cell [ref=f18e518]
+                          - cell [ref=f18e519]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e521]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e523]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e525]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e527]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e529]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e531]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e533]:
+                            - table:
+                              - rowgroup:
+                                - row
+                        - row [ref=f18e535]:
+                          - cell [ref=f18e536]:
+                            - table [ref=f18e538]:
+                              - rowgroup [ref=f18e539]:
+                                - row [ref=f18e540]:
+                                  - cell [ref=f18e541]:
+                                    - img "Japon" [ref=f18e542]
+                                  - cell "38 ans" [ref=f18e543]
+                          - cell [ref=f18e545]
+                          - cell [ref=f18e546]:
+                            - table [ref=f18e547]:
+                              - rowgroup [ref=f18e548]:
+                                - row [ref=f18e549]:
+                                  - cell [ref=f18e550]:
+                                    - link:
+                                      - /url: gameinfos.php?plateforme=3&gameid=1355
+                                    - generic [ref=f18e551]:
+                                      - link "Adventures Of Bayou Billy, The" [ref=f18e552] [cursor=pointer]:
+                                        - /url: gameinfos.php?plateforme=3&gameid=1355
+                                      - generic:
+                                        - link:
+                                          - /url: gameinfos.php?plateforme=3&gameid=1355
+                                  - cell [ref=f18e553]
+                            - table [ref=f18e555]:
+                              - rowgroup [ref=f18e556]:
+                                - row [ref=f18e557]:
+                                  - cell [ref=f18e558]
+                                  - cell "The Adventures of Bayou Billy" [ref=f18e560]
+                                - row [ref=f18e561]:
+                                  - cell [ref=f18e562]
+                                  - cell "Mad City" [ref=f18e564]
+                                - row [ref=f18e565]:
+                                  - cell [ref=f18e566]
+                                  - cell "The Adventures of Bayou Billy" [ref=f18e568]
+                          - cell "NES" [ref=f18e569]:
+                            - link "NES":
+                              - /url: systemeinfos.php?plateforme=3
+                              - img "NES"
+                          - cell [ref=f18e570]:
+                            - img "Konami" [ref=f18e571]
+                            - img "Konami" [ref=f18e572]
+                          - cell [ref=f18e573]:
+                            - table [ref=f18e575]:
+                              - rowgroup [ref=f18e576]:
+                                - row [ref=f18e577]:
+                                  - cell [ref=f18e578]:
+                                    - img "1" [ref=f18e580]
+                          - cell [ref=f18e581]:
+                            - table [ref=f18e583]:
+                              - rowgroup [ref=f18e584]:
+                                - row [ref=f18e585]:
+                                  - cell [ref=f18e586]:
+                                    - img "12/20" [ref=f18e588]
+                          - cell [ref=f18e589]:
+                            - img "10 ans et plus" [ref=f18e590]
+                          - cell [ref=f18e591]:
+                            - table [ref=f18e593]:
+                              - rowgroup [ref=f18e594]:
+                                - row [ref=f18e595]:
+                                  - cell [ref=f18e596]:
+                                    - img "Beat'em All" [ref=f18e598]
+                          - cell [ref=f18e599]:
+                            - table [ref=f18e601]:
+                              - rowgroup [ref=f18e602]:
+                                - row [ref=f18e603]:
+                                  - cell [ref=f18e604]:
+                                    - img "USA" [ref=f18e605]
+                                  - cell "02/06/1989" [ref=f18e606]
+                            - table [ref=f18e608]:
+                              - rowgroup [ref=f18e609]:
+                                - row [ref=f18e610]:
+                                  - cell [ref=f18e611]:
+                                    - img "Europe" [ref=f18e612]
+                                  - cell "24/01/1991" [ref=f18e613]
+                            - table [ref=f18e615]:
+                              - rowgroup [ref=f18e616]:
+                                - row [ref=f18e617]:
+                                  - cell [ref=f18e618]:
+                                    - img "Japon" [ref=f18e619]
+                                  - cell "12/08/1988" [ref=f18e620]
+                          - cell [ref=f18e621]:
+                            - table [ref=f18e622]:
+                              - rowgroup [ref=f18e623]:
+                                - row [ref=f18e624]:
+                                  - cell [ref=f18e625]
+                                  - cell [ref=f18e627]:
+                                    - 'img "Vous incarnez Billy West, dont la petite amie Annabelle a été capturée par le maléfique gangster Gordon. Le soft mélange 3 phases de jeu : du beat''em all classique où vous pouvez utiliser des armes de poing et un pistolet, du shoot''em up à la manette ou au Nes Zapper où l''objectif est d''éliminer les ennemis apparaissant à l''écran, et enfin des phases de courses où vous devez échapper à vos assaillants." [ref=f18e628]'
+                                  - cell [ref=f18e629]
+                                - row [ref=f18e631]:
+                                  - cell [ref=f18e632]
+                                  - cell [ref=f18e634]:
+                                    - img [ref=f18e635]
+                                  - cell [ref=f18e636]
+                          - cell [ref=f18e637]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e639]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e641]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e643]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e645]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e647]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e649]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e651]:
+                            - table:
+                              - rowgroup:
+                                - row
+                        - row [ref=f18e653]:
+                          - cell [ref=f18e654]:
+                            - table [ref=f18e656]:
+                              - rowgroup [ref=f18e657]:
+                                - row [ref=f18e658]:
+                                  - cell [ref=f18e659]:
+                                    - img "Japon" [ref=f18e660]
+                                  - cell "32 ans" [ref=f18e661]
+                          - cell [ref=f18e663]
+                          - cell [ref=f18e664]:
+                            - table [ref=f18e665]:
+                              - rowgroup [ref=f18e666]:
+                                - row [ref=f18e667]:
+                                  - cell [ref=f18e668]:
+                                    - link:
+                                      - /url: gameinfos.php?plateforme=4&gameid=2591
+                                    - generic [ref=f18e670]:
+                                      - link "Flintstones - The Treasure Of Sierra Madrock" [ref=f18e671] [cursor=pointer]:
+                                        - /url: gameinfos.php?plateforme=4&gameid=2591
+                                      - link "..." [ref=f18e672] [cursor=pointer]:
+                                        - /url: "#"
+                                  - cell [ref=f18e673]
+                            - table [ref=f18e675]:
+                              - rowgroup [ref=f18e676]:
+                                - row [ref=f18e677]:
+                                  - cell [ref=f18e678]
+                                  - cell [ref=f18e680]:
+                                    - text: "The Flintstones : The Treasure of Sierra Madr"
+                                    - link "..." [ref=f18e681] [cursor=pointer]:
+                                      - /url: "#"
+                                - row [ref=f18e682]:
+                                  - cell [ref=f18e683]
+                                  - cell [ref=f18e685]:
+                                    - text: "The Flintstones : The Treasure of Sierra Madr"
+                                    - link "..." [ref=f18e686] [cursor=pointer]:
+                                      - /url: "#"
+                                - row [ref=f18e687]:
+                                  - cell [ref=f18e688]
+                                  - cell [ref=f18e690]:
+                                    - text: "The Flintstones : The Treasure of Sierra Madr"
+                                    - link "..." [ref=f18e691] [cursor=pointer]:
+                                      - /url: "#"
+                          - cell [ref=f18e692]:
+                            - link [ref=f18e693] [cursor=pointer]:
+                              - /url: systemeinfos.php?plateforme=4
+                              - img "Super Nintendo" [ref=f18e694]
+                          - cell [ref=f18e695]:
+                            - img "Taito" [ref=f18e696]
+                            - img "SOL" [ref=f18e697]
+                          - cell [ref=f18e698]:
+                            - table [ref=f18e700]:
+                              - rowgroup [ref=f18e701]:
+                                - row [ref=f18e702]:
+                                  - cell [ref=f18e703]:
+                                    - img "1-2" [ref=f18e705]
+                          - cell [ref=f18e706]:
+                            - table [ref=f18e708]:
+                              - rowgroup [ref=f18e709]:
+                                - row [ref=f18e710]:
+                                  - cell [ref=f18e711]:
+                                    - img "12/20" [ref=f18e713]
+                          - cell [ref=f18e714]:
+                            - table [ref=f18e715]:
+                              - rowgroup [ref=f18e716]:
+                                - row [ref=f18e717]:
+                                  - cell [ref=f18e718]
+                          - cell [ref=f18e721]:
+                            - table [ref=f18e723]:
+                              - rowgroup [ref=f18e724]:
+                                - row [ref=f18e725]:
+                                  - cell [ref=f18e726]:
+                                    - img "Plateforme" [ref=f18e728]
+                          - cell [ref=f18e729]:
+                            - table [ref=f18e731]:
+                              - rowgroup [ref=f18e732]:
+                                - row [ref=f18e733]:
+                                  - cell [ref=f18e734]:
+                                    - img "Europe" [ref=f18e735]
+                                  - cell "23/06/1994" [ref=f18e736]
+                            - table [ref=f18e738]:
+                              - rowgroup [ref=f18e739]:
+                                - row [ref=f18e740]:
+                                  - cell [ref=f18e741]:
+                                    - img "Japon" [ref=f18e742]
+                                  - cell "12/08/1994" [ref=f18e743]
+                            - table [ref=f18e745]:
+                              - rowgroup [ref=f18e746]:
+                                - row [ref=f18e747]:
+                                  - cell [ref=f18e748]:
+                                    - img "USA" [ref=f18e749]
+                                  - cell "01/03/1994" [ref=f18e750]
+                          - cell [ref=f18e751]:
+                            - table [ref=f18e752]:
+                              - rowgroup [ref=f18e753]:
+                                - row [ref=f18e754]:
+                                  - cell [ref=f18e755]
+                                  - cell [ref=f18e757]:
+                                    - img "Le joueur contrôle Fred et Barney chacun à leur tour. Le jeu se présente comme un jeu de société dont les cases représentent des niveaux à parcourir. Il y a plusieurs cases spéciales qui amènent des challenges tout particuliers. Un mode 2 joueurs permet d'y jouer avec un ami." [ref=f18e758]
+                                  - cell [ref=f18e759]
+                                - row [ref=f18e761]:
+                                  - cell [ref=f18e762]
+                                  - cell [ref=f18e764]:
+                                    - img "When things go wrong in Bedrock, it's up to Fred Flintstone to set them right. Fly the skies on a Pterodactyl, do some tough driving in your trusty Flintmobile and hop aboard the Dino Express! Use your club to fend off zany monsters in this excellent cartoon adventure!" [ref=f18e765]
+                                  - cell [ref=f18e766]
+                          - cell [ref=f18e767]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e769]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e771]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e773]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e775]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e777]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e779]:
+                            - table:
+                              - rowgroup:
+                                - row
+                          - cell [ref=f18e781]:
+                            - table:
+                              - rowgroup:
+                                - row
+                    - table [ref=f18e784]:
+                      - rowgroup [ref=f18e785]:
+                        - row [ref=f18e786]:
+                          - cell [ref=f18e787]
+                          - cell "PLUS D'ANNIVERSAIRES" [ref=f18e788]
+                    - table [ref=f18e791]:
+                      - rowgroup [ref=f18e792]:
+                        - row [ref=f18e793]:
+                          - cell [ref=f18e794]:
+                            - link [ref=f18e795] [cursor=pointer]:
+                              - /url: /index.php?&action=openclosezoneclose&zone=helpzone#zoneopenclosehelpzone
+                          - cell "Vous pouvez sans doute nous aider !" [ref=f18e797]
+                    - generic [ref=f18e798]:
+                      - table [ref=f18e800]:
+                        - rowgroup [ref=f18e801]:
+                          - row [ref=f18e802]:
+                            - cell [ref=f18e803]:
+                              - text: Aidez-nous à financer l'hébergement et le développement de ScreenScraper
+                              - table [ref=f18e804]:
+                                - rowgroup [ref=f18e805]:
+                                  - row [ref=f18e806]:
+                                    - cell [ref=f18e807]:
+                                      - table [ref=f18e808]:
+                                        - rowgroup [ref=f18e809]:
+                                          - row [ref=f18e810]:
+                                            - cell [ref=f18e811]
+                                            - 'cell "1 euro : merci !" [ref=f18e813]'
+                                          - row [ref=f18e814]:
+                                            - cell "Pour 1 euro par mois, vous apportez votre soutien a la vie et l'amélioration de ScreenScraper et nous vous en remercions jamais assez ! 50.000 requêtes de scrape maximum par jour En nous fournissant votre identifiant ScreenScraper, vous obtiendrez le succès contributeur financier niveau BRONZE sur le site ScreenScraper rubrique Membre !" [ref=f18e815]
+                                    - cell [ref=f18e816]:
+                                      - table [ref=f18e817]:
+                                        - rowgroup [ref=f18e818]:
+                                          - row [ref=f18e819]:
+                                            - cell [ref=f18e820]
+                                            - 'cell "2 euros : merci beaucoup !" [ref=f18e822]'
+                                          - row [ref=f18e823]:
+                                            - cell "Pour 2 euros par mois, vous apportez votre soutien a la vie et l'amélioration de ScreenScraper et nous vous en remercions jamais assez ! 50.000 requêtes de scrape maximum par jour En nous fournissant votre identifiant ScreenScraper, vous obtiendrez le succès contributeur financier niveau ARGENT sur le site ScreenScraper rubrique Membre !" [ref=f18e824]
+                                    - cell [ref=f18e825]:
+                                      - table [ref=f18e826]:
+                                        - rowgroup [ref=f18e827]:
+                                          - row [ref=f18e828]:
+                                            - cell [ref=f18e829]
+                                            - 'cell "5 euros : 1 thread supplémentaire !" [ref=f18e831]'
+                                          - row [ref=f18e832]:
+                                            - cell "Pour 5 euros, obtenez 1 thread supplémentaire a vie pour scraper plus vite en plus d'apporter votre soutien a la vie et l'amélioration de ScreenScraper et nous vous en remercions jamais assez ! 100.000 requêtes de scrape maximum par jour En nous fournissant votre identifiant ScreenScraper, vous obtiendrez le succès contributeur financier niveau OR sur le site ScreenScraper rubrique Membre !" [ref=f18e833]
+                                    - cell [ref=f18e834]:
+                                      - table [ref=f18e835]:
+                                        - rowgroup [ref=f18e836]:
+                                          - row [ref=f18e837]:
+                                            - cell [ref=f18e838]
+                                            - 'cell "10 euros : 5 threads supplémentaires !" [ref=f18e840]'
+                                          - row [ref=f18e841]:
+                                            - cell "Pour 10 euros, obtenez 5 threads supplémentaires a vie pour scraper 5 fois plus vite en plus d'apporter votre soutien a la vie et l'amélioration de ScreenScraper et nous vous en remercions jamais assez ! 100.000 requêtes de scrape maximum par jour En nous fournissant votre identifiant ScreenScraper, vous obtiendrez le succès contributeur financier niveau CARBON sur le site ScreenScraper rubrique Membre !" [ref=f18e842]
+                                    - cell [ref=f18e843]:
+                                      - table [ref=f18e844]:
+                                        - rowgroup [ref=f18e845]:
+                                          - row [ref=f18e846]:
+                                            - cell [ref=f18e847]:
+                                              - text: Énorme MERCI à...
+                                              - table [ref=f18e849]:
+                                                - rowgroup [ref=f18e850]:
+                                                  - row [ref=f18e851]:
+                                                    - cell [ref=f18e852]
+                                                    - cell "Ivanlivemusic" [ref=f18e854]
+                                                  - row [ref=f18e855]:
+                                                    - cell [ref=f18e856]
+                                                    - cell "MissCatfish" [ref=f18e858]
+                                                  - row [ref=f18e859]:
+                                                    - cell [ref=f18e860]
+                                                    - cell "LefosG" [ref=f18e862]
+                                                  - row [ref=f18e863]:
+                                                    - cell [ref=f18e864]
+                                                    - cell "NICKCHEESE" [ref=f18e866]
+                                                  - row [ref=f18e867]:
+                                                    - cell [ref=f18e868]
+                                                    - cell "Crimzoniris" [ref=f18e870]
+                                                  - row [ref=f18e871]:
+                                                    - cell [ref=f18e872]
+                                                    - cell "Endorian" [ref=f18e874]
+                                                  - row [ref=f18e875]:
+                                                    - cell [ref=f18e876]
+                                                    - cell "Fnordcorps" [ref=f18e878]
+                                                  - row [ref=f18e879]:
+                                                    - cell [ref=f18e880]
+                                                    - cell "geebake" [ref=f18e882]
+                                                  - row [ref=f18e883]:
+                                                    - cell [ref=f18e884]
+                                                    - cell "gocloude" [ref=f18e886]
+                                                  - row [ref=f18e887]:
+                                                    - cell [ref=f18e888]
+                                                    - cell "Dweezledap" [ref=f18e890]
+                                                  - row [ref=f18e891]:
+                                                    - cell [ref=f18e892]
+                                                    - cell "danives" [ref=f18e894]
+                                                  - row [ref=f18e895]:
+                                                    - cell [ref=f18e896]
+                                                    - cell "thyrlian" [ref=f18e898]
+                                                  - row [ref=f18e899]:
+                                                    - cell [ref=f18e900]
+                                                    - cell "willianmoura8" [ref=f18e902]
+                                                  - row [ref=f18e903]:
+                                                    - cell [ref=f18e904]
+                                                    - cell "pamp" [ref=f18e906]
+                                                  - row [ref=f18e907]:
+                                                    - cell [ref=f18e908]
+                                                    - cell "Antipop" [ref=f18e910]
+                                                  - row [ref=f18e911]:
+                                                    - cell [ref=f18e912]
+                                                    - cell "warhorse" [ref=f18e914]
+                                                  - row [ref=f18e915]:
+                                                    - cell [ref=f18e916]
+                                                    - cell "Fascinatingeo" [ref=f18e918]
+                                                  - row [ref=f18e919]:
+                                                    - cell [ref=f18e920]
+                                                    - cell "rmathieu" [ref=f18e922]
+                                                  - row [ref=f18e923]:
+                                                    - cell [ref=f18e924]
+                                                    - cell "retrostalgic" [ref=f18e926]
+                                                  - row [ref=f18e927]:
+                                                    - cell [ref=f18e928]
+                                                    - cell "stronger" [ref=f18e930]
+                                                  - row [ref=f18e931]:
+                                                    - cell [ref=f18e932]
+                                                    - cell "darkwolverine" [ref=f18e934]
+                                                  - row [ref=f18e935]:
+                                                    - cell [ref=f18e936]
+                                                    - cell "error2000000" [ref=f18e938]
+                                                  - row [ref=f18e939]:
+                                                    - cell [ref=f18e940]
+                                                    - cell "dunerunner27" [ref=f18e942]
+                                                  - row [ref=f18e943]:
+                                                    - cell [ref=f18e944]
+                                                    - cell "Nintendoboy" [ref=f18e946]
+                                                  - row [ref=f18e947]:
+                                                    - cell [ref=f18e948]
+                                                    - cell "TBGrizzlyAdams" [ref=f18e950]
+                              - table [ref=f18e951]:
+                                - rowgroup [ref=f18e952]:
+                                  - row [ref=f18e953]:
+                                    - 'cell "Pour que tout ce passe bien, suivez ces étapes ... 1. Créer vous compte screenscraper 2. Faite votre don sur l''une des plateformes de don 3. Identifiez-vous sur le site ScreenScraper puis rendez-vous sur la page de votre compte membre screenscraper (cliquer sur votre pseudo en haut de page), puis associé votre compte patreon ou tipeee a votre compte screenscraper. 4. Si aprés 24h, votre compte n''a pas été mis a jour, contactez-nous sur notre discord et suivre les instructions disponibles sur les sujets épinglés du salon #support." [ref=f18e954]'
+                              - table [ref=f18e955]:
+                                - rowgroup [ref=f18e956]:
+                                  - row [ref=f18e957]:
+                                    - cell "Financer ScreenScraper sur..." [ref=f18e958]
+                                    - cell [ref=f18e959]
+                                    - cell [ref=f18e961]:
+                                      - link [ref=f18e962] [cursor=pointer]:
+                                        - /url: https://www.tipeee.com/screenscraper
+                                    - cell [ref=f18e964]
+                                    - cell [ref=f18e966]:
+                                      - link [ref=f18e967] [cursor=pointer]:
+                                        - /url: https://www.patreon.com/screenscraper
+                                    - cell [ref=f18e969]
+                      - generic [ref=f18e970]:
+                        - table [ref=f18e971]:
+                          - rowgroup [ref=f18e972]:
+                            - row [ref=f18e973]:
+                              - cell [ref=f18e974]
+                              - cell [ref=f18e976]:
+                                - text: Vous êtes bilingues ? Vous pourriez traduire des descriptions de jeux. Vous êtes spécialiste d’une plateforme ? Vous pourriez vérifier l’exactitude des données de ScreenScraper ou encore associer des roms orphelines à un jeu. Vous êtes infographiste ? Vous pourriez créer les logos des jeux manquants ou encore reproduire, retoucher ou assembler des textures de boîtiers ou de supports. Vous êtes collectionneur ? Vous pourriez scanner les jaquettes de boîtier ou les étiquettes de cartouche de jeu. Vous êtes joueur ? Vous pourriez capturer une petite vidéo de présentation d’un jeu sans vidéo. Nous avons besoin de toutes les bonnes volontés pour nous aider à remplir la base de données & de médias ScreenScraper.
+                                - generic [ref=f18e977]: Ensemble, nous y arriverons !
+                                - text: Alors si vous voulez que le front-end soit le plus beau et complet possible, rendez-vous sur la page des
+                                - link "chantiers en cours" [ref=f18e978] [cursor=pointer]:
+                                  - /url: chantiers.php
+                                - text: pour trouver comment nous aider.
+                        - text: The Nanpa (c) 1999 Nichibutsu. - TRIVIA - Released in October 1999. - SOURCES - Game's ROM.
+                        - table [ref=f18e979]:
+                          - rowgroup [ref=f18e980]:
+                            - row [ref=f18e981]:
+                              - cell [ref=f18e982]:
+                                - generic [ref=f18e983]:
+                                  - text: Par exemple, pouriez-vous nous traduire le synopsis manquant du jeu "
+                                  - link "Nanpa, The" [ref=f18e984] [cursor=pointer]:
+                                    - /url: gameinfos.php?gameid=43593
+                                  - text: "\" sur Nichibutsu dans la langue que vous avez selectionnée ?"
+                            - row [ref=f18e985]:
+                              - cell "Synopsis" [ref=f18e986]
+                            - row [ref=f18e988]:
+                              - cell "The Nanpa (c) 1999 Nichibutsu. - TRIVIA - Released in October 1999. - SOURCES - Game's ROM." [ref=f18e989]
+                            - row [ref=f18e990]:
+                              - cell "Synopsis" [ref=f18e991]
+                            - row [ref=f18e993]:
+                              - cell [ref=f18e994]:
+                                - textbox [ref=f18e995]
+                            - row [ref=f18e996]:
+                              - cell "Source de l'info :" [ref=f18e997]
+                              - cell [ref=f18e998]:
+                                - textbox [ref=f18e999]
+                            - row [ref=f18e1000]:
+                              - 'cell "Merci d''indiquer votre source d''information : url de la page internet, nom du livre (page), support original, autre." [ref=f18e1001]'
+                            - row [ref=f18e1002]:
+                              - cell [ref=f18e1003]:
+                                - button "envoyer" [ref=f18e1004]
+                      - table [ref=f18e1006]:
+                        - rowgroup [ref=f18e1007]:
+                          - row [ref=f18e1008]:
+                            - cell "Derniers ajouts de médias de jeu" [ref=f18e1009]
+                            - cell "PLUS D'INFOS" [ref=f18e1010]
+                      - table [ref=f18e1013]:
+                        - rowgroup [ref=f18e1014]:
+                          - row [ref=f18e1015]:
+                            - cell [ref=f18e1016]:
+                              - table [ref=f18e1017]:
+                                - rowgroup [ref=f18e1018]:
+                                  - row [ref=f18e1019]:
+                                    - cell "12 août 2026 - 526 Participations" [ref=f18e1020]
+                                  - row [ref=f18e1023]:
+                                    - cell "TOP PARTICIPATIONS" [ref=f18e1024]
+                                    - cell "STATISTIQUES" [ref=f18e1026]
+                                    - cell "PLATEFORMES" [ref=f18e1028]
+                                  - row [ref=f18e1030]:
+                                    - cell [ref=f18e1031]:
+                                      - table [ref=f18e1032]:
+                                        - rowgroup [ref=f18e1033]:
+                                          - row [ref=f18e1034]:
+                                            - cell [ref=f18e1035]
+                                            - cell [ref=f18e1037]:
+                                              - img "Grand Gourou Infographiste Contributeur" [ref=f18e1038]
+                                              - link "pullover" [ref=f18e1039] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=172213
+                                            - cell "285" [ref=f18e1040]
+                                            - cell [ref=f18e1041]
+                                            - cell [ref=f18e1043]:
+                                              - img "Dieu tout puissant - Contributeur financier" [ref=f18e1044]
+                                              - link "marblemad" [ref=f18e1045] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=1
+                                            - cell "62" [ref=f18e1046]
+                                          - row [ref=f18e1047]:
+                                            - cell [ref=f18e1048]
+                                            - cell [ref=f18e1050]:
+                                              - img "Grand Gourou Infographiste Contributeur" [ref=f18e1051]
+                                              - link "Scraperdoo256" [ref=f18e1052] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=26981907
+                                            - cell "51" [ref=f18e1053]
+                                            - cell [ref=f18e1054]
+                                            - cell [ref=f18e1056]:
+                                              - img "Modérateur Système(s)" [ref=f18e1057]
+                                              - link "snydar" [ref=f18e1058] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=27496004
+                                            - cell "29" [ref=f18e1059]
+                                          - row [ref=f18e1060]:
+                                            - cell [ref=f18e1061]
+                                            - cell [ref=f18e1063]:
+                                              - img "Robot" [ref=f18e1064]
+                                              - link "Terscreenator" [ref=f18e1065] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=107
+                                            - cell "26" [ref=f18e1066]
+                                            - cell [ref=f18e1067]
+                                            - cell [ref=f18e1069]:
+                                              - img "Grand Gourou Infographiste Contributeur" [ref=f18e1070]
+                                              - link "megatari49" [ref=f18e1071] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=26813383
+                                            - cell "14" [ref=f18e1072]
+                                          - row [ref=f18e1073]:
+                                            - cell [ref=f18e1074]
+                                            - cell [ref=f18e1076]:
+                                              - img "Grand Gourou Infographiste Contributeur" [ref=f18e1077]
+                                              - link "MordemRetro" [ref=f18e1078] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=258100
+                                            - cell "9" [ref=f18e1079]
+                                            - cell [ref=f18e1080]
+                                            - cell [ref=f18e1082]:
+                                              - img "Grand Gourou Infographiste Contributeur" [ref=f18e1083]
+                                              - link "Cid2mizard" [ref=f18e1084] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=106676
+                                            - cell "9" [ref=f18e1085]
+                                          - row [ref=f18e1086]:
+                                            - cell [ref=f18e1087]
+                                            - cell [ref=f18e1089]:
+                                              - img "Grand Gourou Infographiste Contributeur" [ref=f18e1090]
+                                              - link "shotropa100" [ref=f18e1091] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=28674541
+                                            - cell "7" [ref=f18e1092]
+                                    - cell [ref=f18e1093]:
+                                      - table [ref=f18e1094]:
+                                        - rowgroup [ref=f18e1095]:
+                                          - row [ref=f18e1096]:
+                                            - 'cell "Boitier : avant" [ref=f18e1097]'
+                                            - cell "120" [ref=f18e1098]
+                                            - 'cell "Boitier : arrière" [ref=f18e1099]'
+                                            - cell "107" [ref=f18e1100]
+                                          - row [ref=f18e1101]:
+                                            - 'cell "Boitier : tranche" [ref=f18e1102]'
+                                            - cell "98" [ref=f18e1103]
+                                            - 'cell "Support : Texture" [ref=f18e1104]'
+                                            - cell "45" [ref=f18e1105]
+                                          - row [ref=f18e1106]:
+                                            - cell "Screenshot Titre" [ref=f18e1107]
+                                            - cell "35" [ref=f18e1108]
+                                            - cell "Vidéo" [ref=f18e1109]
+                                            - cell "35" [ref=f18e1110]
+                                          - row [ref=f18e1111]:
+                                            - cell "Screenshot" [ref=f18e1112]
+                                            - cell "35" [ref=f18e1113]
+                                            - cell "Logos HD" [ref=f18e1114]
+                                            - cell "18" [ref=f18e1115]
+                                          - row [ref=f18e1116]:
+                                            - 'cell "Boitier : texture" [ref=f18e1117]'
+                                            - cell "18" [ref=f18e1118]
+                                    - cell [ref=f18e1119]:
+                                      - table [ref=f18e1120]:
+                                        - rowgroup [ref=f18e1121]:
+                                          - row [ref=f18e1122]:
+                                            - cell [ref=f18e1123]
+                                            - cell "NEC PC-8801" [ref=f18e1125]
+                                            - cell "167" [ref=f18e1126]
+                                            - cell [ref=f18e1127]
+                                            - cell "Sharp X68000" [ref=f18e1129]
+                                            - cell "116" [ref=f18e1130]
+                                          - row [ref=f18e1131]:
+                                            - cell [ref=f18e1132]
+                                            - cell "Switch" [ref=f18e1134]
+                                            - cell "63" [ref=f18e1135]
+                                            - cell [ref=f18e1136]
+                                            - cell "Wii" [ref=f18e1138]
+                                            - cell "50" [ref=f18e1139]
+                                          - row [ref=f18e1140]:
+                                            - cell [ref=f18e1141]
+                                            - cell "Commodore 64" [ref=f18e1143]
+                                            - cell "29" [ref=f18e1144]
+                                            - cell [ref=f18e1145]
+                                            - cell "PC Windows" [ref=f18e1147]
+                                            - cell "21" [ref=f18e1148]
+                                          - row [ref=f18e1149]:
+                                            - cell [ref=f18e1150]
+                                            - cell "Sharp X1" [ref=f18e1152]
+                                            - cell "18" [ref=f18e1153]
+                                            - cell [ref=f18e1154]
+                                            - cell "Megadrive" [ref=f18e1156]
+                                            - cell "14" [ref=f18e1157]
+                                          - row [ref=f18e1158]:
+                                            - cell [ref=f18e1159]
+                                            - cell "FM-7" [ref=f18e1161]
+                                            - cell "9" [ref=f18e1162]
+                          - row [ref=f18e1163]:
+                            - cell "Date Membre Validé par" [ref=f18e1164]: DateMembreValidé par
+                            - cell "Jeux/... Système" [ref=f18e1165]: Jeux/...Système
+                            - cell "Type" [ref=f18e1166]
+                            - cell "Médias" [ref=f18e1167]
+                            - cell [ref=f18e1168]
+                            - cell "Date Membre Validé par" [ref=f18e1169]: DateMembreValidé par
+                            - cell "Jeux/... Système" [ref=f18e1170]: Jeux/...Système
+                            - cell "Type Région" [ref=f18e1171]: TypeRégion
+                            - cell "Médias" [ref=f18e1172]
+                          - row [ref=f18e1173]:
+                            - cell [ref=f18e1174]:
+                              - text: 12/08/26 22:19
+                              - generic [ref=f18e1175]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e1176]
+                                - link "Scraperdoo256" [ref=f18e1177] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=26981907
+                              - text: Zwabikoski
+                            - cell [ref=f18e1178]:
+                              - text: Jeu
+                              - link "Front Mission Series - Gun Ha" [ref=f18e1179] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=16&gameid=203448
+                              - link "..." [ref=f18e1181] [cursor=pointer]:
+                                - /url: "#"
+                              - table [ref=f18e1182]:
+                                - rowgroup [ref=f18e1183]:
+                                  - row [ref=f18e1184]:
+                                    - cell [ref=f18e1185]
+                                    - cell "Wii" [ref=f18e1187]:
+                                      - link "Wii":
+                                        - /url: systemeinfos.php?plateforme=16
+                                        - img "Wii"
+                            - 'cell "Support : Texture Monde" [ref=f18e1188]'
+                            - cell [ref=f18e1189]
+                            - cell [ref=f18e1190]
+                            - cell [ref=f18e1191]:
+                              - text: 12/08/26 22:19
+                              - generic [ref=f18e1192]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e1193]
+                                - link "Scraperdoo256" [ref=f18e1194] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=26981907
+                              - text: Zwabikoski
+                            - cell [ref=f18e1195]:
+                              - text: Jeu
+                              - link "Fire Emblem - Thracia 776 (SNE" [ref=f18e1196] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=16&gameid=9616
+                              - link "..." [ref=f18e1198] [cursor=pointer]:
+                                - /url: "#"
+                              - table [ref=f18e1199]:
+                                - rowgroup [ref=f18e1200]:
+                                  - row [ref=f18e1201]:
+                                    - cell [ref=f18e1202]
+                                    - cell "Wii" [ref=f18e1204]:
+                                      - link "Wii":
+                                        - /url: systemeinfos.php?plateforme=16
+                                        - img "Wii"
+                            - 'cell "Support : Texture Japon" [ref=f18e1205]'
+                            - cell [ref=f18e1207]
+                          - row [ref=f18e1208]:
+                            - cell [ref=f18e1209]:
+                              - text: 12/08/26 22:19
+                              - generic [ref=f18e1210]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e1211]
+                                - link "Scraperdoo256" [ref=f18e1212] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=26981907
+                              - text: Zwabikoski
+                            - cell [ref=f18e1213]:
+                              - text: Jeu
+                              - link "Kaizou Choujin Shubibinman (TG" [ref=f18e1214] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=16&gameid=203810
+                              - link "..." [ref=f18e1216] [cursor=pointer]:
+                                - /url: "#"
+                              - table [ref=f18e1217]:
+                                - rowgroup [ref=f18e1218]:
+                                  - row [ref=f18e1219]:
+                                    - cell [ref=f18e1220]
+                                    - cell "Wii" [ref=f18e1222]:
+                                      - link "Wii":
+                                        - /url: systemeinfos.php?plateforme=16
+                                        - img "Wii"
+                            - 'cell "Support : Texture Japon" [ref=f18e1223]'
+                            - cell [ref=f18e1225]
+                            - cell [ref=f18e1226]
+                            - cell [ref=f18e1227]:
+                              - text: 12/08/26 22:19
+                              - generic [ref=f18e1228]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e1229]
+                                - link "Scraperdoo256" [ref=f18e1230] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=26981907
+                              - text: Zwabikoski
+                            - cell [ref=f18e1231]:
+                              - text: Jeu
+                              - link "Kaizou Choujin Shubibinman (TG" [ref=f18e1232] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=16&gameid=203810
+                              - link "..." [ref=f18e1234] [cursor=pointer]:
+                                - /url: "#"
+                              - table [ref=f18e1235]:
+                                - rowgroup [ref=f18e1236]:
+                                  - row [ref=f18e1237]:
+                                    - cell [ref=f18e1238]
+                                    - cell "Wii" [ref=f18e1240]:
+                                      - link "Wii":
+                                        - /url: systemeinfos.php?plateforme=16
+                                        - img "Wii"
+                            - 'cell "Boitier : avant Japon" [ref=f18e1241]'
+                            - cell [ref=f18e1243]
+                          - row [ref=f18e1244]:
+                            - cell [ref=f18e1245]:
+                              - text: 12/08/26 22:19
+                              - generic [ref=f18e1246]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e1247]
+                                - link "megatari49" [ref=f18e1248] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=26813383
+                              - text: Zwabikoski
+                            - cell [ref=f18e1249]:
+                              - text: Jeu
+                              - link "Elf Run" [ref=f18e1250] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=1&gameid=551390
+                              - table [ref=f18e1251]:
+                                - rowgroup [ref=f18e1252]:
+                                  - row [ref=f18e1253]:
+                                    - cell [ref=f18e1254]
+                                    - cell "Megadrive" [ref=f18e1256]:
+                                      - link "Megadrive":
+                                        - /url: systemeinfos.php?plateforme=1
+                                        - img "Megadrive"
+                            - cell "Screenshot Monde" [ref=f18e1257]
+                            - cell [ref=f18e1258]
+                            - cell [ref=f18e1259]
+                            - cell [ref=f18e1260]:
+                              - text: 12/08/26 22:19
+                              - generic [ref=f18e1261]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e1262]
+                                - link "megatari49" [ref=f18e1263] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=26813383
+                              - text: Zwabikoski
+                            - cell [ref=f18e1264]:
+                              - text: Jeu
+                              - link "Elf Run" [ref=f18e1265] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=1&gameid=551390
+                              - table [ref=f18e1266]:
+                                - rowgroup [ref=f18e1267]:
+                                  - row [ref=f18e1268]:
+                                    - cell [ref=f18e1269]
+                                    - cell "Megadrive" [ref=f18e1271]:
+                                      - link "Megadrive":
+                                        - /url: systemeinfos.php?plateforme=1
+                                        - img "Megadrive"
+                            - cell "Screenshot Titre Monde" [ref=f18e1272]
+                            - cell [ref=f18e1273]
+                      - table [ref=f18e1275]:
+                        - rowgroup [ref=f18e1276]:
+                          - row [ref=f18e1277]:
+                            - cell "Derniers ajouts d'infos de jeu/rom" [ref=f18e1278]
+                            - cell "PLUS D'INFOS" [ref=f18e1279]
+                      - table [ref=f18e1282]:
+                        - rowgroup [ref=f18e1283]:
+                          - row [ref=f18e1284]:
+                            - cell [ref=f18e1285]:
+                              - table [ref=f18e1286]:
+                                - rowgroup [ref=f18e1287]:
+                                  - row [ref=f18e1288]:
+                                    - cell "12 août 2026 - 803 Participations" [ref=f18e1289]
+                                  - row [ref=f18e1292]:
+                                    - cell "TOP PARTICIPATIONS" [ref=f18e1293]
+                                    - cell "STATISTIQUES" [ref=f18e1295]
+                                    - cell "PLATEFORMES" [ref=f18e1297]
+                                  - row [ref=f18e1299]:
+                                    - cell [ref=f18e1300]:
+                                      - table [ref=f18e1301]:
+                                        - rowgroup [ref=f18e1302]:
+                                          - row [ref=f18e1303]:
+                                            - cell [ref=f18e1304]
+                                            - cell [ref=f18e1306]:
+                                              - img "2/3 de Dieu - Contributeur financier" [ref=f18e1307]
+                                              - link "Zwabikoski" [ref=f18e1308] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=13899
+                                            - cell "536" [ref=f18e1309]
+                                            - cell [ref=f18e1310]
+                                            - cell [ref=f18e1312]:
+                                              - img "Modérateur Système(s)" [ref=f18e1313]
+                                              - link "snydar" [ref=f18e1314] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=27496004
+                                            - cell "75" [ref=f18e1315]
+                                          - row [ref=f18e1316]:
+                                            - cell [ref=f18e1317]
+                                            - cell [ref=f18e1319]:
+                                              - img "Grand Gourou Infographiste Contributeur" [ref=f18e1320]
+                                              - link "megatari49" [ref=f18e1321] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=26813383
+                                            - cell "61" [ref=f18e1322]
+                                            - cell [ref=f18e1323]
+                                            - cell [ref=f18e1325]:
+                                              - img "2/3 de Dieu" [ref=f18e1326]
+                                              - link "zwabiksoki" [ref=f18e1327] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=128
+                                            - cell "56" [ref=f18e1328]
+                                          - row [ref=f18e1329]:
+                                            - cell [ref=f18e1330]
+                                            - cell [ref=f18e1332]:
+                                              - img "Dieu tout puissant - Contributeur financier" [ref=f18e1333]
+                                              - link "marblemad" [ref=f18e1334] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=1
+                                            - cell "28" [ref=f18e1335]
+                                            - cell [ref=f18e1336]
+                                            - cell [ref=f18e1338]:
+                                              - img "Grand Gourou Infographiste Contributeur" [ref=f18e1339]
+                                              - link "MordemRetro" [ref=f18e1340] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=258100
+                                            - cell "15" [ref=f18e1341]
+                                          - row [ref=f18e1342]:
+                                            - cell [ref=f18e1343]
+                                            - cell [ref=f18e1345]:
+                                              - img "Contributeur occasionnel" [ref=f18e1346]
+                                              - link "Steevflores" [ref=f18e1347] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=268678
+                                            - cell "10" [ref=f18e1348]
+                                            - cell [ref=f18e1349]
+                                            - cell [ref=f18e1351]:
+                                              - img "Grand Gourou Infographiste Contributeur" [ref=f18e1352]
+                                              - link "Scraperdoo256" [ref=f18e1353] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=26981907
+                                            - cell "5" [ref=f18e1354]
+                                          - row [ref=f18e1355]:
+                                            - cell [ref=f18e1356]
+                                            - cell [ref=f18e1358]:
+                                              - img "Grand gourou contributeur" [ref=f18e1359]
+                                              - link "speedsterh" [ref=f18e1360] [cursor=pointer]:
+                                                - /url: membreinfos.php?membreid=27389785
+                                            - cell "4" [ref=f18e1361]
+                                    - cell [ref=f18e1362]:
+                                      - table [ref=f18e1363]:
+                                        - rowgroup [ref=f18e1364]:
+                                          - row [ref=f18e1365]:
+                                            - cell "Association rom <> jeu" [ref=f18e1366]
+                                            - cell "254" [ref=f18e1367]
+                                            - cell "Nouveau NON jeu" [ref=f18e1368]
+                                            - cell "212" [ref=f18e1369]
+                                          - row [ref=f18e1370]:
+                                            - cell "Nouveau jeu" [ref=f18e1371]
+                                            - cell "124" [ref=f18e1372]
+                                            - cell "Synopsis" [ref=f18e1373]
+                                            - cell "60" [ref=f18e1374]
+                                          - row [ref=f18e1375]:
+                                            - cell "Nom du jeu (par Région)" [ref=f18e1376]
+                                            - cell "33" [ref=f18e1377]
+                                            - cell "Date(s) de sortie" [ref=f18e1378]
+                                            - cell "30" [ref=f18e1379]
+                                          - row [ref=f18e1380]:
+                                            - cell "Genre(s)" [ref=f18e1381]
+                                            - cell "22" [ref=f18e1382]
+                                            - cell "Développeur" [ref=f18e1383]
+                                            - cell "21" [ref=f18e1384]
+                                          - row [ref=f18e1385]:
+                                            - cell "Éditeur" [ref=f18e1386]
+                                            - cell "18" [ref=f18e1387]
+                                    - cell [ref=f18e1388]:
+                                      - table [ref=f18e1389]:
+                                        - rowgroup [ref=f18e1390]:
+                                          - row [ref=f18e1391]:
+                                            - cell [ref=f18e1392]
+                                            - cell "Commodore 64" [ref=f18e1394]
+                                            - cell "78" [ref=f18e1395]
+                                            - cell [ref=f18e1396]
+                                            - cell "Megadrive" [ref=f18e1398]
+                                            - cell "60" [ref=f18e1399]
+                                          - row [ref=f18e1400]:
+                                            - cell [ref=f18e1401]
+                                            - cell "Switch" [ref=f18e1403]
+                                            - cell "28" [ref=f18e1404]
+                                            - cell [ref=f18e1405]
+                                            - cell "PC Windows" [ref=f18e1407]
+                                            - cell "25" [ref=f18e1408]
+                                          - row [ref=f18e1409]:
+                                            - cell [ref=f18e1410]
+                                            - cell "Wii" [ref=f18e1412]
+                                            - cell "5" [ref=f18e1413]
+                                            - cell [ref=f18e1414]
+                                            - cell "Nintendo DS" [ref=f18e1416]
+                                            - cell "2" [ref=f18e1417]
+                                          - row [ref=f18e1418]:
+                                            - cell [ref=f18e1419]
+                                            - cell "Game Boy Color" [ref=f18e1421]
+                                            - cell "2" [ref=f18e1422]
+                                            - cell [ref=f18e1423]
+                                            - cell "NEC PC-8801" [ref=f18e1425]
+                                            - cell "2" [ref=f18e1426]
+                                          - row [ref=f18e1427]:
+                                            - cell [ref=f18e1428]
+                                            - cell "NES" [ref=f18e1430]
+                                            - cell "2" [ref=f18e1431]
+                          - row [ref=f18e1432]:
+                            - cell "Date Membre Validé par" [ref=f18e1433]: DateMembreValidé par
+                            - cell "Jeux/Roms Système" [ref=f18e1434]: Jeux/RomsSystème
+                            - cell "Type d'infos Région / Langue" [ref=f18e1435]: Type d'infosRégion / Langue
+                            - cell "Infos/Roms" [ref=f18e1436]
+                          - row [ref=f18e1437]:
+                            - cell [ref=f18e1438]:
+                              - text: 12/08/26 22:19
+                              - img "2/3 de Dieu" [ref=f18e1439]
+                              - link "zwabiksoki" [ref=f18e1440] [cursor=pointer]:
+                                - /url: membreinfos.php?membreid=128
+                              - text: Zwabikoski
+                            - cell [ref=f18e1441]:
+                              - link "Lord Of Magna - Maiden Heaven" [ref=f18e1442] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=17&gameid=12018
+                              - table [ref=f18e1443]:
+                                - rowgroup [ref=f18e1444]:
+                                  - row [ref=f18e1445]:
+                                    - cell [ref=f18e1446]
+                                    - cell "Nintendo 3DS" [ref=f18e1448]
+                            - cell "Association rom <> jeu" [ref=f18e1449]
+                            - cell "1269 - Lord of Magna - Maiden Heaven (US).cia" [ref=f18e1450]
+                          - row [ref=f18e1451]:
+                            - cell [ref=f18e1452]:
+                              - text: 12/08/26 22:19
+                              - img "2/3 de Dieu" [ref=f18e1453]
+                              - link "zwabiksoki" [ref=f18e1454] [cursor=pointer]:
+                                - /url: membreinfos.php?membreid=128
+                              - text: Zwabikoski
+                            - cell [ref=f18e1455]:
+                              - link "Lego The Lord Of The Rings" [ref=f18e1456] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=17&gameid=11058
+                              - table [ref=f18e1457]:
+                                - rowgroup [ref=f18e1458]:
+                                  - row [ref=f18e1459]:
+                                    - cell [ref=f18e1460]
+                                    - cell "Nintendo 3DS" [ref=f18e1462]
+                            - cell "Association rom <> jeu" [ref=f18e1463]
+                            - cell "1324 - LEGO El Senor de los Anillos (ES)(M7)...." [ref=f18e1464]
+                          - row [ref=f18e1465]:
+                            - cell [ref=f18e1466]:
+                              - text: 12/08/26 22:19
+                              - img "2/3 de Dieu" [ref=f18e1467]
+                              - link "zwabiksoki" [ref=f18e1468] [cursor=pointer]:
+                                - /url: membreinfos.php?membreid=128
+                              - text: Zwabikoski
+                            - cell [ref=f18e1469]:
+                              - link "Lego Ninjago - Nindroïds" [ref=f18e1470] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=17&gameid=11129
+                              - table [ref=f18e1471]:
+                                - rowgroup [ref=f18e1472]:
+                                  - row [ref=f18e1473]:
+                                    - cell [ref=f18e1474]
+                                    - cell "Nintendo 3DS" [ref=f18e1476]
+                            - cell "Association rom <> jeu" [ref=f18e1477]
+                            - cell "1011 - LEGO Ninjago - Nindroids (US)(M4).cia" [ref=f18e1478]
+                          - row [ref=f18e1479]:
+                            - cell [ref=f18e1480]:
+                              - text: 12/08/26 22:19
+                              - img "2/3 de Dieu" [ref=f18e1481]
+                              - link "zwabiksoki" [ref=f18e1482] [cursor=pointer]:
+                                - /url: membreinfos.php?membreid=128
+                              - text: Zwabikoski
+                            - cell [ref=f18e1483]:
+                              - link "Petz Countryside" [ref=f18e1484] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=17&gameid=11443
+                              - table [ref=f18e1485]:
+                                - rowgroup [ref=f18e1486]:
+                                  - row [ref=f18e1487]:
+                                    - cell [ref=f18e1488]
+                                    - cell "Nintendo 3DS" [ref=f18e1490]
+                            - cell "Association rom <> jeu" [ref=f18e1491]
+                            - cell "1083 - Petz Countryside (US)(M3).cia" [ref=f18e1492]
+                          - row [ref=f18e1493]:
+                            - cell [ref=f18e1494]:
+                              - text: 12/08/26 22:19
+                              - img "2/3 de Dieu" [ref=f18e1495]
+                              - link "zwabiksoki" [ref=f18e1496] [cursor=pointer]:
+                                - /url: membreinfos.php?membreid=128
+                              - text: Zwabikoski
+                            - cell [ref=f18e1497]:
+                              - link "Lego Le Hobbit" [ref=f18e1498] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=17&gameid=11034
+                              - table [ref=f18e1499]:
+                                - rowgroup [ref=f18e1500]:
+                                  - row [ref=f18e1501]:
+                                    - cell [ref=f18e1502]
+                                    - cell "Nintendo 3DS" [ref=f18e1504]
+                            - cell "Association rom <> jeu" [ref=f18e1505]
+                            - cell "1303 - LEGO El Hobbit (ES)(M7).cia" [ref=f18e1506]
+                      - table [ref=f18e1508]:
+                        - rowgroup [ref=f18e1509]:
+                          - row [ref=f18e1510]:
+                            - cell "Derniers Ajouts de Jeux" [ref=f18e1511]
+                            - cell "PLUS D'INFOS" [ref=f18e1512]
+                      - table [ref=f18e1515]:
+                        - rowgroup [ref=f18e1516]:
+                          - row [ref=f18e1517]:
+                            - cell "Date" [ref=f18e1518]
+                            - cell "Système" [ref=f18e1519]
+                            - cell "Titre" [ref=f18e1520]
+                            - cell "Jeu / Non jeu" [ref=f18e1521]
+                          - row [ref=f18e1522]:
+                            - cell "12/08/26 22:03" [ref=f18e1523]
+                            - cell [ref=f18e1524]:
+                              - table [ref=f18e1525]:
+                                - rowgroup [ref=f18e1526]:
+                                  - row [ref=f18e1527]:
+                                    - cell [ref=f18e1528]
+                                    - cell "NES" [ref=f18e1530]
+                            - cell [ref=f18e1531]:
+                              - link "Wild Boys Of Dogstar" [ref=f18e1532] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=3&gameid=555956
+                            - cell "Jeu" [ref=f18e1533]
+                          - row [ref=f18e1534]:
+                            - cell "12/08/26 22:03" [ref=f18e1535]
+                            - cell [ref=f18e1536]:
+                              - table [ref=f18e1537]:
+                                - rowgroup [ref=f18e1538]:
+                                  - row [ref=f18e1539]:
+                                    - cell [ref=f18e1540]
+                                    - cell "NES" [ref=f18e1542]
+                            - cell [ref=f18e1543]:
+                              - link "Land Ahoy!" [ref=f18e1544] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=3&gameid=555944
+                            - cell "Jeu" [ref=f18e1545]
+                          - row [ref=f18e1546]:
+                            - cell "12/08/26 22:03" [ref=f18e1547]
+                            - cell [ref=f18e1548]:
+                              - table [ref=f18e1549]:
+                                - rowgroup [ref=f18e1550]:
+                                  - row [ref=f18e1551]:
+                                    - cell [ref=f18e1552]
+                                    - cell "NES" [ref=f18e1554]
+                            - cell [ref=f18e1555]:
+                              - link "Storied Sword, The" [ref=f18e1556] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=3&gameid=555938
+                            - cell "Jeu" [ref=f18e1557]
+                          - row [ref=f18e1558]:
+                            - cell "12/08/26 22:02" [ref=f18e1559]
+                            - cell [ref=f18e1560]:
+                              - table [ref=f18e1561]:
+                                - rowgroup [ref=f18e1562]:
+                                  - row [ref=f18e1563]:
+                                    - cell [ref=f18e1564]
+                                    - cell "NES" [ref=f18e1566]
+                            - cell [ref=f18e1567]:
+                              - link "Hallway" [ref=f18e1568] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=3&gameid=555929
+                            - cell "Jeu" [ref=f18e1569]
+                          - row [ref=f18e1570]:
+                            - cell "12/08/26 22:02" [ref=f18e1571]
+                            - cell [ref=f18e1572]:
+                              - table [ref=f18e1573]:
+                                - rowgroup [ref=f18e1574]:
+                                  - row [ref=f18e1575]:
+                                    - cell [ref=f18e1576]
+                                    - cell "NES" [ref=f18e1578]
+                            - cell [ref=f18e1579]:
+                              - link "Monk - The Shaolin Warrior" [ref=f18e1580] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=3&gameid=555926
+                            - cell "Jeu" [ref=f18e1581]
+                          - row [ref=f18e1582]:
+                            - cell "12/08/26 22:02" [ref=f18e1583]
+                            - cell [ref=f18e1584]:
+                              - table [ref=f18e1585]:
+                                - rowgroup [ref=f18e1586]:
+                                  - row [ref=f18e1587]:
+                                    - cell [ref=f18e1588]
+                                    - cell "ZX Spectrum" [ref=f18e1590]
+                            - cell [ref=f18e1591]:
+                              - link "Many In One Games" [ref=f18e1592] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=76&gameid=555920
+                            - cell "Jeu" [ref=f18e1593]
+                          - row [ref=f18e1594]:
+                            - cell "12/08/26 22:01" [ref=f18e1595]
+                            - cell [ref=f18e1596]:
+                              - table [ref=f18e1597]:
+                                - rowgroup [ref=f18e1598]:
+                                  - row [ref=f18e1599]:
+                                    - cell [ref=f18e1600]
+                                    - cell "NES" [ref=f18e1602]
+                            - cell [ref=f18e1603]:
+                              - link "Ember Hollow" [ref=f18e1604] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=3&gameid=555917
+                            - cell "Jeu" [ref=f18e1605]
+                          - row [ref=f18e1606]:
+                            - cell "12/08/26 22:01" [ref=f18e1607]
+                            - cell [ref=f18e1608]:
+                              - table [ref=f18e1609]:
+                                - rowgroup [ref=f18e1610]:
+                                  - row [ref=f18e1611]:
+                                    - cell [ref=f18e1612]
+                                    - cell "ZX Spectrum" [ref=f18e1614]
+                            - cell [ref=f18e1615]:
+                              - link "Manic Miner - The Hobbit - The Hobbit - Easy" [ref=f18e1616] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=76&gameid=555914
+                            - cell "Jeu" [ref=f18e1617]
+                          - row [ref=f18e1618]:
+                            - cell "12/08/26 22:01" [ref=f18e1619]
+                            - cell [ref=f18e1620]:
+                              - table [ref=f18e1621]:
+                                - rowgroup [ref=f18e1622]:
+                                  - row [ref=f18e1623]:
+                                    - cell [ref=f18e1624]
+                                    - cell "ZX Spectrum" [ref=f18e1626]
+                            - cell [ref=f18e1627]:
+                              - link "Manic-4-Noobs" [ref=f18e1628] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=76&gameid=555908
+                            - cell "Jeu" [ref=f18e1629]
+                          - row [ref=f18e1630]:
+                            - cell "12/08/26 22:01" [ref=f18e1631]
+                            - cell [ref=f18e1632]:
+                              - table [ref=f18e1633]:
+                                - rowgroup [ref=f18e1634]:
+                                  - row [ref=f18e1635]:
+                                    - cell [ref=f18e1636]
+                                    - cell "ZX Spectrum" [ref=f18e1638]
+                            - cell [ref=f18e1639]:
+                              - link "Manic Scroller" [ref=f18e1640] [cursor=pointer]:
+                                - /url: gameinfos.php?plateforme=76&gameid=555905
+                            - cell "Jeu" [ref=f18e1641]
+                      - table [ref=f18e1643]:
+                        - rowgroup [ref=f18e1644]:
+                          - row [ref=f18e1645]:
+                            - cell "Derniers commentaires" [ref=f18e1646]
+                            - cell "PLUS D'INFOS" [ref=f18e1647]
+                      - generic [ref=f18e1649]:
+                        - table [ref=f18e1651]:
+                          - rowgroup [ref=f18e1652]:
+                            - row [ref=f18e1653]:
+                              - cell "12/08/26 22:09" [ref=f18e1654]
+                              - cell [ref=f18e1655]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e1656]
+                                - link "megatari49" [ref=f18e1657] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=26813383
+                              - cell [ref=f18e1658]:
+                                - table [ref=f18e1659]:
+                                  - rowgroup [ref=f18e1660]:
+                                    - row [ref=f18e1661]:
+                                      - cell [ref=f18e1662]:
+                                        - 'link "Jeu: Fatal Fury 2" [ref=f18e1663] [cursor=pointer]':
+                                          - /url: gameinfos.php?zone=gameinfoscomm&gameid=147#com90326
+                                      - cell [ref=f18e1664]
+                                      - cell "Megadrive" [ref=f18e1666]
+                        - table [ref=f18e1668]:
+                          - rowgroup [ref=f18e1669]:
+                            - row [ref=f18e1670]:
+                              - 'cell "clôturé par Zwabikoski Grand Gourou Infographiste Contributeur megatari49 01h #ERREUR Supprimez Nom région Europe. Merci clôturé par 2/3 de Dieu - Contributeur financierZwabikoski le 12/08/26 22:40" [ref=f18e1671]':
+                                - img "clôturé par Zwabikoski"
+                                - generic [ref=f18e1672]:
+                                  - img "Grand Gourou Infographiste Contributeur" [ref=f18e1673]
+                                  - link "megatari49" [ref=f18e1674] [cursor=pointer]:
+                                    - /url: membreinfos.php?membreid=26813383
+                                - text: 01h
+                                - generic [ref=f18e1675]: "#ERREUR Supprimez Nom région Europe. Merci"
+                                - table [ref=f18e1676]:
+                                  - rowgroup [ref=f18e1677]:
+                                    - row [ref=f18e1678]:
+                                      - cell "clôturé par" [ref=f18e1679]
+                                      - cell [ref=f18e1680]:
+                                        - generic [ref=f18e1681]:
+                                          - img "2/3 de Dieu - Contributeur financier" [ref=f18e1682]
+                                          - link "Zwabikoski" [ref=f18e1683] [cursor=pointer]:
+                                            - /url: membreinfos.php?membreid=13899
+                                      - cell "le" [ref=f18e1684]
+                                      - cell "12/08/26 22:40" [ref=f18e1685]
+                        - table [ref=f18e1688]:
+                          - rowgroup [ref=f18e1689]:
+                            - row [ref=f18e1690]:
+                              - cell "12/08/26 21:23" [ref=f18e1691]
+                              - cell [ref=f18e1692]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e1693]
+                                - link "pullover" [ref=f18e1694] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=172213
+                              - cell [ref=f18e1695]:
+                                - table [ref=f18e1696]:
+                                  - rowgroup [ref=f18e1697]:
+                                    - row [ref=f18e1698]:
+                                      - cell [ref=f18e1699]:
+                                        - 'link "Jeu: Combat Simulator - Battle Gorilla" [ref=f18e1700] [cursor=pointer]':
+                                          - /url: gameinfos.php?zone=gameinfoscomm&gameid=193744#com90323
+                                      - cell [ref=f18e1701]
+                                      - cell "NEC PC-8801" [ref=f18e1703]
+                        - table [ref=f18e1705]:
+                          - rowgroup [ref=f18e1706]:
+                            - row [ref=f18e1707]:
+                              - cell [ref=f18e1708]:
+                                - img "clôturé par Zwabikoski"
+                                - generic [ref=f18e1709]:
+                                  - img "Grand Gourou Infographiste Contributeur" [ref=f18e1710]
+                                  - link "pullover" [ref=f18e1711] [cursor=pointer]:
+                                    - /url: membreinfos.php?membreid=172213
+                                - text: 01h
+                                - generic [ref=f18e1712]:
+                                  - text: "#DOUBLON"
+                                  - link "https://www.screenscraper.fr/gameinfos.php?plateforme=221&gameid=193744" [ref=f18e1713] [cursor=pointer]:
+                                    - /url: https://www.screenscraper.fr/gameinfos.php?plateforme=221&gameid=193744
+                                - table [ref=f18e1714]:
+                                  - rowgroup [ref=f18e1715]:
+                                    - row [ref=f18e1716]:
+                                      - cell "clôturé par" [ref=f18e1717]
+                                      - cell [ref=f18e1718]:
+                                        - generic [ref=f18e1719]:
+                                          - img "2/3 de Dieu - Contributeur financier" [ref=f18e1720]
+                                          - link "Zwabikoski" [ref=f18e1721] [cursor=pointer]:
+                                            - /url: membreinfos.php?membreid=13899
+                                      - cell "le" [ref=f18e1722]
+                                      - cell "12/08/26 21:57" [ref=f18e1723]
+                        - table [ref=f18e1726]:
+                          - rowgroup [ref=f18e1727]:
+                            - row [ref=f18e1728]:
+                              - cell "12/08/26 15:46" [ref=f18e1729]
+                              - cell [ref=f18e1730]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e1731]
+                                - link "Scraperdoo256" [ref=f18e1732] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=26981907
+                              - cell [ref=f18e1733]:
+                                - table [ref=f18e1734]:
+                                  - rowgroup [ref=f18e1735]:
+                                    - row [ref=f18e1736]:
+                                      - cell [ref=f18e1737]:
+                                        - 'link "Jeu: Wild West Shootout" [ref=f18e1738] [cursor=pointer]':
+                                          - /url: gameinfos.php?zone=gameinfoscomm&gameid=9479#com90305
+                                      - cell [ref=f18e1739]
+                                      - cell "Wii" [ref=f18e1741]
+                        - table [ref=f18e1743]:
+                          - rowgroup [ref=f18e1744]:
+                            - row [ref=f18e1745]:
+                              - cell "clôturé par zwabiksoki Grand Gourou Infographiste Contributeur Scraperdoo256 07h Some of the Wii supports have good quality scans but the exposure or colors are slightly off. Is it alright if I color correct them and resubmit? 2/3 de Dieu zwabiksoki 05h yes ;) clôturé par 2/3 de Dieu zwabiksoki le 12/08/26 18:20" [ref=f18e1746]:
+                                - img "clôturé par zwabiksoki"
+                                - generic [ref=f18e1747]:
+                                  - img "Grand Gourou Infographiste Contributeur" [ref=f18e1748]
+                                  - link "Scraperdoo256" [ref=f18e1749] [cursor=pointer]:
+                                    - /url: membreinfos.php?membreid=26981907
+                                - text: 07h
+                                - generic [ref=f18e1750]: Some of the Wii supports have good quality scans but the exposure or colors are slightly off. Is it alright if I color correct them and resubmit?
+                                - table [ref=f18e1751]:
+                                  - rowgroup [ref=f18e1752]:
+                                    - row [ref=f18e1753]:
+                                      - cell "2/3 de Dieu zwabiksoki 05h yes ;)" [ref=f18e1754]:
+                                        - generic [ref=f18e1755]:
+                                          - img "2/3 de Dieu" [ref=f18e1756]
+                                          - link "zwabiksoki" [ref=f18e1757] [cursor=pointer]:
+                                            - /url: membreinfos.php?membreid=128
+                                        - text: 05h
+                                        - generic [ref=f18e1758]: yes ;)
+                                - table [ref=f18e1759]:
+                                  - rowgroup [ref=f18e1760]:
+                                    - row [ref=f18e1761]:
+                                      - cell "clôturé par" [ref=f18e1762]
+                                      - cell [ref=f18e1763]:
+                                        - generic [ref=f18e1764]:
+                                          - img "2/3 de Dieu" [ref=f18e1765]
+                                          - link "zwabiksoki" [ref=f18e1766] [cursor=pointer]:
+                                            - /url: membreinfos.php?membreid=128
+                                      - cell "le" [ref=f18e1767]
+                                      - cell "12/08/26 18:20" [ref=f18e1768]
+                        - table [ref=f18e1771]:
+                          - rowgroup [ref=f18e1772]:
+                            - row [ref=f18e1773]:
+                              - cell "12/08/26 17:36" [ref=f18e1774]
+                              - cell [ref=f18e1775]:
+                                - img "Modérateur Système(s)" [ref=f18e1776]
+                                - link "snydar" [ref=f18e1777] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=27496004
+                              - cell [ref=f18e1778]:
+                                - table [ref=f18e1779]:
+                                  - rowgroup [ref=f18e1780]:
+                                    - row [ref=f18e1781]:
+                                      - cell [ref=f18e1782]:
+                                        - 'link "Jeu: Burger Time (Interceptor Software - 1984)" [ref=f18e1783] [cursor=pointer]':
+                                          - /url: gameinfos.php?zone=gameinfoscomm&gameid=110427#com90317
+                                      - cell [ref=f18e1784]
+                                      - cell "Commodore 64" [ref=f18e1786]
+                        - table [ref=f18e1788]:
+                          - rowgroup [ref=f18e1789]:
+                            - row [ref=f18e1790]:
+                              - cell [ref=f18e1791]:
+                                - img "clôturé par snydar"
+                                - generic [ref=f18e1792]:
+                                  - img "Modérateur Système(s)" [ref=f18e1793]
+                                  - link "snydar" [ref=f18e1794] [cursor=pointer]:
+                                    - /url: membreinfos.php?membreid=27496004
+                                - text: 05h
+                                - generic [ref=f18e1795]:
+                                  - text: "#DOUBLON"
+                                  - link "https://www.screenscraper.fr/gameinfos.php?plateforme=66&gameid=110427" [ref=f18e1796] [cursor=pointer]:
+                                    - /url: https://www.screenscraper.fr/gameinfos.php?plateforme=66&gameid=110427
+                                - table [ref=f18e1797]:
+                                  - rowgroup [ref=f18e1798]:
+                                    - row [ref=f18e1799]:
+                                      - cell "clôturé par" [ref=f18e1800]
+                                      - cell [ref=f18e1801]:
+                                        - generic [ref=f18e1802]:
+                                          - img "Modérateur Système(s)" [ref=f18e1803]
+                                          - link "snydar" [ref=f18e1804] [cursor=pointer]:
+                                            - /url: membreinfos.php?membreid=27496004
+                                      - cell "le" [ref=f18e1805]
+                                      - cell "12/08/26 17:36" [ref=f18e1806]
+                        - table [ref=f18e1809]:
+                          - rowgroup [ref=f18e1810]:
+                            - row [ref=f18e1811]:
+                              - cell "12/08/26 17:06" [ref=f18e1812]
+                              - cell [ref=f18e1813]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e1814]
+                                - link "megatari49" [ref=f18e1815] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=26813383
+                              - cell [ref=f18e1816]:
+                                - table [ref=f18e1817]:
+                                  - rowgroup [ref=f18e1818]:
+                                    - row [ref=f18e1819]:
+                                      - cell [ref=f18e1820]:
+                                        - 'link "Jeu: Cadillacs and Dinosaurs" [ref=f18e1821] [cursor=pointer]':
+                                          - /url: gameinfos.php?zone=gameinfoscomm&gameid=542276#com90314
+                                      - cell [ref=f18e1822]
+                                      - cell "Megadrive" [ref=f18e1824]
+                        - table [ref=f18e1826]:
+                          - rowgroup [ref=f18e1827]:
+                            - row [ref=f18e1828]:
+                              - 'cell "clôturé par zwabiksoki Grand Gourou Infographiste Contributeur megatari49 06h #ERREUR Supprimez Date World 22/02/2023 Merci clôturé par 2/3 de Dieu zwabiksoki le 12/08/26 18:20" [ref=f18e1829]':
+                                - img "clôturé par zwabiksoki"
+                                - generic [ref=f18e1830]:
+                                  - img "Grand Gourou Infographiste Contributeur" [ref=f18e1831]
+                                  - link "megatari49" [ref=f18e1832] [cursor=pointer]:
+                                    - /url: membreinfos.php?membreid=26813383
+                                - text: 06h
+                                - generic [ref=f18e1833]: "#ERREUR Supprimez Date World 22/02/2023 Merci"
+                                - table [ref=f18e1834]:
+                                  - rowgroup [ref=f18e1835]:
+                                    - row [ref=f18e1836]:
+                                      - cell "clôturé par" [ref=f18e1837]
+                                      - cell [ref=f18e1838]:
+                                        - generic [ref=f18e1839]:
+                                          - img "2/3 de Dieu" [ref=f18e1840]
+                                          - link "zwabiksoki" [ref=f18e1841] [cursor=pointer]:
+                                            - /url: membreinfos.php?membreid=128
+                                      - cell "le" [ref=f18e1842]
+                                      - cell "12/08/26 18:20" [ref=f18e1843]
+                      - table [ref=f18e1846]:
+                        - rowgroup [ref=f18e1847]:
+                          - row [ref=f18e1848]:
+                            - cell "Derniers Messages sur le Forum" [ref=f18e1849]
+                            - cell "PLUS D'INFOS" [ref=f18e1850]
+                      - table [ref=f18e1853]:
+                        - rowgroup [ref=f18e1854]:
+                          - row [ref=f18e1855]:
+                            - cell [ref=f18e1856]:
+                              - generic [ref=f18e1857]:
+                                - table [ref=f18e1858]:
+                                  - rowgroup [ref=f18e1859]:
+                                    - row [ref=f18e1860]:
+                                      - cell "ScreenScraper / WebAPI ScreenScraper" [ref=f18e1861]
+                                    - row
+                                - table [ref=f18e1862]:
+                                  - rowgroup [ref=f18e1863]:
+                                    - row [ref=f18e1864]:
+                                      - cell [ref=f18e1865]:
+                                        - link "DEV credentials for ROMM" [ref=f18e1866] [cursor=pointer]:
+                                          - /url: forumsujet.php?frub=12&fsuj=21443&numpagesujet=last
+                                - table [ref=f18e1867]:
+                                  - rowgroup [ref=f18e1868]:
+                                    - row [ref=f18e1869]:
+                                      - cell [ref=f18e1870]:
+                                        - generic [ref=f18e1871]:
+                                          - text: de
+                                          - generic [ref=f18e1872]:
+                                            - img "Membre" [ref=f18e1873]
+                                            - link "Gambler666" [ref=f18e1874] [cursor=pointer]:
+                                              - /url: membreinfos.php?membreid=29270609
+                                          - text: le 12/08/26 18:48
+                            - cell [ref=f18e1875]:
+                              - generic [ref=f18e1876]:
+                                - table [ref=f18e1877]:
+                                  - rowgroup [ref=f18e1878]:
+                                    - row [ref=f18e1879]:
+                                      - cell "ScreenScraper / WebAPI ScreenScraper" [ref=f18e1880]
+                                    - row
+                                - table [ref=f18e1881]:
+                                  - rowgroup [ref=f18e1882]:
+                                    - row [ref=f18e1883]:
+                                      - cell [ref=f18e1884]:
+                                        - link "API access request — GameAlfa, a self-hosted catalogue for physical game collections" [ref=f18e1885] [cursor=pointer]:
+                                          - /url: forumsujet.php?frub=12&fsuj=21440&numpagesujet=last
+                                - table [ref=f18e1886]:
+                                  - rowgroup [ref=f18e1887]:
+                                    - row [ref=f18e1888]:
+                                      - cell [ref=f18e1889]:
+                                        - generic [ref=f18e1890]:
+                                          - text: de
+                                          - generic [ref=f18e1891]:
+                                            - img "Membre" [ref=f18e1892]
+                                            - link "alfaalex" [ref=f18e1893] [cursor=pointer]:
+                                              - /url: membreinfos.php?membreid=29270585
+                                          - text: le 12/08/26 17:27
+                          - row [ref=f18e1894]:
+                            - cell [ref=f18e1895]:
+                              - generic [ref=f18e1896]:
+                                - table [ref=f18e1897]:
+                                  - rowgroup [ref=f18e1898]:
+                                    - row [ref=f18e1899]:
+                                      - cell "ScreenScraper / WebAPI ScreenScraper" [ref=f18e1900]
+                                    - row
+                                - table [ref=f18e1901]:
+                                  - rowgroup [ref=f18e1902]:
+                                    - row [ref=f18e1903]:
+                                      - cell [ref=f18e1904]:
+                                        - link "Developer ID (devid) Request - DigBitPlay - Front-end" [ref=f18e1905] [cursor=pointer]:
+                                          - /url: forumsujet.php?frub=12&fsuj=21437&numpagesujet=last
+                                - table [ref=f18e1906]:
+                                  - rowgroup [ref=f18e1907]:
+                                    - row [ref=f18e1908]:
+                                      - cell [ref=f18e1909]:
+                                        - generic [ref=f18e1910]:
+                                          - text: de
+                                          - generic [ref=f18e1911]:
+                                            - img "Membre" [ref=f18e1912]
+                                            - link "chri273uu" [ref=f18e1913] [cursor=pointer]:
+                                              - /url: membreinfos.php?membreid=26837226
+                                          - text: le 12/08/26 14:14
+                            - cell [ref=f18e1914]:
+                              - generic [ref=f18e1915]:
+                                - table [ref=f18e1916]:
+                                  - rowgroup [ref=f18e1917]:
+                                    - row [ref=f18e1918]:
+                                      - cell "ScreenScraper / WebAPI ScreenScraper" [ref=f18e1919]
+                                    - row
+                                - table [ref=f18e1920]:
+                                  - rowgroup [ref=f18e1921]:
+                                    - row [ref=f18e1922]:
+                                      - cell [ref=f18e1923]:
+                                        - link "Presentation and Dev ID request – Modding Indy Air" [ref=f18e1924] [cursor=pointer]:
+                                          - /url: forumsujet.php?frub=12&fsuj=21434&numpagesujet=last
+                                - table [ref=f18e1925]:
+                                  - rowgroup [ref=f18e1926]:
+                                    - row [ref=f18e1927]:
+                                      - cell [ref=f18e1928]:
+                                        - generic [ref=f18e1929]:
+                                          - text: de
+                                          - generic [ref=f18e1930]:
+                                            - img "Membre" [ref=f18e1931]
+                                            - link "dronesindyair" [ref=f18e1932] [cursor=pointer]:
+                                              - /url: membreinfos.php?membreid=27744830
+                                          - text: le 12/08/26 13:37
+                          - row [ref=f18e1933]:
+                            - cell [ref=f18e1934]:
+                              - generic [ref=f18e1935]:
+                                - table [ref=f18e1936]:
+                                  - rowgroup [ref=f18e1937]:
+                                    - row [ref=f18e1938]:
+                                      - cell "ScreenScraper / WebAPI ScreenScraper" [ref=f18e1939]
+                                    - row
+                                - table [ref=f18e1940]:
+                                  - rowgroup [ref=f18e1941]:
+                                    - row [ref=f18e1942]:
+                                      - cell [ref=f18e1943]:
+                                        - 'link "RE : How to properly deploy software w/ Dev key" [ref=f18e1944] [cursor=pointer]':
+                                          - /url: forumsujet.php?frub=12&fsuj=21431&numpagesujet=last
+                                - table [ref=f18e1945]:
+                                  - rowgroup [ref=f18e1946]:
+                                    - row [ref=f18e1947]:
+                                      - cell [ref=f18e1948]:
+                                        - generic [ref=f18e1949]:
+                                          - text: de
+                                          - generic [ref=f18e1950]:
+                                            - img "Dieu tout puissant - Contributeur financier" [ref=f18e1951]
+                                            - link "marblemad" [ref=f18e1952] [cursor=pointer]:
+                                              - /url: membreinfos.php?membreid=1
+                                          - text: le 12/08/26 08:43
+                            - cell [ref=f18e1953]:
+                              - generic [ref=f18e1954]:
+                                - table [ref=f18e1955]:
+                                  - rowgroup [ref=f18e1956]:
+                                    - row [ref=f18e1957]:
+                                      - cell "ScreenScraper / WebAPI ScreenScraper" [ref=f18e1958]
+                                    - row
+                                - table [ref=f18e1959]:
+                                  - rowgroup [ref=f18e1960]:
+                                    - row [ref=f18e1961]:
+                                      - cell [ref=f18e1962]:
+                                        - link "Création du compte développeur" [ref=f18e1963] [cursor=pointer]:
+                                          - /url: forumsujet.php?frub=12&fsuj=21428&numpagesujet=last
+                                - table [ref=f18e1964]:
+                                  - rowgroup [ref=f18e1965]:
+                                    - row [ref=f18e1966]:
+                                      - cell [ref=f18e1967]:
+                                        - generic [ref=f18e1968]:
+                                          - text: de
+                                          - generic [ref=f18e1969]:
+                                            - img "Dieu tout puissant - Contributeur financier" [ref=f18e1970]
+                                            - link "marblemad" [ref=f18e1971] [cursor=pointer]:
+                                              - /url: membreinfos.php?membreid=1
+                                          - text: le 12/08/26 08:38
+                          - row [ref=f18e1972]:
+                            - cell [ref=f18e1973]:
+                              - generic [ref=f18e1974]:
+                                - table [ref=f18e1975]:
+                                  - rowgroup [ref=f18e1976]:
+                                    - row [ref=f18e1977]:
+                                      - cell "ScreenScraper / WebAPI ScreenScraper" [ref=f18e1978]
+                                    - row
+                                - table [ref=f18e1979]:
+                                  - rowgroup [ref=f18e1980]:
+                                    - row [ref=f18e1981]:
+                                      - cell [ref=f18e1982]:
+                                        - 'link "RE : Developer API Access Request – Pluto Core" [ref=f18e1983] [cursor=pointer]':
+                                          - /url: forumsujet.php?frub=12&fsuj=21425&numpagesujet=last
+                                - table [ref=f18e1984]:
+                                  - rowgroup [ref=f18e1985]:
+                                    - row [ref=f18e1986]:
+                                      - cell [ref=f18e1987]:
+                                        - generic [ref=f18e1988]:
+                                          - text: de
+                                          - generic [ref=f18e1989]:
+                                            - img "Dieu tout puissant - Contributeur financier" [ref=f18e1990]
+                                            - link "marblemad" [ref=f18e1991] [cursor=pointer]:
+                                              - /url: membreinfos.php?membreid=1
+                                          - text: le 12/08/26 08:35
+                            - cell [ref=f18e1992]:
+                              - generic [ref=f18e1993]:
+                                - table [ref=f18e1994]:
+                                  - rowgroup [ref=f18e1995]:
+                                    - row [ref=f18e1996]:
+                                      - cell "ScreenScraper / WebAPI ScreenScraper" [ref=f18e1997]
+                                    - row
+                                - table [ref=f18e1998]:
+                                  - rowgroup [ref=f18e1999]:
+                                    - row [ref=f18e2000]:
+                                      - cell [ref=f18e2001]:
+                                        - link "Création du compte développeur" [ref=f18e2002] [cursor=pointer]:
+                                          - /url: forumsujet.php?frub=12&fsuj=21422&numpagesujet=last
+                                - table [ref=f18e2003]:
+                                  - rowgroup [ref=f18e2004]:
+                                    - row [ref=f18e2005]:
+                                      - cell [ref=f18e2006]:
+                                        - generic [ref=f18e2007]:
+                                          - text: de
+                                          - generic [ref=f18e2008]:
+                                            - img "Dieu tout puissant - Contributeur financier" [ref=f18e2009]
+                                            - link "marblemad" [ref=f18e2010] [cursor=pointer]:
+                                              - /url: membreinfos.php?membreid=1
+                                          - text: le 12/08/26 08:33
+                          - row [ref=f18e2011]:
+                            - cell [ref=f18e2012]:
+                              - generic [ref=f18e2013]:
+                                - table [ref=f18e2014]:
+                                  - rowgroup [ref=f18e2015]:
+                                    - row [ref=f18e2016]:
+                                      - cell "ScreenScraper / WebAPI ScreenScraper" [ref=f18e2017]
+                                    - row
+                                - table [ref=f18e2018]:
+                                  - rowgroup [ref=f18e2019]:
+                                    - row [ref=f18e2020]:
+                                      - cell [ref=f18e2021]:
+                                        - link "Création du compte développeur" [ref=f18e2022] [cursor=pointer]:
+                                          - /url: forumsujet.php?frub=12&fsuj=21419&numpagesujet=last
+                                - table [ref=f18e2023]:
+                                  - rowgroup [ref=f18e2024]:
+                                    - row [ref=f18e2025]:
+                                      - cell [ref=f18e2026]:
+                                        - generic [ref=f18e2027]:
+                                          - text: de
+                                          - generic [ref=f18e2028]:
+                                            - img "Dieu tout puissant - Contributeur financier" [ref=f18e2029]
+                                            - link "marblemad" [ref=f18e2030] [cursor=pointer]:
+                                              - /url: membreinfos.php?membreid=1
+                                          - text: le 12/08/26 08:08
+                            - cell [ref=f18e2031]:
+                              - generic [ref=f18e2032]:
+                                - table [ref=f18e2033]:
+                                  - rowgroup [ref=f18e2034]:
+                                    - row [ref=f18e2035]:
+                                      - cell "ScreenScraper / WebAPI ScreenScraper" [ref=f18e2036]
+                                    - row
+                                - table [ref=f18e2037]:
+                                  - rowgroup [ref=f18e2038]:
+                                    - row [ref=f18e2039]:
+                                      - cell [ref=f18e2040]:
+                                        - link "Création du compte développeur" [ref=f18e2041] [cursor=pointer]:
+                                          - /url: forumsujet.php?frub=12&fsuj=21416&numpagesujet=last
+                                - table [ref=f18e2042]:
+                                  - rowgroup [ref=f18e2043]:
+                                    - row [ref=f18e2044]:
+                                      - cell [ref=f18e2045]:
+                                        - generic [ref=f18e2046]:
+                                          - text: de
+                                          - generic [ref=f18e2047]:
+                                            - img "Dieu tout puissant - Contributeur financier" [ref=f18e2048]
+                                            - link "marblemad" [ref=f18e2049] [cursor=pointer]:
+                                              - /url: membreinfos.php?membreid=1
+                                          - text: le 12/08/26 08:06
+                          - row
+                      - generic [ref=f18e2050]: Derniers ajouts de médias de système
+                      - table [ref=f18e2052]:
+                        - rowgroup [ref=f18e2053]:
+                          - row [ref=f18e2054]:
+                            - cell [ref=f18e2055]:
+                              - table [ref=f18e2056]:
+                                - rowgroup [ref=f18e2057]:
+                                  - row [ref=f18e2058]:
+                                    - cell "02 août 2026 - 3 Participations" [ref=f18e2059]
+                          - row [ref=f18e2062]:
+                            - cell "Date Membre Validé par" [ref=f18e2063]: DateMembreValidé par
+                            - cell "Système" [ref=f18e2064]
+                            - cell "Type" [ref=f18e2065]
+                            - cell "Médias" [ref=f18e2066]
+                            - cell [ref=f18e2067]
+                            - cell "Date Membre Validé par" [ref=f18e2068]: DateMembreValidé par
+                            - cell "Système" [ref=f18e2069]
+                            - cell "Type Région" [ref=f18e2070]: TypeRégion
+                            - cell "Médias" [ref=f18e2071]
+                          - row [ref=f18e2072]:
+                            - cell [ref=f18e2073]:
+                              - text: 02/08/26 08:49
+                              - generic [ref=f18e2074]:
+                                - img "Dieu tout puissant - Contributeur financier" [ref=f18e2075]
+                                - link "marblemad" [ref=f18e2076] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=1
+                              - text: marblemad
+                            - cell [ref=f18e2077]:
+                              - table [ref=f18e2078]:
+                                - rowgroup [ref=f18e2079]:
+                                  - row [ref=f18e2080]:
+                                    - cell [ref=f18e2081]
+                                    - cell "FM Towns" [ref=f18e2083]:
+                                      - link "FM Towns":
+                                        - /url: systemeinfos.php?plateforme=253
+                                        - img "FM Towns"
+                            - cell "Boitier 3D vierge Japon" [ref=f18e2084]
+                            - cell [ref=f18e2086]
+                            - cell [ref=f18e2087]
+                            - cell [ref=f18e2088]:
+                              - text: 02/08/26 08:45
+                              - generic [ref=f18e2089]:
+                                - img "Dieu tout puissant - Contributeur financier" [ref=f18e2090]
+                                - link "marblemad" [ref=f18e2091] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=1
+                              - text: marblemad
+                            - cell [ref=f18e2092]:
+                              - table [ref=f18e2093]:
+                                - rowgroup [ref=f18e2094]:
+                                  - row [ref=f18e2095]:
+                                    - cell [ref=f18e2096]
+                                    - cell "FM Towns" [ref=f18e2098]:
+                                      - link "FM Towns":
+                                        - /url: systemeinfos.php?plateforme=253
+                                        - img "FM Towns"
+                            - cell "Tranche Vierge Japon" [ref=f18e2099]
+                            - cell [ref=f18e2101]
+                          - row [ref=f18e2102]:
+                            - cell [ref=f18e2103]:
+                              - text: 02/08/26 08:41
+                              - generic [ref=f18e2104]:
+                                - img "Dieu tout puissant - Contributeur financier" [ref=f18e2105]
+                                - link "marblemad" [ref=f18e2106] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=1
+                              - text: marblemad
+                            - cell [ref=f18e2107]:
+                              - table [ref=f18e2108]:
+                                - rowgroup [ref=f18e2109]:
+                                  - row [ref=f18e2110]:
+                                    - cell [ref=f18e2111]
+                                    - cell "FM Towns" [ref=f18e2113]:
+                                      - link "FM Towns":
+                                        - /url: systemeinfos.php?plateforme=253
+                                        - img "FM Towns"
+                            - cell "Gabarit de boitier Japon" [ref=f18e2114]
+                            - cell [ref=f18e2116]
+                            - cell [ref=f18e2117]
+                          - row [ref=f18e2118]:
+                            - cell [ref=f18e2119]:
+                              - table [ref=f18e2120]:
+                                - rowgroup [ref=f18e2121]:
+                                  - row [ref=f18e2122]:
+                                    - cell "09 juillet 2026 - 8 Participations" [ref=f18e2123]
+                          - row [ref=f18e2126]:
+                            - cell "Date Membre Validé par" [ref=f18e2127]: DateMembreValidé par
+                            - cell "Système" [ref=f18e2128]
+                            - cell "Type" [ref=f18e2129]
+                            - cell "Médias" [ref=f18e2130]
+                            - cell [ref=f18e2131]
+                            - cell "Date Membre Validé par" [ref=f18e2132]: DateMembreValidé par
+                            - cell "Système" [ref=f18e2133]
+                            - cell "Type Région" [ref=f18e2134]: TypeRégion
+                            - cell "Médias" [ref=f18e2135]
+                          - row [ref=f18e2136]:
+                            - cell [ref=f18e2137]:
+                              - text: 09/07/26 18:45
+                              - generic [ref=f18e2138]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e2139]
+                                - link "mikael42" [ref=f18e2140] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=33743
+                              - text: zwabiksoki
+                            - cell [ref=f18e2141]:
+                              - table [ref=f18e2142]:
+                                - rowgroup [ref=f18e2143]:
+                                  - row [ref=f18e2144]:
+                                    - cell [ref=f18e2145]
+                                    - cell "NES" [ref=f18e2147]:
+                                      - link "NES":
+                                        - /url: systemeinfos.php?plateforme=3
+                                        - img "NES"
+                            - cell "Illustration Asie" [ref=f18e2148]
+                            - cell [ref=f18e2150]
+                          - row [ref=f18e2151]:
+                            - cell [ref=f18e2152]:
+                              - text: 09/07/26 18:43
+                              - generic [ref=f18e2153]:
+                                - img "Grand Gourou Infographiste Contributeur" [ref=f18e2154]
+                                - link "mikael42" [ref=f18e2155] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=33743
+                              - text: zwabiksoki
+                            - cell [ref=f18e2156]:
+                              - table [ref=f18e2157]:
+                                - rowgroup [ref=f18e2158]:
+                                  - row [ref=f18e2159]:
+                                    - cell [ref=f18e2160]
+                                    - cell "Family Computer Disk System" [ref=f18e2162]:
+                                      - link "Family Computer Disk System":
+                                        - /url: systemeinfos.php?plateforme=106
+                                        - img "Family Computer Disk System"
+                            - cell "Illustration Japon" [ref=f18e2163]
+                            - cell [ref=f18e2165]
+                            - cell [ref=f18e2166]
+                            - cell [ref=f18e2167]:
+                              - text: 09/07/26 13:14
+                              - generic [ref=f18e2168]:
+                                - img "Dieu tout puissant - Contributeur financier" [ref=f18e2169]
+                                - link "marblemad" [ref=f18e2170] [cursor=pointer]:
+                                  - /url: membreinfos.php?membreid=1
+                              - text: marblemad
+                            - cell [ref=f18e2171]:
+                              - table [ref=f18e2172]:
+                                - rowgroup [ref=f18e2173]:
+                                  - row [ref=f18e2174]:
+                                    - cell [ref=f18e2175]
+                                    - cell "M5" [ref=f18e2177]:
+                                      - link "M5":
+                                        - /url: systemeinfos.php?plateforme=323
+                                        - img "M5"
+                            - cell "Logo HD Vierge Custom" [ref=f18e2178]
+                            - cell [ref=f18e2180]
+            - row [ref=f18e2181]:
+              - cell [ref=f18e2182]:
+                - generic [ref=f18e2183]:
+                  - table [ref=f18e2184]:
+                    - rowgroup [ref=f18e2185]:
+                      - row [ref=f18e2186]:
+                        - cell [ref=f18e2187]:
+                          - iframe
+                          - iframe
+                          - link [ref=f18e2188] [cursor=pointer]:
+                            - /url: http://creativecommons.org/licenses/by-nc-sa/4.0/
+                            - img "Licence Creative Commons" [ref=f18e2189]
+                        - cell [ref=f18e2190]:
+                          - text: mise à disposition selon les termes de la
+                          - link "Licence Creative Commons Attribution" [ref=f18e2191] [cursor=pointer]:
+                            - /url: http://creativecommons.org/licenses/by-nc-sa/4.0/
+                          - text: Pas d'Utilisation Commerciale - Partage dans les Mêmes Conditions 4.0 International.
+                  - table [ref=f18e2192]:
+                    - rowgroup [ref=f18e2193]:
+                      - row [ref=f18e2194]:
+                        - cell [ref=f18e2195]:
+                          - text: "Crédits généraux : Si dessous, les sources 'Creative Commons' de récupération des différentes informations et médias. Infos : Communauté ScreenScraper."
+                          - link "Wikipedia" [ref=f18e2196] [cursor=pointer]:
+                            - /url: https://fr.wikipedia.org
+                          - text: .
+                          - link "Gamefaqs" [ref=f18e2197] [cursor=pointer]:
+                            - /url: http://www.gamefaqs.com/
+                          - text: .
+                          - link "jeuxvideo" [ref=f18e2198] [cursor=pointer]:
+                            - /url: http://www.jeuxvideo.com/
+                          - text: .
+                          - link "gametronik" [ref=f18e2199] [cursor=pointer]:
+                            - /url: http://www.gametronik.com/
+                          - text: .
+                          - link "gametdb" [ref=f18e2200] [cursor=pointer]:
+                            - /url: http://www.gametdb.com/
+                          - text: .
+                          - link "mobygames" [ref=f18e2201] [cursor=pointer]:
+                            - /url: http://www.mobygames.com/
+                          - text: ". Boxes Texture : Communauté ScreenScraper . Communauté"
+                          - link "The Cover Project" [ref=f18e2202] [cursor=pointer]:
+                            - /url: http://www.thecoverproject.net/
+                          - text: . Communauté
+                          - link "gbatemp" [ref=f18e2203] [cursor=pointer]:
+                            - /url: https://gbatemp.net
+                          - text: . Communauté
+                          - link "Hyperspin" [ref=f18e2204] [cursor=pointer]:
+                            - /url: http://www.hyperspin-fe.com/
+                          - text: .
+                          - link "Southtown-Homebrew" [ref=f18e2205] [cursor=pointer]:
+                            - /url: http://southtown-homebrew.com/
+                          - text: ". Boxes 2D / 3D : Communauté ScreenScraper . Communauté"
+                          - link "Hyperspin" [ref=f18e2206] [cursor=pointer]:
+                            - /url: http://www.hyperspin-fe.com/
+                          - text: . Communauté
+                          - link "Emumovies" [ref=f18e2207] [cursor=pointer]:
+                            - /url: http://emumovies.com/forums/page/portal
+                          - text: .
+                          - link "gametdb" [ref=f18e2208] [cursor=pointer]:
+                            - /url: http://www.gametdb.com/
+                          - text: .
+                          - link "flyers.arcade-museum.com" [ref=f18e2209] [cursor=pointer]:
+                            - /url: http://flyers.arcade-museum.com
+                          - text: ". Vidéos : Communauté ScreenScraper . Communauté"
+                          - link "Emumovies" [ref=f18e2210] [cursor=pointer]:
+                            - /url: http://emumovies.com/forums/page/portal
+                          - text: "Screenshots / Marquees : ScreenScraper ."
+                          - link "Progetto Snaps" [ref=f18e2211] [cursor=pointer]:
+                            - /url: http://www.progettosnaps.net/marquees/
+                          - text: .
+                          - link "musee des jeux video" [ref=f18e2212] [cursor=pointer]:
+                            - /url: https://www.musee-des-jeux-video.com/fr
+                          - text: .
+      - cell [ref=f18e2213]

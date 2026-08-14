@@ -1,0 +1,175 @@
+- generic [ref=f12e2]:
+  - banner [ref=f12e3]:
+    - navigation [ref=f12e4]:
+      - list [ref=f12e5]:
+        - listitem [ref=f12e6]:
+          - link [ref=f12e7] [cursor=pointer]:
+            - /url: /
+            - img "mobygames logo" [ref=f12e8]
+        - listitem [ref=f12e9]:
+          - searchbox "Search" [ref=f12e14]
+        - listitem [ref=f12e15]:
+          - list [ref=f12e16]:
+            - listitem [ref=f12e17]:
+              - link [ref=f12e20] [cursor=pointer]:
+                - /url: /mobyplus/
+                - img "Moby Plus" [ref=f12e21]
+            - listitem [ref=f12e22]:
+              - link "API" [ref=f12e25] [cursor=pointer]:
+                - /url: /api/subscribe/
+            - listitem [ref=f12e26]:
+              - generic [ref=f12e27]: Browse
+              - list [ref=f12e29]:
+                - listitem [ref=f12e30]:
+                  - link "Random" [ref=f12e31] [cursor=pointer]:
+                    - /url: /random/
+                - listitem [ref=f12e32]:
+                  - link "Platforms" [ref=f12e33] [cursor=pointer]:
+                    - /url: /platform/
+                - listitem [ref=f12e34]:
+                  - link "Games" [ref=f12e35] [cursor=pointer]:
+                    - /url: /game/
+                - listitem [ref=f12e36]:
+                  - link "Companies" [ref=f12e37] [cursor=pointer]:
+                    - /url: /company/
+                - listitem [ref=f12e38]:
+                  - link "People" [ref=f12e39] [cursor=pointer]:
+                    - /url: /person/
+                - listitem [ref=f12e40]:
+                  - link "Groups" [ref=f12e41] [cursor=pointer]:
+                    - /url: /group/
+                - listitem [ref=f12e42]:
+                  - link "Genres" [ref=f12e43] [cursor=pointer]:
+                    - /url: /genre/
+                - listitem [ref=f12e44]:
+                  - link "Attributes" [ref=f12e45] [cursor=pointer]:
+                    - /url: /attributes/tech-specs/
+                - listitem [ref=f12e46]:
+                  - link "Critics" [ref=f12e47] [cursor=pointer]:
+                    - /url: /critic/
+                - listitem [ref=f12e48]:
+                  - link "This Day" [ref=f12e49] [cursor=pointer]:
+                    - /url: /this-day-in-gaming/
+                - listitem [ref=f12e50]:
+                  - link "Stats" [ref=f12e51] [cursor=pointer]:
+                    - /url: /stats/
+            - listitem [ref=f12e52]:
+              - generic [ref=f12e53]: Contribute
+              - list [ref=f12e55]:
+                - listitem [ref=f12e56]:
+                  - link "Most Wanted" [ref=f12e57] [cursor=pointer]:
+                    - /url: /most-wanted/
+                - listitem [ref=f12e58]:
+                  - link "Missing Games" [ref=f12e59] [cursor=pointer]:
+                    - /url: /contribute/missing-games/
+                - listitem [ref=f12e60]:
+                  - link "Add Game" [ref=f12e61] [cursor=pointer]:
+                    - /url: /contribute/game/
+                - listitem [ref=f12e62]:
+                  - link "Instructions" [ref=f12e63] [cursor=pointer]:
+                    - /url: /info/contribute/
+                - listitem [ref=f12e64]:
+                  - link "Standards" [ref=f12e65] [cursor=pointer]:
+                    - /url: /info/standards/
+                - listitem [ref=f12e66]:
+                  - link "Style Guide" [ref=f12e67] [cursor=pointer]:
+                    - /url: /info/style-guide/
+                - listitem [ref=f12e68]
+                - listitem [ref=f12e69]:
+                  - link [ref=f12e70] [cursor=pointer]:
+                    - /url: /mobyplus/
+                    - img "Moby Plus" [ref=f12e71]
+                    - text: Get MobyPlus Free
+            - listitem [ref=f12e72]:
+              - generic [ref=f12e73]: Community
+              - list [ref=f12e75]:
+                - listitem [ref=f12e76]:
+                  - link "Contributors" [ref=f12e77] [cursor=pointer]:
+                    - /url: /leaderboard/
+                - listitem [ref=f12e78]:
+                  - link "Forums" [ref=f12e79] [cursor=pointer]:
+                    - /url: /forum/
+                - listitem [ref=f12e80]:
+                  - link "Reviews" [ref=f12e81] [cursor=pointer]:
+                    - /url: /feed/player-reviews/
+                - listitem [ref=f12e82]:
+                  - link "Discord" [ref=f12e83] [cursor=pointer]:
+                    - /url: https://discord.gg/8zWGTQp
+                - listitem [ref=f12e84]:
+                  - link "Twitter" [ref=f12e85] [cursor=pointer]:
+                    - /url: https://twitter.com/MobyGames
+                - listitem [ref=f12e86]:
+                  - link "Bluesky" [ref=f12e87] [cursor=pointer]:
+                    - /url: https://bsky.app/profile/mobygames.com
+            - listitem [ref=f12e88]:
+              - link [ref=f12e89] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f12e91]:
+              - generic [ref=f12e93]:
+                - img "user avatar" [ref=f12e94]
+                - text: Login
+              - list [ref=f12e95]:
+                - listitem [ref=f12e96]:
+                  - link "Login" [ref=f12e97] [cursor=pointer]:
+                    - /url: /user/login/
+                - listitem [ref=f12e98]:
+                  - link "Register" [ref=f12e99] [cursor=pointer]:
+                    - /url: /user/register/
+      - text: ×
+  - main [ref=f12e102]:
+    - list [ref=f12e103]:
+      - listitem [ref=f12e104]: Please log in to access this page.
+    - generic [ref=f12e105]:
+      - heading "Login" [level=1] [ref=f12e106]
+      - textbox "Email or Username" [ref=f12e108]
+      - generic [ref=f12e109]:
+        - textbox "Password" [ref=f12e110]
+        - paragraph [ref=f12e111]:
+          - text: "["
+          - link "forgot password?" [ref=f12e112] [cursor=pointer]:
+            - /url: /user/reset-password/
+          - text: "]"
+      - paragraph [ref=f12e113]:
+        - button "Login" [ref=f12e114] [cursor=pointer]
+    - paragraph [ref=f12e115]:
+      - text: Don't have an account?
+      - link "Register here" [ref=f12e116] [cursor=pointer]:
+        - /url: /user/register/?next=/subscription-request-form
+      - text: .
+  - separator [ref=f12e117]
+  - contentinfo [ref=f12e118]:
+    - paragraph [ref=f12e119]:
+      - link "About" [ref=f12e120] [cursor=pointer]:
+        - /url: /info/about/
+      - text: ·
+      - link "FAQ" [ref=f12e121] [cursor=pointer]:
+        - /url: /info/faq/
+      - text: ·
+      - link "MobyPlus" [ref=f12e122] [cursor=pointer]:
+        - /url: /mobyplus/
+      - text: ·
+      - link "Stats" [ref=f12e123] [cursor=pointer]:
+        - /url: /stats/
+      - text: ·
+      - link "Standards" [ref=f12e124] [cursor=pointer]:
+        - /url: /info/standards/
+      - text: ·
+      - link "Style Guide" [ref=f12e125] [cursor=pointer]:
+        - /url: /info/style-guide/
+      - text: ·
+      - link "API" [ref=f12e126] [cursor=pointer]:
+        - /url: /api/subscribe/
+      - text: ·
+      - link "Contact" [ref=f12e127] [cursor=pointer]:
+        - /url: /info/contact/
+      - text: ·
+      - link "Change Log" [ref=f12e128] [cursor=pointer]:
+        - /url: /changelog/
+      - text: ·
+      - link "Privacy Policy" [ref=f12e129] [cursor=pointer]:
+        - /url: /info/privacy/
+      - text: ·
+      - link "Terms of Use" [ref=f12e130] [cursor=pointer]:
+        - /url: /info/terms/
+    - paragraph [ref=f12e131]: © 1999–2026 MobyGames ™
+    - paragraph [ref=f12e132]: v20260730

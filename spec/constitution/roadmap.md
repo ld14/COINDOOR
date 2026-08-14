@@ -7,6 +7,8 @@ _Orden y estado de las features. Cada entrada apunta a su carpeta en `../feature
 - [`003 · base`](../features/003-base-frontend/spec.md) — Vite + React + Router, tokens, primitivas DOS, layout y catálogo interno.
 - [`004 · dominio y contrato`](../features/004-dominio-y-contrato/spec.md) — contrato ATTRACT derivado, política de completitud, dominio TS/Python y seed/mock server.
 - [`005 · esqueleto de backend`](../features/005-esqueleto-backend/spec.md) — FastAPI local, persistencia atómica, seguridad por loopback + `Host`, patrón de jobs y comando `coindoor`.
+- [`006 · pantallas de lectura`](../features/006-pantallas-lectura/spec.md) — `/sistemas`, `/juegos` y ficha readonly contra la API real.
+- [`007 · edición`](../features/007-edicion/spec.md) — alta de juego, edición de identidad/textos/media/presentación/`review`/`cheats` estructurados y `mark-ready`.
 
 Cerrado como trabajo previo:
 
@@ -28,7 +30,7 @@ demás.
 ## Qué cerró cada cosa
 
 | Qué estaba abierto | Lo cerró |
-|---|---|
+| --- | --- |
 | Qué significa COMPLETO | Paquete de diseño: 7 campos de identidad + carátula + póster + sinopsis + acento |
 | Stack de frontend | Paquete de diseño: Vite + React + TS + TanStack Query, sin librerías de componentes |
 | Contrato de API | `data-model.md` §6 más los deltas |
@@ -62,12 +64,12 @@ backend no estaba contemplado ahí y va en paralelo, porque las fases 1 a 4 se d
 contra un mock server y no lo necesitan.
 
 | Fase | Qué | Feature | Estado |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | **Base** — Vite + React + Router, `tokens.css`, primitivas de `components/dos/`, layout de `App.tsx` | [`003`](../features/003-base-frontend/spec.md) | Hecha |
 | 2 | **Dominio y datos mock** — `types.ts`, `contract.json`, `fielddefs.json`, `completeness`, `validation`, mock server con el seed | [`004`](../features/004-dominio-y-contrato/spec.md) | Hecha |
 | — | **Esqueleto de backend** — app FastAPI, `store/` con escritura atómica, patrón de job, configuración | [`005`](../features/005-esqueleto-backend/spec.md) | Hecha |
-| 3 | **Pantallas de lectura** — Sistemas, lista de Juegos, ficha en solo lectura | — | Falta carpeta |
-| 4 | **Edición** — alta en dos pasos, carga y borrado de campos, textos, presentación, marcar como listo | — | Falta carpeta |
+| 3 | **Pantallas de lectura** — Sistemas, lista de Juegos, ficha en solo lectura | [`006`](../features/006-pantallas-lectura/spec.md) | Hecha |
+| 4 | **Edición** — alta en dos pasos, carga y borrado de campos, textos, presentación, marcar como listo | [`007`](../features/007-edicion/spec.md) | Hecha |
 | 5 | **Asíncrono** — manuales con job y cancelación, modal de sugerencias | [`002`](../features/002-sugerencias-multiproveedor/spec.md) | Especificada |
 | 6 | **Exportación** — lista de exportables, "qué incluir", generación del `.zip` | [`001`](../features/001-export-bundle/spec.md) | Especificada |
 

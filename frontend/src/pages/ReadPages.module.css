@@ -1,0 +1,416 @@
+.page {
+  display: grid;
+  gap: var(--dos-space-5);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dos-space-4);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.gameHero {
+  display: grid;
+  gap: var(--dos-space-5);
+  grid-template-columns: minmax(0, 1.4fr) minmax(17rem, 0.6fr);
+}
+
+.heroPreview {
+  align-items: center;
+  background: var(--dos-terminal);
+  border: var(--dos-border-thick) solid var(--dos-edge-dark);
+  color: var(--dos-ok-crt);
+  display: flex;
+  justify-content: center;
+  min-height: var(--dos-hero-preview-height);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: var(--dos-space-5);
+  text-align: center;
+}
+
+.heroStatus {
+  align-content: start;
+  display: grid;
+  gap: var(--dos-space-4);
+}
+
+.completionPanel {
+  display: grid;
+  gap: var(--dos-space-4);
+}
+
+.completionHeader {
+  align-items: center;
+  display: flex;
+  gap: var(--dos-space-3);
+  justify-content: space-between;
+}
+
+.completionGrid {
+  display: grid;
+  gap: var(--dos-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--dos-completion-tile-min)), 1fr));
+}
+
+.completionTile {
+  background: var(--dos-panel);
+  border: var(--dos-border-2) solid var(--dos-edge-dark);
+  display: grid;
+  gap: var(--dos-space-1);
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: var(--dos-space-3);
+}
+
+.completionTile .meta {
+  grid-column: 2;
+}
+
+.tileMark {
+  color: var(--dos-titlebar);
+  font-weight: 700;
+}
+
+.criticalList {
+  background: var(--dos-terminal);
+  border: var(--dos-border-thick) solid var(--dos-edge-dark);
+  color: var(--dos-warn-crt);
+  display: grid;
+  gap: var(--dos-space-1);
+  padding: var(--dos-space-3);
+}
+
+.title {
+  font-size: var(--dos-size-title);
+  margin: 0 0 var(--dos-space-2);
+}
+
+.subtitle,
+.meta,
+.empty,
+.error {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-meta);
+  margin: 0;
+}
+
+.error {
+  color: var(--dos-error);
+}
+
+.grid {
+  display: grid;
+  gap: var(--dos-space-5);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+}
+
+.systemCard {
+  display: grid;
+  gap: var(--dos-space-3);
+}
+
+.invalidCard {
+  border-color: var(--dos-error);
+}
+
+.cardTop,
+.rowMain,
+.fieldTop,
+.toolbar {
+  align-items: center;
+  display: flex;
+  gap: var(--dos-space-3);
+  justify-content: space-between;
+}
+
+.name,
+.gameTitle,
+.fieldValue {
+  color: var(--dos-titlebar);
+  font-weight: 700;
+}
+
+.command {
+  background: var(--dos-terminal);
+  border: var(--dos-border-thick) solid var(--dos-edge-dark);
+  color: var(--dos-ok-crt);
+  overflow: hidden;
+  padding: var(--dos-space-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.invalidLabel {
+  color: var(--dos-error);
+  font-size: var(--dos-size-field-tag);
+  font-weight: 700;
+}
+
+.filters {
+  display: grid;
+  gap: var(--dos-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.list {
+  display: grid;
+}
+
+.gameRow {
+  align-items: center;
+  background: var(--dos-panel-light);
+  border: 0;
+  border-bottom: var(--dos-px-1) solid var(--dos-row-border);
+  color: var(--dos-ink);
+  cursor: pointer;
+  display: grid;
+  gap: var(--dos-space-4);
+  grid-template-columns: 40px 1fr auto;
+  min-height: 48px;
+  padding: var(--dos-space-2);
+  text-align: left;
+  width: 100%;
+}
+
+.gameRow:hover,
+.gameRow:focus-visible {
+  background: var(--dos-accent);
+}
+
+.thumb {
+  align-items: center;
+  background: var(--dos-panel);
+  border: var(--dos-px-1) solid var(--dos-edge-dark);
+  display: flex;
+  font-size: var(--dos-size-field-tag);
+  height: 40px;
+  justify-content: center;
+  width: 40px;
+}
+
+.thumbImage {
+  height: 40px;
+  object-fit: cover;
+  width: 40px;
+}
+
+.sections {
+  display: grid;
+  gap: var(--dos-space-5);
+}
+
+.fields {
+  display: grid;
+  gap: var(--dos-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.formActions {
+  align-self: end;
+}
+
+.accentPanel {
+  display: grid;
+  gap: var(--dos-space-4);
+}
+
+.accentRow {
+  border-bottom: var(--dos-px-1) solid var(--dos-row-border);
+  display: grid;
+  gap: var(--dos-space-3);
+  padding-bottom: var(--dos-space-4);
+}
+
+.accentTopline,
+.hexField {
+  align-items: center;
+  display: flex;
+  gap: var(--dos-space-3);
+}
+
+.accentTopline {
+  justify-content: space-between;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dos-space-2);
+}
+
+.swatch {
+  background: var(--dos-panel);
+  border: var(--dos-border-2) solid var(--dos-edge-dark);
+  height: var(--dos-swatch-size);
+  width: var(--dos-swatch-size);
+}
+
+.swatchActive {
+  border-style: inset;
+}
+
+.swatchGold {
+  background: var(--dos-accent-preset-gold);
+}
+
+.swatchCyan {
+  background: var(--dos-accent);
+}
+
+.swatchRed {
+  background: var(--dos-error);
+}
+
+.swatchGreen {
+  background: var(--dos-ok);
+}
+
+.swatchBlue {
+  background: var(--dos-desktop);
+}
+
+.hexField input {
+  width: var(--dos-hex-input-width);
+}
+
+.accentActions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.field {
+  display: grid;
+  gap: var(--dos-space-1);
+}
+
+.label {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-meta);
+}
+
+.mediaGrid {
+  display: grid;
+  gap: var(--dos-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.preview {
+  align-items: center;
+  background: var(--dos-terminal);
+  border: var(--dos-border-thick) solid var(--dos-edge-dark);
+  color: var(--dos-ink-invert);
+  display: flex;
+  min-height: var(--dos-media-preview-height);
+  justify-content: center;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: var(--dos-space-2);
+  text-align: center;
+}
+
+.previewImage {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.reviewGrid {
+  align-items: end;
+  display: grid;
+  gap: var(--dos-space-3);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.scorePlate {
+  background: var(--dos-terminal);
+  border: var(--dos-border-thick) solid var(--dos-edge-dark);
+  color: var(--dos-ok-crt);
+  font-size: var(--dos-size-title);
+  font-weight: 700;
+  min-width: var(--dos-control-height);
+  padding: var(--dos-space-2) var(--dos-space-4);
+  text-align: center;
+}
+
+.catGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dos-space-2);
+}
+
+.catPill {
+  background: var(--dos-panel);
+  border: var(--dos-px-1) solid var(--dos-edge-dark);
+  color: var(--dos-titlebar);
+  font-size: var(--dos-size-meta);
+  font-weight: 700;
+  padding: var(--dos-space-1) var(--dos-space-2);
+}
+
+.cheatLedger {
+  background: var(--dos-terminal);
+  border: var(--dos-border-thick) solid var(--dos-edge-dark);
+  color: var(--dos-ok-crt);
+  display: grid;
+  gap: var(--dos-space-3);
+  padding: var(--dos-space-3);
+}
+
+.cheatGroup {
+  display: grid;
+  gap: var(--dos-space-2);
+}
+
+.cheatGroupName {
+  color: var(--dos-warn-crt);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cheatEntry {
+  display: grid;
+  gap: var(--dos-space-2);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+}
+
+.cheatEntry code {
+  color: var(--dos-ink-invert);
+  font-family: var(--dos-font-family);
+  overflow-wrap: anywhere;
+}
+
+.stack {
+  display: grid;
+  gap: var(--dos-space-3);
+  min-width: 0;
+}
+
+.stack > * {
+  min-width: 0;
+}
+
+.stack input[type='file'] {
+  max-width: 100%;
+}
+
+.backLink {
+  color: var(--dos-titlebar);
+  font-weight: 700;
+}
+
+@media (max-width: 42rem) {
+  .gameHero {
+    grid-template-columns: 1fr;
+  }
+
+  .gameRow {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .gameRow > :last-child {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

@@ -3,6 +3,10 @@ import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { Banner, MenuBar, StatusBar } from '@/components/dos';
 import { Catalogo } from '@/pages/_Catalogo';
 import { EmptyPage } from '@/pages/EmptyPage';
+import { FichaJuego } from '@/pages/FichaJuego';
+import { Juegos } from '@/pages/Juegos';
+import { NuevoJuego } from '@/pages/NuevoJuego';
+import { Sistemas } from '@/pages/Sistemas';
 import styles from './App.module.css';
 
 export function App() {
@@ -36,10 +40,10 @@ export function App() {
           <Banner />
           <Routes>
             <Route element={<Navigate replace to="/juegos" />} path="/" />
-            <Route element={<EmptyPage title="Sistemas" />} path="/sistemas" />
-            <Route element={<EmptyPage title="Juegos" />} path="/juegos" />
-            <Route element={<EmptyPage title="Nuevo juego" />} path="/juegos/nuevo" />
-            <Route element={<EmptyPage title="Ficha del juego" />} path="/juegos/:gameId" />
+            <Route element={<Sistemas />} path="/sistemas" />
+            <Route element={<Juegos />} path="/juegos" />
+            <Route element={<NuevoJuego />} path="/juegos/nuevo" />
+            <Route element={<FichaJuego />} path="/juegos/:gameId" />
             <Route element={<EmptyPage title="Exportar" />} path="/exportar" />
             <Route element={<Catalogo />} path="/_catalogo" />
           </Routes>

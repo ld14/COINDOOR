@@ -4,7 +4,7 @@ import threading
 from pathlib import Path
 
 from backend.api.errors import NotFound
-from backend.api.schemas import CreateGame, GameOut, PatchGame, StoredGame
+from backend.api.schemas import CreateGame, FieldProvenance, GameOut, PatchGame, StoredGame
 from backend.lib.domain.fielddefs import image_keys, text_keys, video_keys
 from backend.store.archivo import escribir_json, leer_json, safe_id
 
@@ -89,6 +89,78 @@ class GamesStore:
         self.save(updated)
         return updated
 
+    def set_review_field(
+        self,
+        game_id: str,
+        score: int | None,
+        cats: dict[str, int],
+    ) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["review"] = {"status": "manual", "score": score, "cats": cats}
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def set_cheats_field(self, game_id: str, groups: list[dict[str, object]]) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["cheats"] = {"status": "manual", "groups": groups}
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def apply_identity_suggestion(
+        self,
+        game_id: str,
+        key: str,
+        value: str,
+        provenance: FieldProvenance,
+    ) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        if key not in {"title", "year", "developer", "publisher", "genre", "players", "format"}:
+            raise NotFound(f"Campo no encontrado: {key}")
+        data["identity"][key] = value
+        data["provenance"][key] = provenance.model_dump(mode="json")
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def apply_text_suggestion(
+        self,
+        game_id: str,
+        key: str,
+        value: str,
+        provenance: FieldProvenance,
+    ) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        if key not in text_keys():
+            raise NotFound(f"Campo no encontrado: {key}")
+        data["texts"][key] = {"status": "suggested", "value": value, "source": provenance.source}
+        data["provenance"][key] = provenance.model_dump(mode="json")
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def apply_rich_suggestion(
+        self,
+        game_id: str,
+        key: str,
+        payload: dict[str, object],
+        provenance: FieldProvenance,
+    ) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        if key not in {"review", "cheats"}:
+            raise NotFound(f"Campo no encontrado: {key}")
+        data[key] = {"status": "suggested", "source": provenance.source, **payload}
+        data["provenance"][key] = provenance.model_dump(mode="json")
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
     def set_media_field(self, game_id: str, key: str, url: str) -> StoredGame:
         game = self.get(game_id)
         data = game.model_dump()
@@ -98,6 +170,32 @@ class GamesStore:
             data["video"][key] = {"status": "manual", "url": url}
         else:
             raise NotFound(f"Campo no encontrado: {key}")
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def apply_media_suggestion(
+        self,
+        game_id: str,
+        key: str,
+        url: str,
+        provenance: FieldProvenance | None,
+    ) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        media = {
+            "status": "suggested",
+            "url": url,
+            "source": provenance.source if provenance else None,
+        }
+        if key in image_keys():
+            data["images"][key] = media
+        elif key in video_keys():
+            data["video"][key] = media
+        else:
+            raise NotFound(f"Campo no encontrado: {key}")
+        if provenance:
+            data["provenance"][key] = provenance.model_dump(mode="json")
         updated = StoredGame.model_validate(data)
         self.save(updated)
         return updated
@@ -114,4 +212,14 @@ class GamesStore:
 
 
 def to_out(game: StoredGame) -> GameOut:
-    return GameOut.from_stored(game)
+    data = game.model_dump()
+    data.setdefault("images", {})
+    data.setdefault("video", {})
+    data.setdefault("texts", {})
+    for key in image_keys():
+        data["images"].setdefault(key, {"status": "empty"})
+    for key in video_keys():
+        data["video"].setdefault(key, {"status": "empty"})
+    for key in text_keys():
+        data["texts"].setdefault(key, {"status": "empty", "value": ""})
+    return GameOut.from_stored(StoredGame.model_validate(data))

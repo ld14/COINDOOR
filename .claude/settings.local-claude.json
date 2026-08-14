@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk ls *)",
+      "Bash(rtk read *)",
+      "Bash(rtk grep *)",
+      "Bash(bash ~/.claude/scripts/scaffold.sh . --no-web --no-api)",
+      "Bash(bash ~/.claude/scripts/scaffold.sh . --web-dir frontend --api-dir backend)",
+      "Bash(awk '/^game: Golden|^game:/{f=1} f&&/^$/{c++} c>1{exit} f' library/arcade/metadata.pegasus.txt)",
+      "Bash(python3 -c \"import json;d=json.load\\(open\\('library/arcade/media/goldnaxe/data.json'\\)\\);print\\(list\\(d.keys\\(\\)\\)\\);print\\(json.dumps\\(d.get\\('manual'\\),ensure_ascii=False\\)[:400]\\);print\\('mags:',json.dumps\\(d.get\\('mags'\\),ensure_ascii=False\\)\\)\")",
+      "Bash(rtk du *)",
+      "Bash(rtk wc *)",
+      "Bash(rtk find *)",
+      "Bash(python3 *)"
+    ]
+  }
+}

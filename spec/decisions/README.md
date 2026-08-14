@@ -35,13 +35,14 @@ de seis meses alguien —tú, o Claude— vuelve a proponer justo lo que ya desc
 | [0003](0003-bundle-por-juego.md) | Cada juego se entrega como un `.zip` instalable y compartible | accepted | 2026-08-10 |
 | [0004](0004-coindoor-fuente-identidad-no-mame.md) | COINDOOR es la fuente de identidad de las plataformas sin catálogo | accepted | 2026-08-10 |
 | [0005](0005-contrato-vendoreado-vs-politica-propia.md) | El contrato vendoreado y la política de completitud son archivos distintos | accepted | 2026-08-11 |
-| [0006](0006-fuentes-externas-multiproveedor.md) | Varios proveedores por campo, con resultados parciales | accepted | 2026-08-11 |
+| [0006](0006-fuentes-externas-multiproveedor.md) | Varios proveedores por campo, con resultados parciales | superseded por [0013](0013-sin-scraping-ni-catalogo-pago.md) | 2026-08-11 |
 | [0007](0007-fastapi-como-framework-backend.md) | FastAPI como framework de backend, no Django ni Flask | accepted | 2026-08-11 |
 | [0008](0008-persistencia-en-archivos.md) | Un `game.json` por juego, sin base de datos | accepted | 2026-08-11 |
 | [0009](0009-proceso-local-en-loopback.md) | Un proceso local en loopback, que sustituye a la autenticación | accepted | 2026-08-11 |
 | [0010](0010-jobs-en-proceso.md) | Trabajos largos en hilos del propio proceso, sin cola ni worker | accepted | 2026-08-11 |
 | [0011](0011-fielddefs-json-compartido.md) | La política de completitud es JSON compartido entre TS y Python | accepted | 2026-08-11 |
 | [0012](0012-verificacion-attract-por-subproceso.md) | Verificar el export con `attract doctor` por subproceso, sin parsear | accepted | 2026-08-11 |
+| [0013](0013-sin-scraping-ni-catalogo-pago.md) | Sugerencias sin scraping ni catálogos de terceros — solo IA y referencias | accepted | 2026-08-13 |
 
 Los seis últimos salen del análisis de arquitectura de
 [`docs/arquitectura/`](../../docs/arquitectura/README.md), que conserva la comparación

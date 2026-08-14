@@ -75,6 +75,14 @@ export interface GameManual {
   progress?: number;
 }
 
+export interface FieldProvenance {
+  source: string;
+  originUrl?: string;
+  sourceId?: string;
+  sourceType: string;
+  processedUrls: string[];
+}
+
 export interface Game {
   id: string;
   systemId: string;
@@ -95,4 +103,5 @@ export interface Game {
   magazine: MagazineLink;
   magazineName: string;
   coverThumbUrl?: string;
+  provenance: Record<string, FieldProvenance>;
 }

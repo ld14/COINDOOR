@@ -1,9 +1,10 @@
 .menu {
-  background: var(--dos-panel);
-  border: var(--dos-border-2) outset var(--dos-panel);
+  background: var(--dos-panel-light);
+  border: var(--dos-border-thick) solid var(--dos-edge-dark);
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  max-width: 100%;
   width: var(--dos-menu-width);
 }
 
@@ -12,33 +13,58 @@
   color: var(--dos-ink-invert);
   font-size: var(--dos-size-section);
   font-weight: 700;
-  padding: var(--dos-space-2) var(--dos-space-3);
+  letter-spacing: 0.08em;
+  padding: var(--dos-space-3);
+  text-transform: uppercase;
 }
 
 .links {
   display: flex;
   flex-direction: column;
-  gap: var(--dos-space-2);
-  padding: var(--dos-space-3);
+  gap: var(--dos-space-3);
+  padding: var(--dos-space-4);
 }
 
 .link {
   background: var(--dos-panel);
-  border: var(--dos-border-2) outset var(--dos-panel);
+  border: var(--dos-border-2) solid var(--dos-edge-dark);
   color: var(--dos-ink);
-  padding: var(--dos-space-2) var(--dos-space-3);
+  font-weight: 700;
+  padding: var(--dos-space-3);
   text-decoration: none;
+}
+
+.link:hover,
+.link:focus-visible {
+  background: var(--dos-banner);
 }
 
 .active {
   background: var(--dos-accent);
-  border-style: inset;
+  border-width: var(--dos-border-thick);
   font-weight: 700;
 }
 
 .footer {
+  border-top: var(--dos-border-2) solid var(--dos-edge-dark);
   color: var(--dos-ink-muted);
   font-size: var(--dos-size-meta);
   margin-top: auto;
   padding: var(--dos-space-3);
+}
+
+@media (max-width: 56rem) {
+  .menu {
+    min-height: auto;
+    width: 100%;
+  }
+
+  .links {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .link {
+    flex: 1 1 8rem;
+  }
 }

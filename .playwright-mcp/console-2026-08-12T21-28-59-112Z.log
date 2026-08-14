@@ -1,0 +1,4 @@
+[    1249ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.screenscraper.fr/sceditor/minified/languages/fr.js:0
+[   78984ms] ReferenceError: checkformforummessage is not defined
+    at HTMLFormElement.onsubmit (https://www.screenscraper.fr/forummessage.php?frub=12&action=fns&plateforme=&gameid=&romid=&companyid=&membreid=:2639:239)
+[   95133ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.screenscraper.fr/sceditor/minified/languages/fr.js:0

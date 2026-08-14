@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     data_dir: Path = Field(default_factory=lambda: Path.home() / ".coindoor")
     host: str = "127.0.0.1"
     port: int = 8765
+    ai_primary_base_url: str = ""
+    ai_primary_api_key: str = ""
+    ai_primary_model: str = ""
+    ai_backup_base_url: str = ""
+    ai_backup_api_key: str = ""
+    ai_backup_model: str = ""
 
     @property
     def media_dir(self) -> Path:

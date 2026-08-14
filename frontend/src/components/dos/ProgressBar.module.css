@@ -1,14 +1,14 @@
 .progress {
   appearance: none;
-  background: var(--dos-terminal);
-  border: var(--dos-border-2) inset var(--dos-panel);
+  background: var(--dos-panel-light);
+  border: var(--dos-border-2) solid var(--dos-edge-dark);
   height: var(--dos-progress-height);
   overflow: hidden;
   width: 100%;
 }
 
 .progress::-webkit-progress-bar {
-  background: var(--dos-terminal);
+  background: var(--dos-panel-light);
 }
 
 .progress::-webkit-progress-value {

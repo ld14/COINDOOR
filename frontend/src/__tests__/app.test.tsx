@@ -17,7 +17,7 @@ describe('App shell', () => {
   it('F2, F3 y F4 navegan', () => {
     renderApp('/juegos');
     fireEvent.keyDown(window, { key: 'F2' });
-    expect(screen.getByRole('heading', { name: 'Sistemas' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Sistemas / Plataformas' })).toBeInTheDocument();
     fireEvent.keyDown(window, { key: 'F3' });
     expect(screen.getByRole('heading', { name: 'Juegos' })).toBeInTheDocument();
     fireEvent.keyDown(window, { key: 'F4' });

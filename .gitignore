@@ -1,5 +1,6 @@
 .claude/settings.local.json
 .claude/settings.local-omni.json
+.env
 
 node_modules/
 dist/

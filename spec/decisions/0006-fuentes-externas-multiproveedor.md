@@ -1,10 +1,10 @@
 ---
 id: 0006
 title: Sugerencias con varios proveedores por campo, con resultados parciales
-status: accepted
+status: superseded
 date: 2026-08-11
 supersedes: null
-superseded-by: null
+superseded-by: 13
 tags: [backend, data]
 ---
 

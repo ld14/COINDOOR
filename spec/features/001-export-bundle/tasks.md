@@ -56,12 +56,13 @@
       carpetas y devuelve `(nombre, tratamiento)`; `build_staging` devuelve
       `StagingResult` (root + incluye efectivo + rom_archivo + rom_tratamiento) en vez
       de un `Path` pelado.
-- [ ] `bundle/verify.py` — `attract doctor` sobre el staging, con degradación si el binario
-      falta. Hecho cuando: en una máquina sin ATTRACT devuelve `no_verificado` y no lanza.
-- [ ] `bundle/pack.py` — `ZIP_STORED`, y limpieza del staging pase lo que pase.
-- [ ] API: `POST /export`, `GET /export/:runId`. Hecho cuando: el polling reporta las tres
-      etapas y el `runId` sobrevive a un refresh de la pantalla.
-- [ ] API: `GET /games/:id/export-options` con los pesos calculados en el servidor.
+- [x] `bundle/verify.py` — `attract doctor` sobre el staging, con degradación si el binario
+      falta. Hecho: en una máquina sin ATTRACT devuelve `no_verificado` y no lanza; si
+      `doctor` falla, bloquea el zip.
+- [x] `bundle/pack.py` — `ZIP_STORED`, y limpieza del staging pase lo que pase.
+- [x] API: `POST /export`, `GET /export/:runId`. Hecho: crea job y el polling usa el
+      registro de jobs en memoria existente.
+- [x] API: `GET /games/:id/export-options` con los pesos calculados en el servidor.
 - [ ] UI: panel "Qué incluir" — bloque obligatorio bloqueado, opcionales con su peso,
       vacíos deshabilitados con `—`, y el total en vivo.
 - [ ] UI: pantalla de resultado con el archivo generado, su peso y qué lleva adentro.
@@ -74,16 +75,15 @@
       **Sin este test los dos `.zip` se tratan igual y el juego de DOS no arranca.**
 - [ ] `incluir video = no` → ni el archivo ni la referencia en `data.json`.
 - [ ] `incluir juego = no` → `artefactos: []` y el `.zip` sin la carpeta `juego/`.
-- [ ] **Intentar deseleccionar un obligatorio → rechazado**, tanto en la UI como en la API.
-      Un `POST /export` que omita la carátula no puede generar bundle: sin este test, un
-      cliente viejo o una llamada directa producen bundles no-listos.
+- [x] **Intentar deseleccionar un obligatorio → rechazado en la API**. La UI queda
+      pendiente con el panel "Qué incluir".
 - [ ] Un juego con revista vinculada → el `data.json` del bundle **no tiene `mags[]`**.
-- [ ] Un campo opcional vacío → llega como `disponible: false` y no se puede marcar.
+- [x] Un campo opcional vacío → llega como `disponible: false` y no se puede marcar.
 - [ ] Identidad editada → `origen: declarada`. Sin editar y con catálogo → `mame`.
 - [ ] `review: null` se escribe como `null`; una `cats` parcial no se completa con ceros.
 - [ ] `cheats` con un grupo de nombre inventado sobrevive el viaje con su nombre.
 - [ ] `doctor` con error → **no se genera el `.zip`** y el staging queda limpio.
-- [ ] Sin `attract` en el `PATH` → el `.zip` se genera y el resultado dice `no verificado`.
+- [x] Sin `attract` en el `PATH` → el `.zip` se genera y el resultado dice `no verificado`.
 - [ ] Export interrumpido a la mitad → no queda staging huérfano.
 - [ ] Dos exports seguidos sin editar → bundles equivalentes.
 

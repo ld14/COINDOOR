@@ -1,5 +1,5 @@
 .panel {
   background: var(--dos-panel);
-  border: var(--dos-border-2) outset var(--dos-panel);
+  border: var(--dos-border-thick) solid var(--dos-edge-dark);
   padding: var(--dos-space-5);
 }

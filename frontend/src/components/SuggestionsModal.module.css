@@ -1,0 +1,93 @@
+.subtitle {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-meta);
+  margin: 0 0 var(--dos-space-4);
+}
+
+.state {
+  align-items: center;
+  display: grid;
+  gap: var(--dos-space-3);
+  justify-items: center;
+  padding: var(--dos-space-6) 0;
+  text-align: center;
+}
+
+.stateTitle {
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  gap: var(--dos-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+}
+
+.candidate {
+  background: var(--dos-panel-light);
+  border: var(--dos-border-2) outset var(--dos-panel);
+  cursor: pointer;
+  display: grid;
+  gap: var(--dos-space-2);
+  padding: var(--dos-space-3);
+  text-align: left;
+}
+
+.candidate:hover,
+.candidate:focus-visible {
+  border-style: inset;
+}
+
+.current {
+  background: var(--dos-ok-crt);
+}
+
+.preview {
+  align-items: center;
+  background: var(--dos-terminal);
+  color: var(--dos-ink-invert);
+  display: flex;
+  font-size: var(--dos-size-field-tag);
+  justify-content: center;
+  min-height: 4.5rem;
+  overflow-wrap: anywhere;
+  padding: var(--dos-space-2);
+  text-align: center;
+}
+
+.name {
+  font-size: var(--dos-size-body);
+  font-weight: 700;
+}
+
+.source {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-field-tag);
+}
+
+.iaBadge {
+  background: var(--dos-info);
+  color: var(--dos-ink-invert);
+  font-size: var(--dos-size-field-tag);
+  font-weight: 700;
+  padding: 0 var(--dos-space-1);
+  width: fit-content;
+}
+
+.referenciaBadge {
+  color: var(--dos-info);
+  font-size: var(--dos-size-field-tag);
+}
+
+.count {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-meta);
+  margin-top: var(--dos-space-4);
+}
+
+.actions {
+  display: flex;
+  gap: var(--dos-space-3);
+  justify-content: center;
+  margin-top: var(--dos-space-4);
+}

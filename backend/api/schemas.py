@@ -72,6 +72,14 @@ class GameManual(BaseModel):
     progress: int | None = None
 
 
+class FieldProvenance(BaseModel):
+    source: str
+    originUrl: str | None = None
+    sourceId: str | None = None
+    sourceType: str = "api"
+    processedUrls: list[str] = Field(default_factory=list)
+
+
 class StoredGame(BaseModel):
     version: int = 1
     id: str
@@ -93,6 +101,7 @@ class StoredGame(BaseModel):
     magazine: MagazineLink = "empty"
     magazineName: str = ""
     coverThumbUrl: str | None = None
+    provenance: dict[str, FieldProvenance] = Field(default_factory=dict)
 
 
 class GameOut(StoredGame):
@@ -158,6 +167,32 @@ class JobOut(BaseModel):
     progress: int
     result: object | None = None
     error: str | None = None
+
+
+class SuggestionJob(BaseModel):
+    jobId: str
+
+
+class ExportRequest(BaseModel):
+    gameId: str
+    incluir: list[str] = Field(default_factory=list)
+
+
+class ExportJob(BaseModel):
+    runId: str
+
+
+class ApplySuggestion(BaseModel):
+    candidateId: str
+
+
+class ReviewValue(BaseModel):
+    score: int | None = None
+    cats: dict[str, int] = Field(default_factory=dict)
+
+
+class CheatsValue(BaseModel):
+    groups: list[CheatGroup] = Field(default_factory=list)
 
 
 class MissingRequiredResponse(BaseModel):
