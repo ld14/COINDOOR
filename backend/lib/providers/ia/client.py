@@ -25,6 +25,7 @@ class OpenAiCompatibleClient:
                 json={
                     "model": self.model,
                     "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": 2048,
                 },
                 headers={"Authorization": f"Bearer {self.api_key}"},
             )
