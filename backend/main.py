@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -12,11 +13,15 @@ from backend.api.export import router as export_router
 from backend.api.fields import router as fields_router
 from backend.api.games import router as games_router
 from backend.api.jobs import router as jobs_router
+from backend.api.magazines import router as magazines_router
+from backend.api.manuals import router as manuals_router
 from backend.api.media import router as media_router
 from backend.api.systems import router as systems_router
 from backend.config import Settings, ensure_data_dirs, get_settings
 from backend.store.cuotas import QuotasStore
 from backend.store.sistemas import SystemsStore
+
+logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s %(message)s")
 
 ALLOWED_HOSTS = {"127.0.0.1", "localhost", "127.0.0.1:8765", "localhost:8765"}
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +41,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(fields_router)
     app.include_router(export_router)
     app.include_router(media_router)
+    app.include_router(manuals_router)
+    app.include_router(magazines_router)
     app.include_router(jobs_router)
     app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")
 

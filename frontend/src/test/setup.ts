@@ -78,6 +78,7 @@ function createGame(body: BodyInit | null | undefined) {
     manuals: [],
     magazine: 'empty',
     magazineName: '',
+    magazineAppearances: [],
     provenance: {},
   };
   storedGames.push(game);

@@ -11,7 +11,7 @@ from backend.lib.providers.ia.client import ModelResponseError, OpenAiCompatible
 
 PROMPT_DIR = Path(__file__).parent / "prompts"
 PROMPT_VERSION = "v1"
-CAMPOS = frozenset({"sinopsis", "review", "cheats"})
+CAMPOS = frozenset({"sinopsis", "review", "cheats", "identidad"})
 
 
 @dataclass(frozen=True)
@@ -42,17 +42,23 @@ class IaGenerador:
         )
         try:
             content = self.client.complete(prompt)
-            value = _validate_shape(consulta.key, content)
+            if consulta.key == "identidad":
+                value = _validate_identity_json(content)
+            else:
+                value = _validate_shape(consulta.key, content)
         except ModelResponseError as exc:
             return ProviderResult(
                 (),
                 ProviderTrace(self.nombre, self.tipo, f"respuesta inválida: {exc}"),
             )
         trace = ProviderTrace(self.nombre, self.tipo, "ok")
+        kind: Literal["identity", "media", "text"] = (
+            "identity" if consulta.key == "identidad" else "text"
+        )
         candidate = Candidato(
             id=f"ia:{self.config.model}:{consulta.key}",
             key=consulta.key,
-            kind="text",
+            kind=kind,
             nombre=f"{consulta.key} generado por IA",
             fuente=self.nombre,
             clase="aplicable",
@@ -79,4 +85,14 @@ def _validate_shape(key: str, content: str) -> str:
         raise ModelResponseError("reseña sin 'cats'")
     if key == "cheats" and (not isinstance(data, dict) or not isinstance(data.get("groups"), list)):
         raise ModelResponseError("trucos sin 'groups'")
+    return json.dumps(data, ensure_ascii=False)
+
+
+def _validate_identity_json(content: str) -> str:
+    try:
+        data = json.loads(content)
+    except json.JSONDecodeError as exc:
+        raise ModelResponseError(f"JSON inválido: {exc}") from exc
+    if not isinstance(data, dict):
+        raise ModelResponseError("identidad no es un objeto")
     return json.dumps(data, ensure_ascii=False)

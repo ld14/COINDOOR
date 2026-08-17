@@ -19,7 +19,7 @@
     { "key": "video", "label": "Video de gameplay", "ratio": "16:9", "required": false, "contractAsset": "video" }
   ],
   "texts": [
-    { "key": "sinopsis", "label": "Sinopsis", "required": true, "contractField": "summary" }
+    { "key": "sinopsis", "label": "Sinopsis", "required": true, "contractField": "summary", "maxLength": 700 }
   ],
   "rich": [
     { "key": "review", "label": "Reseña", "required": false, "contractField": "review" },

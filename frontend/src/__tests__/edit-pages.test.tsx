@@ -124,7 +124,7 @@ describe('Edición de ficha', () => {
     const input = within(logoCard).getByLabelText('Cargar Logo');
     await userEvent.upload(input, file);
 
-    await waitFor(() => expect(within(logoCard).getByText(/\/media\/arcade\/mslug\/logo\.jpg/)).toBeInTheDocument());
+    await waitFor(() => expect(within(logoCard).getByRole('img', { name: 'Logo' })).toHaveAttribute('src', '/media/arcade/mslug/logo.jpg'));
     expect(within(logoCard).queryByText(/nombre-cliente\.png/)).not.toBeInTheDocument();
   });
 });

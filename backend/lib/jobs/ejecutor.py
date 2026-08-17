@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from backend.lib.jobs.registro import JobState, registry
+
+log = logging.getLogger(__name__)
 
 executor = ThreadPoolExecutor(max_workers=4)
 JobFn = Callable[[JobState], Any]
@@ -24,6 +27,7 @@ def _run(job: JobState, fn: JobFn) -> None:
     try:
         result = fn(job)
     except Exception as exc:  # noqa: BLE001
+        log.error("Job %s failed: %s", job.job_id, exc, exc_info=True)
         if job.cancel_event.is_set():
             job.status = "cancelled"
         else:

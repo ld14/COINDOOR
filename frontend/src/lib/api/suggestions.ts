@@ -42,6 +42,13 @@ export function createSuggestionJob(gameId: string, key: string, reintentar = fa
   });
 }
 
+export function createIdentityBatchJob(gameId: string, reintentar = false) {
+  const suffix = reintentar ? '?reintentar=true' : '';
+  return fetchJson<{ jobId: string }>(`/games/${gameId}/fields/identity/suggestions${suffix}`, {
+    method: 'POST',
+  });
+}
+
 export function applySuggestion(gameId: string, key: string, candidateId: string) {
   return fetchJson<Game>(`/games/${gameId}/fields/${key}/apply-suggestion`, {
     method: 'POST',

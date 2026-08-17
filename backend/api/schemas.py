@@ -64,12 +64,31 @@ class CheatsField(BaseModel):
     groups: list[CheatGroup] = Field(default_factory=list)
 
 
+class MagazineValue(BaseModel):
+    magazine: str = "empty"
+    magazineName: str = ""
+
+
 class GameManual(BaseModel):
     id: str
     fileName: str
     status: ManualStatus
     pages: int = 0
     progress: int | None = None
+
+
+class MagazineAppearance(BaseModel):
+    id: str
+    magazineName: str
+    country: str = ""
+    language: str = ""
+    issueNumber: str = ""
+    volume: str | None = None
+    date: str = ""
+    platform: str = ""
+    contentType: str = ""
+    source: str = ""
+    appearanceType: str = "no_determinado"
 
 
 class FieldProvenance(BaseModel):
@@ -100,6 +119,7 @@ class StoredGame(BaseModel):
     manuals: list[GameManual] = Field(default_factory=list)
     magazine: MagazineLink = "empty"
     magazineName: str = ""
+    magazineAppearances: list[MagazineAppearance] = Field(default_factory=list)
     coverThumbUrl: str | None = None
     provenance: dict[str, FieldProvenance] = Field(default_factory=dict)
 

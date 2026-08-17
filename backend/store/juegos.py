@@ -4,8 +4,16 @@ import threading
 from pathlib import Path
 
 from backend.api.errors import NotFound
-from backend.api.schemas import CreateGame, FieldProvenance, GameOut, PatchGame, StoredGame
-from backend.lib.domain.fielddefs import image_keys, text_keys, video_keys
+from backend.api.schemas import (
+    CreateGame,
+    FieldProvenance,
+    GameManual,
+    GameOut,
+    MagazineAppearance,
+    PatchGame,
+    StoredGame,
+)
+from backend.lib.domain.fielddefs import identity_keys, image_keys, text_keys, video_keys
 from backend.store.archivo import escribir_json, leer_json, safe_id
 
 
@@ -119,9 +127,10 @@ class GamesStore:
     ) -> StoredGame:
         game = self.get(game_id)
         data = game.model_dump()
-        if key not in {"title", "year", "developer", "publisher", "genre", "players", "format"}:
+        if key not in identity_keys():
             raise NotFound(f"Campo no encontrado: {key}")
         data["identity"][key] = value
+        data["identitySource"] = _identity_source(provenance.source)
         data["provenance"][key] = provenance.model_dump(mode="json")
         updated = StoredGame.model_validate(data)
         self.save(updated)
@@ -174,6 +183,49 @@ class GamesStore:
         self.save(updated)
         return updated
 
+    def add_manual(self, game_id: str, manual: GameManual) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["manuals"].append(manual.model_dump(mode="json"))
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def remove_manual(self, game_id: str, manual_id: str) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["manuals"] = [m for m in data["manuals"] if m.get("id") != manual_id]
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def set_magazine(self, game_id: str, magazine: str, magazine_name: str) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["magazine"] = magazine
+        data["magazineName"] = magazine_name
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def add_magazine_appearance(self, game_id: str, appearance: MagazineAppearance) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["magazineAppearances"].append(appearance.model_dump(mode="json"))
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def remove_magazine_appearance(self, game_id: str, appearance_id: str) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["magazineAppearances"] = [
+            a for a in data["magazineAppearances"] if a.get("id") != appearance_id
+        ]
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
     def apply_media_suggestion(
         self,
         game_id: str,
@@ -209,6 +261,14 @@ class GamesStore:
 
     def _path(self, game: StoredGame) -> Path:
         return self.root / safe_id(game.systemId) / safe_id(game.id) / "game.json"
+
+
+def _identity_source(source: str) -> str:
+    if source == "MAME":
+        return "mame"
+    if source == "ScreenScraper":
+        return "screenscraper"
+    return "manual"
 
 
 def to_out(game: StoredGame) -> GameOut:

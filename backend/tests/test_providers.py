@@ -151,7 +151,7 @@ def test_one_provider_fails_other_responds_no_error_state(
     assert payload["candidatos"][0]["fuente"] == "Healthy"
 
 
-def test_circuit_breaker_skips_provider_after_two_exhausted_retries(
+def test_circuit_breaker_resets_on_reintentar(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -183,9 +183,9 @@ def test_circuit_breaker_skips_provider_after_two_exhausted_retries(
     service.suggest("golden-axe", "year", reintentar=True)
     assert calls == 2
 
-    payload = service.suggest("golden-axe", "year", reintentar=True)
-    assert calls == 2
-    assert payload["consultados"] == 0
+    # reintentar=True resets the circuit breaker, so the provider runs again
+    service.suggest("golden-axe", "year", reintentar=True)
+    assert calls == 3
 
 
 def test_ia_generador_returns_sinopsis_candidate(tmp_path: Path) -> None:
@@ -277,3 +277,83 @@ def test_apply_suggestion_rejects_referencia_candidate(
 
     with pytest.raises(BadRequest):
         FieldsService(settings).apply_suggestion("golden-axe", "video", candidate_id)
+
+
+def test_identity_suggestion_uses_current_value_with_ia(tmp_path: Path) -> None:
+    settings = _seeded_settings(tmp_path)
+
+    payload = SuggestionsService(settings).suggest("golden-axe", "title")
+
+    assert payload["consultados"] >= 1
+    identity_candidates = [c for c in payload["candidatos"] if c["kind"] == "identity"]
+    assert len(identity_candidates) >= 1
+    actual = identity_candidates[0]
+    assert actual["value"] == "Golden Axe"
+    assert actual["generadoPorIa"] is False
+
+
+def test_empty_identity_suggestion_returns_empty_results(tmp_path: Path) -> None:
+    settings = _seeded_settings(tmp_path)
+    GamesStore(settings.games_dir).create(
+        CreateGame(
+            systemId="arcade",
+            romSource="path",
+            romRef="/roms/empty.zip",
+            identity=Identity(title="Empty Year", year=""),
+        )
+    )
+
+    payload = SuggestionsService(settings).suggest("empty-year", "year")
+
+    assert payload["consultados"] >= 1
+    assert payload["candidatos"] == []
+
+
+def test_apply_identity_suggestion_updates_identity_field(tmp_path: Path) -> None:
+    settings = _seeded_settings(tmp_path)
+    payload = SuggestionsService(settings).suggest("golden-axe", "publisher")
+    candidate_id = payload["candidatos"][0]["id"]
+
+    game = FieldsService(settings).apply_suggestion("golden-axe", "publisher", candidate_id)
+
+    assert game.identity.publisher == "Sega"
+    assert game.identitySource == "manual"
+
+
+def test_apply_identity_suggestion_accepts_ia_candidate(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = _seeded_settings(tmp_path)
+
+    class FakeIdentityIaProvider:
+        nombre = "Fake IA"
+        tipo = "api"
+        campos = frozenset({"year"})
+        timeout = 1.0
+        limite = Limite()
+
+        def buscar(self, consulta: Consulta) -> ProviderResult:
+            trace = ProviderTrace("Fake IA", "api", "ok")
+            candidate = Candidato(
+                "fake-ia:year",
+                "year",
+                "identity",
+                "1989",
+                "Fake IA",
+                "aplicable",
+                value="1989",
+                trace=trace,
+                generado_por_ia=True,
+            )
+            return ProviderResult((candidate,), trace)
+
+    monkeypatch.setattr(
+        "backend.lib.providers.orquestador.providers_for",
+        lambda _key, _settings, _cancel_event=None: (FakeIdentityIaProvider(),),
+    )
+
+    payload = SuggestionsService(settings).suggest("golden-axe", "year", reintentar=True)
+
+    assert len(payload["candidatos"]) == 1
+    assert payload["candidatos"][0]["generadoPorIa"] is True

@@ -75,6 +75,20 @@ export interface GameManual {
   progress?: number;
 }
 
+export interface MagazineAppearance {
+  id: string;
+  magazineName: string;
+  country: string;
+  language: string;
+  issueNumber: string;
+  volume?: string;
+  date: string;
+  platform: string;
+  contentType: string;
+  source: string;
+  appearanceType: string;
+}
+
 export interface FieldProvenance {
   source: string;
   originUrl?: string;
@@ -102,6 +116,7 @@ export interface Game {
   manuals: GameManual[];
   magazine: MagazineLink;
   magazineName: string;
+  magazineAppearances: MagazineAppearance[];
   coverThumbUrl?: string;
   provenance: Record<string, FieldProvenance>;
 }

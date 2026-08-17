@@ -17,6 +17,12 @@
   font-weight: 700;
 }
 
+.error {
+  color: var(--dos-error);
+  font-size: var(--dos-size-meta);
+  margin: 0 0 var(--dos-space-4);
+}
+
 .grid {
   display: grid;
   gap: var(--dos-space-3);
@@ -90,4 +96,17 @@
   gap: var(--dos-space-3);
   justify-content: center;
   margin-top: var(--dos-space-4);
+}
+
+.batchField {
+  display: grid;
+  gap: var(--dos-space-2);
+  padding: var(--dos-space-3);
+  border: var(--dos-border-2) inset var(--dos-panel);
+}
+
+.empty {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-meta);
+  font-style: italic;
 }

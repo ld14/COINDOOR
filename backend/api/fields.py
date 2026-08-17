@@ -5,7 +5,14 @@ from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from backend.api.schemas import ApplySuggestion, CheatsValue, GameOut, ReviewValue, SuggestionJob
+from backend.api.schemas import (
+    ApplySuggestion,
+    CheatsValue,
+    GameOut,
+    MagazineValue,
+    ReviewValue,
+    SuggestionJob,
+)
 from backend.config import get_settings
 from backend.lib.jobs.ejecutor import submit
 from backend.services.fields import FieldsService
@@ -20,6 +27,13 @@ class FieldValue(BaseModel):
 
 def _service() -> FieldsService:
     return FieldsService(get_settings())
+
+
+@router.post("/identity/suggestions")
+def create_identity_batch_job(game_id: str, reintentar: bool = False) -> SuggestionJob:
+    fn = SuggestionJobsService(get_settings()).run_identity_batch(game_id, reintentar=reintentar)
+    job = submit(fn)
+    return SuggestionJob(jobId=job.job_id)
 
 
 @router.post("/{key}/suggestions")
@@ -40,6 +54,9 @@ def put_field(game_id: str, key: str, payload: dict[str, Any]) -> GameOut:
         return _service().set_review(game_id, ReviewValue.model_validate(payload))
     if key == "cheats":
         return _service().set_cheats(game_id, CheatsValue.model_validate(payload))
+    if key == "magazine":
+        mv = MagazineValue.model_validate(payload)
+        return _service().set_magazine(game_id, mv.magazine, mv.magazineName)
     return _service().set_value(game_id, key, FieldValue.model_validate(payload).value)
 
 

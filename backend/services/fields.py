@@ -8,8 +8,8 @@ import httpx
 from backend.api.errors import BadRequest, NotFound
 from backend.api.schemas import CheatsValue, FieldProvenance, GameOut, ReviewValue
 from backend.config import Settings
-from backend.lib.domain.fielddefs import image_keys, rich_keys, text_keys, video_keys
-from backend.lib.providers.orquestador import cached_candidate
+from backend.lib.domain.fielddefs import identity_keys, image_keys, rich_keys, text_keys, video_keys
+from backend.lib.providers.orquestador import cached_candidate, cached_identity_candidate
 from backend.store.archivo import escribir_binario, safe_id
 from backend.store.juegos import GamesStore, to_out
 
@@ -20,7 +20,7 @@ class FieldsService:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         self.store = GamesStore(settings.games_dir)
-        self.valid_keys = image_keys() | video_keys() | text_keys() | rich_keys()
+        self.valid_keys = identity_keys() | image_keys() | video_keys() | text_keys() | rich_keys()
 
     def set_value(self, game_id: str, key: str, value: str) -> GameOut:
         self._validate_key(key)
@@ -37,9 +37,14 @@ class FieldsService:
         groups = [group.model_dump(mode="json") for group in payload.groups]
         return to_out(self.store.set_cheats_field(game_id, groups))
 
+    def set_magazine(self, game_id: str, magazine: str, magazine_name: str) -> GameOut:
+        return to_out(self.store.set_magazine(game_id, magazine, magazine_name))
+
     def apply_suggestion(self, game_id: str, key: str, candidate_id: str) -> GameOut:
         self._validate_key(key)
         candidate = cached_candidate(self.settings, game_id, key, candidate_id)
+        if candidate is None and key in identity_keys():
+            candidate = cached_identity_candidate(self.settings, game_id, candidate_id)
         if candidate is None:
             raise NotFound(f"Candidato no encontrado: {candidate_id}")
         if candidate.get("clase") != "aplicable":

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   DosButton,
@@ -8,10 +8,12 @@ import {
   Panel,
   ProgressBar,
   SectionHeader,
+  Spinner,
   StatusBadge,
   SunkenBox,
 } from '@/components/dos';
 import { SuggestionsModal } from '@/components/SuggestionsModal';
+import { IdentityBatchModal } from '@/components/IdentityBatchModal';
 import { useGame } from '@/hooks/useGame';
 import { useGameMutations } from '@/hooks/useGameMutations';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
@@ -20,15 +22,20 @@ import type {
   CheatGroup,
   Game,
   Identity,
+  IdentityKey,
   ImageKey,
   MediaField,
   ReviewCat,
   TextKey,
   VideoKey,
 } from '@/lib/domain/types';
+import { searchManuals, type ManualSearchResult } from '@/lib/api/manuals';
+import { searchMagazines, setMagazine, addAppearance, removeAppearance, buildMagazineLinks, type MagazineSearchResult } from '@/lib/api/magazines';
 import styles from './ReadPages.module.css';
 
 const MANUAL_DELETE_CONFIRM = 'Este campo fue cargado a mano. ¿Borrarlo de todas formas?';
+
+type SaveHandle = { save: () => void };
 
 function confirmManualDelete(status: string, action: () => void) {
   if (status === 'manual' && !window.confirm(MANUAL_DELETE_CONFIRM)) return;
@@ -36,13 +43,19 @@ function confirmManualDelete(status: string, action: () => void) {
 }
 
 const SUGGESTABLE_LABELS: Record<string, string> = {
+  ...Object.fromEntries(FIELDDEFS.identity.map((field) => [field.key, field.label])),
   sinopsis: 'Sinopsis',
   review: 'Reseña',
   cheats: 'Trucos',
   video: 'Video de gameplay',
 };
 
+function isIdentityKey(key: string): key is IdentityKey {
+  return FIELDDEFS.identity.some((field) => field.key === key);
+}
+
 function suggestionStatus(game: Game, key: string): { hasContent: boolean; isManual: boolean } {
+  if (isIdentityKey(key)) return { hasContent: game.identity[key] !== '', isManual: game.identitySource === 'manual' };
   if (key === 'sinopsis') return { hasContent: game.texts.sinopsis.value !== '', isManual: game.texts.sinopsis.status === 'manual' };
   if (key === 'review') return { hasContent: game.review.status !== 'empty', isManual: game.review.status === 'manual' };
   if (key === 'cheats') return { hasContent: game.cheats.status !== 'empty', isManual: game.cheats.status === 'manual' };
@@ -51,10 +64,16 @@ function suggestionStatus(game: Game, key: string): { hasContent: boolean; isMan
 
 export function FichaJuego() {
   const { gameId = '' } = useParams();
-  const { data: game, error, isLoading } = useGame(gameId);
+  const { data: game, error, isLoading, refetch: refetchGame } = useGame(gameId);
   const mutations = useGameMutations(gameId);
   const [missingAfterReady, setMissingAfterReady] = useState<string[]>([]);
   const [suggestField, setSuggestField] = useState<string | null>(null);
+  const [suggestIdentityBatch, setSuggestIdentityBatch] = useState(false);
+  const sectionRefs = useRef<Record<string, SaveHandle | null>>({});
+
+  const saveAll = () => {
+    for (const ref of Object.values(sectionRefs.current)) ref?.save();
+  };
 
   if (isLoading) return <p className={styles.meta}>Cargando ficha…</p>;
   if (error || !game) {
@@ -77,6 +96,7 @@ export function FichaJuego() {
       <GameHero
         game={game}
         missing={missing}
+        onSaveAll={saveAll}
         onMarkReady={() => {
           setMissingAfterReady(missing);
           if (missing.length === 0) void mutations.markReady.mutateAsync();
@@ -109,7 +129,7 @@ export function FichaJuego() {
       ) : null}
 
       <div className={styles.sections}>
-        <IdentitySection game={game} onSave={(identity) => mutations.patchGame.mutate({ identity })} />
+        <IdentitySection ref={(r) => { sectionRefs.current.identity = r; }} game={game} onSave={(identity) => mutations.patchGame.mutate({ identity })} onSuggest={setSuggestField} onSuggestBatch={() => setSuggestIdentityBatch(true)} />
         <MediaSection
           game={game}
           onDelete={(key) => mutations.deleteField.mutate(key)}
@@ -117,22 +137,26 @@ export function FichaJuego() {
           onUpload={(key, file) => mutations.uploadMedia.mutate({ key, file })}
         />
         <TextSection
+          ref={(r) => { sectionRefs.current.texts = r; }}
           game={game}
           onDelete={(key) => mutations.deleteField.mutate(key)}
           onSuggest={() => setSuggestField('sinopsis')}
           onText={(key, value) => mutations.setTextField.mutate({ key, value })}
         />
         <ReviewSection
+          ref={(r) => { sectionRefs.current.review = r; }}
           game={game}
           onReview={(score, cats) => mutations.setReview.mutate({ score, cats })}
           onSuggest={() => setSuggestField('review')}
         />
         <CheatsSection
+          ref={(r) => { sectionRefs.current.cheats = r; }}
           game={game}
           onCheats={(groups) => mutations.setCheats.mutate({ groups })}
           onSuggest={() => setSuggestField('cheats')}
         />
         <PresentationSection
+          ref={(r) => { sectionRefs.current.presentation = r; }}
           game={game}
           onSave={(accentValue, accent2Value) => mutations.patchGame.mutate({
             accent: accentValue ? 'manual' : 'empty',
@@ -140,7 +164,7 @@ export function FichaJuego() {
             accent2Value,
           })}
         />
-        <ManualSection game={game} />
+        <ManualSection game={game} onUpload={(file) => mutations.uploadManual.mutate(file)} onDelete={(id) => mutations.deleteManual.mutate(id)} />
         <MagazineSection game={game} />
       </div>
 
@@ -156,11 +180,20 @@ export function FichaJuego() {
           open
         />
       ) : null}
+
+      {suggestIdentityBatch ? (
+        <IdentityBatchModal
+          gameId={game.id}
+          open={suggestIdentityBatch}
+          onClose={() => setSuggestIdentityBatch(false)}
+          onApplied={() => void refetchGame()}
+        />
+      ) : null}
     </div>
   );
 }
 
-function GameHero({ game, missing, onMarkReady, status }: { game: Game; missing: string[]; onMarkReady: () => void; status: ReturnType<typeof computeGameStatus> }) {
+function GameHero({ game, missing, onSaveAll, onMarkReady, status }: { game: Game; missing: string[]; onSaveAll: () => void; onMarkReady: () => void; status: ReturnType<typeof computeGameStatus> }) {
   const heroMedia = game.images.caratula?.url ?? game.video.video?.url;
   return (
     <Panel className={styles.gameHero}>
@@ -175,7 +208,10 @@ function GameHero({ game, missing, onMarkReady, status }: { game: Game; missing:
         </div>
         <StatusBadge status={status} />
         <p className={styles.meta}>{summary(game, missing)}</p>
-        <DosButton onClick={onMarkReady} variant="primary-small">Marcar como listo</DosButton>
+        <div className={styles.toolbar}>
+          <DosButton onClick={onSaveAll} variant="primary-small">Guardar todo</DosButton>
+          <DosButton onClick={onMarkReady} variant="primary-small">Marcar como listo</DosButton>
+        </div>
       </div>
     </Panel>
   );
@@ -233,9 +269,10 @@ function buildCompletionTiles(game: Game, missing: string[]): CompletionTile[] {
   ];
 }
 
-function IdentitySection({ game, onSave }: { game: Game; onSave: (identity: Identity) => void }) {
+const IdentitySection = forwardRef<SaveHandle, { game: Game; onSave: (identity: Identity) => void; onSuggest: (key: IdentityKey) => void; onSuggestBatch: () => void }>(function IdentitySection({ game, onSave, onSuggest, onSuggestBatch }, ref) {
   const [identity, setIdentity] = useState(game.identity);
   useEffect(() => setIdentity(game.identity), [game.identity]);
+  useImperativeHandle(ref, () => ({ save: () => onSave(identity) }), [onSave, identity]);
   return (
     <Panel>
       <SectionHeader>IDENTIDAD</SectionHeader>
@@ -248,15 +285,18 @@ function IdentitySection({ game, onSave }: { game: Game; onSave: (identity: Iden
               onChange={(event) => setIdentity({ ...identity, [field.key]: event.target.value })}
               value={identity[field.key]}
             />
+            <DosButton onClick={() => onSuggest(field.key)} type="button" variant="ghost-small">Sugerir</DosButton>
           </label>
         ))}
       </SunkenBox>
       <div className={styles.toolbar}>
+        <span className={styles.meta}>Fuente actual: {game.identitySource}</span>
+        <DosButton onClick={onSuggestBatch} variant="ghost-small">Sugerir todo</DosButton>
         <DosButton onClick={() => onSave(identity)} variant="primary-small">Guardar identidad</DosButton>
       </div>
     </Panel>
   );
-}
+});
 
 function MediaSection({
   game,
@@ -353,26 +393,22 @@ function MediaCard({
   );
 }
 
-function TextSection({
-  game,
-  onDelete,
-  onSuggest,
-  onText,
-}: {
+const TextSection = forwardRef<SaveHandle, {
   game: Game;
   onDelete: (key: string) => void;
   onSuggest: () => void;
   onText: (key: TextKey, value: string) => void;
-}) {
+}>(function TextSection({ game, onDelete, onSuggest, onText }, ref) {
   const [sinopsis, setSinopsis] = useState(game.texts.sinopsis.value);
   useEffect(() => setSinopsis(game.texts.sinopsis.value), [game.texts.sinopsis.value]);
+  useImperativeHandle(ref, () => ({ save: () => onText('sinopsis', sinopsis) }), [onText, sinopsis]);
 
   return (
     <Panel>
       <SectionHeader>TEXTOS</SectionHeader>
       <SunkenBox>
         <div className={styles.fieldTop}><span className={styles.name}>Sinopsis</span><FieldTag status={game.texts.sinopsis.status} /></div>
-        <DosTextarea aria-label="Sinopsis" onChange={(event) => setSinopsis(event.target.value)} value={sinopsis} />
+        <DosTextarea aria-label="Sinopsis" maxLength={FIELDDEFS.texts[0].maxLength} onChange={(event) => setSinopsis(event.target.value)} value={sinopsis} />
         <div className={styles.toolbar}>
           <DosButton onClick={() => onText('sinopsis', sinopsis)} variant="primary-small">Guardar sinopsis</DosButton>
           <DosButton onClick={onSuggest} variant="ghost-small">Sugerir</DosButton>
@@ -381,11 +417,12 @@ function TextSection({
       </SunkenBox>
     </Panel>
   );
-}
+});
 
-function ReviewSection({ game, onReview, onSuggest }: { game: Game; onReview: (score: number | null, cats: Partial<Record<ReviewCat, number>>) => void; onSuggest: () => void }) {
+const ReviewSection = forwardRef<SaveHandle, { game: Game; onReview: (score: number | null, cats: Partial<Record<ReviewCat, number>>) => void; onSuggest: () => void }>(function ReviewSection({ game, onReview, onSuggest }, ref) {
   const [reviewScore, setReviewScore] = useState(String(game.review.score ?? ''));
   useEffect(() => setReviewScore(String(game.review.score ?? '')), [game.review.score]);
+  useImperativeHandle(ref, () => ({ save: () => onReview(reviewScore ? Number(reviewScore) : null, game.review.cats) }), [onReview, reviewScore, game.review.cats]);
   return (
     <Panel>
       <SectionHeader>RESEÑA</SectionHeader>
@@ -410,15 +447,16 @@ function ReviewSection({ game, onReview, onSuggest }: { game: Game; onReview: (s
       </SunkenBox>
     </Panel>
   );
-}
+});
 
-function CheatsSection({ game, onCheats, onSuggest }: { game: Game; onCheats: (groups: CheatGroup[]) => void; onSuggest: () => void }) {
+const CheatsSection = forwardRef<SaveHandle, { game: Game; onCheats: (groups: CheatGroup[]) => void; onSuggest: () => void }>(function CheatsSection({ game, onCheats, onSuggest }, ref) {
   const [cheatName, setCheatName] = useState(game.cheats.groups[0]?.entries[0]?.name ?? '');
   const [cheatInput, setCheatInput] = useState(game.cheats.groups[0]?.entries[0]?.input ?? '');
   useEffect(() => {
     setCheatName(game.cheats.groups[0]?.entries[0]?.name ?? '');
     setCheatInput(game.cheats.groups[0]?.entries[0]?.input ?? '');
   }, [game.cheats.groups]);
+  useImperativeHandle(ref, () => ({ save: () => onCheats([{ name: 'general', entries: [{ name: cheatName, input: cheatInput }] }]) }), [onCheats, cheatName, cheatInput]);
 
   return (
     <Panel>
@@ -449,7 +487,7 @@ function CheatsSection({ game, onCheats, onSuggest }: { game: Game; onCheats: (g
       </SunkenBox>
     </Panel>
   );
-}
+});
 
 const hex = (value: string) => `#${value}`;
 
@@ -461,17 +499,15 @@ const ACCENT_PRESETS = [
   { label: 'azul', value: hex('0000aa'), className: styles.swatchBlue },
 ];
 
-function PresentationSection({
-  game,
-  onSave,
-}: {
+const PresentationSection = forwardRef<SaveHandle, {
   game: Game;
   onSave: (accentValue: string, accent2Value: string) => void;
-}) {
+}>(function PresentationSection({ game, onSave }, ref) {
   const [accentValue, setAccentValue] = useState(game.accentValue);
   const [accent2Value, setAccent2Value] = useState(game.accent2Value);
   useEffect(() => setAccentValue(game.accentValue), [game.accentValue]);
   useEffect(() => setAccent2Value(game.accent2Value), [game.accent2Value]);
+  useImperativeHandle(ref, () => ({ save: () => onSave(accentValue, accent2Value) }), [onSave, accentValue, accent2Value]);
   return (
     <Panel>
       <SectionHeader>PRESENTACIÓN</SectionHeader>
@@ -484,7 +520,7 @@ function PresentationSection({
       </SunkenBox>
     </Panel>
   );
-}
+});
 
 function AccentRow({ label, onChange, status, value }: { label: string; onChange: (value: string) => void; status: string; value: string }) {
   return (
@@ -512,24 +548,177 @@ function AccentRow({ label, onChange, status, value }: { label: string; onChange
   );
 }
 
-function ManualSection({ game }: { game: Game }) {
+function ManualSection({ game, onUpload, onDelete }: { game: Game; onUpload: (file: File) => void; onDelete: (id: string) => void }) {
+  const [searching, setSearching] = useState(false);
+  const [results, setResults] = useState<ManualSearchResult[]>([]);
+
+  const handleSearch = async () => {
+    setSearching(true);
+    setResults([]);
+    try {
+      const data = await searchManuals(game.id);
+      setResults(data);
+    } catch {
+      setResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
+
   return (
     <Panel>
       <SectionHeader>MANUAL</SectionHeader>
-      <SunkenBox>
-        {game.manuals.length === 0 ? <p>No Disponible</p> : game.manuals.map((manual) => (
-          <p key={manual.id}>📎 {manual.fileName} — {manual.status} — {manual.pages} páginas</p>
-        ))}
+      <SunkenBox className={styles.stack}>
+        {game.manuals.length > 0 ? (
+          <div className={styles.cheatLedger}>
+            {game.manuals.map((manual) => (
+              <div className={styles.cheatEntry} key={manual.id}>
+                <span>📎 {manual.fileName}</span>
+                <span className={styles.meta}>{manual.status} — {manual.pages} páginas</span>
+                <DosButton onClick={() => onDelete(manual.id)} variant="danger-small">Borrar</DosButton>
+              </div>
+            ))}
+          </div>
+        ) : <p className={styles.empty}>No Disponible</p>}
+        <div className={styles.toolbar}>
+          <label className={styles.meta}>
+            Cargar PDF:
+            <input
+              multiple
+              accept=".pdf"
+              onChange={(event) => {
+                const files = event.target.files;
+                if (files) Array.from(files).forEach((file) => onUpload(file));
+              }}
+              type="file"
+            />
+          </label>
+          <DosButton disabled={searching} onClick={handleSearch} variant="ghost-small">
+            {searching ? 'Buscando…' : 'Buscar manuales'}
+          </DosButton>
+        </div>
+        {searching ? (
+          <div className={styles.toolbar}>
+            <Spinner />
+            <span className={styles.meta}>Buscando manuales digitales…</span>
+          </div>
+        ) : null}
+        {results.length > 0 ? (
+          <div className={styles.stack}>
+            <span className={styles.name}>Resultados de búsqueda:</span>
+            {results.map((result) => (
+              <div className={styles.cheatEntry} key={result.url}>
+                <span>{result.title}</span>
+                <span className={styles.meta}>{result.source}</span>
+                <DosButton onClick={() => window.open(result.url, '_blank')} variant="ghost-small">Abrir</DosButton>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </SunkenBox>
     </Panel>
   );
 }
 
 function MagazineSection({ game }: { game: Game }) {
+  const [searching, setSearching] = useState(false);
+  const [results, setResults] = useState<MagazineSearchResult[]>([]);
+
+  const handleSearch = async () => {
+    setSearching(true);
+    setResults([]);
+    try {
+      const data = await searchMagazines(game.id);
+      setResults(data);
+    } catch {
+      setResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleAddAppearance = async (result: MagazineSearchResult) => {
+    if (!result.appearance) return;
+    await addAppearance(game.id, result.appearance);
+    window.location.reload();
+  };
+
+  const handleRemoveAppearance = async (appearanceId: string) => {
+    await removeAppearance(game.id, appearanceId);
+    window.location.reload();
+  };
+
+  const appearances = game.magazineAppearances || [];
+
   return (
     <Panel>
       <SectionHeader>REVISTA</SectionHeader>
-      <SunkenBox><p>{game.magazine === 'linked' ? game.magazineName : 'Sin cobertura en revistas'}</p></SunkenBox>
+      <SunkenBox className={styles.stack}>
+        {game.magazine === 'linked' ? (
+          <div className={styles.cheatEntry}>
+            <span className={styles.name}>{game.magazineName}</span>
+            <DosButton onClick={() => { setMagazine(game.id, ''); window.location.reload(); }} variant="danger-small">Desvincular</DosButton>
+          </div>
+        ) : null}
+        {appearances.length > 0 ? (
+          <div className={styles.stack}>
+            <span className={styles.name}>Apariciones en revistas:</span>
+            {appearances.map((a) => {
+              const links = buildMagazineLinks(a);
+              return (
+                <div className={styles.cheatEntry} key={a.id}>
+                  <span className={styles.name}>{a.magazineName}</span>
+                  {a.issueNumber ? <span className={styles.meta}>N° {a.issueNumber}</span> : null}
+                  {a.date ? <span className={styles.meta}>{a.date}</span> : null}
+                  <span className={styles.meta}>{a.contentType}</span>
+                  <span className={styles.meta}>{a.appearanceType}</span>
+                  {links.archiveOrg ? (
+                    <DosButton onClick={() => window.open(links.archiveOrg, '_blank')} variant="ghost-small">Archive.org</DosButton>
+                  ) : null}
+                  {links.retroCdn ? (
+                    <DosButton onClick={() => window.open(links.retroCdn, '_blank')} variant="ghost-small">Retro CDN</DosButton>
+                  ) : null}
+                  <DosButton onClick={() => handleRemoveAppearance(a.id)} variant="danger-small">Eliminar</DosButton>
+                </div>
+              );
+            })}
+          </div>
+        ) : <p className={styles.empty}>Sin cobertura en revistas</p>}
+        <div className={styles.toolbar}>
+          <DosButton disabled={searching} onClick={handleSearch} variant="ghost-small">
+            {searching ? 'Buscando…' : 'Buscar revistas'}
+          </DosButton>
+        </div>
+        {searching ? (
+          <div className={styles.toolbar}>
+            <Spinner />
+            <span className={styles.meta}>Identificando apariciones en revistas…</span>
+          </div>
+        ) : null}
+        {results.length > 0 ? (
+          <div className={styles.stack}>
+            <span className={styles.name}>Resultados:</span>
+            {results.map((result, idx) => (
+              <div className={styles.cheatEntry} key={result.url || idx}>
+                <span>{result.title}</span>
+                <span className={styles.meta}>{result.magazine}</span>
+                {result.url ? (
+                  <DosButton onClick={() => window.open(result.url, '_blank')} variant="ghost-small">Abrir</DosButton>
+                ) : null}
+                {result.links?.archiveOrg ? (
+                  <DosButton onClick={() => window.open(result.links!.archiveOrg, '_blank')} variant="ghost-small">Archive.org</DosButton>
+                ) : null}
+                {result.links?.retroCdn ? (
+                  <DosButton onClick={() => window.open(result.links!.retroCdn, '_blank')} variant="ghost-small">Retro CDN</DosButton>
+                ) : null}
+                {result.appearance ? (
+                  <DosButton onClick={() => handleAddAppearance(result)} variant="ghost-small">Agregar</DosButton>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </SunkenBox>
     </Panel>
   );
 }
