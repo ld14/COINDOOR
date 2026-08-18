@@ -1,0 +1,21 @@
+.container {
+  align-items: center;
+  display: flex;
+  gap: var(--dos-space-3);
+}
+
+.input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fileName {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-meta);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

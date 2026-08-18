@@ -31,7 +31,16 @@ fi
 
 uv sync
 
-uv run uvicorn backend.main:app --host 127.0.0.1 --port "${COINDOOR_PORT:-8765}" --reload &
+# Matar procesos existentes en el puerto antes de levantar
+PORT="${COINDOOR_PORT:-8765}"
+EXISTING_PIDS=$(lsof -ti :"$PORT" 2>/dev/null || true)
+if [ -n "$EXISTING_PIDS" ]; then
+  printf '%s\n' "Bajando procesos en :$PORT (PIDs $EXISTING_PIDS)…"
+  echo "$EXISTING_PIDS" | xargs kill -9 2>/dev/null || true
+  sleep 1
+fi
+
+uv run uvicorn backend.main:app --host 127.0.0.1 --port "$PORT" --reload &
 BACKEND_PID=$!
 
 npm run dev &

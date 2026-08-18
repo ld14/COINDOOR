@@ -61,6 +61,22 @@
   text-align: center;
 }
 
+.previewImage {
+  max-width: 100%;
+  max-height: 6rem;
+  object-fit: contain;
+}
+
+.previewText {
+  font-family: var(--dos-font-mono);
+  font-size: var(--dos-size-field-tag);
+  margin: 0;
+  overflow-wrap: anywhere;
+  text-align: left;
+  white-space: pre-wrap;
+  width: 100%;
+}
+
 .name {
   font-size: var(--dos-size-body);
   font-weight: 700;

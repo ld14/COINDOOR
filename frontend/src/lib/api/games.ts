@@ -59,3 +59,9 @@ export function patchGame(id: string, payload: Partial<Pick<Game, 'identity' | '
 export function markReady(id: string) {
   return fetchJson<Game>(`/games/${id}/mark-ready`, { method: 'POST' });
 }
+
+export function uploadRom(id: string, file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return fetchJson<Game>(`/games/${id}/rom`, { method: 'POST', body: formData });
+}

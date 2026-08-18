@@ -55,7 +55,13 @@ class GamesStore:
         current = self.get(game_id)
         data = current.model_dump()
         patch = payload.model_dump(exclude_unset=True)
-        data.update({key: value for key, value in patch.items() if value is not None})
+        for key, value in patch.items():
+            if value is None:
+                continue
+            if key == "identity" and isinstance(value, dict) and isinstance(data.get(key), dict):
+                data[key].update(value)
+            else:
+                data[key] = value
         updated = StoredGame.model_validate(data)
         self.save(updated)
         return updated
@@ -179,6 +185,14 @@ class GamesStore:
             data["video"][key] = {"status": "manual", "url": url}
         else:
             raise NotFound(f"Campo no encontrado: {key}")
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def set_rom_ref(self, game_id: str, rom_ref: str) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["romRef"] = rom_ref
         updated = StoredGame.model_validate(data)
         self.save(updated)
         return updated

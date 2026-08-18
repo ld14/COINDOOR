@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DosButton, DosInput, DosSelect, Panel, SectionHeader, SunkenBox } from '@/components/dos';
+import { DosButton, DosFileInput, DosInput, DosSelect, Panel, SectionHeader, SunkenBox } from '@/components/dos';
 import { useGameMutations } from '@/hooks/useGameMutations';
 import { useSystems } from '@/hooks/useSystems';
 import type { Identity, RomSource } from '@/lib/domain/types';
@@ -24,6 +24,7 @@ export function NuevoJuego() {
   const [systemId, setSystemId] = useState('');
   const [romSource, setRomSource] = useState<RomSource>('path');
   const [romRef, setRomRef] = useState('');
+  const [romFile, setRomFile] = useState<File | null>(null);
   const [identity, setIdentity] = useState(emptyIdentity);
   const [error, setError] = useState('');
 
@@ -40,9 +41,17 @@ export function NuevoJuego() {
       setError(ABSOLUTE_PATH_MESSAGE);
       return;
     }
+    if (romSource === 'upload' && !romFile) {
+      setError('Seleccioná un archivo para subir.');
+      return;
+    }
     try {
       setError('');
-      const game = await mutations.createGame.mutateAsync({ systemId, romSource, romRef, identity });
+      const ref = romSource === 'upload' ? romFile!.name : romRef;
+      const game = await mutations.createGame.mutateAsync({ systemId, romSource, romRef: ref, identity });
+      if (romSource === 'upload' && romFile) {
+        await mutations.uploadRom.mutateAsync(romFile);
+      }
       navigate(`/juegos/${game.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo crear la ficha.');
@@ -72,10 +81,25 @@ export function NuevoJuego() {
               <option value="upload">Subir ROM</option>
             </DosSelect>
           </label>
-          <label className={styles.field}>
-            <span className={styles.label}>ROM</span>
-            <DosInput aria-label="ROM" onChange={(event) => setRomRef(event.target.value)} placeholder="/roms/arcade/sf2.zip" value={romRef} />
-          </label>
+          {romSource === 'path' ? (
+            <label className={styles.field}>
+              <span className={styles.label}>ROM</span>
+              <DosInput aria-label="ROM" onChange={(event) => setRomRef(event.target.value)} placeholder="/roms/arcade/sf2.zip" value={romRef} />
+            </label>
+          ) : (
+            <label className={styles.field}>
+              <span className={styles.label}>ROM</span>
+              <DosFileInput
+                accept=".zip,.nes,.sms,.gb,.gbc,.gba,.gen,.smc,.sfc,.ngp,.pce,.col,.rom,.bin"
+                ariaLabel="ROM"
+                fileName={romFile?.name}
+                onChange={(file) => {
+                  setRomFile(file);
+                  setRomRef(file?.name ?? '');
+                }}
+              />
+            </label>
+          )}
           {error ? <p className={styles.error}>{error}</p> : null}
         </SunkenBox>
       </Panel>

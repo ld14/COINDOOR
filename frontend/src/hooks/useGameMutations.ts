@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createGame, markReady, patchGame, type CreateGamePayload } from '@/lib/api/games';
+import { createGame, markReady, patchGame, uploadRom, type CreateGamePayload } from '@/lib/api/games';
 import { deleteField, setCheats, setReview, setTextField } from '@/lib/api/fields';
 import { deleteManual, uploadManual } from '@/lib/api/manuals';
 import { uploadMedia } from '@/lib/api/media';
@@ -25,6 +25,7 @@ export function useGameMutations(gameId?: string) {
     setReview: useMutation({ mutationFn: (review: Pick<ReviewField, 'score' | 'cats'>) => setReview(gameId ?? '', review), onSuccess: invalidate }),
     setCheats: useMutation({ mutationFn: (cheats: Pick<CheatsField, 'groups'>) => setCheats(gameId ?? '', cheats), onSuccess: invalidate }),
     uploadMedia: useMutation({ mutationFn: ({ key, file }: { key: ImageKey | VideoKey; file: File }) => uploadMedia(gameId ?? '', key, file), onSuccess: invalidate }),
+    uploadRom: useMutation({ mutationFn: (file: File) => uploadRom(gameId ?? '', file), onSuccess: invalidate }),
     applySuggestion: useMutation({ mutationFn: ({ key, candidateId }: { key: string; candidateId: string }) => applySuggestion(gameId ?? '', key, candidateId), onSuccess: invalidate }),
     uploadManual: useMutation({ mutationFn: (file: File) => uploadManual(gameId ?? '', file), onSuccess: invalidate }),
     deleteManual: useMutation({ mutationFn: (manualId: string) => deleteManual(gameId ?? '', manualId), onSuccess: invalidate }),

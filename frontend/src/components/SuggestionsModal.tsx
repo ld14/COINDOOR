@@ -5,6 +5,20 @@ import styles from './SuggestionsModal.module.css';
 
 const MANUAL_REPLACE_CONFIRM = 'Este campo fue cargado a mano. ¿Reemplazarlo por la sugerencia elegida?';
 
+function formatCheatPreview(value: string): string {
+  try {
+    const data = JSON.parse(value);
+    const groups = data.groups as Array<{ name: string; entries: Array<{ name: string; input: string }> }>;
+    if (!Array.isArray(groups) || groups.length === 0) return 'Sin trucos';
+    return groups.map((g) => {
+      const entries = g.entries?.map((e) => `  · ${e.name}: ${e.input}`).join('\n') ?? '';
+      return `${g.name}\n${entries}`;
+    }).join('\n\n');
+  } catch {
+    return value;
+  }
+}
+
 interface SuggestionsModalProps {
   fieldKey: string;
   gameId: string;
@@ -72,7 +86,15 @@ export function SuggestionsModal({ fieldKey, gameId, hasContent, isManual, label
             ) : null}
             {result.candidatos.map((candidate) => (
               <button className={styles.candidate} key={candidate.id} onClick={() => pick(candidate)} type="button">
-                <div className={styles.preview}>{candidate.previewUrl ?? candidate.value ?? candidate.nombre}</div>
+                <div className={styles.preview}>
+                  {candidate.previewUrl && candidate.previewUrl.startsWith('http') ? (
+                    <img alt={candidate.nombre} className={styles.previewImage} src={candidate.previewUrl} />
+                  ) : candidate.kind === 'text' && candidate.value ? (
+                    <pre className={styles.previewText}>{fieldKey === 'cheats' ? formatCheatPreview(candidate.value) : candidate.value}</pre>
+                  ) : (
+                    candidate.previewUrl ?? candidate.nombre
+                  )}
+                </div>
                 {candidate.generadoPorIa ? <span className={styles.iaBadge}>IA</span> : null}
                 <span className={styles.name}>{candidate.nombre}</span>
                 <span className={styles.source}>{candidate.fuente}</span>

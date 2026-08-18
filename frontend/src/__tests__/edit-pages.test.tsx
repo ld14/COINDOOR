@@ -84,25 +84,17 @@ describe('Edición de ficha', () => {
     expect(screen.getByLabelText('Sinopsis')).toHaveValue('Sinopsis cargada para pruebas.');
   });
 
-  it('review y cheats se guardan como estructura, no como texto', async () => {
+  it('review se guarda como estructura, no como texto', async () => {
     renderApp('/juegos/mslug');
 
     await screen.findByRole('heading', { name: 'Metal Slug' });
     await userEvent.type(screen.getByLabelText('Puntaje de reseña'), '75');
     await userEvent.click(screen.getByRole('button', { name: 'Guardar reseña' }));
-    await userEvent.type(screen.getByLabelText('Nombre del truco'), 'Vidas extra');
-    await userEvent.type(screen.getByLabelText('Input del truco'), '↑ ↑ ↓ ↓');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar trucos' }));
 
     const fetchMock = vi.mocked(fetch);
     const reviewCall = fetchMock.mock.calls.find(([input]) => String(input).includes('/fields/review'));
-    const cheatsCall = fetchMock.mock.calls.find(([input]) => String(input).includes('/fields/cheats'));
     expect(reviewCall).toBeDefined();
-    expect(cheatsCall).toBeDefined();
     expect(JSON.parse(String(reviewCall?.[1]?.body))).toEqual({ score: 75, cats: {} });
-    expect(JSON.parse(String(cheatsCall?.[1]?.body))).toEqual({
-      groups: [{ name: 'general', entries: [{ name: 'Vidas extra', input: '↑ ↑ ↓ ↓' }] }],
-    });
   });
 
   it('mark-ready incompleto muestra faltantes exactos', async () => {

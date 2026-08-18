@@ -1,6 +1,7 @@
 export { Banner } from './Banner';
 export { DosButton } from './DosButton';
 export type { DosButtonVariant } from './DosButton';
+export { DosFileInput } from './DosFileInput';
 export { DosInput } from './DosInput';
 export { DosSelect } from './DosSelect';
 export { DosTextarea } from './DosTextarea';

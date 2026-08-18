@@ -14,8 +14,10 @@ import {
 } from '@/components/dos';
 import { SuggestionsModal } from '@/components/SuggestionsModal';
 import { IdentityBatchModal } from '@/components/IdentityBatchModal';
+import { ImageModal } from '@/components/ImageModal';
 import { useGame } from '@/hooks/useGame';
 import { useGameMutations } from '@/hooks/useGameMutations';
+import { useDominantColors } from '@/hooks/useDominantColors';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
 import { FIELDDEFS } from '@/lib/domain/types';
 import type {
@@ -44,6 +46,7 @@ function confirmManualDelete(status: string, action: () => void) {
 
 const SUGGESTABLE_LABELS: Record<string, string> = {
   ...Object.fromEntries(FIELDDEFS.identity.map((field) => [field.key, field.label])),
+  ...Object.fromEntries(FIELDDEFS.images.map((field) => [field.key, field.label])),
   sinopsis: 'Sinopsis',
   review: 'Reseña',
   cheats: 'Trucos',
@@ -56,6 +59,10 @@ function isIdentityKey(key: string): key is IdentityKey {
 
 function suggestionStatus(game: Game, key: string): { hasContent: boolean; isManual: boolean } {
   if (isIdentityKey(key)) return { hasContent: game.identity[key] !== '', isManual: game.identitySource === 'manual' };
+  if (FIELDDEFS.images.some((f) => f.key === key)) {
+    const img = game.images[key as ImageKey];
+    return { hasContent: img?.status !== 'empty', isManual: img?.status === 'manual' };
+  }
   if (key === 'sinopsis') return { hasContent: game.texts.sinopsis.value !== '', isManual: game.texts.sinopsis.status === 'manual' };
   if (key === 'review') return { hasContent: game.review.status !== 'empty', isManual: game.review.status === 'manual' };
   if (key === 'cheats') return { hasContent: game.cheats.status !== 'empty', isManual: game.cheats.status === 'manual' };
@@ -134,6 +141,7 @@ export function FichaJuego() {
           game={game}
           onDelete={(key) => mutations.deleteField.mutate(key)}
           onSuggestVideo={() => setSuggestField('video')}
+          onSuggestImage={(key) => setSuggestField(key)}
           onUpload={(key, file) => mutations.uploadMedia.mutate({ key, file })}
         />
         <TextSection
@@ -194,7 +202,10 @@ export function FichaJuego() {
 }
 
 function GameHero({ game, missing, onSaveAll, onMarkReady, status }: { game: Game; missing: string[]; onSaveAll: () => void; onMarkReady: () => void; status: ReturnType<typeof computeGameStatus> }) {
-  const heroMedia = game.images.caratula?.url ?? game.video.video?.url;
+  const coverUrl = game.images.caratula?.url;
+  const heroMedia = coverUrl ?? game.video.video?.url;
+  const { colors } = useDominantColors(coverUrl, 4);
+
   return (
     <Panel className={styles.gameHero}>
       <div className={styles.heroPreview}>
@@ -208,6 +219,19 @@ function GameHero({ game, missing, onSaveAll, onMarkReady, status }: { game: Gam
         </div>
         <StatusBadge status={status} />
         <p className={styles.meta}>{summary(game, missing)}</p>
+        {colors.length > 0 ? (
+          <div className={styles.colorPalette}>
+            <span className={styles.paletteLabel}>Colores predominantes</span>
+            <div className={styles.swatches}>
+              {colors.map((color) => (
+                <div key={color.hex} className={styles.colorSwatch}>
+                  <div className={styles.colorBlock} style={{ backgroundColor: color.hex }} />
+                  <span className={styles.colorHex}>{color.hex}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <div className={styles.toolbar}>
           <DosButton onClick={onSaveAll} variant="primary-small">Guardar todo</DosButton>
           <DosButton onClick={onMarkReady} variant="primary-small">Marcar como listo</DosButton>
@@ -302,11 +326,13 @@ function MediaSection({
   game,
   onDelete,
   onSuggestVideo,
+  onSuggestImage,
   onUpload,
 }: {
   game: Game;
   onDelete: (key: ImageKey | VideoKey) => void;
   onSuggestVideo: () => void;
+  onSuggestImage: (key: ImageKey) => void;
   onUpload: (key: ImageKey | VideoKey, file: File) => void;
 }) {
   return (
@@ -321,6 +347,7 @@ function MediaSection({
               label={field.label}
               mediaKey={field.key}
               onDelete={onDelete}
+              onSuggest={() => onSuggestImage(field.key)}
               onUpload={onUpload}
               ratio={field.ratio}
             />
@@ -365,7 +392,10 @@ function MediaCard({
   onUpload: (key: ImageKey | VideoKey, file: File) => void;
   ratio: string;
 }) {
+  const [imageModalOpen, setImageModalOpen] = useState(false);
   const status = field?.status ?? 'empty';
+  const isVideo = mediaKey === 'video';
+
   return (
     <Panel className={styles.stack}>
       <div className={styles.fieldTop}>
@@ -373,7 +403,24 @@ function MediaCard({
         <FieldTag status={status} />
       </div>
       <div className={styles.preview}>
-        {field?.url ? <img alt={label} className={styles.previewImage} src={field.url} /> : `${label.toLowerCase()} · ${ratio} · No Disponible`}
+        {field?.url ? (
+          isVideo ? (
+            <video
+              className={styles.videoPlayer}
+              controls
+              preload="metadata"
+              src={field.url}
+            />
+          ) : (
+            <button
+              className={styles.imageButton}
+              onClick={() => setImageModalOpen(true)}
+              type="button"
+            >
+              <img alt={label} className={styles.previewImage} src={field.url} />
+            </button>
+          )
+        ) : `${label.toLowerCase()} · ${ratio} · No Disponible`}
       </div>
       <input
         aria-label={`Cargar ${label}`}
@@ -389,6 +436,14 @@ function MediaCard({
           <DosButton onClick={() => confirmManualDelete(status, () => onDelete(mediaKey))} variant="danger-small">Borrar</DosButton>
         ) : null}
       </div>
+      {!isVideo && field?.url ? (
+        <ImageModal
+          alt={label}
+          onClose={() => setImageModalOpen(false)}
+          open={imageModalOpen}
+          src={field.url}
+        />
+      ) : null}
     </Panel>
   );
 }
@@ -450,13 +505,9 @@ const ReviewSection = forwardRef<SaveHandle, { game: Game; onReview: (score: num
 });
 
 const CheatsSection = forwardRef<SaveHandle, { game: Game; onCheats: (groups: CheatGroup[]) => void; onSuggest: () => void }>(function CheatsSection({ game, onCheats, onSuggest }, ref) {
-  const [cheatName, setCheatName] = useState(game.cheats.groups[0]?.entries[0]?.name ?? '');
-  const [cheatInput, setCheatInput] = useState(game.cheats.groups[0]?.entries[0]?.input ?? '');
-  useEffect(() => {
-    setCheatName(game.cheats.groups[0]?.entries[0]?.name ?? '');
-    setCheatInput(game.cheats.groups[0]?.entries[0]?.input ?? '');
-  }, [game.cheats.groups]);
-  useImperativeHandle(ref, () => ({ save: () => onCheats([{ name: 'general', entries: [{ name: cheatName, input: cheatInput }] }]) }), [onCheats, cheatName, cheatInput]);
+  useImperativeHandle(ref, () => ({
+    save: () => onCheats(game.cheats.groups),
+  }), [onCheats, game.cheats.groups]);
 
   return (
     <Panel>
@@ -478,10 +529,7 @@ const CheatsSection = forwardRef<SaveHandle, { game: Game; onCheats: (groups: Ch
             ))}
           </div>
         ) : <p className={styles.empty}>No Disponible</p>}
-        <DosInput aria-label="Nombre del truco" onChange={(event) => setCheatName(event.target.value)} value={cheatName} />
-        <DosInput aria-label="Input del truco" onChange={(event) => setCheatInput(event.target.value)} value={cheatInput} />
         <div className={styles.toolbar}>
-          <DosButton onClick={() => onCheats([{ name: 'general', entries: [{ name: cheatName, input: cheatInput }] }])} variant="primary-small">Guardar trucos</DosButton>
           <DosButton onClick={onSuggest} variant="ghost-small">Sugerir</DosButton>
         </div>
       </SunkenBox>

@@ -57,9 +57,16 @@ class FieldsService:
             return to_out(self.store.apply_identity_suggestion(game_id, key, value, provenance))
         if candidate.get("kind") == "media":
             media_url = str(candidate.get("mediaUrl") or "")
-            if not media_url.startswith("https://"):
+            preview_url = str(candidate.get("previewUrl") or "")
+            if not media_url.startswith(("https://", "http://")):
                 raise BadRequest("URL de media inválida")
-            url = self._download_candidate_media(game_id, key, media_url)
+            try:
+                url = self._download_candidate_media(game_id, key, media_url)
+            except BadRequest:
+                if preview_url.startswith(("https://", "http://")) and preview_url != media_url:
+                    url = self._download_candidate_media(game_id, key, preview_url)
+                else:
+                    raise
             return to_out(self.store.apply_media_suggestion(game_id, key, url, provenance))
         if candidate.get("kind") == "text":
             value = str(candidate.get("value") or "")
@@ -82,10 +89,14 @@ class FieldsService:
 
     def _download_candidate_media(self, game_id: str, key: str, media_url: str) -> str:
         game = self.store.get(game_id)
-        response = httpx.get(media_url, timeout=30.0, follow_redirects=False)
-        if response.status_code in {401, 403}:
-            raise BadRequest("El sitio rechazó la descarga")
-        response.raise_for_status()
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "image/*,*/*",
+            "Referer": "https://duckduckgo.com/",
+        }
+        response = httpx.get(media_url, timeout=30.0, follow_redirects=True, headers=headers)
+        if response.status_code >= 400:
+            raise BadRequest(f"El sitio devolvió {response.status_code}")
         suffix = Path(httpx.URL(media_url).path).suffix.lower() or ".jpg"
         system_dir = safe_id(game.systemId)
         game_dir = safe_id(game.id)

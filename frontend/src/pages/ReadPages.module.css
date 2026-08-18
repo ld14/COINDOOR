@@ -316,6 +316,28 @@
   object-fit: contain;
 }
 
+.imageButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.imageButton:hover {
+  opacity: 0.9;
+}
+
+.videoPlayer {
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  width: 100%;
+}
+
 .reviewGrid {
   align-items: end;
   display: grid;
@@ -398,6 +420,35 @@
 .backLink {
   color: var(--dos-titlebar);
   font-weight: 700;
+}
+
+.colorPalette {
+  display: grid;
+  gap: var(--dos-space-2);
+}
+
+.paletteLabel {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-meta);
+}
+
+.colorSwatch {
+  display: flex;
+  align-items: center;
+  gap: var(--dos-space-2);
+}
+
+.colorBlock {
+  height: var(--dos-swatch-size);
+  width: var(--dos-swatch-size);
+  border: var(--dos-border-2) solid var(--dos-edge-dark);
+}
+
+.colorHex {
+  font-family: var(--dos-font-mono);
+  font-size: var(--dos-size-field-tag);
+  color: var(--dos-ink-muted);
+  text-transform: uppercase;
 }
 
 @media (max-width: 42rem) {
