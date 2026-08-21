@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import json
 
 import httpx
 import pytest
@@ -211,6 +212,38 @@ def test_ia_generador_returns_sinopsis_candidate(tmp_path: Path) -> None:
     assert result.trace.estado == "ok"
     assert result.candidatos[0].value == "Un beat 'em up de vikingos."
     assert result.candidatos[0].generado_por_ia is True
+
+
+def test_ia_generador_cheats_prompt_requires_matching_platform(tmp_path: Path) -> None:
+    seen_prompt = ""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal seen_prompt
+        seen_prompt = json.loads(request.content)["messages"][0]["content"]
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": '{"groups": []}'}}]},
+        )
+
+    http = ProviderHttpClient(
+        "ia:test-model",
+        Limite(),
+        QuotasStore(tmp_path / "cuotas.json"),
+        timeout=1,
+        client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    config = AiModelConfig("https://api.test/v1", "key", "test-model")
+    result = IaGenerador(config, http).buscar(
+        Consulta("ghost-n-goblins", "cheats", "Ghosts 'n Goblins", "MAME (máquinas arcade)", "1985"),
+    )
+
+    assert result.trace.estado == "ok"
+    assert "solo para la\nversión de MAME (máquinas arcade)" in seen_prompt
+    assert "no mezcles\ntrucos de ports" in seen_prompt
+    assert "Si no\npodés asociar el truco con MAME (máquinas arcade), omitilo" in seen_prompt
+    assert "usuarios principiantes" in seen_prompt
+    assert "DIP\nswitches, explicá que son interruptores/configuración" in seen_prompt
+    assert "menú de servicio, explicá cómo se accede" in seen_prompt
 
 
 def test_ia_generador_invalid_review_json_fails_explicit(tmp_path: Path) -> None:
