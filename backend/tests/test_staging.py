@@ -53,20 +53,20 @@ def _game(settings: Settings) -> dict[str, Any]:
 
 def test_obligatorios_se_copian_con_nombre_de_contrato(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
-    resultado = build_staging(settings, _game(settings), incluir=set())
+    resultado = build_staging(settings, _game(settings), incluir=set(), system_name="MAME")
     assert (resultado.root / "media" / "boxFront.jpg").exists()
     assert (resultado.root / "media" / "poster.jpg").exists()
 
 
 def test_opcional_no_incluido_no_se_copia(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
-    resultado = build_staging(settings, _game(settings), incluir=set())
+    resultado = build_staging(settings, _game(settings), incluir=set(), system_name="MAME")
     assert not (resultado.root / "media" / "marquee.png").exists()
 
 
 def test_opcional_incluido_se_copia_con_nombre_de_contrato(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
-    resultado = build_staging(settings, _game(settings), incluir={"marquesina"})
+    resultado = build_staging(settings, _game(settings), incluir={"marquesina"}, system_name="MAME")
     assert (resultado.root / "media" / "marquee.png").exists()
 
 
@@ -74,32 +74,37 @@ def test_captura_se_traduce_a_screenshot(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
     game = _game(settings)
     game["images"]["captura"] = {"status": "manual", "url": _write_media(settings, "captura.jpg", b"cap" * 10)}  # noqa: E501
-    resultado = build_staging(settings, game, incluir={"captura"})
+    resultado = build_staging(settings, game, incluir={"captura"}, system_name="MAME")
     assert (resultado.root / "media" / "screenshot.jpg").exists()
 
 
-def test_data_json_escrito_en_media(tmp_path: Path) -> None:
+def test_data_json_en_raiz(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
-    resultado = build_staging(settings, _game(settings), incluir=set())
-    data = json.loads((resultado.root / "media" / "data.json").read_text(encoding="utf-8"))
+    resultado = build_staging(settings, _game(settings), incluir=set(), system_name="MAME")
+    data = json.loads((resultado.root / "data.json").read_text(encoding="utf-8"))
     assert data["accent"] == "#d4a017"
     assert "mags" not in data
 
 
-def test_synopsis_json_con_summary(tmp_path: Path) -> None:
+def test_game_json_en_raiz(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
-    resultado = build_staging(settings, _game(settings), incluir=set())
-    synopsis = json.loads((resultado.root / "_synopsis.json").read_text(encoding="utf-8"))
-    assert synopsis == {"summary": "Un juego de hachas."}
+    resultado = build_staging(settings, _game(settings), incluir=set(), system_name="MAME")
+    game = json.loads((resultado.root / "game.json").read_text(encoding="utf-8"))
+    assert game["schema_version"] == "1"
+    assert game["system"] == "MAME"
+    assert game["set"] == "goldnaxe"
+    assert game["title"] == "Golden Axe"
+    assert game["developer"] == "Sega"
+    assert game["summary"] == "Un juego de hachas."
 
 
 def test_manual_nunca_se_incluye_sin_pipeline_real(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
     game = _game(settings)
     game["manuals"] = [{"id": "m1", "fileName": "manual.pdf", "status": "processed", "pages": 6}]
-    resultado = build_staging(settings, game, incluir={"manual"})
+    resultado = build_staging(settings, game, incluir={"manual"}, system_name="MAME")
     assert not (resultado.root / "media" / "_manual").exists()
-    data = json.loads((resultado.root / "media" / "data.json").read_text(encoding="utf-8"))
+    data = json.loads((resultado.root / "data.json").read_text(encoding="utf-8"))
     assert "manual" not in data
     assert "manual" not in resultado.incluye
 
@@ -113,11 +118,11 @@ def test_juego_se_copia_solo_si_incluido_y_romref_existe(tmp_path: Path) -> None
     game = _game(settings)
     game["romRef"] = str(rom)
 
-    sin_incluir = build_staging(settings, game, incluir=set())
+    sin_incluir = build_staging(settings, game, incluir=set(), system_name="MAME")
     assert not (sin_incluir.root / "juego").exists()
     assert sin_incluir.rom_archivo is None
 
-    con_incluir = build_staging(settings, game, incluir={"juego"})
+    con_incluir = build_staging(settings, game, incluir={"juego"}, system_name="MAME")
     assert (con_incluir.root / "juego" / "goldnaxe.zip").read_bytes() == b"rom-bytes"
     assert con_incluir.rom_archivo == "juego/goldnaxe.zip"
     assert con_incluir.rom_tratamiento == "copiar"
@@ -133,7 +138,7 @@ def test_juego_carpeta_ms_dos_se_comprime_y_tratamiento_es_descomprimir(tmp_path
     game = _game(settings)
     game["romRef"] = str(carpeta)
 
-    resultado = build_staging(settings, game, incluir={"juego"})
+    resultado = build_staging(settings, game, incluir={"juego"}, system_name="MAME")
     assert resultado.rom_tratamiento == "descomprimir"
     assert resultado.rom_archivo == "juego/dot.zip"
 
@@ -147,7 +152,7 @@ def test_juego_pedido_pero_romref_inexistente_se_descarta_de_incluye(tmp_path: P
     settings = _settings(tmp_path)
     game = _game(settings)
     game["romRef"] = "no-existe.zip"
-    resultado = build_staging(settings, game, incluir={"juego"})
+    resultado = build_staging(settings, game, incluir={"juego"}, system_name="MAME")
     assert "juego" not in resultado.incluye
     assert resultado.rom_archivo is None
 
@@ -157,10 +162,17 @@ def test_dos_corridas_producen_arboles_equivalentes(tmp_path: Path) -> None:
     game = _game(settings)
     incluir = {"marquesina"}
 
-    primero = build_staging(settings, game, incluir)
-    segundo = build_staging(settings, game, incluir)
+    primero = build_staging(settings, game, incluir, system_name="MAME")
+    segundo = build_staging(settings, game, incluir, system_name="MAME")
 
     comparacion = filecmp.dircmp(primero.root, segundo.root)
     assert not comparacion.left_only
     assert not comparacion.right_only
     assert not comparacion.diff_files
+
+
+def test_no_synopsis_ni_bundle_en_staging(tmp_path: Path) -> None:
+    settings = _settings(tmp_path)
+    resultado = build_staging(settings, _game(settings), incluir=set(), system_name="MAME")
+    assert not (resultado.root / "_synopsis.json").exists()
+    assert not (resultado.root / "bundle.json").exists()

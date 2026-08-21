@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { Banner, MenuBar, StatusBar } from '@/components/dos';
 import { Catalogo } from '@/pages/_Catalogo';
 import { EmptyPage } from '@/pages/EmptyPage';
+import { ExportPage } from '@/pages/ExportPage';
 import { FichaJuego } from '@/pages/FichaJuego';
 import { Juegos } from '@/pages/Juegos';
 import { NuevoJuego } from '@/pages/NuevoJuego';
@@ -44,7 +45,8 @@ export function App() {
             <Route element={<Juegos />} path="/juegos" />
             <Route element={<NuevoJuego />} path="/juegos/nuevo" />
             <Route element={<FichaJuego />} path="/juegos/:gameId" />
-            <Route element={<EmptyPage title="Exportar" />} path="/exportar" />
+            <Route element={<ExportPage />} path="/exportar" />
+            <Route element={<ExportPage />} path="/exportar/:gameId" />
             <Route element={<Catalogo />} path="/_catalogo" />
           </Routes>
         </section>

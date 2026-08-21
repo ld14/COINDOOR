@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import zipfile
 from pathlib import Path
 from time import sleep
@@ -41,7 +42,7 @@ def test_systems_create_rejects_relative_launch(tmp_path: Path) -> None:
 
 def test_games_mark_ready_incomplete_returns_missing(tmp_path: Path) -> None:
     api = client(tmp_path)
-    api.post("/api/systems", json={"name": "Arcade", "shortName": "arcade", "launchCmd": "/usr/local/bin/mame"})  # noqa: E501
+    api.post("/api/systems", json={"name": "arcade", "shortName": "arcade", "launchCmd": "/usr/local/bin/mame"})  # noqa: E501
     created = api.post(
         "/api/games",
         json={
@@ -61,7 +62,7 @@ def test_games_mark_ready_incomplete_returns_missing(tmp_path: Path) -> None:
 
 def test_games_list_filters_and_paginates(tmp_path: Path) -> None:
     api = client(tmp_path)
-    api.post("/api/systems", json={"name": "Arcade", "shortName": "arcade", "launchCmd": "/usr/local/bin/mame"})  # noqa: E501
+    api.post("/api/systems", json={"name": "arcade", "shortName": "arcade", "launchCmd": "/usr/local/bin/mame"})  # noqa: E501
     api.post(
         "/api/games",
         json={
@@ -98,7 +99,7 @@ def test_docs_and_openapi_exist(tmp_path: Path) -> None:
 
 
 def _create_arcade_game(api: TestClient) -> str:
-    api.post("/api/systems", json={"name": "Arcade", "shortName": "arcade", "launchCmd": "/usr/local/bin/mame"})  # noqa: E501
+    api.post("/api/systems", json={"name": "arcade", "shortName": "arcade", "launchCmd": "/usr/local/bin/mame"})  # noqa: E501
     created = api.post(
         "/api/games",
         json={
@@ -127,7 +128,7 @@ def test_media_upload_sets_field_and_serves_file(tmp_path: Path) -> None:
     body = response.json()
     assert body["images"]["caratula"]["status"] == "manual"
     url = body["images"]["caratula"]["url"]
-    assert url.endswith("/media/arcade/golden-axe/caratula.jpg")
+    assert url.endswith("/media/arcade/golden-axe/boxFront.jpg")
 
     served = api.get(url)
     assert served.status_code == 200
@@ -217,9 +218,11 @@ def test_export_options_and_job_without_attract(tmp_path: Path) -> None:
     payload = result.json()["result"]
     assert payload["verificado"]["estado"] == "no_verificado"
     with zipfile.ZipFile(payload["file"]) as archive:
-        assert archive.getinfo("bundle.json").compress_type == zipfile.ZIP_STORED
-        assert "media/data.json" in archive.namelist()
-        assert "_synopsis.json" in archive.namelist()
+        names = archive.namelist()
+        assert "game.json" in names
+        assert "data.json" in names
+        assert "_synopsis.json" not in names
+        assert "bundle.json" not in names
 
 
 def test_export_rejects_optional_empty_field(tmp_path: Path) -> None:
@@ -237,3 +240,113 @@ def test_export_rejects_optional_empty_field(tmp_path: Path) -> None:
         result = api.get(f"/api/export/{run_id}")
 
     assert result.json()["error"] == "Campo no disponible para exportar: video"
+
+
+def test_system_create_rejects_uppercase_name(tmp_path: Path) -> None:
+    response = client(tmp_path).post(
+        "/api/systems",
+        json={"name": "MAME", "shortName": "mame", "launchCmd": "/usr/local/bin/mame"},
+    )
+    assert response.status_code == 422
+    assert "minusculas" in response.json()["error"]
+
+
+def test_export_rejects_uppercase_system_name(tmp_path: Path) -> None:
+    api = client(tmp_path)
+
+    systems_path = tmp_path / "data" / "sistemas.json"
+    systems_data = {
+        "version": 1,
+        "items": [
+            {
+                "id": "arcade",
+                "name": "Arcade",
+                "shortName": "arcade",
+                "launchCmd": "/usr/local/bin/mame",
+                "valid": True,
+                "errorMsg": None,
+                "gameCount": 0,
+            }
+        ],
+    }
+    systems_path.write_text(json.dumps(systems_data), encoding="utf-8")
+
+    created = api.post(
+        "/api/games",
+        json={
+            "systemId": "arcade",
+            "romSource": "path",
+            "romRef": "/roms/goldnaxe.zip",
+            "identity": {
+                "title": "Golden Axe", "year": "1989", "developer": "Sega",
+                "publisher": "Sega", "genre": "Beat em up", "players": "2",
+                "format": "Arcade",
+            },
+        },
+    ).json()
+    game_id = str(created["id"])
+    _make_exportable(api, game_id)
+
+    export_created = api.post("/api/export", json={"gameId": game_id, "incluir": []})
+    run_id = export_created.json()["runId"]
+    result = api.get(f"/api/export/{run_id}")
+    for _ in range(20):
+        if result.json()["status"] == "failed":
+            break
+        sleep(0.05)
+        result = api.get(f"/api/export/{run_id}")
+
+    assert "minusculas" in result.json()["error"]
+
+
+def test_patch_systemId_moves_game_to_new_directory(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    api.post("/api/systems", json={"name": "arcade", "shortName": "arcade", "launchCmd": "/usr/bin/mame"})
+    api.post("/api/systems", json={"name": "mame", "shortName": "mame", "launchCmd": "/usr/bin/mame"})
+    created = api.post(
+        "/api/games",
+        json={
+            "systemId": "arcade",
+            "romSource": "path",
+            "romRef": "/roms/goldnaxe.zip",
+            "identity": {
+                "title": "Golden Axe", "year": "1989", "developer": "Sega",
+                "publisher": "Sega", "genre": "Beat em up", "players": "2",
+                "format": "Arcade",
+            },
+        },
+    ).json()
+    game_id = created["id"]
+
+    old_path = tmp_path / "data" / "juegos" / "arcade" / game_id / "game.json"
+    assert old_path.exists()
+
+    response = api.patch(f"/api/games/{game_id}", json={"systemId": "mame"})
+    assert response.status_code == 200
+    assert response.json()["systemId"] == "mame"
+
+    new_path = tmp_path / "data" / "juegos" / "mame" / game_id / "game.json"
+    assert new_path.exists()
+    assert not old_path.exists()
+
+
+def test_patch_systemId_rejects_nonexistent_system(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    api.post("/api/systems", json={"name": "arcade", "shortName": "arcade", "launchCmd": "/usr/bin/mame"})
+    created = api.post(
+        "/api/games",
+        json={
+            "systemId": "arcade",
+            "romSource": "path",
+            "romRef": "/roms/goldnaxe.zip",
+            "identity": {
+                "title": "Golden Axe", "year": "1989", "developer": "Sega",
+                "publisher": "Sega", "genre": "Beat em up", "players": "2",
+                "format": "Arcade",
+            },
+        },
+    ).json()
+    game_id = created["id"]
+
+    response = api.patch(f"/api/games/{game_id}", json={"systemId": "noexiste"})
+    assert response.status_code == 404

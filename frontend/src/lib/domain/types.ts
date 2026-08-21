@@ -8,6 +8,7 @@ export type IdentitySource = 'mame' | 'screenscraper' | 'manual';
 export type MagazineLink = 'empty' | 'linked';
 export type ManualStatus = 'unprocessed' | 'processing' | 'processed' | 'failed';
 export type RomSource = 'upload' | 'path';
+export type Tratamiento = 'copiar' | 'descomprimir';
 
 export type IdentityKey = (typeof fielddefs.identity)[number]['key'];
 export type ImageKey = (typeof fielddefs.images)[number]['key'];
@@ -104,6 +105,8 @@ export interface Game {
   identitySource: IdentitySource;
   romSource: RomSource;
   romRef: string;
+  file_format: string;
+  tratamiento: string;
   errors: FormatError[];
   images: Record<ImageKey, MediaField>;
   video: Record<VideoKey, MediaField>;

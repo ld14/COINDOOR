@@ -27,8 +27,7 @@ class RomService:
 
         system_dir = safe_id(game.systemId)
         game_dir = safe_id(game.id)
-        rom_path = self.settings.games_dir / system_dir / game_dir / f"rom{suffix}"
+        rom_path = self.settings.games_dir / system_dir / game_dir / filename
         escribir_binario(rom_path, data)
 
-        rom_ref = f"{system_dir}/{game_dir}/rom{suffix}"
-        return to_out(self.store.set_rom_ref(game_id, rom_ref))
+        return to_out(self.store.set_rom_ref(game_id, str(rom_path)))

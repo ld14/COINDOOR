@@ -52,3 +52,14 @@ def text_keys() -> frozenset[str]:
 
 def rich_keys() -> frozenset[str]:
     return _keys("rich")
+
+
+def contract_asset(section: str, key: str) -> str:
+    """Devuelve el nombre de asset del contrato ATTRACT para un key dado.
+
+    Ejemplo: contract_asset("images", "caratula") → "boxFront"
+    """
+    for field in fields(section):
+        if field["key"] == key:
+            return str(field["contractAsset"])
+    raise KeyError(f"{section}.{key} no tiene contractAsset en fielddefs.json")

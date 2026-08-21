@@ -66,6 +66,8 @@ function createGame(body: BodyInit | null | undefined) {
     identitySource: 'manual',
     romSource: payload.romSource as Game['romSource'],
     romRef: String(payload.romRef),
+    file_format: String(payload.file_format ?? ''),
+    tratamiento: String(payload.tratamiento ?? ''),
     errors: [],
     images: { caratula: { status: 'empty' }, marquesina: { status: 'empty' }, poster: { status: 'empty' }, logo: { status: 'empty' }, captura: { status: 'empty' } },
     video: { video: { status: 'empty' } },

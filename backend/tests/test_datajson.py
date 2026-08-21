@@ -45,7 +45,6 @@ GOLDNAXE_EXPECTED: dict[str, Any] = {
     "manual": [
         {
             "file": "manual.pdf",
-            "pages": [f"p{i:03d}.png" for i in range(1, 27)],
         },
     ],
 }

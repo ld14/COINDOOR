@@ -9,9 +9,13 @@ from pathlib import Path
 from typing import Any
 
 from backend.bundle.datajson import build_datajson
+from backend.bundle.gamejson import build_gamejson
 from backend.config import Settings
 from backend.lib.domain import fielddefs
 from backend.store.archivo import escribir_json, media_path
+
+IMAGE_EXTS = frozenset({".png", ".jpg", ".jpeg", ".gif", ".webp"})
+VIDEO_EXTS = frozenset({".mp4", ".webm", ".ogg", ".avi", ".mkv"})
 
 
 @dataclass(frozen=True)
@@ -22,27 +26,27 @@ class StagingResult:
     rom_tratamiento: str | None
 
 
-def build_staging(settings: Settings, game: Mapping[str, Any], incluir: Collection[str]) -> StagingResult:  # noqa: E501
-    """Arma el árbol temporal que `attract doctor` va a verificar. Los nombres ya son
-    los del contrato (`caratula` -> `boxFront`, etc): la traducción ocurre acá y en
-    ningún otro lado."""
+def build_staging(settings: Settings, game: Mapping[str, Any], incluir: Collection[str], system_name: str) -> StagingResult:  # noqa: E501
+    """Arma el arbol temporal que ``attract import`` va a decodificar.
+
+    Estructura del staging (igual al contrato del zip):
+        game.json          <- raiz
+        data.json          <- raiz
+        media/             <- assets planos
+    """
     root = Path(tempfile.mkdtemp(prefix="export-", dir=settings.tmp_dir))
     media_dir = root / "media"
     media_dir.mkdir(parents=True, exist_ok=True)
 
     efectivo = set(incluir)
     if not _manual_files_exist(settings, game):
-        # ponytail: sin endpoint que guarde manual.pdf ni sus páginas todavía (mismo
-        # hueco de seleccion.py/datajson.py). Sin archivos reales que copiar, no se
-        # incluye "manual" en data.json aunque el usuario lo haya pedido — nunca un
-        # data.json que promete páginas que el zip no trae.
         efectivo.discard("manual")
 
     _copy_assets(settings, game, media_dir, "images", fielddefs.fields("images"), efectivo)
     _copy_assets(settings, game, media_dir, "video", fielddefs.fields("videos"), efectivo)
 
-    escribir_json(media_dir / "data.json", build_datajson(game, efectivo))
-    _write_synopsis(root, game)
+    escribir_json(root / "data.json", build_datajson(game, efectivo))
+    escribir_json(root / "game.json", build_gamejson(game, system_name))
 
     rom_archivo: str | None = None
     rom_tratamiento: str | None = None
@@ -80,26 +84,51 @@ def _copy_assets(
         source = media_path(settings.media_dir, url) if isinstance(url, str) else None
         if source is None or not source.exists():
             continue
-        dest = media_dir / f"{field['contractAsset']}{source.suffix}"
+        ext = _real_extension(source, game_key)
+        dest = media_dir / f"{field['contractAsset']}{ext}"
         shutil.copy2(source, dest)
 
 
-def _write_synopsis(root: Path, game: Mapping[str, Any]) -> None:
-    texts = game.get("texts", {})
-    sinopsis = texts.get("sinopsis") if isinstance(texts, Mapping) else None
-    value = sinopsis.get("value", "") if isinstance(sinopsis, Mapping) else ""
-    escribir_json(root / "_synopsis.json", {"summary": str(value)})
+def _real_extension(path: Path, media_type: str) -> str:
+    """Extrae la extension real del archivo, ignorando sufijos hash.
+
+    Archivos en disco pueden tener nombres como ``caratula.b8uycgdntcg6il6wunv8pwhajs``
+    donde la extension real (jpg/png) no esta en el nombre. Primero intenta por el
+    nombre; si no funciona, detecta por magic bytes.
+    """
+    name = path.name
+    known = IMAGE_EXTS if media_type == "images" else VIDEO_EXTS
+    for ext in known:
+        if name.lower().endswith(ext):
+            return ext
+    return _detect_ext_by_magic(path)
+
+
+def _detect_ext_by_magic(path: Path) -> str:
+    """Detecta la extension por los primeros bytes del archivo (magic bytes)."""
+    try:
+        with open(path, "rb") as f:
+            header = f.read(16)
+    except OSError:
+        return ".bin"
+    if header[:8] == b"\x89PNG\r\n\x1a\n":
+        return ".png"
+    if header[:2] == b"\xff\xd8":
+        return ".jpg"
+    if header[:4] == b"GIF8":
+        return ".gif"
+    if header[:4] == b"RIFF" and header[8:12] == b"WEBP":
+        return ".webp"
+    if header[:4] == b"\x1a\x45\xdf\xa3" or header[:3] == b"\x1a\x45\xdf":
+        return ".webm"
+    if header[:4] == b"\x00\x00\x00\x1c" or header[:4] == b"\x00\x00\x00\x18":
+        return ".mp4"
+    if header[:4] == b"OggS":
+        return ".ogg"
+    return ".bin"
 
 
 def _copy_rom(game: Mapping[str, Any], juego_dir: Path) -> tuple[str, str] | None:
-    """Devuelve (nombre_del_archivo, tratamiento) o None si no hay nada que copiar.
-
-    Los dos casos terminan en `.zip` (spec.md): un romset de MAME ya es un `.zip` y se
-    copia tal cual (`copiar`, install lo deja comprimido); una carpeta de MS-DOS son
-    archivos sueltos que hay que comprimir para el viaje, y `install` los desempaqueta
-    (`descomprimir`). Por la extensión no se distinguen — el tratamiento es lo único
-    que le dice a `install` qué hacer con cada uno.
-    """
     rom_ref = str(game.get("romRef", ""))
     if not rom_ref:
         return None
@@ -119,6 +148,4 @@ def _copy_rom(game: Mapping[str, Any], juego_dir: Path) -> tuple[str, str] | Non
 
 
 def _manual_files_exist(settings: Settings, game: Mapping[str, Any]) -> bool:
-    # ponytail: siempre False hasta que exista el endpoint que guarda manual.pdf y sus
-    # páginas rasterizadas. Reemplazar por una comprobación real en disco cuando exista.
     return False

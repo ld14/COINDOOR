@@ -57,6 +57,8 @@ const game = (overrides: Partial<Game> & { id: string; title: string; systemId?:
     identitySource: (systemId ?? 'arcade') === 'arcade' ? 'mame' : 'screenscraper',
     romSource: 'path',
     romRef: `${id}.zip`,
+    file_format: 'zip',
+    tratamiento: 'copiar',
     errors: [],
     images: images(),
     video: video(),

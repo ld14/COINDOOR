@@ -1,8 +1,9 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   DosButton,
   DosInput,
+  DosSelect,
   DosTextarea,
   FieldTag,
   Panel,
@@ -17,6 +18,7 @@ import { IdentityBatchModal } from '@/components/IdentityBatchModal';
 import { ImageModal } from '@/components/ImageModal';
 import { useGame } from '@/hooks/useGame';
 import { useGameMutations } from '@/hooks/useGameMutations';
+import { useSystems } from '@/hooks/useSystems';
 import { useDominantColors } from '@/hooks/useDominantColors';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
 import { FIELDDEFS } from '@/lib/domain/types';
@@ -28,7 +30,9 @@ import type {
   ImageKey,
   MediaField,
   ReviewCat,
+  System,
   TextKey,
+  Tratamiento,
   VideoKey,
 } from '@/lib/domain/types';
 import { searchManuals, type ManualSearchResult } from '@/lib/api/manuals';
@@ -71,8 +75,10 @@ function suggestionStatus(game: Game, key: string): { hasContent: boolean; isMan
 
 export function FichaJuego() {
   const { gameId = '' } = useParams();
+  const navigate = useNavigate();
   const { data: game, error, isLoading, refetch: refetchGame } = useGame(gameId);
   const mutations = useGameMutations(gameId);
+  const { data: systems = [] } = useSystems();
   const [missingAfterReady, setMissingAfterReady] = useState<string[]>([]);
   const [suggestField, setSuggestField] = useState<string | null>(null);
   const [suggestIdentityBatch, setSuggestIdentityBatch] = useState(false);
@@ -102,12 +108,18 @@ export function FichaJuego() {
     <div className={styles.page}>
       <GameHero
         game={game}
+        systems={systems}
         missing={missing}
         onSaveAll={saveAll}
+        onSystemChange={(systemId) => mutations.patchGame.mutate({ systemId })}
         onMarkReady={() => {
           setMissingAfterReady(missing);
           if (missing.length === 0) void mutations.markReady.mutateAsync();
         }}
+        onSaveTratamiento={(tratamiento) => mutations.patchGame.mutate({ tratamiento })}
+        onSaveRomRef={(romRef) => mutations.patchGame.mutate({ romRef })}
+        onUploadRom={(file) => mutations.uploadRom.mutate(file)}
+        onExport={() => { saveAll(); navigate(`/exportar/${game.id}`); }}
         status={status}
       />
 
@@ -201,43 +213,114 @@ export function FichaJuego() {
   );
 }
 
-function GameHero({ game, missing, onSaveAll, onMarkReady, status }: { game: Game; missing: string[]; onSaveAll: () => void; onMarkReady: () => void; status: ReturnType<typeof computeGameStatus> }) {
+function GameHero({ game, systems, missing, onSaveAll, onSystemChange, onMarkReady, onSaveTratamiento, onSaveRomRef, onUploadRom, onExport, status }: { game: Game; systems: System[]; missing: string[]; onSaveAll: () => void; onSystemChange: (systemId: string) => void; onMarkReady: () => void; onSaveTratamiento: (tratamiento: string) => void; onSaveRomRef: (romRef: string) => void; onUploadRom: (file: File) => void; onExport: () => void; status: ReturnType<typeof computeGameStatus> }) {
   const coverUrl = game.images.caratula?.url;
   const heroMedia = coverUrl ?? game.video.video?.url;
   const { colors } = useDominantColors(coverUrl, 4);
+  const [tratamiento, setTratamiento] = useState(game.tratamiento || 'copiar');
+  const [romPath, setRomPath] = useState(game.romRef || '');
+  const [romFile, setRomFile] = useState<File | null>(null);
+
+  const romFileName = romFile?.name || (game.romRef ? game.romRef.split('/').pop() || game.romRef : '');
+
+  const handleSaveTratamiento = () => {
+    onSaveTratamiento(tratamiento);
+    if (romFile) {
+      onUploadRom(romFile);
+    } else if (romPath !== game.romRef) {
+      onSaveRomRef(romPath);
+    }
+  };
 
   return (
-    <Panel className={styles.gameHero}>
+    <div className={styles.gameHero}>
       <div className={styles.heroPreview}>
         {heroMedia ? <img alt={game.identity.title} className={styles.previewImage} src={heroMedia} /> : `${game.identity.title} · carátula pendiente`}
       </div>
-      <div className={styles.heroStatus}>
+      <div className={styles.heroRight}>
         <Link className={styles.backLink} to="/juegos">&lt;&lt; Juegos</Link>
-        <div>
-          <h1 className={styles.title}>{game.identity.title}</h1>
-          <p className={styles.meta}>{game.systemId} · {game.identity.year || 'Sin Información'} · {game.identitySource}</p>
-        </div>
-        <StatusBadge status={status} />
-        <p className={styles.meta}>{summary(game, missing)}</p>
-        {colors.length > 0 ? (
-          <div className={styles.colorPalette}>
-            <span className={styles.paletteLabel}>Colores predominantes</span>
-            <div className={styles.swatches}>
-              {colors.map((color) => (
-                <div key={color.hex} className={styles.colorSwatch}>
-                  <div className={styles.colorBlock} style={{ backgroundColor: color.hex }} />
-                  <span className={styles.colorHex}>{color.hex}</span>
-                </div>
+        <h1 className={styles.title}>{game.identity.title}</h1>
+        <Panel className={styles.heroPanel}>
+          <SunkenBox className={styles.heroFields}>
+            <DosSelect
+              aria-label="Plataforma"
+              className={styles.systemSelect}
+              value={game.systemId}
+              onChange={(e) => onSystemChange(e.target.value)}
+            >
+              {systems.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
               ))}
+            </DosSelect>
+            <StatusBadge status={status} />
+            {colors.length > 0 ? (
+              <div className={styles.colorPalette}>
+                <span className={styles.paletteLabel}>Colores predominantes</span>
+                <div className={styles.swatches}>
+                  {colors.map((color) => (
+                    <div key={color.hex} className={styles.colorSwatch}>
+                      <div className={styles.colorBlock} style={{ backgroundColor: color.hex }} />
+                      <span className={styles.colorHex}>{color.hex}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            <div className={styles.tratamientoField}>
+              <span className={styles.label}>Tratamiento</span>
+              <div className={styles.tratamientoRow}>
+                <DosSelect aria-label="Tratamiento" className={styles.tratamientoSelect} value={tratamiento} onChange={(e) => setTratamiento(e.target.value as Tratamiento)}>
+                  <option value="copiar">Copiar (romset)</option>
+                  <option value="descomprimir">Descomprimir (archivos sueltos)</option>
+                </DosSelect>
+              </div>
             </div>
+            <div className={styles.tratamientoField}>
+              <span className={styles.label}>Archivo del juego</span>
+              {romFileName ? (
+                <div className={styles.romInfo}>
+                  <span className={styles.romName}>{romFileName}</span>
+                </div>
+              ) : (
+                <span className={styles.empty}>No adjunto</span>
+              )}
+              <div className={styles.tratamientoRow}>
+                <label className={styles.romUpload}>
+                  <input
+                    type="file"
+                    accept=".zip,.nes,.sms,.gb,.gbc,.gba,.gen,.smc,.sfc,.pce,.ngp,.ngpc,.col,.sg"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setRomFile(file);
+                    }}
+                  />
+                  <span className={styles.romUploadBtn}>Adjuntar archivo</span>
+                </label>
+              </div>
+              <div className={styles.tratamientoRow}>
+                <DosInput
+                  aria-label="Path del ROM"
+                  className={styles.romPathInput}
+                  placeholder="O ingresar path del archivo..."
+                  value={romPath}
+                  onChange={(e) => setRomPath(e.target.value)}
+                />
+              </div>
+            </div>
+          </SunkenBox>
+          <div className={styles.heroToolbar}>
+            <DosButton onClick={handleSaveTratamiento} variant="primary-small">Guardar</DosButton>
+            <DosButton onClick={onSaveAll} variant="ghost-small">Guardar todo</DosButton>
+            <DosButton onClick={onMarkReady} variant="ghost-small">Marcar como listo</DosButton>
           </div>
-        ) : null}
-        <div className={styles.toolbar}>
-          <DosButton onClick={onSaveAll} variant="primary-small">Guardar todo</DosButton>
-          <DosButton onClick={onMarkReady} variant="primary-small">Marcar como listo</DosButton>
-        </div>
+          {status === 'ready' ? (
+            <div className={styles.heroToolbar}>
+              <DosButton onClick={onExport} variant="ghost-small" className={styles.heroExport}>Exportar</DosButton>
+            </div>
+          ) : null}
+        </Panel>
       </div>
-    </Panel>
+    </div>
   );
 }
 

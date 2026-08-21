@@ -15,6 +15,7 @@
   display: grid;
   gap: var(--dos-space-5);
   grid-template-columns: minmax(0, 1.4fr) minmax(17rem, 0.6fr);
+  overflow: hidden;
 }
 
 .heroPreview {
@@ -35,6 +36,47 @@
   align-content: start;
   display: grid;
   gap: var(--dos-space-4);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.heroRight {
+  display: grid;
+  gap: var(--dos-space-3);
+  min-width: 0;
+  width: 100%;
+  align-content: start;
+  overflow: hidden;
+}
+
+.heroPanel {
+  align-self: start;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.heroPanel > div {
+  overflow: hidden;
+}
+
+.heroToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dos-space-3);
+  justify-content: flex-start;
+  padding-top: var(--dos-space-2);
+}
+
+.heroExport {
+  width: 100%;
+}
+
+.heroFields {
+  display: grid;
+  gap: var(--dos-space-4);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .completionPanel {
@@ -100,6 +142,83 @@
   color: var(--dos-error);
 }
 
+.systemSelect {
+  display: block;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--dos-ink-muted);
+  padding: var(--dos-space-1) var(--dos-space-2);
+  cursor: pointer;
+}
+
+.tratamientoSelect {
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--dos-ink-muted);
+  padding: var(--dos-space-1) var(--dos-space-2);
+  cursor: pointer;
+}
+
+.tratamientoRow {
+  display: grid;
+  gap: var(--dos-space-2);
+}
+
+.tratamientoBtn {
+  width: 100%;
+}
+
+.tratamientoField {
+  border-top: 1px solid var(--dos-edge-dark);
+  padding-top: var(--dos-space-3);
+}
+
+.romInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--dos-space-2);
+  padding: var(--dos-space-1) 0;
+}
+
+.romName {
+  color: var(--dos-ok-crt);
+  font-weight: bold;
+}
+
+.romUpload {
+  display: block;
+  cursor: pointer;
+}
+
+.romUpload input[type="file"] {
+  display: none;
+}
+
+.romUploadBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: var(--dos-space-1) var(--dos-space-2);
+  border: 1px dashed var(--dos-ink-muted);
+  color: var(--dos-ink-muted);
+  cursor: pointer;
+}
+
+.romUploadBtn:hover {
+  border-color: var(--dos-ok-crt);
+  color: var(--dos-ok-crt);
+}
+
+.romPathInput {
+  width: 100%;
+}
+
 .grid {
   display: grid;
   gap: var(--dos-space-5);
@@ -121,7 +240,14 @@
 .toolbar {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: var(--dos-space-3);
+  justify-content: flex-start;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.toolbarBetween {
   justify-content: space-between;
 }
 

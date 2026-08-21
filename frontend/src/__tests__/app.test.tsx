@@ -21,6 +21,6 @@ describe('App shell', () => {
     fireEvent.keyDown(window, { key: 'F3' });
     expect(screen.getByRole('heading', { name: 'Juegos' })).toBeInTheDocument();
     fireEvent.keyDown(window, { key: 'F4' });
-    expect(screen.getByRole('heading', { name: 'Exportar' })).toBeInTheDocument();
+    expect(screen.getByText('EXPORTAR')).toBeInTheDocument();
   });
 });

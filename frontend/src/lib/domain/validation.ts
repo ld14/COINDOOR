@@ -15,7 +15,12 @@ export const hexColor = z.string().regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/, H
 export const yearField = z.string().regex(/^\d{4}$/, YEAR_MESSAGE);
 
 export const newSystemSchema = z.object({
-  name: z.string().min(1, 'Requerido'),
+  name: z
+    .string()
+    .min(1, 'Requerido')
+    .refine((v) => v === v.toLowerCase(), {
+      message: 'El nombre del sistema debe ser minusculas (arcade, nes, pc).',
+    }),
   shortName: z.string().min(1, 'Requerido'),
   launchCmd: absolutePath,
 });

@@ -10,7 +10,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="COINDOOR_", env_file=".env", extra="ignore")
 
-    data_dir: Path = Field(default_factory=lambda: Path.home() / ".coindoor")
+    data_dir: Path = Field(default_factory=lambda: Path(__file__).resolve().parent.parent / "games")
     host: str = "127.0.0.1"
     port: int = 8765
     ai_primary_base_url: str = ""

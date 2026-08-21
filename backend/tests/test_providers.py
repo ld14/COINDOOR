@@ -25,7 +25,7 @@ def _seeded_settings(tmp_path: Path) -> Settings:
     settings = Settings(data_dir=tmp_path / "data")
     settings.data_dir.mkdir(parents=True)
     SystemsStore(settings.systems_path).create(
-        NewSystem(name="Arcade", shortName="arcade", launchCmd="/bin/echo"),
+        NewSystem(name="arcade", shortName="arcade", launchCmd="/bin/echo"),
     )
     GamesStore(settings.games_dir).create(
         CreateGame(

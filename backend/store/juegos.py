@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 import threading
 from pathlib import Path
 
@@ -47,12 +48,15 @@ class GamesStore:
             identity=payload.identity,
             romSource=payload.romSource,
             romRef=payload.romRef,
+            file_format=payload.file_format,
+            tratamiento=payload.tratamiento,
         )
         self.save(game)
         return game
 
     def patch(self, game_id: str, payload: PatchGame) -> StoredGame:
         current = self.get(game_id)
+        old_system_id = current.systemId
         data = current.model_dump()
         patch = payload.model_dump(exclude_unset=True)
         for key, value in patch.items():
@@ -63,6 +67,10 @@ class GamesStore:
             else:
                 data[key] = value
         updated = StoredGame.model_validate(data)
+        if updated.systemId != old_system_id:
+            old_dir = self.root / safe_id(old_system_id) / safe_id(game_id)
+            if old_dir.exists():
+                shutil.rmtree(old_dir)
         self.save(updated)
         return updated
 

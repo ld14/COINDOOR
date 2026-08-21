@@ -3,16 +3,22 @@ from __future__ import annotations
 from collections.abc import Collection, Mapping
 from typing import Any
 
+from backend.bundle.gamejson import validate_accent
+
 
 def build_datajson(game: Mapping[str, Any], incluir: Collection[str]) -> dict[str, Any]:
-    data: dict[str, Any] = {"accent": str(game.get("accentValue", ""))}
+    data: dict[str, Any] = {}
+
+    accent = str(game.get("accentValue", ""))
+    if validate_accent(accent):
+        data["accent"] = accent
 
     accent2 = str(game.get("accent2Value", ""))
-    if accent2.strip() and "accent2" in incluir:
+    if accent2.strip() and validate_accent(accent2) and "accent2" in incluir:
         data["accent2"] = accent2
 
-    # review es la única excepción a "se omite lo vacío o deseleccionado": null
-    # tiene significado propio ("no hay reseña"), a diferencia de una clave ausente.
+    # review es la unica excepcion a "se omite lo vacio o deseleccionado": null
+    # tiene significado propio ("no hay resena"), a diferencia de una clave ausente.
     data["review"] = _review(game, incluir)
 
     if "cheats" in incluir:
@@ -55,6 +61,11 @@ def _cheats(game: Mapping[str, Any]) -> dict[str, list[dict[str, str]]]:
 
 
 def _manual(game: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Genera la lista manual[] para data.json.
+
+    COINDOOR entrega el PDF crudo en media/_manual/, sin paginas rasterizadas.
+    pages va ausente: rasterizar es paso de ATTRACT (attract rasterize).
+    """
     manuals = game.get("manuals", [])
     if not isinstance(manuals, list):
         return []
@@ -68,10 +79,6 @@ def _manual(game: Mapping[str, Any]) -> list[dict[str, Any]]:
         result.append(
             {
                 "file": manual.get("fileName", "manual.pdf"),
-                # ponytail: nombres de página por convención (p001.png…), como en
-                # ATTRACT. No hay pipeline de rasterizado real todavía (mismo hueco
-                # que seleccion.py ya marca); cuando exista, leer los nombres reales.
-                "pages": [f"p{i:03d}.png" for i in range(1, pages + 1)],
             }
         )
     return result

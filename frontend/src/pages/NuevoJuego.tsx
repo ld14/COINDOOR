@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { DosButton, DosFileInput, DosInput, DosSelect, Panel, SectionHeader, SunkenBox } from '@/components/dos';
 import { useGameMutations } from '@/hooks/useGameMutations';
 import { useSystems } from '@/hooks/useSystems';
-import type { Identity, RomSource } from '@/lib/domain/types';
+import { uploadRom } from '@/lib/api/games';
+import type { Identity, RomSource, Tratamiento } from '@/lib/domain/types';
 import { absolutePath, ABSOLUTE_PATH_MESSAGE } from '@/lib/domain/validation';
 import styles from './ReadPages.module.css';
 
@@ -25,6 +26,8 @@ export function NuevoJuego() {
   const [romSource, setRomSource] = useState<RomSource>('path');
   const [romRef, setRomRef] = useState('');
   const [romFile, setRomFile] = useState<File | null>(null);
+  const [fileFormat, setFileFormat] = useState('');
+  const [tratamiento, setTratamiento] = useState<Tratamiento>('copiar');
   const [identity, setIdentity] = useState(emptyIdentity);
   const [error, setError] = useState('');
 
@@ -48,9 +51,9 @@ export function NuevoJuego() {
     try {
       setError('');
       const ref = romSource === 'upload' ? romFile!.name : romRef;
-      const game = await mutations.createGame.mutateAsync({ systemId, romSource, romRef: ref, identity });
+      const game = await mutations.createGame.mutateAsync({ systemId, romSource, romRef: ref, file_format: fileFormat, tratamiento, identity });
       if (romSource === 'upload' && romFile) {
-        await mutations.uploadRom.mutateAsync(romFile);
+        await uploadRom(game.id, romFile);
       }
       navigate(`/juegos/${game.id}`);
     } catch (err) {
@@ -100,6 +103,13 @@ export function NuevoJuego() {
               />
             </label>
           )}
+          <label className={styles.field}>
+            <span className={styles.label}>Tratamiento</span>
+            <DosSelect aria-label="Tratamiento" onChange={(event) => setTratamiento(event.target.value as Tratamiento)} value={tratamiento}>
+              <option value="copiar">Copiar (romset)</option>
+              <option value="descomprimir">Descomprimir (archivos sueltos)</option>
+            </DosSelect>
+          </label>
           {error ? <p className={styles.error}>{error}</p> : null}
         </SunkenBox>
       </Panel>

@@ -5,7 +5,7 @@ from pathlib import Path
 from backend.api.errors import BadRequest
 from backend.api.schemas import GameOut
 from backend.config import Settings
-from backend.lib.domain.fielddefs import image_keys, video_keys
+from backend.lib.domain.fielddefs import contract_asset, image_keys, video_keys
 from backend.store.archivo import escribir_binario, safe_id
 from backend.store.juegos import GamesStore, to_out
 
@@ -25,7 +25,9 @@ class MediaService:
         suffix = Path(filename).suffix.lower()
         system_dir = safe_id(game.systemId)
         game_dir = safe_id(game.id)
-        path = self.settings.media_dir / system_dir / game_dir / f"{key}{suffix}"
+        section = "images" if key in image_keys() else "videos"
+        asset_name = contract_asset(section, key)
+        path = self.settings.media_dir / system_dir / game_dir / f"{asset_name}{suffix}"
         escribir_binario(path, data)
-        url = f"/media/{system_dir}/{game_dir}/{key}{suffix}"
+        url = f"/media/{system_dir}/{game_dir}/{asset_name}{suffix}"
         return to_out(self.store.set_media_field(game_id, key, url))

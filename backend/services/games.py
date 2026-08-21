@@ -54,6 +54,8 @@ class GamesService:
         return to_out(self.store.create(payload))
 
     def patch(self, game_id: str, payload: PatchGame) -> GameOut:
+        if payload.systemId is not None:
+            self.systems.get(payload.systemId)
         return to_out(self.store.patch(game_id, payload))
 
     def mark_ready(self, game_id: str) -> GameOut:

@@ -12,6 +12,7 @@ IdentitySource = Literal["mame", "screenscraper", "manual"]
 MagazineLink = Literal["empty", "linked"]
 ManualStatus = Literal["unprocessed", "processing", "processed", "failed"]
 RomSource = Literal["upload", "path"]
+Tratamiento = Literal["copiar", "descomprimir"]
 
 
 class FormatError(BaseModel):
@@ -107,6 +108,8 @@ class StoredGame(BaseModel):
     identitySource: IdentitySource = "manual"
     romSource: RomSource
     romRef: str
+    file_format: str = ""
+    tratamiento: str = ""
     errors: list[FormatError] = Field(default_factory=list)
     images: dict[str, MediaField] = Field(default_factory=dict)
     video: dict[str, MediaField] = Field(default_factory=dict)
@@ -155,11 +158,17 @@ class CreateGame(BaseModel):
     systemId: str
     romSource: RomSource
     romRef: str
+    file_format: str = ""
+    tratamiento: str = ""
     identity: Identity
 
 
 class PatchGame(BaseModel):
+    systemId: str | None = None
     identity: Identity | None = None
+    romRef: str | None = None
+    file_format: str | None = None
+    tratamiento: str | None = None
     accent: FieldStatus | None = None
     accentValue: str | None = None
     accent2Value: str | None = None

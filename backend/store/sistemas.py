@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from backend.api.errors import NotFound
+from backend.api.errors import BadRequest, NotFound
 from backend.api.schemas import NewSystem, System
 from backend.lib.domain.validation import ABSOLUTE_PATH_MESSAGE, validate_absolute_path
 from backend.store.archivo import escribir_json, leer_json
@@ -31,6 +31,11 @@ class SystemsStore:
         raise NotFound(f"Sistema no encontrado: {system_id}")
 
     def create(self, payload: NewSystem) -> System:
+        if payload.name != payload.name.lower():
+            raise BadRequest(
+                f"El nombre del sistema '{payload.name}' debe ser minusculas "
+                f"(contrato ATTRACT: system == system.lower())"
+            )
         items = self.list()
         valid = True
         error_msg = None

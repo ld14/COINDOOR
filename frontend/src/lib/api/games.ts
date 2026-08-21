@@ -41,6 +41,8 @@ export interface CreateGamePayload {
   systemId: string;
   romSource: RomSource;
   romRef: string;
+  file_format: string;
+  tratamiento: string;
   identity: Identity;
 }
 
@@ -52,7 +54,7 @@ export function createGame(payload: CreateGamePayload) {
   return fetchJson<Game>('/games', { method: 'POST', body: JSON.stringify(payload) });
 }
 
-export function patchGame(id: string, payload: Partial<Pick<Game, 'identity' | 'accent' | 'accentValue' | 'accent2Value'>>) {
+export function patchGame(id: string, payload: Partial<Pick<Game, 'systemId' | 'identity' | 'romRef' | 'file_format' | 'tratamiento' | 'accent' | 'accentValue' | 'accent2Value'>>) {
   return fetchJson<Game>(`/games/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
 }
 

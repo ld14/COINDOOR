@@ -14,7 +14,7 @@ from backend.bundle.verify import verify_staging
 from backend.config import Settings
 from backend.lib.domain.completeness import compute_game_status, missing_required
 from backend.lib.jobs.registro import JobState
-from backend.store.archivo import escribir_json, safe_id
+from backend.store.archivo import safe_id
 from backend.store.juegos import GamesStore
 from backend.store.sistemas import SystemsStore
 
@@ -49,8 +49,16 @@ class ExportService:
         game_data = game.model_dump(mode="json")
         if compute_game_status(game_data) != "ready":
             raise Conflict(
-                "El juego está incompleto",
+                "El juego esta incompleto",
                 detail={"missing": missing_required(game_data)},
+            )
+
+        system = self.systems.get(game.systemId)
+        if system.name != system.name.lower():
+            raise BadRequest(
+                f"El nombre del sistema '{system.name}' debe ser minusculas. "
+                f"Corregilo en Configuracion > Sistemas antes de exportar. "
+                f"(contrato ATTRACT: system == system.lower())"
             )
 
         items = compute_seleccion(self.settings, game_data)
@@ -60,18 +68,17 @@ class ExportService:
 
         if job is not None:
             job.progress = 20
-        staging = build_staging(self.settings, game_data, selected)
+        staging = build_staging(self.settings, game_data, selected, system.name)
         try:
             if job is not None:
                 job.progress = 50
             verificado = verify_staging(staging.root)
             if verificado.get("ok") is False:
                 raise Conflict(
-                    "ATTRACT doctor rechazó el bundle",
+                    "ATTRACT doctor rechazo el bundle",
                     detail={"verificado": verificado},
                 )
 
-            system = self.systems.get(game.systemId)
             manifest = build_manifest(
                 game_data,
                 system.name,
@@ -80,7 +87,6 @@ class ExportService:
                 staging.rom_tratamiento,
                 verificado,
             )
-            escribir_json(staging.root / "bundle.json", manifest)
 
             if job is not None:
                 job.progress = 80
@@ -108,7 +114,5 @@ def _validate_incluir(incluir: set[str], items: list[SeleccionItem]) -> None:
         raise BadRequest(f"Campo de export desconocido: {sorted(unknown)[0]}")
     for key in incluir:
         item = by_key[key]
-        if item.required:
-            raise BadRequest(f"Campo obligatorio no se puede seleccionar: {key}")
         if not item.disponible:
             raise BadRequest(f"Campo no disponible para exportar: {key}")
