@@ -6,8 +6,10 @@ from pathlib import Path
 
 from backend.api.errors import NotFound
 from backend.api.schemas import (
+    CabinetInfo,
     CreateGame,
     FieldProvenance,
+    GalleryImage,
     GameManual,
     GameOut,
     MagazineAppearance,
@@ -68,11 +70,35 @@ class GamesStore:
                 data[key] = value
         updated = StoredGame.model_validate(data)
         if updated.systemId != old_system_id:
-            old_dir = self.root / safe_id(old_system_id) / safe_id(game_id)
-            if old_dir.exists():
-                shutil.rmtree(old_dir)
+            updated = self._mover_a_sistema(updated, old_system_id)
         self.save(updated)
         return updated
+
+    def _mover_a_sistema(self, game: StoredGame, old_system_id: str) -> StoredGame:
+        """Mueve los archivos del juego al directorio del sistema nuevo.
+
+        Antes se borraba el directorio viejo entero, lo que se llevaba puesta la ROM
+        subida y dejaba ``romRef`` apuntando a un archivo inexistente: el export salia
+        sin ``juego/`` y ATTRACT rechazaba el paquete.
+        """
+        old_dir = self.root / safe_id(old_system_id) / safe_id(game.id)
+        if not old_dir.exists():
+            return game
+        new_dir = self.root / safe_id(game.systemId) / safe_id(game.id)
+        new_dir.mkdir(parents=True, exist_ok=True)
+        for entry in old_dir.iterdir():
+            if entry.name == "game.json":
+                continue
+            destino = new_dir / entry.name
+            if destino.exists():
+                shutil.rmtree(destino) if destino.is_dir() else destino.unlink()
+            shutil.move(str(entry), str(destino))
+        rom = Path(game.romRef)
+        movido = bool(game.romRef) and rom.parent == old_dir
+        shutil.rmtree(old_dir, ignore_errors=True)
+        if movido:
+            return game.model_copy(update={"romRef": str(new_dir / rom.name)})
+        return game
 
     def save(self, game: StoredGame) -> None:
         lock = self._lock(game.systemId)
@@ -230,6 +256,14 @@ class GamesStore:
         self.save(updated)
         return updated
 
+    def set_cabinet(self, game_id: str, cabinet: CabinetInfo) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["cabinet"] = cabinet.model_dump(mode="json")
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
     def add_magazine_appearance(self, game_id: str, appearance: MagazineAppearance) -> StoredGame:
         game = self.get(game_id)
         data = game.model_dump()
@@ -244,6 +278,24 @@ class GamesStore:
         data["magazineAppearances"] = [
             a for a in data["magazineAppearances"] if a.get("id") != appearance_id
         ]
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def add_gallery_images(self, game_id: str, imagenes: list[GalleryImage]) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["gallery"] = [*data["gallery"], *(img.model_dump(mode="json") for img in imagenes)]
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def remove_gallery_image(self, game_id: str, image_id: str) -> StoredGame:
+        game = self.get(game_id)
+        if not any(img.id == image_id for img in game.gallery):
+            raise NotFound(f"Imagen de galería no encontrada: {image_id}")
+        data = game.model_dump()
+        data["gallery"] = [img for img in data["gallery"] if img["id"] != image_id]
         updated = StoredGame.model_validate(data)
         self.save(updated)
         return updated
@@ -286,7 +338,7 @@ class GamesStore:
 
 
 def _identity_source(source: str) -> str:
-    if source == "MAME":
+    if source in ("MAME", "ArcadeDB"):
         return "mame"
     if source == "ScreenScraper":
         return "screenscraper"

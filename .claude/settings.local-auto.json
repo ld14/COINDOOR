@@ -1,4 +1,15 @@
 {
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://localhost:20128",
+    "ANTHROPIC_AUTH_TOKEN": "sk-92269f8b4fd88a14-4d2f20-e5ccd58c",
+    "ANTHROPIC_MODEL": "coindoor-auto",
+    "ANTHROPIC_SMALL_FAST_MODEL": "coindoor-auto",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "coindoor-auto",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "coindoor-auto",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "coindoor-auto",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(rtk ls *)",
@@ -11,7 +22,15 @@
       "Bash(rtk du *)",
       "Bash(rtk wc *)",
       "Bash(rtk find *)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(npm test *)",
+      "Bash(rtk npm *)",
+      "Bash(rtk lint *)",
+      "Bash(rtk proxy *)",
+      "Bash(git switch *)",
+      "Skill(claude-api)",
+      "Bash(rtk rg *)",
+      "Bash(rtk pytest *)"
     ]
   }
 }

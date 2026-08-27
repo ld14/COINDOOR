@@ -70,6 +70,15 @@ class ExportService:
             job.progress = 20
         staging = build_staging(self.settings, game_data, selected, system.name)
         try:
+            if "juego" in selected and "juego" not in staging.incluye:
+                raise Conflict(
+                    "El archivo del juego no se pudo incluir en el paquete",
+                    detail={
+                        "romRef": game.romRef,
+                        "motivo": "La ruta del ROM no existe. Volve a subir el archivo "
+                                  "o corregi la ruta en la ficha del juego.",
+                    },
+                )
             if job is not None:
                 job.progress = 50
             verificado = verify_staging(staging.root)

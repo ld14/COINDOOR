@@ -45,10 +45,15 @@ backend/
 │   ├── systems.py
 │   ├── games.py
 │   ├── fields.py
-│   └── media.py
+│   ├── media.py
+│   └── arcadedb.py  # precarga ArcadeDB al crear juego arcade
 ├── store/           # archivo.py (atómico) · juegos · sistemas · cuotas · migracion
 ├── lib/
 │   ├── domain/      # completeness.py · validation.py · fielddefs.py
+│   ├── providers/
+│   │   ├── arcadedb/  # parser.py · cliente.py · proveedor.py
+│   │   ├── ia/        # generador.py
+│   │   └── ...
 │   └── jobs/        # registro.py · ejecutor.py
 ├── config.py
 ├── main.py

@@ -37,8 +37,15 @@ def create_identity_batch_job(game_id: str, reintentar: bool = False) -> Suggest
 
 
 @router.post("/{key}/suggestions")
-def create_suggestion_job(game_id: str, key: str, reintentar: bool = False) -> SuggestionJob:
-    fn = SuggestionJobsService(get_settings()).run(game_id, key, reintentar=reintentar)
+def create_suggestion_job(
+    game_id: str,
+    key: str,
+    reintentar: bool = False,
+    source: str | None = None,
+) -> SuggestionJob:
+    fn = SuggestionJobsService(get_settings()).run(
+        game_id, key, reintentar=reintentar, source=source,
+    )
     job = submit(fn)
     return SuggestionJob(jobId=job.job_id)
 

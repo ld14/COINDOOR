@@ -6,6 +6,9 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
+import pytest
+
+from backend.api.errors import BadRequest
 from backend.bundle.staging import build_staging
 from backend.config import Settings
 
@@ -176,3 +179,42 @@ def test_no_synopsis_ni_bundle_en_staging(tmp_path: Path) -> None:
     resultado = build_staging(settings, _game(settings), incluir=set(), system_name="MAME")
     assert not (resultado.root / "_synopsis.json").exists()
     assert not (resultado.root / "bundle.json").exists()
+
+
+def test_gamejson_separa_soporte_fisico_de_formato_de_archivo(tmp_path: Path) -> None:
+    settings = _settings(tmp_path)
+    rom = tmp_path / "roms" / "sf2.zip"
+    rom.parent.mkdir(parents=True, exist_ok=True)
+    rom.write_bytes(b"rom-bytes")
+
+    game = _game(settings)
+    game["romRef"] = str(rom)
+
+    resultado = build_staging(settings, game, incluir={"juego"}, system_name="mame")
+    gamejson = json.loads((resultado.root / "game.json").read_text())
+
+    assert gamejson["format"] == "Arcade"
+    assert gamejson["file_format"] == "zip"
+    assert gamejson["file"] == "sf2.zip"
+    assert (resultado.root / "juego" / gamejson["file"]).exists()
+
+
+def test_gamejson_deriva_soporte_fisico_del_sistema_si_no_esta_declarado(tmp_path: Path) -> None:
+    settings = _settings(tmp_path)
+    game = _game(settings)
+    game["identity"]["format"] = ""
+
+    resultado = build_staging(settings, game, incluir=set(), system_name="mame")
+    gamejson = json.loads((resultado.root / "game.json").read_text())
+
+    assert gamejson["format"] == "Arcade"
+    assert "file" not in gamejson
+
+
+def test_gamejson_falla_si_el_formato_no_es_un_soporte_fisico(tmp_path: Path) -> None:
+    settings = _settings(tmp_path)
+    game = _game(settings)
+    game["identity"]["format"] = "zip"
+
+    with pytest.raises(BadRequest, match="no es un soporte fisico"):
+        build_staging(settings, game, incluir=set(), system_name="mame")

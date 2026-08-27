@@ -126,3 +126,24 @@
   font-size: var(--dos-size-meta);
   font-style: italic;
 }
+
+.sourceSection {
+  margin-bottom: var(--dos-space-3);
+}
+
+.sourceHeaderRow {
+  align-items: center;
+  display: flex;
+  gap: var(--dos-space-2);
+}
+
+.sourceHeader {
+  font-size: var(--dos-size-body);
+  font-weight: 700;
+  margin: 0;
+}
+
+.sourceCount {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-field-tag);
+}

@@ -48,7 +48,7 @@ def test_identidad_siempre_disponible_y_obligatoria(tmp_path: Path) -> None:
 def test_obligatorios_del_contrato(tmp_path: Path) -> None:
     items = compute_seleccion(_settings(tmp_path), _base_game())
     required_keys = {item.key for item in items if item.required}
-    assert required_keys == {"identidad", "caratula", "poster", "sinopsis", "accent"}
+    assert required_keys == {"identidad", "caratula", "poster", "sinopsis", "accent", "juego"}
 
 
 def test_imagen_vacia_no_disponible(tmp_path: Path) -> None:

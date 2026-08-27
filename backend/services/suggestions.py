@@ -20,6 +20,7 @@ class SuggestionJobsService:
         key: str,
         *,
         reintentar: bool = False,
+        source: str | None = None,
     ) -> Callable[[JobState], dict[str, object]]:
         def job_fn(job: JobState) -> dict[str, object]:
             return SuggestionsService(self.settings).suggest(
@@ -27,6 +28,7 @@ class SuggestionJobsService:
                 key,
                 job.cancel_event,
                 reintentar=reintentar,
+                source=source,
             )
 
         return job_fn

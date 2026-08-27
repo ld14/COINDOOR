@@ -42,7 +42,9 @@ de seis meses alguien —tú, o Claude— vuelve a proponer justo lo que ya desc
 | [0010](0010-jobs-en-proceso.md) | Trabajos largos en hilos del propio proceso, sin cola ni worker | accepted | 2026-08-11 |
 | [0011](0011-fielddefs-json-compartido.md) | La política de completitud es JSON compartido entre TS y Python | accepted | 2026-08-11 |
 | [0012](0012-verificacion-attract-por-subproceso.md) | Verificar el export con `attract doctor` por subproceso, sin parsear | accepted | 2026-08-11 |
-| [0013](0013-sin-scraping-ni-catalogo-pago.md) | Sugerencias sin scraping ni catálogos de terceros — solo IA y referencias | accepted | 2026-08-13 |
+| [0013](0013-sin-scraping-ni-catalogo-pago.md) | Sugerencias sin scraping ni catálogos de terceros — solo IA y referencias | superseded por [0014](0014-arcadedb-fuente-arcade.md) | 2026-08-13 |
+| [0014](0014-arcadedb-fuente-arcade.md) | ArcadeDB como fuente de imágenes, video, manual y texto para arcade | accepted | 2026-08-24 |
+| [0015](0015-precarga-con-red-al-alta.md) | Una precarga con red al dar de alta un juego | accepted | 2026-08-24 |
 
 Los seis últimos salen del análisis de arquitectura de
 [`docs/arquitectura/`](../../docs/arquitectura/README.md), que conserva la comparación

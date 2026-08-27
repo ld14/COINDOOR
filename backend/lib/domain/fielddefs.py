@@ -54,6 +54,15 @@ def rich_keys() -> frozenset[str]:
     return _keys("rich")
 
 
+def max_length_for(section: str, key: str) -> int | None:
+    """Limite de caracteres declarado en fielddefs.json, o ``None`` si no tiene."""
+    for field in fields(section):
+        if field["key"] == key:
+            valor = field.get("maxLength")
+            return int(valor) if valor is not None else None
+    raise KeyError(f"{section}.{key} no esta en fielddefs.json")
+
+
 def contract_asset(section: str, key: str) -> str:
     """Devuelve el nombre de asset del contrato ATTRACT para un key dado.
 

@@ -67,3 +67,12 @@ export function uploadRom(id: string, file: File) {
   formData.append('file', file);
   return fetchJson<Game>(`/games/${id}/rom`, { method: 'POST', body: formData });
 }
+
+export interface PrecargaResult {
+  jobId: string;
+}
+
+export function startPrecarga(id: string, force: boolean = false) {
+  const params = force ? '?force=true' : '';
+  return fetchJson<PrecargaResult>(`/games/${id}/arcadedb${params}`, { method: 'POST' });
+}

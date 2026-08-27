@@ -41,7 +41,8 @@ def _tabla() -> tuple[tuple[str, str, bool, Medir], ...]:
     filas.append(("accent", "rich", True, _medir_accent))
     filas.append(("accent2", "rich", False, _medir_accent2))
     filas.append(("manual", "rich", False, _medir_manual))
-    filas.append(("juego", "juego", False, _medir_juego))
+    filas.append(("galeria", "galeria", False, _medir_galeria))
+    filas.append(("juego", "juego", True, _medir_juego))
     return tuple(filas)
 
 
@@ -50,6 +51,10 @@ def _label(section: str, key: str) -> str:
         return "Identidad"
     if section == "juego":
         return "Archivo del juego"
+    if section == "galeria":
+        # No hay entrada en fielddefs.json a la que pedirle label: la galeria no es
+        # un asset del contrato (ADR-0016).
+        return "Galería"
     return fielddefs.label_for(section, key)
 
 
@@ -115,6 +120,26 @@ def _medir_manual(settings: Settings, game: Mapping[str, Any], key: str) -> tupl
     # media antes de esta sesión). Cuando exista, sumar el tamaño real en vez de 0.
     manuals = game.get("manuals", [])
     return bool(manuals), 0
+
+
+def _medir_galeria(settings: Settings, game: Mapping[str, Any], key: str) -> tuple[bool, int]:
+    """Suma los archivos de ``_gallery/`` que la ficha declara.
+
+    Se miden por la ruta declarada y no listando la carpeta: una entrada sin archivo
+    en disco tiene que pesar 0, no desaparecer del total sin que se note.
+    """
+    imagenes = game.get("gallery", [])
+    if not isinstance(imagenes, list) or not imagenes:
+        return False, 0
+    total = 0
+    for imagen in imagenes:
+        if not isinstance(imagen, Mapping):
+            continue
+        url = imagen.get("url")
+        path = media_path(settings.media_dir, url) if isinstance(url, str) else None
+        if path is not None:
+            total += _path_size(path)
+    return True, total
 
 
 def _medir_juego(settings: Settings, game: Mapping[str, Any], key: str) -> tuple[bool, int]:

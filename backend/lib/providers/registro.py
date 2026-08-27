@@ -5,22 +5,28 @@ from collections.abc import Sequence
 
 from backend.config import Settings
 from backend.lib.domain.fielddefs import identity_keys, image_keys
+from backend.lib.providers.arcadedb.proveedor import ArcadeDbProvider
 from backend.lib.providers.base import Proveedor
 from backend.lib.providers.http import ProviderHttpClient
 from backend.lib.providers.ia.generador import AiModelConfig, IaGenerador
-from backend.lib.providers.identidad.actual import IdentityActualProvider
+from backend.lib.providers.launchbox.proveedor import LaunchboxImageProvider
 from backend.lib.providers.referencia.images import ImageSearchProvider
 from backend.lib.providers.referencia.youtube import YoutubeReferenceProvider
 from backend.store.cuotas import QuotasStore
 
 # Tabla campo → proveedores, en orden. Sumar una fuente es una fila; ver ADR-0013.
+_ARCADEDB_IDENTITY = ("arcadedb", "ia_primary", "ia_backup")
+_ARCADEDB_TEXT = ("arcadedb", "ia_primary", "ia_backup")
+_ARCADEDB_IMAGE = ("arcadedb", "image_search", "launchbox")
+_ARCADEDB_VIDEO = ("arcadedb", "youtube_referencia")
+
 _TABLE: dict[str, tuple[str, ...]] = {
-    **{key: ("identity_actual", "ia_primary", "ia_backup") for key in identity_keys()},
-    **{key: ("image_search",) for key in image_keys()},
-    "sinopsis": ("ia_primary", "ia_backup"),
+    **{key: _ARCADEDB_IDENTITY for key in identity_keys()},
+    **{key: _ARCADEDB_IMAGE for key in image_keys()},
+    "sinopsis": _ARCADEDB_TEXT,
     "review": ("ia_primary", "ia_backup"),
-    "cheats": ("ia_primary", "ia_backup"),
-    "video": ("youtube_referencia",),
+    "cheats": _ARCADEDB_TEXT,
+    "video": _ARCADEDB_VIDEO,
 }
 
 
@@ -62,8 +68,10 @@ def _build(
         return YoutubeReferenceProvider()
     if name == "image_search":
         return ImageSearchProvider()
-    if name == "identity_actual":
-        return IdentityActualProvider(settings)
+    if name == "launchbox":
+        return LaunchboxImageProvider()
+    if name == "arcadedb":
+        return _arcadedb_provider(settings, quotas, cancel_event)
     raise ValueError(f"Proveedor desconocido: {name}")
 
 
@@ -82,3 +90,18 @@ def _ia_provider(
         cancel_event=cancel_event,
     )
     return IaGenerador(config, http)
+
+
+def _arcadedb_provider(
+    settings: Settings,
+    quotas: QuotasStore,
+    cancel_event: threading.Event | None,
+) -> ArcadeDbProvider:
+    http = ProviderHttpClient(
+        "arcadedb",
+        ArcadeDbProvider.limite,
+        quotas,
+        timeout=ArcadeDbProvider.timeout,
+        cancel_event=cancel_event,
+    )
+    return ArcadeDbProvider(settings, http)

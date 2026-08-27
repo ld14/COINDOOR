@@ -156,7 +156,9 @@ export function ExportPage() {
                   <label className={styles.field} key={opt.key}>
                     <input checked disabled type="checkbox" />
                     <span className={styles.label}>{opt.label}</span>
-                    <span className={styles.meta}>{formatBytes(opt.bytes)}</span>
+                    <span className={opt.disponible ? styles.meta : styles.error}>
+                      {opt.disponible ? formatBytes(opt.bytes) : 'falta el archivo'}
+                    </span>
                   </label>
                 ))}
               </div>

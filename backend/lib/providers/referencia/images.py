@@ -43,6 +43,7 @@ _TRUSTED_DOMAINS = frozenset({
     "flyers.arcade-museum.com",
     "flyers.arcadeotaku.com",
     "launchbox-android.com",
+    "launchbox-app.com",
     "screenscraper.fr",
     "emumovies.com",
 })

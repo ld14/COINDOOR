@@ -38,8 +38,9 @@ class SuggestionsService:
         cancel_event: threading.Event | None = None,
         *,
         reintentar: bool = False,
+        source: str | None = None,
     ) -> dict[str, object]:
-        cache_key = (str(self.settings.data_dir), game_id, key)
+        cache_key = (str(self.settings.data_dir), game_id, key, source or "")
         if not reintentar:
             with _cache_lock:
                 cached = _cache.get(cache_key)
@@ -55,6 +56,8 @@ class SuggestionsService:
             game.identity.year or None,
         )
         providers = providers_for(key, self.settings, cancel_event)
+        if source:
+            providers = [p for p in providers if p.nombre == source]
         if reintentar:
             for p in providers:
                 breaker.reset(p.nombre)
@@ -71,6 +74,10 @@ class SuggestionsService:
                 if exc.retry_exhausted:
                     breaker.strike(provider.nombre)
                 traces.append(ProviderTrace(provider.nombre, provider.tipo, str(exc)))
+                continue
+            except Exception:
+                log.exception("Provider %s failed unexpectedly", provider.nombre)
+                traces.append(ProviderTrace(provider.nombre, provider.tipo, "excepción inesperada"))
                 continue
             candidates.extend(result.candidatos)
             traces.append(result.trace)
@@ -176,16 +183,17 @@ def cached_candidate(
     key: str,
     candidate_id: str,
 ) -> dict[str, object] | None:
+    prefix = (str(settings.data_dir), game_id, key)
     with _cache_lock:
-        payload = _cache.get((str(settings.data_dir), game_id, key))
-    if payload is None:
-        return None
-    candidates = payload.get("candidatos", [])
-    if not isinstance(candidates, list):
-        return None
-    for candidate in candidates:
-        if isinstance(candidate, dict) and candidate.get("id") == candidate_id:
-            return candidate
+        for cache_key, payload in _cache.items():
+            if cache_key[:3] != prefix:
+                continue
+            candidates = payload.get("candidatos", [])
+            if not isinstance(candidates, list):
+                continue
+            for candidate in candidates:
+                if isinstance(candidate, dict) and candidate.get("id") == candidate_id:
+                    return candidate
     return None
 
 

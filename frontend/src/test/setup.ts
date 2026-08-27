@@ -64,6 +64,7 @@ function createGame(body: BodyInit | null | undefined) {
     systemId: String(payload.systemId),
     identity,
     identitySource: 'manual',
+    gallery: [],
     romSource: payload.romSource as Game['romSource'],
     romRef: String(payload.romRef),
     file_format: String(payload.file_format ?? ''),

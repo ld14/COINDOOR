@@ -97,7 +97,10 @@ class FieldsService:
         response = httpx.get(media_url, timeout=30.0, follow_redirects=True, headers=headers)
         if response.status_code >= 400:
             raise BadRequest(f"El sitio devolvió {response.status_code}")
-        suffix = Path(httpx.URL(media_url).path).suffix.lower() or ".jpg"
+        suffix = _suffix_from_content_type(response.headers.get("content-type", ""))
+        if not suffix:
+            suffix = Path(httpx.URL(media_url).path).suffix.lower()
+        suffix = suffix or ".jpg"
         system_dir = safe_id(game.systemId)
         game_dir = safe_id(game.id)
         path = self.settings.media_dir / system_dir / game_dir / f"{key}{suffix}"
@@ -125,3 +128,20 @@ class FieldsService:
     def _validate_key(self, key: str) -> None:
         if key not in self.valid_keys:
             raise BadRequest(f"Campo inválido: {key}")
+
+
+_CONTENT_TYPE_SUFFIX: dict[str, str] = {
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/gif": ".gif",
+    "image/webp": ".webp",
+    "image/svg+xml": ".svg",
+    "video/mp4": ".mp4",
+    "application/pdf": ".pdf",
+}
+
+
+def _suffix_from_content_type(content_type: str) -> str:
+    """Deriva extensión del content-type. ArcadeDB no pone extensión en las URLs."""
+    mime = content_type.split(";", 1)[0].strip().lower()
+    return _CONTENT_TYPE_SUFFIX.get(mime, "")

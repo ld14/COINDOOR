@@ -4,13 +4,30 @@ import re
 from collections.abc import Mapping
 from typing import Any
 
+from backend.api.errors import BadRequest
+
 HEX6 = re.compile(r"^#[0-9a-fA-F]{6}$")
 
+# Soporte fisico del juego original. Enum cerrado del contrato ATTRACT
+# (game.json schema_version "1"), case-sensitive. NO es el formato del archivo:
+# eso es ``file_format`` y es texto libre.
+FORMATOS_FISICOS = ("Arcade", "GD-ROM", "PCB", "Cartucho", "Diskette", "CD", "DVD")
+_POR_NOMBRE = {f.lower(): f for f in FORMATOS_FISICOS}
 
-def build_gamejson(game: Mapping[str, Any], system_name: str) -> dict[str, Any]:
+# Sistemas cuyo soporte fisico es conocido sin que el usuario lo declare.
+_FORMATO_POR_SISTEMA = {"mame": "Arcade", "arcade": "Arcade"}
+
+
+def build_gamejson(
+    game: Mapping[str, Any],
+    system_name: str,
+    rom_file: str | None = None,
+) -> dict[str, Any]:
     """Construye game.json segun el contrato COINDOOR -> ATTRACT (ADR-0027).
 
     Campos obligatorios: schema_version, system, set, title.
+
+    ``rom_file`` es el nombre del archivo tal como viaja dentro de ``juego/``.
     """
     identity = game.get("identity", {})
     if not isinstance(identity, Mapping):
@@ -37,15 +54,18 @@ def build_gamejson(game: Mapping[str, Any], system_name: str) -> dict[str, Any]:
     if players:
         result["players"] = _players_int(players)
 
-    fmt = str(identity.get("format", "")).strip()
+    fmt = _formato_fisico(str(identity.get("format", "")).strip(), system_name)
     if fmt:
         result["format"] = fmt
 
-    file_format = str(game.get("file_format", "")).strip()
+    file_format = str(game.get("file_format") or "").strip() or _extension(rom_file)
     if file_format:
         result["file_format"] = file_format
 
-    tratamiento = str(game.get("tratamiento", "")).strip()
+    if rom_file:
+        result["file"] = rom_file
+
+    tratamiento = str(game.get("tratamiento", "")).strip() if rom_file else ""
     if tratamiento:
         result["tratamiento"] = tratamiento
 
@@ -54,6 +74,27 @@ def build_gamejson(game: Mapping[str, Any], system_name: str) -> dict[str, Any]:
         result["summary"] = summary
 
     return result
+
+
+def _formato_fisico(declarado: str, system_name: str) -> str:
+    """Devuelve el soporte fisico canonico, o falla si el declarado no es del enum."""
+    if not declarado:
+        return _FORMATO_POR_SISTEMA.get(system_name.strip().lower(), "")
+    canonico = _POR_NOMBRE.get(declarado.lower())
+    if canonico is None:
+        raise BadRequest(
+            f"El formato '{declarado}' no es un soporte fisico conocido "
+            f"(conocidos: {list(FORMATOS_FISICOS)}). Corregilo en la identidad del juego. "
+            f"El formato del archivo ('zip', 'chd', 'iso') va en 'Formato de archivo', "
+            f"no en 'Formato'."
+        )
+    return canonico
+
+
+def _extension(rom_file: str | None) -> str:
+    if not rom_file or "." not in rom_file:
+        return ""
+    return rom_file.rsplit(".", 1)[-1].lower()
 
 
 def _players_int(value: str) -> int:

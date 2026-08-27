@@ -13,6 +13,7 @@ from backend.lib.providers.base import Candidato, Consulta, Limite, ProviderResu
 from backend.lib.providers.cortocircuito import breaker
 from backend.lib.providers.http import ProviderHttpClient, ProviderHttpError, ProviderRejected
 from backend.lib.providers.ia.generador import AiModelConfig, IaGenerador
+from backend.lib.providers.identidad.actual import IdentityActualProvider
 from backend.lib.providers.orquestador import SuggestionsService
 from backend.lib.providers.referencia.youtube import YoutubeReferenceProvider
 from backend.lib.providers.registro import providers_for
@@ -290,10 +291,12 @@ def test_registro_skips_ia_without_credentials(tmp_path: Path) -> None:
     )
     settings.data_dir.mkdir(parents=True)
 
-    assert providers_for("sinopsis", settings) == ()
+    # ArcadeDB no depende de credenciales IA, siempre está para sinopsis.
+    sinopsis_providers = providers_for("sinopsis", settings)
+    assert all(p.nombre != "IA" for p in sinopsis_providers)
     video_providers = providers_for("video", settings)
-    assert len(video_providers) == 1
-    assert video_providers[0].nombre == "YouTube"
+    assert len(video_providers) == 2
+    assert {p.nombre for p in video_providers} == {"ArcadeDB", "YouTube"}
 
 
 def test_apply_suggestion_rejects_referencia_candidate(
@@ -342,8 +345,15 @@ def test_empty_identity_suggestion_returns_empty_results(tmp_path: Path) -> None
     assert payload["candidatos"] == []
 
 
-def test_apply_identity_suggestion_updates_identity_field(tmp_path: Path) -> None:
+def test_apply_identity_suggestion_updates_identity_field(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     settings = _seeded_settings(tmp_path)
+    monkeypatch.setattr(
+        "backend.lib.providers.orquestador.providers_for",
+        lambda _key, _settings, _cancel_event=None: (IdentityActualProvider(_settings),),
+    )
     payload = SuggestionsService(settings).suggest("golden-axe", "publisher")
     candidate_id = payload["candidatos"][0]["id"]
 

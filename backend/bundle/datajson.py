@@ -6,7 +6,11 @@ from typing import Any
 from backend.bundle.gamejson import validate_accent
 
 
-def build_datajson(game: Mapping[str, Any], incluir: Collection[str]) -> dict[str, Any]:
+def build_datajson(
+    game: Mapping[str, Any],
+    incluir: Collection[str],
+    galeria: Collection[Mapping[str, str]] = (),
+) -> dict[str, Any]:
     data: dict[str, Any] = {}
 
     accent = str(game.get("accentValue", ""))
@@ -30,6 +34,13 @@ def build_datajson(game: Mapping[str, Any], incluir: Collection[str]) -> dict[st
         manual = _manual(game)
         if manual:
             data["manual"] = manual
+
+    # La galeria la arma el staging, que es quien sabe que archivos copio de verdad:
+    # declarar una imagen que no viaja deja un hueco del otro lado (ADR-0016).
+    if "galeria" in incluir and galeria:
+        data["gallery"] = [
+            {"file": img["file"], "label": img["label"]} for img in galeria
+        ]
 
     return data
 

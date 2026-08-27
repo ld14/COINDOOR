@@ -33,6 +33,15 @@ export interface FormatError {
 
 export type Identity = Record<IdentityKey, string>;
 
+export interface GalleryImage {
+  id: string;
+  tipo: string;
+  label: string;
+  file: string;
+  url: string;
+  source: string;
+}
+
 export interface MediaField {
   status: FieldStatus;
   url?: string;
@@ -98,6 +107,20 @@ export interface FieldProvenance {
   processedUrls: string[];
 }
 
+export interface CabinetButton {
+  control: string;
+  color: string;
+  action: string;
+}
+
+export interface CabinetInfo {
+  resolution: string;
+  orientation: string;
+  controls: string;
+  buttons: number;
+  button_list: CabinetButton[];
+}
+
 export interface Game {
   id: string;
   systemId: string;
@@ -117,9 +140,11 @@ export interface Game {
   accentValue: string;
   accent2Value: string;
   manuals: GameManual[];
+  gallery: GalleryImage[];
   magazine: MagazineLink;
   magazineName: string;
   magazineAppearances: MagazineAppearance[];
   coverThumbUrl?: string;
   provenance: Record<string, FieldProvenance>;
+  cabinet?: CabinetInfo;
 }

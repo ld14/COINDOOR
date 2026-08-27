@@ -48,9 +48,12 @@ demás.
 
 ## Bloqueado 🚧
 
-1. **Credenciales y cuotas de ScreenScraper y MobyGames**, verificadas contra su
-   documentación actual. Bloquea la feature 002, no el arranque.
-2. **Elegir el modelo de IA** y escribir `sinopsis.v1.md`. Bloquea la feature 002.
+1. **Elegir el modelo de IA** y escribir `sinopsis.v1.md`. Bloquea la feature 002.
+
+**Ya no bloquea:** las credenciales y cuotas de ScreenScraper y MobyGames.
+[`ADR-0013`](../decisions/0013-sin-scraping-ni-catalogo-pago.md) sacó las dos fuentes por ese
+mismo motivo, y [`ADR-0014`](../decisions/0014-arcadedb-fuente-arcade.md) cubre arcade con
+ArcadeDB, que no pide cuenta ni tiene cuota.
 
 **Ya no bloquea:** el stack. **Ni los dos huecos del contrato** que bloqueaban la
 feature 001 (mapeo de `identitySource` a `identidad.origen`, y `players` no entero) —
@@ -72,6 +75,7 @@ contra un mock server y no lo necesitan.
 | 4 | **Edición** — alta en dos pasos, carga y borrado de campos, textos, presentación, marcar como listo | [`007`](../features/007-edicion/spec.md) | Hecha |
 | 5 | **Asíncrono** — manuales con job y cancelación, modal de sugerencias | [`002`](../features/002-sugerencias-multiproveedor/spec.md) | Especificada |
 | 6 | **Exportación** — lista de exportables, "qué incluir", generación del `.zip` | [`001`](../features/001-export-bundle/spec.md) | Especificada |
+| — | **ArcadeDB** — precarga al alta y candidatos reales en los botones Sugerir | [`008`](../features/008-arcadedb/spec.md) | Hecha |
 
 **Orden de arranque:** 003 → 004 → 005. Las tres primeras son independientes entre sí
 salvo que 004 necesita `contract.json`, y 005 consume el `fielddefs.json` que produce 004.

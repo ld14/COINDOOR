@@ -591,3 +591,60 @@
     justify-self: start;
   }
 }
+
+/* --- Galería (ADR-0016): banco de imágenes, no assets del contrato --- */
+
+.galleryGrid {
+  display: grid;
+  gap: var(--dos-space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
+}
+
+.galleryItem {
+  border: var(--dos-border-2) solid var(--dos-edge-dark);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dos-space-2);
+  padding: var(--dos-space-2);
+}
+
+.galleryThumb {
+  align-items: center;
+  background: var(--dos-terminal);
+  display: flex;
+  height: var(--dos-media-preview-height);
+  justify-content: center;
+  overflow: hidden;
+}
+
+.galleryPick {
+  align-items: center;
+  display: flex;
+  gap: var(--dos-space-2);
+}
+
+.galleryBadge {
+  color: var(--dos-ink-soft);
+  font-size: var(--dos-size-meta);
+}
+
+.sourceHeader {
+  font-size: var(--dos-size-body);
+  font-weight: bold;
+  margin: var(--dos-space-3) 0 var(--dos-space-2);
+  color: var(--dos-ink);
+}
+
+.sourceSection {
+  margin-bottom: var(--dos-space-2);
+}
+
+.sourceHeaderRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dos-space-2);
+}
+
+.sourceHeaderRow .sourceHeader {
+  margin: 0;
+}

@@ -35,9 +35,12 @@ export interface SuggestionsResult {
   fuentes: SuggestionTrace[];
 }
 
-export function createSuggestionJob(gameId: string, key: string, reintentar = false) {
-  const suffix = reintentar ? '?reintentar=true' : '';
-  return fetchJson<{ jobId: string }>(`/games/${gameId}/fields/${key}/suggestions${suffix}`, {
+export function createSuggestionJob(gameId: string, key: string, reintentar = false, source?: string) {
+  const params = new URLSearchParams();
+  if (reintentar) params.set('reintentar', 'true');
+  if (source) params.set('source', source);
+  const qs = params.toString();
+  return fetchJson<{ jobId: string }>(`/games/${gameId}/fields/${key}/suggestions${qs ? `?${qs}` : ''}`, {
     method: 'POST',
   });
 }

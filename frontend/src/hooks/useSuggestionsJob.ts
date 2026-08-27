@@ -11,12 +11,12 @@ export function useSuggestionsJob(gameId: string, key: string, open: boolean) {
   const [phase, setPhase] = useState<Phase>('buscando');
   const requestId = useRef(0);
 
-  const start = useCallback((reintentar = false) => {
+  const start = useCallback((reintentar = false, source?: string) => {
     const id = ++requestId.current;
     setPhase('buscando');
     setResult(null);
     void (async () => {
-      const { jobId } = await createSuggestionJob(gameId, key, reintentar);
+      const { jobId } = await createSuggestionJob(gameId, key, reintentar, source);
       while (requestId.current === id) {
         const job = await getJob<SuggestionsResult>(jobId);
         if (requestId.current !== id) return;
@@ -39,7 +39,37 @@ export function useSuggestionsJob(gameId: string, key: string, open: boolean) {
     else requestId.current += 1;
   }, [open, start]);
 
-  return { phase, result, retry: () => start(true) };
+  const retryAll = useCallback(() => start(true), [start]);
+  const retrySource = useCallback((source: string) => {
+    setPhase('buscando');
+    void (async () => {
+      const { jobId } = await createSuggestionJob(gameId, key, true, source);
+      const id = requestId.current;
+      while (requestId.current === id) {
+        const job = await getJob<SuggestionsResult>(jobId);
+        if (requestId.current !== id) return;
+        if (job.status === 'succeeded' && job.result) {
+          // Merge: keep existing candidates from other sources, replace this source
+          setResult((prev) => {
+            if (!prev) return job.result;
+            const kept = prev.candidatos.filter((c) => c.fuente !== source);
+            const nuevos = job.result!.candidatos;
+            const merged = { ...job.result!, candidatos: [...kept, ...nuevos] };
+            setPhase(deriveFase(merged));
+            return merged;
+          });
+          return;
+        }
+        if (job.status === 'failed' || job.status === 'cancelled') {
+          setPhase('error');
+          return;
+        }
+        await new Promise((resolve) => setTimeout(resolve, POLL_MS));
+      }
+    })();
+  }, [gameId, key]);
+
+  return { phase, result, retry: retryAll, retrySource };
 }
 
 function deriveFase(result: SuggestionsResult): Phase {

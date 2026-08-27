@@ -12,10 +12,8 @@ from backend.bundle.datajson import build_datajson
 from backend.bundle.gamejson import build_gamejson
 from backend.config import Settings
 from backend.lib.domain import fielddefs
+from backend.lib.media import ext_de_archivo
 from backend.store.archivo import escribir_json, media_path
-
-IMAGE_EXTS = frozenset({".png", ".jpg", ".jpeg", ".gif", ".webp"})
-VIDEO_EXTS = frozenset({".mp4", ".webm", ".ogg", ".avi", ".mkv"})
 
 
 @dataclass(frozen=True)
@@ -45,21 +43,65 @@ def build_staging(settings: Settings, game: Mapping[str, Any], incluir: Collecti
     _copy_assets(settings, game, media_dir, "images", fielddefs.fields("images"), efectivo)
     _copy_assets(settings, game, media_dir, "video", fielddefs.fields("videos"), efectivo)
 
-    escribir_json(root / "data.json", build_datajson(game, efectivo))
-    escribir_json(root / "game.json", build_gamejson(game, system_name))
+    galeria = _copy_galeria(settings, game, media_dir) if "galeria" in efectivo else []
+    if not galeria:
+        efectivo.discard("galeria")
 
+    # El ROM se copia primero: game.json necesita su nombre real para el campo ``file``.
     rom_archivo: str | None = None
     rom_tratamiento: str | None = None
+    rom_nombre: str | None = None
     if "juego" in efectivo:
         resultado = _copy_rom(game, root / "juego")
         if resultado is not None:
-            nombre, tratamiento = resultado
-            rom_archivo = f"juego/{nombre}"
-            rom_tratamiento = tratamiento
+            rom_nombre, rom_tratamiento = resultado
+            rom_archivo = f"juego/{rom_nombre}"
         else:
             efectivo.discard("juego")
 
+    escribir_json(root / "data.json", build_datajson(game, efectivo, galeria))
+    try:
+        escribir_json(root / "game.json", build_gamejson(game, system_name, rom_nombre))
+    except Exception:
+        shutil.rmtree(root, ignore_errors=True)
+        raise
+
     return StagingResult(root=root, incluye=frozenset(efectivo), rom_archivo=rom_archivo, rom_tratamiento=rom_tratamiento)  # noqa: E501
+
+
+def _copy_galeria(
+    settings: Settings,
+    game: Mapping[str, Any],
+    media_dir: Path,
+) -> list[dict[str, str]]:
+    """Copia el banco a ``media/_gallery/`` y devuelve lo que va en data.json.
+
+    La subcarpeta con guion bajo sigue la marca de ``_manual/`` y ``_magazines/``
+    del contrato de ATTRACT: dice "esto no es un asset auto-descubrible"
+    (ADR-0016). Cada entrada declara un NOMBRE suelto, nunca una ruta.
+
+    Una entrada cuyo archivo no esta en disco se omite: declararla dejaria un hueco
+    del otro lado, que es donde peor se descubre.
+    """
+    imagenes = game.get("gallery", [])
+    if not isinstance(imagenes, list):
+        return []
+    destino = media_dir / "_gallery"
+    declaradas: list[dict[str, str]] = []
+    for imagen in imagenes:
+        if not isinstance(imagen, Mapping):
+            continue
+        url = imagen.get("url")
+        source = media_path(settings.media_dir, url) if isinstance(url, str) else None
+        if source is None or not source.exists():
+            continue
+        nombre = Path(str(imagen.get("file", ""))).name
+        if not nombre:
+            continue
+        destino.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destino / nombre)
+        declaradas.append({"file": nombre, "label": str(imagen.get("label", ""))})
+    return declaradas
 
 
 def _copy_assets(
@@ -84,48 +126,9 @@ def _copy_assets(
         source = media_path(settings.media_dir, url) if isinstance(url, str) else None
         if source is None or not source.exists():
             continue
-        ext = _real_extension(source, game_key)
+        ext = ext_de_archivo(source, game_key)
         dest = media_dir / f"{field['contractAsset']}{ext}"
         shutil.copy2(source, dest)
-
-
-def _real_extension(path: Path, media_type: str) -> str:
-    """Extrae la extension real del archivo, ignorando sufijos hash.
-
-    Archivos en disco pueden tener nombres como ``caratula.b8uycgdntcg6il6wunv8pwhajs``
-    donde la extension real (jpg/png) no esta en el nombre. Primero intenta por el
-    nombre; si no funciona, detecta por magic bytes.
-    """
-    name = path.name
-    known = IMAGE_EXTS if media_type == "images" else VIDEO_EXTS
-    for ext in known:
-        if name.lower().endswith(ext):
-            return ext
-    return _detect_ext_by_magic(path)
-
-
-def _detect_ext_by_magic(path: Path) -> str:
-    """Detecta la extension por los primeros bytes del archivo (magic bytes)."""
-    try:
-        with open(path, "rb") as f:
-            header = f.read(16)
-    except OSError:
-        return ".bin"
-    if header[:8] == b"\x89PNG\r\n\x1a\n":
-        return ".png"
-    if header[:2] == b"\xff\xd8":
-        return ".jpg"
-    if header[:4] == b"GIF8":
-        return ".gif"
-    if header[:4] == b"RIFF" and header[8:12] == b"WEBP":
-        return ".webp"
-    if header[:4] == b"\x1a\x45\xdf\xa3" or header[:3] == b"\x1a\x45\xdf":
-        return ".webm"
-    if header[:4] == b"\x00\x00\x00\x1c" or header[:4] == b"\x00\x00\x00\x18":
-        return ".mp4"
-    if header[:4] == b"OggS":
-        return ".ogg"
-    return ".bin"
 
 
 def _copy_rom(game: Mapping[str, Any], juego_dir: Path) -> tuple[str, str] | None:

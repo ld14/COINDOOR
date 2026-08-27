@@ -55,6 +55,7 @@ const game = (overrides: Partial<Game> & { id: string; title: string; systemId?:
     systemId: systemId ?? 'arcade',
     identity: { ...fullIdentity, title, ...(identity ?? {}) },
     identitySource: (systemId ?? 'arcade') === 'arcade' ? 'mame' : 'screenscraper',
+    gallery: [],
     romSource: 'path',
     romRef: `${id}.zip`,
     file_format: 'zip',

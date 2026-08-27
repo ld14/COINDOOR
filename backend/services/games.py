@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from backend.api.errors import Conflict
+from pathlib import Path
+
+from backend.api.errors import BadRequest, Conflict
 from backend.api.schemas import CreateGame, GameOut, GamesPage, GameSummary, PatchGame
 from backend.config import Settings
 from backend.lib.domain.completeness import compute_game_status, missing_required
@@ -51,11 +53,15 @@ class GamesService:
         return to_out(self.store.get(game_id))
 
     def create(self, payload: CreateGame) -> GameOut:
+        if payload.romSource == "path":
+            _validar_rom_ref(payload.romRef)
         return to_out(self.store.create(payload))
 
     def patch(self, game_id: str, payload: PatchGame) -> GameOut:
         if payload.systemId is not None:
             self.systems.get(payload.systemId)
+        if payload.romRef is not None:
+            _validar_rom_ref(payload.romRef)
         return to_out(self.store.patch(game_id, payload))
 
     def mark_ready(self, game_id: str) -> GameOut:
@@ -66,3 +72,29 @@ class GamesService:
         if game.errors:
             raise Conflict("El juego tiene errores de formato", detail={"missing": []})
         return to_out(game)
+
+
+def _validar_rom_ref(rom_ref: str) -> None:
+    """Rechaza rutas que el export no va a poder leer.
+
+    Sin esto la ficha se guarda con una ruta fantasma, el juego figura ``ready``
+    (completitud no mira el ROM) y el error recien aparece en Exportar como
+    "falta el archivo", lejos de donde se tipeo la ruta.
+
+    Una carpeta es valida: MS-DOS y similares se entregan como archivos sueltos
+    y el staging la comprime (ver ``_copy_rom``).
+    """
+    ruta = rom_ref.strip()
+    if not ruta:
+        raise BadRequest("Indica la ruta del archivo o carpeta del juego.")
+    path = Path(ruta)
+    if not path.is_absolute():
+        raise BadRequest(
+            f"La ruta del juego debe ser absoluta, no '{ruta}'. "
+            f"Ejemplos: /roms/arcade/sf2.zip o /roms/msdos/dino (carpeta)."
+        )
+    if not path.exists():
+        raise BadRequest(
+            f"No existe nada en '{ruta}'. Revisa la ruta: si el juego son archivos "
+            f"sueltos, apunta a la carpeta que los contiene."
+        )

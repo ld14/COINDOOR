@@ -11,6 +11,7 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from backend.api.errors import install_error_handlers
 from backend.api.export import router as export_router
 from backend.api.fields import router as fields_router
+from backend.api.gallery import router as gallery_router
 from backend.api.games import router as games_router
 from backend.api.jobs import router as jobs_router
 from backend.api.magazines import router as magazines_router
@@ -41,6 +42,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(games_router)
     app.include_router(fields_router)
     app.include_router(export_router)
+    app.include_router(gallery_router)
     app.include_router(media_router)
     app.include_router(roms_router)
     app.include_router(manuals_router)

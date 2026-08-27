@@ -1,10 +1,10 @@
 ---
 id: 0013
 title: Sugerencias sin scraping ni catálogos de terceros — solo IA y referencias
-status: accepted
+status: superseded
 date: 2026-08-13
 supersedes: 6
-superseded-by: null
+superseded-by: 14
 tags: [backend, data]
 ---
 

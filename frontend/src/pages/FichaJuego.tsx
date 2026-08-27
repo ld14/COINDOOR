@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   DosButton,
   DosInput,
@@ -16,10 +16,12 @@ import {
 import { SuggestionsModal } from '@/components/SuggestionsModal';
 import { IdentityBatchModal } from '@/components/IdentityBatchModal';
 import { ImageModal } from '@/components/ImageModal';
+import { GalleryPanel } from '@/components/GalleryPanel';
 import { useGame } from '@/hooks/useGame';
 import { useGameMutations } from '@/hooks/useGameMutations';
 import { useSystems } from '@/hooks/useSystems';
 import { useDominantColors } from '@/hooks/useDominantColors';
+import { soportaArcadeDb } from '@/lib/domain/arcade';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
 import { FIELDDEFS } from '@/lib/domain/types';
 import type {
@@ -37,6 +39,8 @@ import type {
 } from '@/lib/domain/types';
 import { searchManuals, type ManualSearchResult } from '@/lib/api/manuals';
 import { searchMagazines, setMagazine, addAppearance, removeAppearance, buildMagazineLinks, type MagazineSearchResult } from '@/lib/api/magazines';
+import { getJob, type JobStatus } from '@/lib/api/jobs';
+import { startPrecarga } from '@/lib/api/games';
 import styles from './ReadPages.module.css';
 
 const MANUAL_DELETE_CONFIRM = 'Este campo fue cargado a mano. ¿Borrarlo de todas formas?';
@@ -61,20 +65,42 @@ function isIdentityKey(key: string): key is IdentityKey {
   return FIELDDEFS.identity.some((field) => field.key === key);
 }
 
-function suggestionStatus(game: Game, key: string): { hasContent: boolean; isManual: boolean } {
-  if (isIdentityKey(key)) return { hasContent: game.identity[key] !== '', isManual: game.identitySource === 'manual' };
+interface SuggestionCurrent {
+  hasContent: boolean;
+  isManual: boolean;
+  previewUrl?: string | null;
+  value?: string | null;
+}
+
+function suggestionStatus(game: Game, key: string): SuggestionCurrent {
+  if (isIdentityKey(key)) {
+    const value = game.identity[key];
+    return { hasContent: value !== '', isManual: game.identitySource === 'manual', value };
+  }
   if (FIELDDEFS.images.some((f) => f.key === key)) {
     const img = game.images[key as ImageKey];
-    return { hasContent: img?.status !== 'empty', isManual: img?.status === 'manual' };
+    return { hasContent: img?.status !== 'empty', isManual: img?.status === 'manual', previewUrl: img?.url };
   }
-  if (key === 'sinopsis') return { hasContent: game.texts.sinopsis.value !== '', isManual: game.texts.sinopsis.status === 'manual' };
-  if (key === 'review') return { hasContent: game.review.status !== 'empty', isManual: game.review.status === 'manual' };
-  if (key === 'cheats') return { hasContent: game.cheats.status !== 'empty', isManual: game.cheats.status === 'manual' };
-  return { hasContent: game.video.video.status !== 'empty', isManual: game.video.video.status === 'manual' };
+  if (key === 'sinopsis') {
+    const t = game.texts.sinopsis;
+    return { hasContent: t.value !== '', isManual: t.status === 'manual', value: t.value };
+  }
+  if (key === 'review') {
+    return { hasContent: game.review.status !== 'empty', isManual: game.review.status === 'manual' };
+  }
+  if (key === 'cheats') {
+    const c = game.cheats;
+    const value = c.groups.length > 0 ? JSON.stringify({ groups: c.groups.map(g => ({ name: g.name, entries: g.entries })) }) : '';
+    return { hasContent: c.status !== 'empty', isManual: c.status === 'manual', value };
+  }
+  const v = game.video.video;
+  return { hasContent: v.status !== 'empty', isManual: v.status === 'manual', previewUrl: v.url };
 }
 
 export function FichaJuego() {
   const { gameId = '' } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const precargaJobId = searchParams.get('precarga');
   const navigate = useNavigate();
   const { data: game, error, isLoading, refetch: refetchGame } = useGame(gameId);
   const mutations = useGameMutations(gameId);
@@ -82,6 +108,7 @@ export function FichaJuego() {
   const [missingAfterReady, setMissingAfterReady] = useState<string[]>([]);
   const [suggestField, setSuggestField] = useState<string | null>(null);
   const [suggestIdentityBatch, setSuggestIdentityBatch] = useState(false);
+  const [precargaLoading, setPrecargaLoading] = useState(false);
   const sectionRefs = useRef<Record<string, SaveHandle | null>>({});
 
   const saveAll = () => {
@@ -101,11 +128,47 @@ export function FichaJuego() {
     );
   }
 
+  const isArcade = soportaArcadeDb(game.systemId);
+
+  const handlePrecarga = async () => {
+    setPrecargaLoading(true);
+    try {
+      const result = await startPrecarga(game.id);
+      setSearchParams({ precarga: result.jobId });
+    } catch {
+      // Error silenciado: el usuario puede reintentar.
+    } finally {
+      setPrecargaLoading(false);
+    }
+  };
+
   const missing = missingRequired(game);
   const status = computeGameStatus(game);
 
   return (
     <div className={styles.page}>
+      {precargaJobId ? (
+        <PrecargaBanner
+          jobId={precargaJobId}
+          onComplete={() => {
+            setSearchParams({});
+            void refetchGame();
+          }}
+        />
+      ) : null}
+      {isArcade && !precargaJobId ? (
+        <Panel>
+          <SectionHeader>PRECARGA DE ARCADEDB</SectionHeader>
+          <SunkenBox className={styles.stack}>
+            <p className={styles.meta}>Buscar datos del juego en Arcade Database (identidad, imágenes, sinopsis, trucos, gabinete).</p>
+            <div className={styles.toolbar}>
+              <DosButton disabled={precargaLoading} onClick={handlePrecarga} variant="primary-small">
+                {precargaLoading ? 'Iniciando…' : 'Precargar ArcadeDB'}
+              </DosButton>
+            </div>
+          </SunkenBox>
+        </Panel>
+      ) : null}
       <GameHero
         game={game}
         systems={systems}
@@ -122,6 +185,15 @@ export function FichaJuego() {
         onExport={() => { saveAll(); navigate(`/exportar/${game.id}`); }}
         status={status}
       />
+
+      {mutations.patchGame.error ? (
+        <Panel>
+          <SectionHeader>NO SE GUARDÓ EL CAMBIO:</SectionHeader>
+          <SunkenBox>
+            <p className={styles.error}>{mutations.patchGame.error.message}</p>
+          </SunkenBox>
+        </Panel>
+      ) : null}
 
       <CompletionDashboard game={game} missing={missing} />
 
@@ -155,6 +227,7 @@ export function FichaJuego() {
           onSuggestVideo={() => setSuggestField('video')}
           onSuggestImage={(key) => setSuggestField(key)}
           onUpload={(key, file) => mutations.uploadMedia.mutate({ key, file })}
+          onGalleryChanged={() => void refetchGame()}
         />
         <TextSection
           ref={(r) => { sectionRefs.current.texts = r; }}
@@ -186,6 +259,7 @@ export function FichaJuego() {
         />
         <ManualSection game={game} onUpload={(file) => mutations.uploadManual.mutate(file)} onDelete={(id) => mutations.deleteManual.mutate(id)} />
         <MagazineSection game={game} />
+        <CabinetSection game={game} />
       </div>
 
       {suggestField ? (
@@ -198,6 +272,7 @@ export function FichaJuego() {
           onApply={(candidateId) => mutations.applySuggestion.mutate({ key: suggestField, candidateId })}
           onClose={() => setSuggestField(null)}
           open
+          current={{ previewUrl: suggestionStatus(game, suggestField).previewUrl, value: suggestionStatus(game, suggestField).value }}
         />
       ) : null}
 
@@ -411,12 +486,14 @@ function MediaSection({
   onSuggestVideo,
   onSuggestImage,
   onUpload,
+  onGalleryChanged,
 }: {
   game: Game;
   onDelete: (key: ImageKey | VideoKey) => void;
   onSuggestVideo: () => void;
   onSuggestImage: (key: ImageKey) => void;
   onUpload: (key: ImageKey | VideoKey, file: File) => void;
+  onGalleryChanged: () => void;
 }) {
   return (
     <>
@@ -437,6 +514,7 @@ function MediaSection({
           ))}
         </div>
       </Panel>
+      <GalleryPanel gallery={game.gallery ?? []} gameId={game.id} onChanged={onGalleryChanged} />
       <Panel>
         <SectionHeader>VIDEO</SectionHeader>
         <div className={styles.mediaGrid}>
@@ -858,4 +936,151 @@ function summary(game: Game, missing: string[]) {
   if (game.errors.length) return `${game.errors.length} error(es) de formato`;
   if (missing.length) return `${missing.length} campo(s) faltante(s)`;
   return 'Completo';
+}
+
+interface PrecargaBannerProps {
+  jobId: string;
+  onComplete: () => void;
+}
+
+function PrecargaBanner({ jobId, onComplete }: PrecargaBannerProps) {
+  const [status, setStatus] = useState<JobStatus>('queued');
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [jobResult, setJobResult] = useState<{ estado?: string; romset?: string } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const job = await getJob<{ estado?: string; romset?: string }>(jobId);
+        if (cancelled) return;
+        setStatus(job.status);
+        setProgress(job.progress);
+        if (job.status === 'succeeded' || job.status === 'failed' || job.status === 'cancelled') {
+          setJobResult(job.result);
+          onComplete();
+          return;
+        }
+        setTimeout(poll, 500);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Error consultando progreso');
+        }
+      }
+    };
+    poll();
+    return () => { cancelled = true; };
+  }, [jobId, onComplete]);
+
+  const failed = status === 'failed' || (status === 'succeeded' && jobResult && 'error' in jobResult);
+  const notFound = status === 'succeeded' && jobResult?.estado === 'no-encontrado';
+  const noRomset = status === 'succeeded' && jobResult?.estado === 'sin-romset';
+  const systemUnsupported = status === 'succeeded' && jobResult?.estado === 'sistema-no-soportado';
+  const isActive = status === 'queued' || status === 'running';
+
+  if (!isActive && !failed) {
+    if (notFound || noRomset || systemUnsupported) {
+      const reason = notFound
+        ? `Romset "${jobResult?.romset}" no encontrado en ArcadeDB.`
+        : noRomset
+          ? 'El juego no tiene romset definido.'
+          : 'El sistema no es compatible con ArcadeDB.';
+      return (
+        <Panel>
+          <SectionHeader>PRECARGA DE ARCADEDB</SectionHeader>
+          <SunkenBox className={styles.stack}>
+            <p className={styles.meta}>{reason}</p>
+          </SunkenBox>
+        </Panel>
+      );
+    }
+    return null;
+  }
+
+  return (
+    <Panel>
+      <SectionHeader>PRECARGA DE ARCADEDB</SectionHeader>
+      <SunkenBox className={styles.stack}>
+        <div className={styles.fieldTop}>
+          <span className={styles.name}>
+            {failed ? 'Error en la precarga' : 'Buscando datos en ArcadeDB…'}
+          </span>
+          <span className={styles.meta}>{progress}%</span>
+        </div>
+        <ProgressBar value={progress} />
+        {error ? <p className={styles.error}>{error}</p> : null}
+        {failed ? (
+          <p className={styles.error}>La precarga falló. Podés reintentar desde la ficha del juego.</p>
+        ) : null}
+      </SunkenBox>
+    </Panel>
+  );
+}
+
+function CabinetSection({ game }: { game: Game }) {
+  const cabinet = game.cabinet;
+  const hasData = cabinet?.resolution || cabinet?.orientation || cabinet?.controls;
+
+  return (
+    <Panel>
+      <SectionHeader>GABINETE</SectionHeader>
+      <SunkenBox className={styles.stack}>
+        {hasData ? (
+          <>
+            <div className={styles.fieldTop}>
+              <span className={styles.name}>Especificaciones</span>
+            </div>
+            <div className={styles.cheatLedger}>
+              {cabinet?.resolution ? (
+                <div className={styles.cheatEntry}>
+                  <span>Resolución</span>
+                  <span className={styles.meta}>{cabinet.resolution}</span>
+                </div>
+              ) : null}
+              {cabinet?.orientation ? (
+                <div className={styles.cheatEntry}>
+                  <span>Orientación</span>
+                  <span className={styles.meta}>{cabinet.orientation}</span>
+                </div>
+              ) : null}
+              {cabinet?.controls ? (
+                <div className={styles.cheatEntry}>
+                  <span>Controles</span>
+                  <span className={styles.meta}>{cabinet.controls}</span>
+                </div>
+              ) : null}
+              {cabinet?.buttons ? (
+                <div className={styles.cheatEntry}>
+                  <span>Botones</span>
+                  <span className={styles.meta}>{cabinet.buttons}</span>
+                </div>
+              ) : null}
+            </div>
+            {cabinet?.button_list.length ? (
+              <>
+                <div className={styles.fieldTop}>
+                  <span className={styles.name}>Mapa de botones</span>
+                </div>
+                <div className={styles.cheatLedger}>
+                  {cabinet.button_list.map((btn, idx) => (
+                    <div className={styles.cheatEntry} key={`${btn.control}-${idx}`}>
+                      <span>{btn.action}</span>
+                      <code>{btn.control}</code>
+                      <span className={styles.meta}>{btn.color}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : null}
+          </>
+        ) : (
+          <p className={styles.empty}>Sin Información</p>
+        )}
+        <p className={styles.meta}>
+          Fuente: Arcade Database (motoschifo) — adb.arcadeitalia.net · Historia (C) arcade-history.com
+        </p>
+      </SunkenBox>
+    </Panel>
+  );
 }

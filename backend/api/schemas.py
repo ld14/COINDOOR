@@ -92,12 +92,42 @@ class MagazineAppearance(BaseModel):
     appearanceType: str = "no_determinado"
 
 
+class GalleryImage(BaseModel):
+    """Una imagen del banco, fuera de los assets del contrato (ADR-0016).
+
+    ``file`` es un NOMBRE suelto dentro de ``_gallery/``, nunca una ruta: es la
+    misma regla que ``_chk_manual_doc`` hace cumplir del lado de ATTRACT, y lo que
+    permite que el theme concatene el prefijo tal cual sin riesgo de traversal.
+    """
+
+    id: str
+    tipo: str
+    label: str
+    file: str
+    url: str
+    source: str = "ArcadeDB"
+
+
 class FieldProvenance(BaseModel):
     source: str
     originUrl: str | None = None
     sourceId: str | None = None
     sourceType: str = "api"
     processedUrls: list[str] = Field(default_factory=list)
+
+
+class CabinetButton(BaseModel):
+    control: str
+    color: str
+    action: str
+
+
+class CabinetInfo(BaseModel):
+    resolution: str = ""
+    orientation: str = ""
+    controls: str = ""
+    buttons: int = 0
+    button_list: list[CabinetButton] = Field(default_factory=list)
 
 
 class StoredGame(BaseModel):
@@ -120,11 +150,15 @@ class StoredGame(BaseModel):
     accentValue: str = ""
     accent2Value: str = ""
     manuals: list[GameManual] = Field(default_factory=list)
+    # Banco de imagenes, aparte de ``images``: es una lista sin asset del contrato,
+    # asi que no entra en fielddefs.images[] ni cuenta para la completitud (ADR-0016).
+    gallery: list[GalleryImage] = Field(default_factory=list)
     magazine: MagazineLink = "empty"
     magazineName: str = ""
     magazineAppearances: list[MagazineAppearance] = Field(default_factory=list)
     coverThumbUrl: str | None = None
     provenance: dict[str, FieldProvenance] = Field(default_factory=dict)
+    cabinet: CabinetInfo = Field(default_factory=CabinetInfo)
 
 
 class GameOut(StoredGame):

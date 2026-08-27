@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, UploadFile
+from pydantic import BaseModel
 
 from backend.api.schemas import GameOut
 from backend.config import get_settings
@@ -18,6 +19,15 @@ def _service() -> ManualsService:
 def upload_manual(game_id: str, file: UploadFile) -> GameOut:
     data = file.file.read()
     return _service().upload(game_id, file.filename or "manual.pdf", data)
+
+
+@router.post("/from-url")
+class ManualFromUrl(BaseModel):
+    url: str
+
+
+def import_manual_from_url(game_id: str, payload: ManualFromUrl) -> GameOut:
+    return _service().import_url(game_id, payload.url)
 
 
 @router.delete("/{manual_id}")

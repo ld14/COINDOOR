@@ -13,8 +13,10 @@ un objeto JSON válido, sin texto antes ni después, sin markdown, con esta form
   "racing", "fighting", "RPG"). Un solo género.
 - `players`: cantidad de jugadores como número o rango (ej: "1", "1-2", "2").
   Si no sabés, "1".
-- `format`: formato del archivo de ROM según la plataforma. Para arcade/MAME
-  es siempre "zip". Para consolas podés inferir "zip" o dejar "".
+- `format`: soporte FÍSICO del juego original, exactamente uno de estos siete
+  valores (respetá mayúsculas): "Arcade", "GD-ROM", "PCB", "Cartucho",
+  "Diskette", "CD", "DVD". Para arcade/MAME es "Arcade". No es la extensión del
+  archivo: nunca devuelvas "zip", "chd" ni "iso". Si no sabés, dejalo en "".
 
 No inventes información que no conozcas. Si no estás seguro de un campo, dejalo en
 cadena vacía (o "1" para players). Es mejor no decir nada que decir algo incorrecto.

@@ -255,7 +255,9 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
   LPT1-9`, sin terminar en espacio ni punto. Un error de capitalización en un asset no
   rompe nada visible: el juego simplemente no muestra la imagen en el gabinete.
 - **Todo lo que sale a la red es a pedido del usuario.** Nada corre en segundo plano, ni al
-  abrir una ficha, ni al guardar.
+  abrir una ficha, ni al guardar. **Única excepción:** la precarga de ArcadeDB al dar de alta
+  un juego arcade ([`ADR-0015`](../decisions/0015-precarga-con-red-al-alta.md)), acotada a un
+  endpoint con nombre propio, un juego por vez, solo sobre campos vacíos y cancelable.
 - **La latencia no es un problema de este producto.** Se trabaja de a un campo de un juego
   por vez, con una persona esperando a propósito el resultado que pidió. Los timeouts
   existen para que una conexión colgada termine alguna vez, no como presupuesto de
@@ -334,10 +336,11 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
 1. **`contract.json` no existe todavía.** Hay que traerlo a mano de ATTRACT hasta que lo
    publique ([`ADR-0005`](../decisions/0005-contrato-vendoreado-vs-politica-propia.md)).
    Bloquea la feature [004](../features/004-dominio-y-contrato/spec.md).
-2. **Credenciales de ScreenScraper y MobyGames.** Las dos APIs piden cuenta y tienen
-   cuotas. Hay que decidir dónde viven las claves y qué pasa cuando se agota la cuota
-   ([`ADR-0006`](../decisions/0006-fuentes-externas-multiproveedor.md)). Bloquea la
-   feature [002](../features/002-sugerencias-multiproveedor/spec.md), no el arranque.
+2. ~~**Credenciales de ScreenScraper y MobyGames.**~~ **Ya no bloquea.**
+   [`ADR-0013`](../decisions/0013-sin-scraping-ni-catalogo-pago.md) sacó las dos fuentes
+   justamente por su credencial y su cuota, y
+   [`ADR-0014`](../decisions/0014-arcadedb-fuente-arcade.md) las reemplaza en arcade con
+   ArcadeDB, que no pide ninguna de las dos.
 3. **Qué modelo de IA.** Afecta al coste por juego y a la voz de los textos. Bloquea la
    feature 002, no el arranque.
 

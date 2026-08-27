@@ -1,0 +1,4 @@
+{
+  "_comment": "Sistemas cuyos juegos son romsets MAME: ArcadeDB los indexa por romset. Match por substring sobre systemId en minusculas. Fuente unica para TypeScript (arcade.ts) y Python (backend/lib/domain/arcade.py).",
+  "markers": ["arcade", "mame", "fbneo", "neogeo", "cps"]
+}

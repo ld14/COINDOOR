@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { DosButton, DosFileInput, DosInput, DosSelect, Panel, SectionHeader, SunkenBox } from '@/components/dos';
 import { useGameMutations } from '@/hooks/useGameMutations';
 import { useSystems } from '@/hooks/useSystems';
-import { uploadRom } from '@/lib/api/games';
+import { uploadRom, startPrecarga } from '@/lib/api/games';
 import type { Identity, RomSource, Tratamiento } from '@/lib/domain/types';
+import { soportaArcadeDb } from '@/lib/domain/arcade';
 import { absolutePath, ABSOLUTE_PATH_MESSAGE } from '@/lib/domain/validation';
 import styles from './ReadPages.module.css';
 
@@ -55,7 +56,18 @@ export function NuevoJuego() {
       if (romSource === 'upload' && romFile) {
         await uploadRom(game.id, romFile);
       }
-      navigate(`/juegos/${game.id}`);
+      // Precarga de ArcadeDB para sistemas de romsets MAME (mismo criterio que el backend).
+      let precargaJobId = '';
+      if (soportaArcadeDb(systemId)) {
+        try {
+          const result = await startPrecarga(game.id);
+          precargaJobId = result.jobId;
+        } catch {
+          // La precarga es best-effort: si falla, el juego se creó igual.
+        }
+      }
+      const query = precargaJobId ? `?precarga=${precargaJobId}` : '';
+      navigate(`/juegos/${game.id}${query}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo crear la ficha.');
     }
