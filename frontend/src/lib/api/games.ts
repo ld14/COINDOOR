@@ -76,3 +76,8 @@ export function startPrecarga(id: string, force: boolean = false) {
   const params = force ? '?force=true' : '';
   return fetchJson<PrecargaResult>(`/games/${id}/arcadedb${params}`, { method: 'POST' });
 }
+
+export function startPrecargaMsdos(id: string, force: boolean = false) {
+  const params = force ? '?force=true' : '';
+  return fetchJson<PrecargaResult>(`/games/${id}/msdos${params}`, { method: 'POST' });
+}

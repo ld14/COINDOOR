@@ -6,6 +6,7 @@ from backend.api.schemas import CreateGame, GameOut, GamesPage, PatchGame, Sugge
 from backend.config import get_settings
 from backend.lib.jobs.ejecutor import submit
 from backend.services.arcadedb import ArcadeDbPrecargaService
+from backend.services.msdos import MsdosPrecargaService
 from backend.services.games import GamesService
 
 router = APIRouter(prefix="/api/games", tags=["games"])
@@ -44,5 +45,13 @@ def mark_ready(game_id: str) -> GameOut:
 def precarga_arcadedb(game_id: str, force: bool = False) -> SuggestionJob:
     """Lanza la precarga de datos de ArcadeDB como un job."""
     service = ArcadeDbPrecargaService(get_settings())
+    job = submit(service.run(game_id, force=force))
+    return SuggestionJob(jobId=job.job_id)
+
+
+@router.post("/{game_id}/msdos")
+def precarga_msdos(game_id: str, force: bool = False) -> SuggestionJob:
+    """Lanza la precarga de datos MSDOS (Launchbox + IA) como un job."""
+    service = MsdosPrecargaService(get_settings())
     job = submit(service.run(game_id, force=force))
     return SuggestionJob(jobId=job.job_id)

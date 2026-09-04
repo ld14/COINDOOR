@@ -310,6 +310,7 @@ class TestLaunchboxImageProvider:
         provider = LaunchboxImageProvider()
         assert provider.campos == frozenset({
             "caratula", "marquesina", "poster", "logo", "captura",
+            "year",
         })
 
 

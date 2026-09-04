@@ -30,12 +30,13 @@ _TIMEOUT = 15.0
 
 
 class LaunchboxImageProvider:
-    """Busca imágenes de juegos en Launchbox Games Database."""
+    """Busca imágenes y datos de identidad de juegos en Launchbox Games Database."""
 
     nombre = "Launchbox"
     tipo: Literal["api", "scrape"] = "scrape"
     campos: frozenset[str] = frozenset({
         "caratula", "marquesina", "poster", "logo", "captura",
+        "year",
     })
     timeout = _TIMEOUT
     limite = Limite(por_segundo=0.5, por_dia=None, espera_min=0.0)
@@ -43,8 +44,8 @@ class LaunchboxImageProvider:
     def buscar(self, consulta: Consulta) -> ProviderResult:
         trace = ProviderTrace(self.nombre, self.tipo, "sin resultados")
 
-        if consulta.key not in self.campos or not consulta.title:
-            log.info("Launchbox: skipped key=%s title=%s", consulta.key, bool(consulta.title))
+        if not consulta.title:
+            log.info("Launchbox: skipped empty title")
             return ProviderResult((), trace)
 
         # 1. Buscar juego por título + plataforma
@@ -56,7 +57,26 @@ class LaunchboxImageProvider:
 
         log.info("Launchbox: found %s-%s (%s)", result.game_id, result.slug, result.title)
 
-        # 2. Obtener imágenes
+        # 2. Si el campo es identity, devolver year del search result
+        if consulta.key == "year" and result.year:
+            trace = ProviderTrace(self.nombre, self.tipo, "ok")
+            candidato = Candidato(
+                id=f"launchbox:{result.game_id}:year",
+                key="year",
+                kind="identity",
+                nombre=f"Año (Launchbox)",
+                fuente=self.nombre,
+                clase="aplicable",
+                value=result.year,
+                origen_url=result.detail_url,
+                trace=trace,
+            )
+            return ProviderResult((candidato,), trace)
+
+        # 3. Para campos de imágenes, buscar imágenes
+        if consulta.key not in self.campos:
+            return ProviderResult((), trace)
+
         images = fetch_images(result.game_id, result.slug)
         if not images:
             log.info("Launchbox: no mapped images for %s-%s", result.game_id, result.slug)
@@ -64,7 +84,7 @@ class LaunchboxImageProvider:
 
         log.info("Launchbox: %d images found for key=%s", len(images), consulta.key)
 
-        # 3. Filtrar por el campo solicitado y crear candidatos
+        # 4. Filtrar por el campo solicitado y crear candidatos
         candidates = []
         for img in images:
             if img.field_key != consulta.key:

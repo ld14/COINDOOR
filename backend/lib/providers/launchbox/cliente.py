@@ -76,6 +76,7 @@ class LaunchboxSearchResult:
     platform: str
     title: str
     detail_url: str
+    year: str = ""
 
 
 def search_game(
@@ -260,12 +261,23 @@ def _parse_search_results(
         if expected_lower not in card_title.lower():
             continue
 
+        # Extraer año de <div class="releaseDate"> → <h5>
+        year = ""
+        year_match = re.search(
+            r'class="releaseDate".*?<h5[^>]*>(\d{4})</h5>',
+            card_html,
+            re.DOTALL,
+        )
+        if year_match:
+            year = year_match.group(1)
+
         return LaunchboxSearchResult(
             game_id=gid,
             slug=slug,
             platform=card_platform,
             title=card_title,
             detail_url=f"{_BASE}/games/details/{gid}-{slug}",
+            year=year,
         )
 
     return None

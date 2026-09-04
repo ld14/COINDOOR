@@ -21,7 +21,7 @@ import { useGame } from '@/hooks/useGame';
 import { useGameMutations } from '@/hooks/useGameMutations';
 import { useSystems } from '@/hooks/useSystems';
 import { useDominantColors } from '@/hooks/useDominantColors';
-import { soportaArcadeDb } from '@/lib/domain/arcade';
+import { soportaArcadeDb, soportaMsdos } from '@/lib/domain/arcade';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
 import { FIELDDEFS } from '@/lib/domain/types';
 import type {
@@ -40,7 +40,7 @@ import type {
 import { searchManuals, type ManualSearchResult } from '@/lib/api/manuals';
 import { searchMagazines, setMagazine, addAppearance, removeAppearance, buildMagazineLinks, type MagazineSearchResult } from '@/lib/api/magazines';
 import { getJob, type JobStatus } from '@/lib/api/jobs';
-import { startPrecarga } from '@/lib/api/games';
+import { startPrecarga, startPrecargaMsdos } from '@/lib/api/games';
 import styles from './ReadPages.module.css';
 
 const MANUAL_DELETE_CONFIRM = 'Este campo fue cargado a mano. ¿Borrarlo de todas formas?';
@@ -129,11 +129,14 @@ export function FichaJuego() {
   }
 
   const isArcade = soportaArcadeDb(game.systemId);
+  const isMsdos = soportaMsdos(game.systemId);
 
   const handlePrecarga = async () => {
     setPrecargaLoading(true);
     try {
-      const result = await startPrecarga(game.id);
+      const result = isMsdos
+        ? await startPrecargaMsdos(game.id)
+        : await startPrecarga(game.id);
       setSearchParams({ precarga: result.jobId });
     } catch {
       // Error silenciado: el usuario puede reintentar.
@@ -164,6 +167,19 @@ export function FichaJuego() {
             <div className={styles.toolbar}>
               <DosButton disabled={precargaLoading} onClick={handlePrecarga} variant="primary-small">
                 {precargaLoading ? 'Iniciando…' : 'Precargar ArcadeDB'}
+              </DosButton>
+            </div>
+          </SunkenBox>
+        </Panel>
+      ) : null}
+      {isMsdos && !precargaJobId ? (
+        <Panel>
+          <SectionHeader>PRECARGA DE MSDOS</SectionHeader>
+          <SunkenBox className={styles.stack}>
+            <p className={styles.meta}>Buscar datos del juego en Launchbox + IA (año, imágenes, identidad, sinopsis).</p>
+            <div className={styles.toolbar}>
+              <DosButton disabled={precargaLoading} onClick={handlePrecarga} variant="primary-small">
+                {precargaLoading ? 'Iniciando…' : 'Precargar Launchbox + IA'}
               </DosButton>
             </div>
           </SunkenBox>

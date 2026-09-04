@@ -19,6 +19,8 @@ _ARCADEDB_IDENTITY = ("arcadedb", "ia_primary", "ia_backup")
 _ARCADEDB_TEXT = ("arcadedb", "ia_primary", "ia_backup")
 _ARCADEDB_IMAGE = ("arcadedb", "image_search", "launchbox")
 _ARCADEDB_VIDEO = ("arcadedb", "youtube_referencia")
+# Cadena para identity con Launchbox (year desde search results)
+_LAUNCHBOX_IDENTITY = ("launchbox", "ia_primary", "ia_backup")
 
 _TABLE: dict[str, tuple[str, ...]] = {
     **{key: _ARCADEDB_IDENTITY for key in identity_keys()},
@@ -27,6 +29,8 @@ _TABLE: dict[str, tuple[str, ...]] = {
     "review": ("ia_primary", "ia_backup"),
     "cheats": _ARCADEDB_TEXT,
     "video": _ARCADEDB_VIDEO,
+    # Year: Launchbox primero (tiene año en search results), luego IA
+    "year": _LAUNCHBOX_IDENTITY,
 }
 
 

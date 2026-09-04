@@ -10,3 +10,18 @@ export function soportaArcadeDb(systemId: string): boolean {
   const nombre = systemId.toLowerCase();
   return arcadeSystems.markers.some((marker) => nombre.includes(marker));
 }
+
+/** ¿Los juegos de este sistema son MSDOS/DOS/PC/Windows?
+ * La precarga MSDOS usa Launchbox + IA.
+ */
+const MSDOS_MARKERS = ['msdos', 'ms-dos', 'dos', 'pc', 'windows'];
+
+export function soportaMsdos(systemId: string): boolean {
+  const nombre = systemId.toLowerCase();
+  return MSDOS_MARKERS.some((marker) => nombre.includes(marker));
+}
+
+/** ¿El sistema soporta algún tipo de precarga (ArcadeDB o MSDOS)? */
+export function soportaPrecarga(systemId: string): boolean {
+  return soportaArcadeDb(systemId) || soportaMsdos(systemId);
+}
