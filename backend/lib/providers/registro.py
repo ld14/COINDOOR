@@ -17,6 +17,7 @@ from backend.store.cuotas import QuotasStore
 # Tabla campo → proveedores, en orden. Sumar una fuente es una fila; ver ADR-0013.
 _ARCADEDB_IDENTITY = ("arcadedb", "ia_primary", "ia_backup")
 _ARCADEDB_TEXT = ("arcadedb", "ia_primary", "ia_backup")
+_ARCADEDB_CHEATS = ("arcadedb", "ia_cheats", "ia_primary", "ia_backup")
 _ARCADEDB_IMAGE = ("arcadedb", "image_search", "launchbox")
 _ARCADEDB_VIDEO = ("arcadedb", "youtube_referencia")
 # Cadena para identity con Launchbox (year desde search results)
@@ -27,7 +28,7 @@ _TABLE: dict[str, tuple[str, ...]] = {
     **{key: _ARCADEDB_IMAGE for key in image_keys()},
     "sinopsis": _ARCADEDB_TEXT,
     "review": ("ia_primary", "ia_backup"),
-    "cheats": _ARCADEDB_TEXT,
+    "cheats": _ARCADEDB_CHEATS,
     "video": _ARCADEDB_VIDEO,
     # Year: Launchbox primero (tiene año en search results), luego IA
     "year": _LAUNCHBOX_IDENTITY,
@@ -66,6 +67,13 @@ def _build(
             settings.ai_backup_base_url,
             settings.ai_backup_api_key,
             settings.ai_backup_model,
+        )
+        return _ia_provider(config, quotas, cancel_event)
+    if name == "ia_cheats":
+        config = AiModelConfig(
+            settings.ai_primary_base_url,
+            settings.ai_primary_api_key,
+            settings.ai_cheats_model,
         )
         return _ia_provider(config, quotas, cancel_event)
     if name == "youtube_referencia":

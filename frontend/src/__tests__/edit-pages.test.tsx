@@ -84,6 +84,44 @@ describe('Edición de ficha', () => {
     expect(screen.getByLabelText('Sinopsis')).toHaveValue('Sinopsis cargada para pruebas.');
   });
 
+  it('los trucos se leen como ledger y solo se vuelven editables al pedirlo', async () => {
+    renderApp('/juegos/contra');
+
+    await screen.findByRole('heading', { name: 'Contra' });
+    // Vista: el truco se lee como texto, no como un campo.
+    expect(screen.getByText('30 vidas')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Qué hace el truco')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Editar trucos' }));
+
+    expect(screen.getByLabelText('Qué hace el truco')).toHaveValue('30 vidas');
+    expect(screen.getByLabelText('Código o procedimiento')).toHaveValue('↑ ↑ ↓ ↓ ← → ← → B A');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+
+    expect(screen.queryByLabelText('Qué hace el truco')).not.toBeInTheDocument();
+    expect(screen.getByText('30 vidas')).toBeInTheDocument();
+  });
+
+  it('editar un truco lo guarda como estructura de grupos', async () => {
+    renderApp('/juegos/contra');
+
+    await screen.findByRole('heading', { name: 'Contra' });
+    await userEvent.click(screen.getByRole('button', { name: 'Editar trucos' }));
+
+    const campo = screen.getByLabelText('Código o procedimiento');
+    await userEvent.clear(campo);
+    await userEvent.type(campo, 'ARRIBA ARRIBA ABAJO');
+    await userEvent.click(screen.getByRole('button', { name: 'Guardar trucos' }));
+
+    const fetchMock = vi.mocked(fetch);
+    const call = fetchMock.mock.calls.find(([input]) => String(input).includes('/fields/cheats'));
+    expect(call).toBeDefined();
+    expect(JSON.parse(String(call?.[1]?.body))).toEqual({
+      groups: [{ name: 'modo cooperativo', entries: [{ name: '30 vidas', input: 'ARRIBA ARRIBA ABAJO' }] }],
+    });
+  });
+
   it('review se guarda como estructura, no como texto', async () => {
     renderApp('/juegos/mslug');
 

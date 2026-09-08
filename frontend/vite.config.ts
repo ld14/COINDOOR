@@ -11,6 +11,10 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // El repo vive en un disco de Windows montado en WSL (/mnt/d): ese montaje no emite
+    // eventos inotify, así que sin polling Vite nunca se entera de un cambio y sirve el
+    // bundle con el que arrancó.
+    watch: { usePolling: true },
     proxy: {
       '/api': 'http://127.0.0.1:8765',
       '/media': 'http://127.0.0.1:8765',

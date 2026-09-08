@@ -258,5 +258,9 @@ class CheatsValue(BaseModel):
     groups: list[CheatGroup] = Field(default_factory=list)
 
 
+class CheatsParseRequest(BaseModel):
+    text: str = ""
+
+
 class MissingRequiredResponse(BaseModel):
     missing: list[str]

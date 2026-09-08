@@ -21,16 +21,23 @@ class OpenAiCompatibleClient:
         self.model = model
         self.http = http
 
-    def complete(self, prompt: str) -> str:
+    def complete(self, prompt: str, *, max_tokens: int = 2048) -> str:
+        """`max_tokens` acota la respuesta. Una sinopsis entra en el default; convertir
+        una guía entera a trucos no, y el modelo que se queda sin lugar devuelve menos
+        entradas en vez de fallar — así que quien pide mucho tiene que pedirlo alto."""
+        body: dict[str, object] = {
+            "model": self.model,
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": max_tokens,
+        }
+        # Los modelos "compound" (agentes con herramientas, p. ej. groq/compound)
+        # rechazan reasoning_effort con 400: no son un modelo de razonamiento plano.
+        if "compound" not in self.model:
+            body["reasoning_effort"] = "low"
         with self.http:
             response = self.http.post_json(
                 f"{self.base_url}/chat/completions",
-                json={
-                    "model": self.model,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 2048,
-                    "reasoning_effort": "low",
-                },
+                json=body,
                 headers={"Authorization": f"Bearer {self.api_key}"},
             )
         choices = response.json.get("choices") if isinstance(response.json, dict) else None

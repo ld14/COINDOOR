@@ -267,6 +267,103 @@ def test_ia_generador_invalid_review_json_fails_explicit(tmp_path: Path) -> None
     assert result.candidatos == ()
 
 
+def test_parse_cheats_text_empty_text_returns_empty_list(tmp_path: Path) -> None:
+    settings = Settings(data_dir=tmp_path / "data")
+    settings.data_dir.mkdir(parents=True)
+
+    assert SuggestionsService(settings).parse_cheats_text("no-existe", "   ") == []
+
+
+def test_parse_cheats_text_without_ia_configured_raises(tmp_path: Path) -> None:
+    settings = _seeded_settings(tmp_path)
+    settings.ai_primary_base_url = ""
+    settings.ai_primary_api_key = ""
+    settings.ai_primary_model = ""
+    settings.ai_backup_base_url = ""
+    settings.ai_backup_api_key = ""
+    settings.ai_backup_model = ""
+
+    with pytest.raises(BadRequest):
+        SuggestionsService(settings).parse_cheats_text("golden-axe", "30 vidas: arriba arriba")
+
+
+def test_parse_cheats_text_returns_groups_from_model(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = _seeded_settings(tmp_path)
+    settings.ai_primary_base_url = "https://api.test/v1"
+    settings.ai_primary_api_key = "key"
+    settings.ai_primary_model = "test-model"
+    settings.ai_backup_model = ""  # aislado del .env real
+
+    monkeypatch.setattr(
+        "backend.lib.providers.orquestador.OpenAiCompatibleClient.complete",
+        lambda self, prompt, **_: (
+            '{"groups": [{"name": "Códigos", '
+            '"entries": [{"name": "30 vidas", "input": "arriba arriba"}]}]}'
+        ),
+    )
+
+    groups = SuggestionsService(settings).parse_cheats_text("golden-axe", "30 vidas: arriba arriba")
+
+    assert groups == [
+        {"name": "Códigos", "entries": [{"name": "30 vidas", "input": "arriba arriba"}]},
+    ]
+
+
+def test_parse_cheats_text_aplasta_saltos_de_linea(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """El modelo puede desobedecer el prompt; el contrato guarda un renglón por truco."""
+    settings = _seeded_settings(tmp_path)
+    settings.ai_primary_base_url = "https://api.test/v1"
+    settings.ai_primary_api_key = "key"
+    settings.ai_primary_model = "test-model"
+    settings.ai_backup_model = ""  # aislado del .env real
+
+    monkeypatch.setattr(
+        "backend.lib.providers.orquestador.OpenAiCompatibleClient.complete",
+        lambda self, prompt, **_: (
+            '{"groups": [{"name": "Técnicas", '
+            '"entries": [{"name": "Escudo", "input": "1. Crear escudo.\\n2. Disparar."}]}]}'
+        ),
+    )
+
+    groups = SuggestionsService(settings).parse_cheats_text("golden-axe", "texto")
+
+    esperado = [{"name": "Escudo", "input": "1. Crear escudo. 2. Disparar."}]
+    assert groups == [{"name": "Técnicas", "entries": esperado}]
+
+
+def test_parse_cheats_text_falls_back_to_backup_model(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = _seeded_settings(tmp_path)
+    settings.ai_primary_base_url = "https://api.test/v1"
+    settings.ai_primary_api_key = "key"
+    settings.ai_primary_model = "primary-model"
+    settings.ai_backup_base_url = "https://api.test/v1"
+    settings.ai_backup_api_key = "key"
+    settings.ai_backup_model = "backup-model"
+
+    def fake_complete(self: object, prompt: str, **_: object) -> str:
+        if self.model == "primary-model":  # type: ignore[attr-defined]
+            raise RuntimeError("caído")
+        return '{"groups": []}'
+
+    monkeypatch.setattr(
+        "backend.lib.providers.orquestador.OpenAiCompatibleClient.complete",
+        fake_complete,
+    )
+
+    groups = SuggestionsService(settings).parse_cheats_text("golden-axe", "sin trucos conocidos")
+
+    assert groups == []
+
+
 def test_youtube_reference_provider_returns_single_referencia_candidate() -> None:
     result = YoutubeReferenceProvider().buscar(
         Consulta("golden-axe", "video", "Golden Axe", "Arcade", "1989"),

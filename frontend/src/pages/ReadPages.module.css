@@ -529,6 +529,18 @@
   overflow-wrap: anywhere;
 }
 
+.cheatGroupEdit {
+  display: grid;
+  gap: var(--dos-space-2);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.cheatEntryEdit {
+  display: grid;
+  gap: var(--dos-space-2);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) auto;
+}
+
 .stack {
   display: grid;
   gap: var(--dos-space-3);

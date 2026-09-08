@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from backend.api.schemas import (
     ApplySuggestion,
+    CheatsParseRequest,
     CheatsValue,
     GameOut,
     MagazineValue,
@@ -15,6 +16,7 @@ from backend.api.schemas import (
 )
 from backend.config import get_settings
 from backend.lib.jobs.ejecutor import submit
+from backend.lib.providers.orquestador import SuggestionsService
 from backend.services.fields import FieldsService
 from backend.services.suggestions import SuggestionJobsService
 
@@ -48,6 +50,12 @@ def create_suggestion_job(
     )
     job = submit(fn)
     return SuggestionJob(jobId=job.job_id)
+
+
+@router.post("/cheats/parse-text")
+def parse_cheats_text(game_id: str, payload: CheatsParseRequest) -> CheatsValue:
+    groups = SuggestionsService(get_settings()).parse_cheats_text(game_id, payload.text)
+    return CheatsValue.model_validate({"groups": groups})
 
 
 @router.post("/{key}/apply-suggestion")

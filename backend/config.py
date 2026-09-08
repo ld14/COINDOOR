@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     ai_backup_base_url: str = ""
     ai_backup_api_key: str = ""
     ai_backup_model: str = ""
+    # Modelo alternativo solo para trucos, con las credenciales de ai_primary
+    # (mismo proveedor, otro modelo — p. ej. uno con búsqueda web). Vacío = no se usa.
+    ai_cheats_model: str = ""
 
     @property
     def media_dir(self) -> Path:

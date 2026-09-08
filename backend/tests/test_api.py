@@ -188,6 +188,26 @@ def test_suggestions_endpoint_creates_job_without_credentials(tmp_path: Path) ->
     assert payload["candidatos"] == []
 
 
+def test_cheats_parse_text_without_ia_configured_returns_422(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+
+    response = api.post(f"/api/games/{game_id}/fields/cheats/parse-text", json={"text": "30 vidas: arriba arriba"})  # noqa: E501
+
+    assert response.status_code == 422
+    assert "No se pudo interpretar el texto" in response.json()["error"]
+
+
+def test_cheats_parse_text_empty_text_returns_empty_groups(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+
+    response = api.post(f"/api/games/{game_id}/fields/cheats/parse-text", json={"text": "   "})
+
+    assert response.status_code == 200
+    assert response.json()["groups"] == []
+
+
 def _make_exportable(api: TestClient, game_id: str) -> None:
     api.put(
         f"/api/games/{game_id}/media/caratula",
