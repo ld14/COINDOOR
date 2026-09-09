@@ -18,7 +18,11 @@ Agrupá por categoría (por ejemplo "Códigos", "DIP Switches", "Menú de Servic
 "Secretos"). Devolvé **únicamente** un objeto JSON válido, sin texto antes ni después,
 sin markdown, con esta forma exacta:
 
-{{"groups": [{{"name": "Códigos", "entries": [{{"name": "30 vidas", "input": "↑ ↑ ↓ ↓ ← → ← → B A"}}]}}]}}
+{{"groups": [{{"name": "NOMBRE DEL GRUPO", "entries": [{{"name": "QUÉ HACE EL TRUCO", "input": "CÓMO SE ACTIVA"}}]}}]}}
+
+Los textos en mayúsculas de arriba son marcadores de posición para mostrar la forma del
+JSON: reemplazalos por datos reales de este juego. **No los copies, y no uses como
+respuesta ningún código de ejemplo que aparezca en estas instrucciones.**
 
 - `groups`: lista de grupos. Cada grupo tiene `name` (texto) y `entries` (lista).
 - Cada entrada de `entries` tiene `name` (qué hace) e `input` (la secuencia, código o

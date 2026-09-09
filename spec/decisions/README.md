@@ -45,6 +45,10 @@ de seis meses alguien —tú, o Claude— vuelve a proponer justo lo que ya desc
 | [0013](0013-sin-scraping-ni-catalogo-pago.md) | Sugerencias sin scraping ni catálogos de terceros — solo IA y referencias | superseded por [0014](0014-arcadedb-fuente-arcade.md) | 2026-08-13 |
 | [0014](0014-arcadedb-fuente-arcade.md) | ArcadeDB como fuente de imágenes, video, manual y texto para arcade | accepted | 2026-08-24 |
 | [0015](0015-precarga-con-red-al-alta.md) | Una precarga con red al dar de alta un juego | accepted | 2026-08-24 |
+| [0016](0016-galeria-en-subcarpeta-gallery.md) | La galería vive en `media/_gallery/` y se declara en `data.json` | accepted | 2026-08-25 |
+| [0017](0017-ficha-en-la-carpeta-del-juego.md) | El `game.json` vive en la carpeta del propio juego | accepted | 2026-09-08 |
+| [0018](0018-gemini-con-busqueda-para-trucos.md) | Los trucos los sugiere Gemini con búsqueda de Google, no un modelo de memoria | superseded por [0019](0019-buscador-mas-modelo-para-trucos.md) | 2026-09-09 |
+| [0019](0019-buscador-mas-modelo-para-trucos.md) | Los trucos salen de un buscador propio más el modelo que ya está configurado | accepted | 2026-09-09 |
 
 Los seis últimos salen del análisis de arquitectura de
 [`docs/arquitectura/`](../../docs/arquitectura/README.md), que conserva la comparación

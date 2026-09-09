@@ -16,8 +16,8 @@ Buscá específicamente:
 - Desbloqueo de personajes, niveles, campañas u objetos secretos.
 - Easter eggs conocidos y relevantes.
 - Formas de saltear niveles o partes muy difíciles.
-- Parámetros de inicio del ejecutable (por ejemplo `juego.exe /debug`, `-nomap`,
-  `--level=5`) que habiliten un modo de depuración o desarrollador.
+- Parámetros de línea de comandos del ejecutable que habiliten un modo de depuración o
+  desarrollador, si este juego tiene alguno documentado.
 - Trainers o editores de partida externos reconocidos por la comunidad (no oficiales
   del juego): incluilos solo si son ampliamente conocidos, y dejalo explícito en el
   nombre de la entrada que son una herramienta externa y qué riesgo tienen (partidas
@@ -32,7 +32,12 @@ Agrupá por categoría (por ejemplo "Códigos", "Comandos de consola", "Contrase
 "Parámetros de inicio", "Trainers externos", "Secretos"). Devolvé **únicamente** un
 objeto JSON válido, sin texto antes ni después, sin markdown, con esta forma exacta:
 
-{{"groups": [{{"name": "Códigos", "entries": [{{"name": "Munición infinita", "input": "Durante la partida, escribí IDDQD y presioná Enter"}}]}}]}}
+{{"groups": [{{"name": "NOMBRE DEL GRUPO", "entries": [{{"name": "QUÉ HACE EL TRUCO", "input": "CÓMO SE ACTIVA"}}]}}]}}
+
+Los textos en mayúsculas de arriba son marcadores de posición para mostrar la forma del
+JSON: reemplazalos por datos reales de este juego. **No los copies, y no uses como
+respuesta ningún código, comando o parámetro de ejemplo que aparezca en estas
+instrucciones.**
 
 - `groups`: lista de grupos. Cada grupo tiene `name` (texto) y `entries` (lista).
 - Cada entrada de `entries` tiene `name` (qué hace) e `input` (el código, comando,

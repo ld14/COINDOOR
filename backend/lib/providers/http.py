@@ -116,7 +116,13 @@ class ProviderHttpClient:
                     status_code=response.status_code,
                 )
             if response.status_code == 404:
-                raise ProviderNotFound("sin resultados", status_code=404)
+                # El detalle importa: un 404 puede ser "ese romset no existe" o
+                # "ese modelo ya no está disponible", y sin el mensaje del
+                # proveedor los dos se leen como "sin resultados".
+                raise ProviderNotFound(
+                    f"sin resultados{_detalle_error(response)}",
+                    status_code=404,
+                )
             if response.status_code == 429:
                 self.quotas.mark_exhausted(self.provider)
                 last_error = ProviderQuotaExhausted("sin cuota", status_code=429)
@@ -126,6 +132,17 @@ class ProviderHttpClient:
                 last_error = ProviderHttpError("fallo pasajero", status_code=response.status_code)
                 self._wait_backoff(attempt, response.headers.get("Retry-After"))
                 continue
+            if 400 <= response.status_code < 500:
+                # Un 4xx que llegó hasta acá es un pedido mal formado (modelo
+                # inexistente, combinación de parámetros no soportada): no se cura
+                # reintentando, y sin esta rama saldría como httpx.HTTPStatusError
+                # —que no es ProviderHttpError— y el orquestador lo registraría como
+                # "excepción inesperada", sin decir qué rechazó el proveedor.
+                raise ProviderRejected(
+                    f"solicitud rechazada {response.status_code}{_detalle_error(response)}",
+                    status_code=response.status_code,
+                    retry_exhausted=True,
+                )
             response.raise_for_status()
             return ProviderResponse(
                 str(response.url),
@@ -163,6 +180,23 @@ class ProviderHttpClient:
             wait_for = (1, 4, 16)[attempt] + random.random()
         if self.cancel_event.wait(wait_for):
             raise ProviderHttpError("cancelado")
+
+
+def _detalle_error(response: httpx.Response) -> str:
+    """El mensaje que el proveedor puso en el body, si lo puso y si es JSON."""
+    try:
+        cuerpo = response.json()
+    except ValueError:
+        return ""
+    if isinstance(cuerpo, dict):
+        error = cuerpo.get("error")
+        if isinstance(error, dict):
+            mensaje = error.get("message")
+        else:
+            mensaje = error if isinstance(error, str) else cuerpo.get("message")
+        if isinstance(mensaje, str) and mensaje.strip():
+            return f": {' '.join(mensaje.split())}"
+    return ""
 
 
 def _retry_after_seconds(value: str | None) -> float | None:

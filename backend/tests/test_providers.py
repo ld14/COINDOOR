@@ -66,6 +66,52 @@ def test_http_rejects_403_without_retry(tmp_path: Path) -> None:
     assert calls == 1
 
 
+def test_entorno_de_tests_no_lee_el_env_real() -> None:
+    """Guarda del conftest: si esto falla, los tests están usando credenciales reales."""
+    settings = Settings()
+    assert settings.ai_primary_api_key == ""
+    assert settings.ai_backup_api_key == ""
+    assert settings.search_api_key == ""
+
+
+@pytest.mark.parametrize("status", [400, 413, 422])
+def test_http_rejects_unhandled_4xx_without_retry(tmp_path: Path, status: int) -> None:
+    """Un 4xx que no es 401/403/404/429 tiene que salir como ProviderHttpError con el
+    motivo del proveedor, no como httpx.HTTPStatusError sin explicación."""
+    calls = 0
+
+    def handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        return httpx.Response(status, json={"error": {"message": "modelo\ninexistente"}})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    quotas = QuotasStore(tmp_path / "cuotas.json")
+    provider = ProviderHttpClient("Test", Limite(), quotas, timeout=1, client=client)
+
+    with pytest.raises(ProviderHttpError) as exc, provider:
+        provider.get_json("https://example.test/bad-request")
+
+    assert exc.value.status_code == status
+    assert exc.value.retry_exhausted is True
+    assert "modelo inexistente" in str(exc.value)
+    assert calls == 1
+
+
+def test_http_4xx_sin_body_json_no_rompe(tmp_path: Path) -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(400, text="<html>Bad Request</html>")
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    quotas = QuotasStore(tmp_path / "cuotas.json")
+    provider = ProviderHttpClient("Test", Limite(), quotas, timeout=1, client=client)
+
+    with pytest.raises(ProviderHttpError) as exc, provider:
+        provider.get_json("https://example.test/bad-request")
+
+    assert "400" in str(exc.value)
+
+
 def test_suggestions_cache_avoids_second_provider_call(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -394,6 +440,44 @@ def test_registro_skips_ia_without_credentials(tmp_path: Path) -> None:
     video_providers = providers_for("video", settings)
     assert len(video_providers) == 2
     assert {p.nombre for p in video_providers} == {"ArcadeDB", "YouTube"}
+
+
+def test_registro_cheats_usa_el_buscador_y_nada_mas(tmp_path: Path) -> None:
+    """ADR-0019: trucos no cae a los modelos sin evidencia."""
+    settings = Settings(
+        data_dir=tmp_path / "data",
+        ai_primary_base_url="https://groq.test/v1",
+        ai_primary_api_key="k",
+        ai_primary_model="gpt-oss-120b",
+        ai_backup_base_url="https://groq.test/v1",
+        ai_backup_api_key="k",
+        ai_backup_model="gpt-oss-20b",
+        search_api_key="tvly-test",
+    )
+    settings.data_dir.mkdir(parents=True)
+
+    nombres = [p.nombre for p in providers_for("cheats", settings)]
+    assert nombres == ["ArcadeDB", "Búsqueda web + IA"]
+
+    # Los gpt-oss siguen intactos —y solos— en el resto de los campos.
+    for key in ("sinopsis", "review", "developer"):
+        otros = [p.nombre for p in providers_for(key, settings)]
+        assert "IA · gpt-oss-120b" in otros
+        assert "Búsqueda web + IA" not in otros
+
+
+def test_registro_cheats_sin_buscador_se_queda_sin_ia(tmp_path: Path) -> None:
+    """Coste asumido del ADR-0019: sin buscador no hay sugerencia de trucos, a propósito."""
+    settings = Settings(
+        data_dir=tmp_path / "data",
+        ai_primary_base_url="https://groq.test/v1",
+        ai_primary_api_key="k",
+        ai_primary_model="gpt-oss-120b",
+        search_api_key="",
+    )
+    settings.data_dir.mkdir(parents=True)
+
+    assert [p.nombre for p in providers_for("cheats", settings)] == ["ArcadeDB"]
 
 
 def test_apply_suggestion_rejects_referencia_candidate(
