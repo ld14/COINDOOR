@@ -570,10 +570,35 @@
   font-size: var(--dos-size-meta);
 }
 
+.paletteHint {
+  color: var(--dos-ink-soft);
+}
+
 .colorSwatch {
   display: flex;
   align-items: center;
   gap: var(--dos-space-2);
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.colorSwatch:hover .colorHex,
+.colorSwatch:focus-visible .colorHex {
+  color: var(--dos-ink);
+}
+
+.colorSwatch:focus-visible {
+  outline: var(--dos-focus-outline);
+  outline-offset: var(--dos-space-1);
+}
+
+.colorSwatch:active .colorBlock {
+  border-color: var(--dos-edge-light);
 }
 
 .colorBlock {
@@ -659,4 +684,58 @@
 
 .sourceHeaderRow .sourceHeader {
   margin: 0;
+}
+
+.candidatesScroll {
+  display: grid;
+  max-height: var(--dos-candidates-max-height);
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.candidateRow {
+  align-items: baseline;
+  background: var(--dos-panel-light);
+  border: 0;
+  border-bottom: var(--dos-px-1) solid var(--dos-row-border);
+  color: var(--dos-ink);
+  cursor: pointer;
+  display: grid;
+  gap: var(--dos-space-1) var(--dos-space-4);
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: var(--dos-space-2);
+  text-align: left;
+  width: 100%;
+}
+
+.candidateRow:hover,
+.candidateRow:focus-visible {
+  background: var(--dos-accent);
+}
+
+.candidateSelected {
+  background: var(--dos-accent);
+}
+
+.candidateName {
+  color: var(--dos-titlebar);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.candidatePath {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-meta);
+  grid-column: 1 / -1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.candidateTag {
+  color: var(--dos-ink-muted);
+  font-size: var(--dos-size-field-tag);
+  white-space: nowrap;
 }

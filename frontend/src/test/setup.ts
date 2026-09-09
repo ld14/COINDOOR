@@ -2,19 +2,23 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
+import type { RomCandidate } from '@/lib/api/roms';
 import type { Game, GameStatus, System } from '@/lib/domain/types';
-import { games, systems } from '@/mocks/seed';
+import { games, romCandidates, systems } from '@/mocks/seed';
 
 const clone = <T>(value: T): T => structuredClone(value);
 let storedGames: Game[] = [];
 let storedSystems: System[] = [];
+let storedCandidates: RomCandidate[] = [];
 
 beforeEach(() => {
   storedGames = clone(games);
   storedSystems = clone(systems);
+  storedCandidates = clone(romCandidates);
   vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = new URL(String(input), 'http://127.0.0.1');
     const method = init?.method ?? 'GET';
+    if (url.pathname === '/api/roms/candidates' && method === 'GET') return json(clone(storedCandidates));
     if (url.pathname === '/api/systems' && method === 'GET') return json(clone(storedSystems));
     if (url.pathname === '/api/systems' && method === 'POST') return createSystem(init?.body);
     if (url.pathname === '/api/games' && method === 'GET') return json(gamesPage(url));

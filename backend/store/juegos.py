@@ -43,9 +43,10 @@ class GamesStore:
             raise NotFound(f"Juego no encontrado: {game_id}")
         return game
 
-    def create(self, payload: CreateGame) -> StoredGame:
+    def create(self, payload: CreateGame, dir_name: str = "") -> StoredGame:
         game = StoredGame(
             id=safe_id(payload.identity.title),
+            dirName=dir_name,
             systemId=payload.systemId,
             identity=payload.identity,
             romSource=payload.romSource,
@@ -81,10 +82,11 @@ class GamesStore:
         subida y dejaba ``romRef`` apuntando a un archivo inexistente: el export salia
         sin ``juego/`` y ATTRACT rechazaba el paquete.
         """
-        old_dir = self.root / safe_id(old_system_id) / safe_id(game.id)
+        carpeta = game.dirName or safe_id(game.id)
+        old_dir = self.root / safe_id(old_system_id) / carpeta
         if not old_dir.exists():
             return game
-        new_dir = self.root / safe_id(game.systemId) / safe_id(game.id)
+        new_dir = self.root / safe_id(game.systemId) / carpeta
         new_dir.mkdir(parents=True, exist_ok=True)
         for entry in old_dir.iterdir():
             if entry.name == "game.json":
@@ -333,8 +335,13 @@ class GamesStore:
             self._locks[system_id] = lock
         return lock
 
+    def dir_de(self, game: StoredGame) -> Path:
+        """Carpeta de la ficha. Es la del propio juego cuando se dio de alta desde
+        una carpeta ya instalada (ADR-0017); si no, la derivada del id."""
+        return self.root / safe_id(game.systemId) / (game.dirName or safe_id(game.id))
+
     def _path(self, game: StoredGame) -> Path:
-        return self.root / safe_id(game.systemId) / safe_id(game.id) / "game.json"
+        return self.dir_de(game) / "game.json"
 
 
 def _identity_source(source: str) -> str:

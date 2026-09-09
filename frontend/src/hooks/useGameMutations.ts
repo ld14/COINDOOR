@@ -12,6 +12,7 @@ export function useGameMutations(gameId?: string) {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['games'] }),
       queryClient.invalidateQueries({ queryKey: ['systems'] }),
+      queryClient.invalidateQueries({ queryKey: ['rom-candidates'] }),
       queryClient.invalidateQueries({ queryKey: ['game', game?.id ?? gameId] }),
     ]);
   };

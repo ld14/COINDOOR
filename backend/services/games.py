@@ -1,17 +1,27 @@
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 
 from backend.api.errors import BadRequest, Conflict
-from backend.api.schemas import CreateGame, GameOut, GamesPage, GameSummary, PatchGame
+from backend.api.schemas import (
+    CreateGame,
+    GameOut,
+    GamesPage,
+    GameSummary,
+    PatchGame,
+    StoredGame,
+)
 from backend.config import Settings
 from backend.lib.domain.completeness import compute_game_status, missing_required
+from backend.store.archivo import safe_id
 from backend.store.juegos import GamesStore, to_out
 from backend.store.sistemas import SystemsStore
 
 
 class GamesService:
     def __init__(self, settings: Settings) -> None:
+        self.settings = settings
         self.store = GamesStore(settings.games_dir)
         self.systems = SystemsStore(settings.systems_path)
 
@@ -55,7 +65,58 @@ class GamesService:
     def create(self, payload: CreateGame) -> GameOut:
         if payload.romSource == "path":
             _validar_rom_ref(payload.romRef)
-        return to_out(self.store.create(payload))
+        game = self.store.create(payload, dir_name=self._dir_name(payload))
+        return to_out(self._adoptar_rom_suelta(game))
+
+    def _relativa_al_sistema(self, payload: CreateGame) -> tuple[Path, ...] | None:
+        """Tramos del `romRef` dentro de `juegos/<sistema>/`, o None si apunta afuera."""
+        if payload.romSource != "path" or not payload.romRef:
+            return None
+        system_dir = self.settings.games_dir / safe_id(payload.systemId)
+        try:
+            relativa = Path(payload.romRef).resolve().relative_to(system_dir.resolve())
+        except (OSError, ValueError):
+            return None
+        return relativa.parts or None
+
+    def _dir_name(self, payload: CreateGame) -> str:
+        """Carpeta donde va el `game.json` (ADR-0017).
+
+        Si la ROM ya vive en una carpeta bajo `juegos/<sistema>/`, la ficha se guarda
+        adentro de esa carpeta: renombrarla se lleva la ficha con ella, y el
+        descubrimiento la deja de ofrecer sin depender de ningun nombre.
+        """
+        partes = self._relativa_al_sistema(payload)
+        if partes is None:
+            return ""
+        if len(partes) == 1 and Path(payload.romRef).is_file():
+            return ""  # ROM suelta: se adopta despues, en la carpeta derivada del id
+        return partes[0]
+
+    def _adoptar_rom_suelta(self, game: StoredGame) -> StoredGame:
+        """Mueve una ROM suelta de la raiz del sistema a la carpeta de su ficha.
+
+        Un archivo no puede contener el `game.json`, asi que la unica forma de que
+        deje de estar suelto —y de dejar de ofrecerse como candidato— es que pase a
+        vivir adentro de la carpeta del juego, igual que una ROM subida.
+        """
+        if game.dirName or game.romSource != "path":
+            return game
+        origen = Path(game.romRef)
+        if not origen.is_file():
+            return game
+        system_dir = self.settings.games_dir / safe_id(game.systemId)
+        try:
+            if origen.resolve().parent != system_dir.resolve():
+                return game
+        except OSError:
+            return game
+        destino = self.store.dir_de(game) / origen.name
+        if destino.exists():
+            raise Conflict(f"Ya existe un archivo en '{destino}'")
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(origen), str(destino))
+        return self.store.set_rom_ref(game.id, str(destino))
 
     def patch(self, game_id: str, payload: PatchGame) -> GameOut:
         if payload.systemId is not None:

@@ -67,5 +67,6 @@
   --dos-page-max-width: 1320px;
   --dos-editorial-gutter: 28px;
   --dos-block-min-height: 120px;
+  --dos-candidates-max-height: 240px;
   --dos-ascii-shadow-offset: 14px;
 }

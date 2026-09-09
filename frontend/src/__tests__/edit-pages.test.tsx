@@ -29,6 +29,37 @@ describe('Alta de un juego', () => {
     expect(await screen.findByRole('heading', { name: 'Nuevo Juego' })).toBeInTheDocument();
   });
 
+  it('elegir un instalado precarga origen e identidad', async () => {
+    renderApp('/juegos/nuevo');
+
+    await userEvent.click(await screen.findByRole('button', { name: /Ninja Gaiden/ }));
+
+    expect(screen.getByLabelText('Sistema')).toHaveValue('nes');
+    expect(screen.getByLabelText('Origen del archivo')).toHaveValue('path');
+    expect(screen.getByLabelText('ROM')).toHaveValue('/data/juegos/nes/Ninja Gaiden.nes');
+    expect(screen.getByLabelText('Tratamiento')).toHaveValue('copiar');
+    expect(screen.getByLabelText('title')).toHaveValue('Ninja Gaiden');
+  });
+
+  it('un instalado que es carpeta se da de alta como descomprimir', async () => {
+    renderApp('/juegos/nuevo');
+
+    await userEvent.click(await screen.findByRole('button', { name: /Chrono Trigger/ }));
+
+    expect(screen.getByLabelText('Tratamiento')).toHaveValue('descomprimir');
+    expect(screen.getByLabelText('Sistema')).toHaveValue('snes');
+  });
+
+  it('el filtro deja solo los instalados que coinciden', async () => {
+    renderApp('/juegos/nuevo');
+
+    await screen.findByRole('button', { name: /Ninja Gaiden/ });
+    await userEvent.type(screen.getByLabelText('Filtrar instalados'), 'chrono');
+
+    expect(screen.queryByRole('button', { name: /Ninja Gaiden/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Chrono Trigger/ })).toBeInTheDocument();
+  });
+
   it('ruta relativa en romRef muestra error y no crea ficha', async () => {
     renderApp('/juegos/nuevo');
 

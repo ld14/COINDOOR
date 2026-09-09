@@ -5,7 +5,7 @@ from pathlib import Path
 from backend.api.errors import BadRequest
 from backend.api.schemas import GameOut
 from backend.config import Settings
-from backend.store.archivo import escribir_binario, safe_id
+from backend.store.archivo import escribir_binario
 from backend.store.juegos import GamesStore, to_out
 
 
@@ -25,9 +25,8 @@ class RomService:
         if not suffix:
             raise BadRequest("El archivo debe tener extensión (ej: .zip, .nes, .sms)")
 
-        system_dir = safe_id(game.systemId)
-        game_dir = safe_id(game.id)
-        rom_path = self.settings.games_dir / system_dir / game_dir / filename
+        # La carpeta la decide el store: puede ser la del propio juego (ADR-0017).
+        rom_path = self.store.dir_de(game) / filename
         escribir_binario(rom_path, data)
 
         return to_out(self.store.set_rom_ref(game_id, str(rom_path)))

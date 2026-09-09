@@ -1,3 +1,4 @@
+import type { RomCandidate } from '@/lib/api/roms';
 import type { CheatsField, Game, Identity, ImageKey, MediaField, ReviewField, System, TextKey, VideoKey } from '@/lib/domain/types';
 
 const fullIdentity: Identity = {
@@ -96,4 +97,10 @@ export const games: Game[] = [
   game({ id: 'zelda', title: 'The Legend of Zelda', systemId: 'nes', identity: { format: 'Cartucho JP' }, errors: [{ field: 'Formato', message: 'Formato no reconocido por contrato ATTRACT.' }] }),
   game({ id: 'sor2', title: 'Streets of Rage 2', systemId: 'genesis', identity: { format: 'Cartucho' }, manuals: [{ id: 'manual-sor2', fileName: 'manual.pdf', status: 'processed', pages: 18 }] }),
   game({ id: 'contra', title: 'Contra', systemId: 'snes', identity: { format: 'Cartucho', year: '1987', developer: 'Konami', publisher: 'Konami', genre: 'Run and gun', players: '1-2' }, review: review({ status: 'suggested', source: 'IA', score: 88, cats: { graficos: 85, adiccion: 92, sonido: 84 } }), cheats: cheats({ status: 'manual', groups: [{ name: 'modo cooperativo', entries: [{ name: '30 vidas', input: '↑ ↑ ↓ ↓ ← → ← → B A' }] }] }) }),
+];
+
+/** Instalados en `games/juegos/<sistema>/` que todavia no tienen ficha. */
+export const romCandidates: RomCandidate[] = [
+  { id: 'chrono-trigger', systemId: 'snes', name: 'Chrono Trigger', title: 'Chrono Trigger', path: '/data/juegos/snes/Chrono Trigger', kind: 'dir', file_format: '', tratamiento: 'descomprimir', sizeBytes: 4194304 },
+  { id: 'ninja-gaiden', systemId: 'nes', name: 'Ninja Gaiden.nes', title: 'Ninja Gaiden', path: '/data/juegos/nes/Ninja Gaiden.nes', kind: 'file', file_format: 'nes', tratamiento: 'copiar', sizeBytes: 262144 },
 ];
