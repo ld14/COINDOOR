@@ -47,6 +47,9 @@ import styles from './ReadPages.module.css';
 const MANUAL_DELETE_CONFIRM = 'Este campo fue cargado a mano. ¿Borrarlo de todas formas?';
 
 type SaveHandle = { save: () => void };
+/** 0 = acento primario, 1 = secundario. */
+type AccentSlot = 0 | 1;
+type PresentationHandle = SaveHandle & { setAccent: (slot: AccentSlot, value: string) => void };
 
 function confirmManualDelete(status: string, action: () => void) {
   if (status === 'manual' && !window.confirm(MANUAL_DELETE_CONFIRM)) return;
@@ -112,9 +115,19 @@ export function FichaJuego() {
   const [suggestIdentityBatch, setSuggestIdentityBatch] = useState(false);
   const [precargaLoading, setPrecargaLoading] = useState(false);
   const sectionRefs = useRef<Record<string, SaveHandle | null>>({});
+  const presentationRef = useRef<PresentationHandle | null>(null);
+  const [proximoAcento, setProximoAcento] = useState<AccentSlot>(0);
 
   const saveAll = () => {
     for (const ref of Object.values(sectionRefs.current)) ref?.save();
+  };
+
+  // Cada clic en un color predominante alterna: primero el acento primario,
+  // después el secundario. Queda cargado en Presentación, no guardado — se
+  // persiste con "Guardar presentación" o "Guardar todo", como el resto.
+  const aplicarColorDominante = (hex: string) => {
+    presentationRef.current?.setAccent(proximoAcento, hex);
+    setProximoAcento((slot) => (slot === 0 ? 1 : 0));
   };
 
   if (isLoading) return <p className={styles.meta}>Cargando ficha…</p>;
@@ -201,6 +214,8 @@ export function FichaJuego() {
         onSaveRomRef={(romRef) => mutations.patchGame.mutate({ romRef })}
         onUploadRom={(file) => mutations.uploadRom.mutate(file)}
         onExport={() => { saveAll(); navigate(`/exportar/${game.id}`); }}
+        onPickColor={aplicarColorDominante}
+        proximoAcento={proximoAcento}
         status={status}
       />
 
@@ -268,7 +283,7 @@ export function FichaJuego() {
           onSuggest={() => setSuggestField('cheats')}
         />
         <PresentationSection
-          ref={(r) => { sectionRefs.current.presentation = r; }}
+          ref={(r) => { sectionRefs.current.presentation = r; presentationRef.current = r; }}
           game={game}
           onSave={(accentValue, accent2Value) => mutations.patchGame.mutate({
             accent: accentValue ? 'manual' : 'empty',
@@ -307,7 +322,7 @@ export function FichaJuego() {
   );
 }
 
-function GameHero({ game, systems, missing, onSaveAll, onSystemChange, onMarkReady, onSaveTratamiento, onSaveRomRef, onUploadRom, onExport, status }: { game: Game; systems: System[]; missing: string[]; onSaveAll: () => void; onSystemChange: (systemId: string) => void; onMarkReady: () => void; onSaveTratamiento: (tratamiento: string) => void; onSaveRomRef: (romRef: string) => void; onUploadRom: (file: File) => void; onExport: () => void; status: ReturnType<typeof computeGameStatus> }) {
+function GameHero({ game, systems, missing, onSaveAll, onSystemChange, onMarkReady, onSaveTratamiento, onSaveRomRef, onUploadRom, onExport, onPickColor, proximoAcento, status }: { game: Game; systems: System[]; missing: string[]; onSaveAll: () => void; onSystemChange: (systemId: string) => void; onMarkReady: () => void; onSaveTratamiento: (tratamiento: string) => void; onSaveRomRef: (romRef: string) => void; onUploadRom: (file: File) => void; onExport: () => void; onPickColor: (hex: string) => void; proximoAcento: AccentSlot; status: ReturnType<typeof computeGameStatus> }) {
   const coverUrl = game.images.caratula?.url;
   const heroMedia = coverUrl ?? game.video.video?.url;
   const { colors } = useDominantColors(coverUrl, 4);
@@ -349,13 +364,22 @@ function GameHero({ game, systems, missing, onSaveAll, onSystemChange, onMarkRea
             <StatusBadge status={status} />
             {colors.length > 0 ? (
               <div className={styles.colorPalette}>
-                <span className={styles.paletteLabel}>Colores predominantes</span>
+                <span className={styles.paletteLabel}>
+                  Colores predominantes
+                  <span className={styles.paletteHint}> — clic: acento {proximoAcento === 0 ? 'primario' : 'secundario'}</span>
+                </span>
                 <div className={styles.swatches}>
                   {colors.map((color) => (
-                    <div key={color.hex} className={styles.colorSwatch}>
-                      <div className={styles.colorBlock} style={{ backgroundColor: color.hex }} />
+                    <button
+                      aria-label={`Usar ${color.hex} como acento ${proximoAcento === 0 ? 'primario' : 'secundario'}`}
+                      className={styles.colorSwatch}
+                      key={color.hex}
+                      onClick={() => onPickColor(color.hex)}
+                      type="button"
+                    >
+                      <span className={styles.colorBlock} style={{ backgroundColor: color.hex }} />
                       <span className={styles.colorHex}>{color.hex}</span>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -855,7 +879,7 @@ const ACCENT_PRESETS = [
   { label: 'azul', value: hex('0000aa'), className: styles.swatchBlue },
 ];
 
-const PresentationSection = forwardRef<SaveHandle, {
+const PresentationSection = forwardRef<PresentationHandle, {
   game: Game;
   onSave: (accentValue: string, accent2Value: string) => void;
 }>(function PresentationSection({ game, onSave }, ref) {
@@ -863,7 +887,16 @@ const PresentationSection = forwardRef<SaveHandle, {
   const [accent2Value, setAccent2Value] = useState(game.accent2Value);
   useEffect(() => setAccentValue(game.accentValue), [game.accentValue]);
   useEffect(() => setAccent2Value(game.accent2Value), [game.accent2Value]);
-  useImperativeHandle(ref, () => ({ save: () => onSave(accentValue, accent2Value) }), [onSave, accentValue, accent2Value]);
+  useImperativeHandle(ref, () => ({
+    save: () => onSave(accentValue, accent2Value),
+    // Los colores predominantes de la carátula viven en el encabezado, que es
+    // otro componente: entran por acá en vez de subir el estado de acento a la
+    // página entera.
+    setAccent: (slot: AccentSlot, value: string) => {
+      if (slot === 0) setAccentValue(value);
+      else setAccent2Value(value);
+    },
+  }), [onSave, accentValue, accent2Value]);
   return (
     <Panel>
       <SectionHeader>PRESENTACIÓN</SectionHeader>
