@@ -25,3 +25,10 @@ export function setCheats(gameId: string, cheats: Pick<CheatsField, 'groups'>) {
     body: JSON.stringify(cheats),
   });
 }
+
+export function parseCheatsText(gameId: string, text: string) {
+  return fetchJson<Pick<CheatsField, 'groups'>>(`/games/${gameId}/fields/cheats/parse-text`, {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  });
+}

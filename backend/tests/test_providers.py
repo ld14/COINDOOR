@@ -66,6 +66,52 @@ def test_http_rejects_403_without_retry(tmp_path: Path) -> None:
     assert calls == 1
 
 
+def test_entorno_de_tests_no_lee_el_env_real() -> None:
+    """Guarda del conftest: si esto falla, los tests están usando credenciales reales."""
+    settings = Settings()
+    assert settings.ai_primary_api_key == ""
+    assert settings.ai_backup_api_key == ""
+    assert settings.search_api_key == ""
+
+
+@pytest.mark.parametrize("status", [400, 413, 422])
+def test_http_rejects_unhandled_4xx_without_retry(tmp_path: Path, status: int) -> None:
+    """Un 4xx que no es 401/403/404/429 tiene que salir como ProviderHttpError con el
+    motivo del proveedor, no como httpx.HTTPStatusError sin explicación."""
+    calls = 0
+
+    def handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        return httpx.Response(status, json={"error": {"message": "modelo\ninexistente"}})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    quotas = QuotasStore(tmp_path / "cuotas.json")
+    provider = ProviderHttpClient("Test", Limite(), quotas, timeout=1, client=client)
+
+    with pytest.raises(ProviderHttpError) as exc, provider:
+        provider.get_json("https://example.test/bad-request")
+
+    assert exc.value.status_code == status
+    assert exc.value.retry_exhausted is True
+    assert "modelo inexistente" in str(exc.value)
+    assert calls == 1
+
+
+def test_http_4xx_sin_body_json_no_rompe(tmp_path: Path) -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(400, text="<html>Bad Request</html>")
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    quotas = QuotasStore(tmp_path / "cuotas.json")
+    provider = ProviderHttpClient("Test", Limite(), quotas, timeout=1, client=client)
+
+    with pytest.raises(ProviderHttpError) as exc, provider:
+        provider.get_json("https://example.test/bad-request")
+
+    assert "400" in str(exc.value)
+
+
 def test_suggestions_cache_avoids_second_provider_call(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -267,6 +313,103 @@ def test_ia_generador_invalid_review_json_fails_explicit(tmp_path: Path) -> None
     assert result.candidatos == ()
 
 
+def test_parse_cheats_text_empty_text_returns_empty_list(tmp_path: Path) -> None:
+    settings = Settings(data_dir=tmp_path / "data")
+    settings.data_dir.mkdir(parents=True)
+
+    assert SuggestionsService(settings).parse_cheats_text("no-existe", "   ") == []
+
+
+def test_parse_cheats_text_without_ia_configured_raises(tmp_path: Path) -> None:
+    settings = _seeded_settings(tmp_path)
+    settings.ai_primary_base_url = ""
+    settings.ai_primary_api_key = ""
+    settings.ai_primary_model = ""
+    settings.ai_backup_base_url = ""
+    settings.ai_backup_api_key = ""
+    settings.ai_backup_model = ""
+
+    with pytest.raises(BadRequest):
+        SuggestionsService(settings).parse_cheats_text("golden-axe", "30 vidas: arriba arriba")
+
+
+def test_parse_cheats_text_returns_groups_from_model(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = _seeded_settings(tmp_path)
+    settings.ai_primary_base_url = "https://api.test/v1"
+    settings.ai_primary_api_key = "key"
+    settings.ai_primary_model = "test-model"
+    settings.ai_backup_model = ""  # aislado del .env real
+
+    monkeypatch.setattr(
+        "backend.lib.providers.orquestador.OpenAiCompatibleClient.complete",
+        lambda self, prompt, **_: (
+            '{"groups": [{"name": "Códigos", '
+            '"entries": [{"name": "30 vidas", "input": "arriba arriba"}]}]}'
+        ),
+    )
+
+    groups = SuggestionsService(settings).parse_cheats_text("golden-axe", "30 vidas: arriba arriba")
+
+    assert groups == [
+        {"name": "Códigos", "entries": [{"name": "30 vidas", "input": "arriba arriba"}]},
+    ]
+
+
+def test_parse_cheats_text_aplasta_saltos_de_linea(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """El modelo puede desobedecer el prompt; el contrato guarda un renglón por truco."""
+    settings = _seeded_settings(tmp_path)
+    settings.ai_primary_base_url = "https://api.test/v1"
+    settings.ai_primary_api_key = "key"
+    settings.ai_primary_model = "test-model"
+    settings.ai_backup_model = ""  # aislado del .env real
+
+    monkeypatch.setattr(
+        "backend.lib.providers.orquestador.OpenAiCompatibleClient.complete",
+        lambda self, prompt, **_: (
+            '{"groups": [{"name": "Técnicas", '
+            '"entries": [{"name": "Escudo", "input": "1. Crear escudo.\\n2. Disparar."}]}]}'
+        ),
+    )
+
+    groups = SuggestionsService(settings).parse_cheats_text("golden-axe", "texto")
+
+    esperado = [{"name": "Escudo", "input": "1. Crear escudo. 2. Disparar."}]
+    assert groups == [{"name": "Técnicas", "entries": esperado}]
+
+
+def test_parse_cheats_text_falls_back_to_backup_model(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = _seeded_settings(tmp_path)
+    settings.ai_primary_base_url = "https://api.test/v1"
+    settings.ai_primary_api_key = "key"
+    settings.ai_primary_model = "primary-model"
+    settings.ai_backup_base_url = "https://api.test/v1"
+    settings.ai_backup_api_key = "key"
+    settings.ai_backup_model = "backup-model"
+
+    def fake_complete(self: object, prompt: str, **_: object) -> str:
+        if self.model == "primary-model":  # type: ignore[attr-defined]
+            raise RuntimeError("caído")
+        return '{"groups": []}'
+
+    monkeypatch.setattr(
+        "backend.lib.providers.orquestador.OpenAiCompatibleClient.complete",
+        fake_complete,
+    )
+
+    groups = SuggestionsService(settings).parse_cheats_text("golden-axe", "sin trucos conocidos")
+
+    assert groups == []
+
+
 def test_youtube_reference_provider_returns_single_referencia_candidate() -> None:
     result = YoutubeReferenceProvider().buscar(
         Consulta("golden-axe", "video", "Golden Axe", "Arcade", "1989"),
@@ -297,6 +440,44 @@ def test_registro_skips_ia_without_credentials(tmp_path: Path) -> None:
     video_providers = providers_for("video", settings)
     assert len(video_providers) == 2
     assert {p.nombre for p in video_providers} == {"ArcadeDB", "YouTube"}
+
+
+def test_registro_cheats_usa_el_buscador_y_nada_mas(tmp_path: Path) -> None:
+    """ADR-0019: trucos no cae a los modelos sin evidencia."""
+    settings = Settings(
+        data_dir=tmp_path / "data",
+        ai_primary_base_url="https://groq.test/v1",
+        ai_primary_api_key="k",
+        ai_primary_model="gpt-oss-120b",
+        ai_backup_base_url="https://groq.test/v1",
+        ai_backup_api_key="k",
+        ai_backup_model="gpt-oss-20b",
+        search_api_key="tvly-test",
+    )
+    settings.data_dir.mkdir(parents=True)
+
+    nombres = [p.nombre for p in providers_for("cheats", settings)]
+    assert nombres == ["ArcadeDB", "Búsqueda web + IA"]
+
+    # Los gpt-oss siguen intactos —y solos— en el resto de los campos.
+    for key in ("sinopsis", "review", "developer"):
+        otros = [p.nombre for p in providers_for(key, settings)]
+        assert "IA · gpt-oss-120b" in otros
+        assert "Búsqueda web + IA" not in otros
+
+
+def test_registro_cheats_sin_buscador_se_queda_sin_ia(tmp_path: Path) -> None:
+    """Coste asumido del ADR-0019: sin buscador no hay sugerencia de trucos, a propósito."""
+    settings = Settings(
+        data_dir=tmp_path / "data",
+        ai_primary_base_url="https://groq.test/v1",
+        ai_primary_api_key="k",
+        ai_primary_model="gpt-oss-120b",
+        search_api_key="",
+    )
+    settings.data_dir.mkdir(parents=True)
+
+    assert [p.nombre for p in providers_for("cheats", settings)] == ["ArcadeDB"]
 
 
 def test_apply_suggestion_rejects_referencia_candidate(

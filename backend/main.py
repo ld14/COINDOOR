@@ -18,6 +18,7 @@ from backend.api.magazines import router as magazines_router
 from backend.api.manuals import router as manuals_router
 from backend.api.media import router as media_router
 from backend.api.roms import router as roms_router
+from backend.api.roms import scan_router as roms_scan_router
 from backend.api.systems import router as systems_router
 from backend.config import Settings, ensure_data_dirs, get_settings
 from backend.store.cuotas import QuotasStore
@@ -45,6 +46,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(gallery_router)
     app.include_router(media_router)
     app.include_router(roms_router)
+    app.include_router(roms_scan_router)
     app.include_router(manuals_router)
     app.include_router(magazines_router)
     app.include_router(jobs_router)

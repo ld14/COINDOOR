@@ -1,12 +1,13 @@
 import { http, HttpResponse } from 'msw';
 import { computeGameStatus } from '@/lib/domain/completeness';
 import type { GameStatus } from '@/lib/domain/types';
-import { games, systems } from './seed';
+import { games, romCandidates, systems } from './seed';
 
 const clone = <T>(value: T): T => structuredClone(value);
 
 export const handlers = [
   http.get('/api/systems', () => HttpResponse.json(clone(systems))),
+  http.get('/api/roms/candidates', () => HttpResponse.json(clone(romCandidates))),
   http.get('/api/games', ({ request }) => {
     const url = new URL(request.url);
     const q = url.searchParams.get('q')?.toLowerCase() ?? '';

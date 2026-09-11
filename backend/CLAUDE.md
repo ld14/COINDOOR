@@ -52,13 +52,33 @@ backend/
 │   ├── domain/      # completeness.py · validation.py · fielddefs.py
 │   ├── providers/
 │   │   ├── arcadedb/  # parser.py · cliente.py · proveedor.py
-│   │   ├── ia/        # generador.py
+│   │   ├── ia/        # client.py · generador.py · trucos_web.py · traductor.py · prompts/
 │   │   └── ...
 │   └── jobs/        # registro.py · ejecutor.py
 ├── config.py
 ├── main.py
 └── cli.py
 ```
+
+## Variables de entorno
+
+Todas con prefijo `COINDOOR_`, en un `.env` fuera del repo. Sin credenciales el proveedor
+correspondiente simplemente no se construye — no hay error, el campo se queda sin sugerencia.
+
+| Variable | Para qué |
+|---|---|
+| `AI_PRIMARY_BASE_URL` / `_API_KEY` / `_MODEL` | Modelo principal. Sinopsis, reseña, identidad, precarga al alta y parseo de texto pegado |
+| `AI_BACKUP_BASE_URL` / `_API_KEY` / `_MODEL` | Respaldo del anterior, mismos campos |
+| `SEARCH_BASE_URL` / `SEARCH_API_KEY` | Buscador web (Tavily), hoy **solo trucos** ([ADR-0019](../spec/decisions/0019-buscador-mas-modelo-para-trucos.md)). Lo que encuentra lo estructura `AI_PRIMARY` |
+| `DATA_DIR`, `HOST`, `PORT` | Ver `config.py` |
+
+Trucos es el único campo que **no** cae a los modelos a secas: se midió que sin evidencia
+devuelven vacíos falsos y códigos inventados, y eso es peor que no sugerir nada. Si falta
+`SEARCH_API_KEY`, el campo queda solo con ArcadeDB (arcade) y carga manual.
+
+El presupuesto de evidencia de `trucos_web.py` no es cosmético: `gpt-oss-120b` en el tier
+gratuito de Groq tiene 8.000 TPM y cuenta `prompt + max_tokens`, así que pasarle las páginas
+enteras devuelve 429.
 
 ## Contexto ampliado
 

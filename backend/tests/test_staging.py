@@ -151,6 +151,27 @@ def test_juego_carpeta_ms_dos_se_comprime_y_tratamiento_es_descomprimir(tmp_path
         assert set(archivo.namelist()) == {"DOT.EXE", "DATA.DAT"}
 
 
+def test_el_zip_del_juego_no_lleva_la_ficha_interna_de_coindoor(tmp_path: Path) -> None:
+    """Desde ADR-0017 el `game.json` de COINDOOR vive adentro de la carpeta del juego,
+    que es justo lo que se comprime: no debe viajar a la instalacion."""
+    settings = _settings(tmp_path)
+    carpeta = tmp_path / "roms" / "dot"
+    (carpeta / "SAVES").mkdir(parents=True, exist_ok=True)
+    (carpeta / "DOT.EXE").write_bytes(b"exe-bytes")
+    (carpeta / "game.json").write_text('{"id": "dot"}', encoding="utf-8")
+    (carpeta / ".game.json.ab12.tmp").write_bytes(b"temporal")
+    # Un `game.json` mas adentro es del juego, no de COINDOOR: ese si viaja.
+    (carpeta / "SAVES" / "game.json").write_bytes(b"partida")
+
+    game = _game(settings)
+    game["romRef"] = str(carpeta)
+
+    resultado = build_staging(settings, game, incluir={"juego"}, system_name="MAME")
+
+    with zipfile.ZipFile(resultado.root / "juego" / "dot.zip") as archivo:
+        assert set(archivo.namelist()) == {"DOT.EXE", "SAVES/game.json"}
+
+
 def test_juego_pedido_pero_romref_inexistente_se_descarta_de_incluye(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
     game = _game(settings)

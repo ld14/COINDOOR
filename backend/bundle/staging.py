@@ -143,11 +143,23 @@ def _copy_rom(game: Mapping[str, Any], juego_dir: Path) -> tuple[str, str] | Non
         nombre = f"{source.name}.zip"
         with zipfile.ZipFile(juego_dir / nombre, "w", zipfile.ZIP_DEFLATED) as archivo:
             for entry in source.rglob("*"):
-                if entry.is_file():
+                if entry.is_file() and not _es_interno(entry, source):
                     archivo.write(entry, entry.relative_to(source))
         return nombre, "descomprimir"
     shutil.copy2(source, juego_dir / source.name)
     return source.name, "copiar"
+
+
+def _es_interno(entry: Path, source: Path) -> bool:
+    """¿Es un archivo de COINDOOR y no del juego?
+
+    Desde ADR-0017 la ficha vive adentro de la carpeta del juego, y esa carpeta es
+    justo lo que se comprime para el bundle. Sin este filtro el `game.json` interno
+    —y los temporales de la escritura atomica— viajarian a la instalacion.
+    """
+    if entry.parent != source:
+        return False
+    return entry.name == "game.json" or entry.name.startswith(".game.json.")
 
 
 def _manual_files_exist(settings: Settings, game: Mapping[str, Any]) -> bool:

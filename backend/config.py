@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     ai_backup_base_url: str = ""
     ai_backup_api_key: str = ""
     ai_backup_model: str = ""
+    # Buscador web, hoy solo para trucos (ADR-0019): lo que encuentra se lo
+    # estructura ai_primary/ai_backup. Sin api_key el campo `cheats` se queda sin
+    # sugerencia, y es deliberado: un modelo sin evidencia inventa códigos.
+    search_base_url: str = "https://api.tavily.com"
+    search_api_key: str = ""
 
     @property
     def media_dir(self) -> Path:

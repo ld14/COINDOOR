@@ -4,14 +4,18 @@ import json
 import logging
 import threading
 from dataclasses import asdict
+from pathlib import Path
 
+from backend.api.errors import BadRequest
 from backend.config import Settings
 from backend.lib.domain.fielddefs import identity_keys
-from backend.lib.providers.base import Candidato, Consulta, ProviderTrace
+from backend.lib.providers.base import Candidato, Consulta, Limite, ProviderTrace
 from backend.lib.providers.cortocircuito import breaker
-from backend.lib.providers.http import ProviderHttpError
-from backend.lib.providers.ia.generador import IaGenerador
+from backend.lib.providers.http import ProviderHttpClient, ProviderHttpError
+from backend.lib.providers.ia.client import ModelResponseError, OpenAiCompatibleClient
+from backend.lib.providers.ia.generador import AiModelConfig, IaGenerador
 from backend.lib.providers.registro import providers_for
+from backend.store.cuotas import QuotasStore
 from backend.store.juegos import GamesStore
 from backend.store.sistemas import SystemsStore
 
@@ -20,6 +24,10 @@ log = logging.getLogger(__name__)
 _IDENTITY_KEYS = identity_keys()
 _BATCH_CACHE_KEY = "__identity_batch__"
 _SUGGESTABLE_IDENTITY_KEYS = _IDENTITY_KEYS - frozenset({"title", "year"})
+_PARSE_PROMPT_PATH = Path(__file__).parent / "ia" / "prompts" / "cheats-parse.v1.md"
+# Una guía completa da decenas de entradas; con el tope por defecto el modelo recorta y
+# devuelve menos de lo que hay en el texto.
+_PARSE_MAX_TOKENS = 16000
 
 _cache: dict[tuple[str, str, str], dict[str, object]] = {}
 _cache_lock = threading.Lock()
@@ -175,6 +183,74 @@ class SuggestionsService:
         with _cache_lock:
             _cache[cache_key] = payload
         return payload
+
+    def parse_cheats_text(self, game_id: str, text: str) -> list[dict[str, object]]:
+        """Convierte texto pegado a mano (Markdown, prosa, lo que sea) en `groups`."""
+        text = text.strip()
+        if not text:
+            return []
+        game = self.games.get(game_id)
+        system = self.systems.get(game.systemId)
+        prompt = _PARSE_PROMPT_PATH.read_text(encoding="utf-8").format(
+            titulo=game.identity.title,
+            sistema=system.name,
+            texto=text,
+        )
+        quotas = QuotasStore(self.settings.quotas_path)
+        configs = (
+            AiModelConfig(
+                self.settings.ai_primary_base_url,
+                self.settings.ai_primary_api_key,
+                self.settings.ai_primary_model,
+            ),
+            AiModelConfig(
+                self.settings.ai_backup_base_url,
+                self.settings.ai_backup_api_key,
+                self.settings.ai_backup_model,
+            ),
+        )
+        last_error = ""
+        for config in configs:
+            if not (config.base_url and config.api_key and config.model):
+                continue
+            http = ProviderHttpClient(
+                f"ia-parse:{config.model}",
+                Limite(por_segundo=None, por_dia=None, espera_min=1.0),
+                quotas,
+                timeout=45.0,
+            )
+            client = OpenAiCompatibleClient(config.base_url, config.api_key, config.model, http)
+            try:
+                content = client.complete(prompt, max_tokens=_PARSE_MAX_TOKENS)
+                data = json.loads(content)
+                if not isinstance(data, dict) or not isinstance(data.get("groups"), list):
+                    raise ModelResponseError("respuesta sin 'groups'")
+                return [_grupo_en_un_renglon(group) for group in data["groups"]]
+            except Exception as exc:
+                log.warning("parse_cheats_text: %s falló: %s", config.model, exc)
+                last_error = str(exc)
+                continue
+        motivo = last_error or "sin modelo de IA configurado"
+        raise BadRequest(f"No se pudo interpretar el texto: {motivo}")
+
+
+def _un_renglon(valor: object) -> str:
+    """Aplasta saltos de línea: el contrato guarda cada truco en un renglón (`goldnaxe`)."""
+    return " ".join(str(valor).split())
+
+
+def _grupo_en_un_renglon(group: object) -> dict[str, object]:
+    if not isinstance(group, dict):
+        return {"name": "", "entries": []}
+    entries = group.get("entries")
+    return {
+        "name": _un_renglon(group.get("name", "")),
+        "entries": [
+            {"name": _un_renglon(e.get("name", "")), "input": _un_renglon(e.get("input", ""))}
+            for e in (entries if isinstance(entries, list) else [])
+            if isinstance(e, dict)
+        ],
+    }
 
 
 def cached_candidate(

@@ -169,3 +169,18 @@ def test_nunca_escribe_mags() -> None:
     game = _goldnaxe_game()
     data = build_datajson(game, incluir={"accent2", "review", "cheats", "manual"})
     assert "mags" not in data
+
+
+def test_cheats_de_referencia_van_en_un_solo_renglon() -> None:
+    """`goldnaxe` no tiene un solo salto de línea en `input`: cada truco es un renglón.
+
+    ATTRACT es quien traduce `data.json` a lo que lee el gabinete, y ese paso no está
+    verificado acá (`attract doctor` no corre en todas las máquinas). Mientras no exista
+    esa prueba, la referencia manda: multilínea no se exporta.
+    """
+    data = build_datajson(_goldnaxe_game(), incluir={"accent2", "review", "cheats", "manual"})
+
+    for entries in data["cheats"].values():
+        for entry in entries:
+            assert "\n" not in entry["name"]
+            assert "\n" not in entry["input"]

@@ -8,7 +8,9 @@ from backend.lib.domain.fielddefs import identity_keys, image_keys
 from backend.lib.providers.arcadedb.proveedor import ArcadeDbProvider
 from backend.lib.providers.base import Proveedor
 from backend.lib.providers.http import ProviderHttpClient
+from backend.lib.providers.ia.client import OpenAiCompatibleClient
 from backend.lib.providers.ia.generador import AiModelConfig, IaGenerador
+from backend.lib.providers.ia.trucos_web import TavilyClient, TrucosWebGenerador
 from backend.lib.providers.launchbox.proveedor import LaunchboxImageProvider
 from backend.lib.providers.referencia.images import ImageSearchProvider
 from backend.lib.providers.referencia.youtube import YoutubeReferenceProvider
@@ -17,6 +19,9 @@ from backend.store.cuotas import QuotasStore
 # Tabla campo → proveedores, en orden. Sumar una fuente es una fila; ver ADR-0013.
 _ARCADEDB_IDENTITY = ("arcadedb", "ia_primary", "ia_backup")
 _ARCADEDB_TEXT = ("arcadedb", "ia_primary", "ia_backup")
+# Trucos NO caen a los modelos a secas: sin evidencia devuelven vacíos falsos y
+# códigos inventados, que es peor que no sugerir nada (ADR-0019).
+_ARCADEDB_CHEATS = ("arcadedb", "trucos_web")
 _ARCADEDB_IMAGE = ("arcadedb", "image_search", "launchbox")
 _ARCADEDB_VIDEO = ("arcadedb", "youtube_referencia")
 # Cadena para identity con Launchbox (year desde search results)
@@ -27,7 +32,7 @@ _TABLE: dict[str, tuple[str, ...]] = {
     **{key: _ARCADEDB_IMAGE for key in image_keys()},
     "sinopsis": _ARCADEDB_TEXT,
     "review": ("ia_primary", "ia_backup"),
-    "cheats": _ARCADEDB_TEXT,
+    "cheats": _ARCADEDB_CHEATS,
     "video": _ARCADEDB_VIDEO,
     # Year: Launchbox primero (tiene año en search results), luego IA
     "year": _LAUNCHBOX_IDENTITY,
@@ -68,6 +73,8 @@ def _build(
             settings.ai_backup_model,
         )
         return _ia_provider(config, quotas, cancel_event)
+    if name == "trucos_web":
+        return _trucos_web_provider(settings, quotas, cancel_event)
     if name == "youtube_referencia":
         return YoutubeReferenceProvider()
     if name == "image_search":
@@ -94,6 +101,56 @@ def _ia_provider(
         cancel_event=cancel_event,
     )
     return IaGenerador(config, http)
+
+
+def _trucos_web_provider(
+    settings: Settings,
+    quotas: QuotasStore,
+    cancel_event: threading.Event | None,
+) -> TrucosWebGenerador | None:
+    """Buscador + los modelos ya configurados (ADR-0019). Sin buscador no hay
+    proveedor: pasarle el prompt a un modelo sin evidencia es lo que se descartó."""
+    if not settings.search_base_url or not settings.search_api_key:
+        return None
+    buscador = TavilyClient(
+        settings.search_base_url,
+        settings.search_api_key,
+        ProviderHttpClient(
+            "tavily",
+            TrucosWebGenerador.limite,
+            quotas,
+            timeout=TrucosWebGenerador.timeout,
+            cancel_event=cancel_event,
+        ),
+    )
+    modelos = []
+    for config in (
+        AiModelConfig(
+            settings.ai_primary_base_url,
+            settings.ai_primary_api_key,
+            settings.ai_primary_model,
+        ),
+        AiModelConfig(
+            settings.ai_backup_base_url,
+            settings.ai_backup_api_key,
+            settings.ai_backup_model,
+        ),
+    ):
+        if not (config.base_url and config.api_key and config.model):
+            continue
+        http = ProviderHttpClient(
+            f"ia:{config.model}",
+            IaGenerador.limite,
+            quotas,
+            timeout=IaGenerador.timeout,
+            cancel_event=cancel_event,
+        )
+        modelos.append(
+            OpenAiCompatibleClient(config.base_url, config.api_key, config.model, http),
+        )
+    if not modelos:
+        return None
+    return TrucosWebGenerador(buscador, modelos)
 
 
 def _arcadedb_provider(

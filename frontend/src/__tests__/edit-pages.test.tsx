@@ -29,6 +29,37 @@ describe('Alta de un juego', () => {
     expect(await screen.findByRole('heading', { name: 'Nuevo Juego' })).toBeInTheDocument();
   });
 
+  it('elegir un instalado precarga origen e identidad', async () => {
+    renderApp('/juegos/nuevo');
+
+    await userEvent.click(await screen.findByRole('button', { name: /Ninja Gaiden/ }));
+
+    expect(screen.getByLabelText('Sistema')).toHaveValue('nes');
+    expect(screen.getByLabelText('Origen del archivo')).toHaveValue('path');
+    expect(screen.getByLabelText('ROM')).toHaveValue('/data/juegos/nes/Ninja Gaiden.nes');
+    expect(screen.getByLabelText('Tratamiento')).toHaveValue('copiar');
+    expect(screen.getByLabelText('title')).toHaveValue('Ninja Gaiden');
+  });
+
+  it('un instalado que es carpeta se da de alta como descomprimir', async () => {
+    renderApp('/juegos/nuevo');
+
+    await userEvent.click(await screen.findByRole('button', { name: /Chrono Trigger/ }));
+
+    expect(screen.getByLabelText('Tratamiento')).toHaveValue('descomprimir');
+    expect(screen.getByLabelText('Sistema')).toHaveValue('snes');
+  });
+
+  it('el filtro deja solo los instalados que coinciden', async () => {
+    renderApp('/juegos/nuevo');
+
+    await screen.findByRole('button', { name: /Ninja Gaiden/ });
+    await userEvent.type(screen.getByLabelText('Filtrar instalados'), 'chrono');
+
+    expect(screen.queryByRole('button', { name: /Ninja Gaiden/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Chrono Trigger/ })).toBeInTheDocument();
+  });
+
   it('ruta relativa en romRef muestra error y no crea ficha', async () => {
     renderApp('/juegos/nuevo');
 
@@ -82,6 +113,44 @@ describe('Edición de ficha', () => {
     await userEvent.click(within(sinopsisBox).getByRole('button', { name: 'Borrar' }));
 
     expect(screen.getByLabelText('Sinopsis')).toHaveValue('Sinopsis cargada para pruebas.');
+  });
+
+  it('los trucos se leen como ledger y solo se vuelven editables al pedirlo', async () => {
+    renderApp('/juegos/contra');
+
+    await screen.findByRole('heading', { name: 'Contra' });
+    // Vista: el truco se lee como texto, no como un campo.
+    expect(screen.getByText('30 vidas')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Qué hace el truco')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Editar trucos' }));
+
+    expect(screen.getByLabelText('Qué hace el truco')).toHaveValue('30 vidas');
+    expect(screen.getByLabelText('Código o procedimiento')).toHaveValue('↑ ↑ ↓ ↓ ← → ← → B A');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+
+    expect(screen.queryByLabelText('Qué hace el truco')).not.toBeInTheDocument();
+    expect(screen.getByText('30 vidas')).toBeInTheDocument();
+  });
+
+  it('editar un truco lo guarda como estructura de grupos', async () => {
+    renderApp('/juegos/contra');
+
+    await screen.findByRole('heading', { name: 'Contra' });
+    await userEvent.click(screen.getByRole('button', { name: 'Editar trucos' }));
+
+    const campo = screen.getByLabelText('Código o procedimiento');
+    await userEvent.clear(campo);
+    await userEvent.type(campo, 'ARRIBA ARRIBA ABAJO');
+    await userEvent.click(screen.getByRole('button', { name: 'Guardar trucos' }));
+
+    const fetchMock = vi.mocked(fetch);
+    const call = fetchMock.mock.calls.find(([input]) => String(input).includes('/fields/cheats'));
+    expect(call).toBeDefined();
+    expect(JSON.parse(String(call?.[1]?.body))).toEqual({
+      groups: [{ name: 'modo cooperativo', entries: [{ name: '30 vidas', input: 'ARRIBA ARRIBA ABAJO' }] }],
+    });
   });
 
   it('review se guarda como estructura, no como texto', async () => {

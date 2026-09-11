@@ -133,6 +133,11 @@ class CabinetInfo(BaseModel):
 class StoredGame(BaseModel):
     version: int = 1
     id: str
+    # Nombre de la carpeta bajo `juegos/<sistema>/` donde vive este `game.json`.
+    # Cuando el juego se dio de alta desde una carpeta ya instalada es el nombre real
+    # en disco, y la ficha vive adentro del juego (ADR-0017). Vacio cae a
+    # `safe_id(id)`, que es donde estan las fichas anteriores a ese ADR.
+    dirName: str = ""
     systemId: str
     identity: Identity
     identitySource: IdentitySource = "manual"
@@ -195,6 +200,24 @@ class CreateGame(BaseModel):
     file_format: str = ""
     tratamiento: str = ""
     identity: Identity
+
+
+class RomCandidate(BaseModel):
+    """Un juego instalado en `games/juegos/<sistema>/` que todavía no tiene ficha.
+
+    No es una entidad: se calcula leyendo el disco en cada pedido y nada de esto
+    se persiste. `path` es absoluto porque va derecho a `romRef`.
+    """
+
+    id: str
+    systemId: str
+    name: str
+    title: str
+    path: str
+    kind: Literal["file", "dir"]
+    file_format: str = ""
+    tratamiento: Tratamiento = "copiar"
+    sizeBytes: int = 0
 
 
 class PatchGame(BaseModel):
@@ -260,6 +283,10 @@ class ReviewValue(BaseModel):
 
 class CheatsValue(BaseModel):
     groups: list[CheatGroup] = Field(default_factory=list)
+
+
+class CheatsParseRequest(BaseModel):
+    text: str = ""
 
 
 class MissingRequiredResponse(BaseModel):

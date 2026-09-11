@@ -13,6 +13,16 @@ PROMPT_DIR = Path(__file__).parent / "prompts"
 PROMPT_VERSION = "v1"
 CAMPOS = frozenset({"sinopsis", "review", "cheats", "identidad"})
 
+# MSDOS/DOS/Windows se tratan como PC: mismo criterio que
+# backend/services/msdos.py:_MSDOS_MARKERS, duplicado acá para no crear un
+# import circular (msdos.py ya importa de este módulo).
+_PC_MARKERS = ("msdos", "ms-dos", "dos", "pc", "windows")
+
+
+def _es_pc(system: str) -> bool:
+    nombre = system.lower()
+    return any(marker in nombre for marker in _PC_MARKERS)
+
 
 @dataclass(frozen=True)
 class AiModelConfig:
@@ -35,7 +45,7 @@ class IaGenerador:
     def buscar(self, consulta: Consulta) -> ProviderResult:
         if consulta.key not in self.campos:
             return ProviderResult((), ProviderTrace(self.nombre, self.tipo, "sin resultados"))
-        prompt = _load_prompt(consulta.key).format(
+        prompt = _load_prompt(consulta.key, consulta.system).format(
             titulo=consulta.title,
             sistema=consulta.system,
             anio=consulta.year or "año desconocido",
@@ -70,7 +80,9 @@ class IaGenerador:
         return ProviderResult((candidate,), trace)
 
 
-def _load_prompt(key: str) -> str:
+def _load_prompt(key: str, system: str) -> str:
+    if key == "cheats" and _es_pc(system):
+        return (PROMPT_DIR / f"cheats-pc.{PROMPT_VERSION}.md").read_text(encoding="utf-8")
     return (PROMPT_DIR / f"{key}.{PROMPT_VERSION}.md").read_text(encoding="utf-8")
 
 
