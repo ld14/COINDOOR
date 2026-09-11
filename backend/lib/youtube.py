@@ -116,6 +116,8 @@ def _legible(error: str) -> str:
         return "YouTube pidió verificación anti-bot. Probá más tarde o actualizá yt-dlp."
     if "Requested format is not available" in texto:
         return "Este video no tiene versión H.264 de 720p o menos."
+    if "ffmpeg is not installed" in texto:
+        return "Falta ffmpeg en el equipo: instalalo para descargar video de YouTube."
     return texto
 
 

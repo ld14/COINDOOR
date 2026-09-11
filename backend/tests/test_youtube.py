@@ -171,6 +171,10 @@ def test_video_largo_o_en_vivo_falla_antes_de_bajar(
             "ERROR: [youtube] x: Requested format is not available. Use --list-formats",
             "Este video no tiene versión H.264 de 720p o menos.",
         ),
+        (
+            "ERROR: You have requested merging of multiple formats but ffmpeg is not installed.",
+            "Falta ffmpeg en el equipo: instalalo para descargar video de YouTube.",
+        ),
         ("ERROR: [youtube] x: Video unavailable", "[youtube] x: Video unavailable"),
     ],
 )

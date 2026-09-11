@@ -40,7 +40,7 @@ No están en `docs/claude_diseño/`. Estos son los literales:
 - Campo `URL de YouTube` · botones `Descargar` y `Cancelar` · en curso `Descargando de YouTube… {n}%`
 - URL inválida: `La URL tiene que ser de un video de youtube.com o youtu.be.`
 - Reemplazo: `El video actual fue cargado a mano. ¿Reemplazarlo con el de YouTube?`
-- Job fallido: `El video dura más de 10 minutos.` · `No se pueden descargar transmisiones en vivo.` · `Este video no tiene versión H.264 de 720p o menos.` · `YouTube pidió verificación anti-bot. Probá más tarde o actualizá yt-dlp.` · `La descarga terminó sin archivo.`
+- Job fallido: `El video dura más de 10 minutos.` · `No se pueden descargar transmisiones en vivo.` · `Este video no tiene versión H.264 de 720p o menos.` · `YouTube pidió verificación anti-bot. Probá más tarde o actualizá yt-dlp.` · `La descarga terminó sin archivo.` · `Falta ffmpeg en el equipo: instalalo para descargar video de YouTube.`
 
 ## Fuera de alcance
 
