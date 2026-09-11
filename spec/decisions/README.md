@@ -45,6 +45,8 @@ de seis meses alguien —tú, o Claude— vuelve a proponer justo lo que ya desc
 | [0013](0013-sin-scraping-ni-catalogo-pago.md) | Sugerencias sin scraping ni catálogos de terceros — solo IA y referencias | superseded por [0014](0014-arcadedb-fuente-arcade.md) | 2026-08-13 |
 | [0014](0014-arcadedb-fuente-arcade.md) | ArcadeDB como fuente de imágenes, video, manual y texto para arcade | accepted | 2026-08-24 |
 | [0015](0015-precarga-con-red-al-alta.md) | Una precarga con red al dar de alta un juego | accepted | 2026-08-24 |
+| [0016](0016-galeria-en-subcarpeta-gallery.md) | La galería vive en `media/_gallery/` y se declara en `data.json` | accepted | 2026-08-25 |
+| [0017](0017-descarga-de-video-youtube.md) | Descargar video de YouTube a pedido con yt-dlp como librería | accepted | 2026-09-10 |
 
 Los seis últimos salen del análisis de arquitectura de
 [`docs/arquitectura/`](../../docs/arquitectura/README.md), que conserva la comparación

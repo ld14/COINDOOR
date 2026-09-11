@@ -73,7 +73,9 @@ carpeta.
 
 ## Requisitos
 
-Python 3.12 · [uv](https://docs.astral.sh/uv/) · Node 20+.
+Python 3.12 · [uv](https://docs.astral.sh/uv/) · Node 20+ · ffmpeg · [Deno](https://deno.com) 2.3+.
+ffmpeg y Deno los usan el video de ArcadeDB y la descarga desde YouTube
+([`ADR-0017`](spec/decisions/0017-descarga-de-video-youtube.md)).
 Opcionales: los binarios `mame` y `attract` — sin ellos la aplicación funciona con más
 trabajo manual.
 
