@@ -236,6 +236,10 @@ class SuggestionJob(BaseModel):
     jobId: str
 
 
+class YoutubeDownload(BaseModel):
+    url: str
+
+
 class ExportRequest(BaseModel):
     gameId: str
     incluir: list[str] = Field(default_factory=list)

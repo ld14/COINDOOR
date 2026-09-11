@@ -64,6 +64,26 @@ def escribir_binario(path: Path, data: bytes) -> None:
             raise StorageError(f"No se pudo escribir {path}") from exc
 
 
+def mover_binario(origen: Path, destino: Path) -> None:
+    """Como ``escribir_binario``, pero para un archivo que ya está en disco.
+
+    Evita cargar en memoria un video de cientos de MB. ``origen`` tiene que estar en
+    el mismo sistema de archivos que ``destino``: ``tmp/`` y ``media/`` viven los dos
+    bajo ``data_dir``.
+    """
+    try:
+        fd = os.open(origen, os.O_RDWR)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(origen, destino)
+        _fsync_dir(destino.parent)
+    except OSError as exc:
+        raise StorageError(f"No se pudo escribir {destino}") from exc
+
+
 def escribir_json(path: Path, payload: BaseModel | dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     data = payload.model_dump(mode="json", exclude={"status"}) if isinstance(payload, BaseModel) else dict(payload)  # noqa: E501
