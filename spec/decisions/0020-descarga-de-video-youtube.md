@@ -1,5 +1,5 @@
 ---
-id: 0017
+id: 0020
 title: Descargar video de YouTube a pedido con yt-dlp como librería, en vez de tratarlo solo como referencia
 status: accepted
 date: 2026-09-10
@@ -8,7 +8,7 @@ superseded-by: null
 tags: [backend, data]
 ---
 
-# 0017 — Descargar video de YouTube a pedido con yt-dlp como librería
+# 0020 — Descargar video de YouTube a pedido con yt-dlp como librería
 
 ## Contexto
 
@@ -177,7 +177,7 @@ como el campo `video` del juego.** Acotado así:
 ## Referencias
 
 - Brief: `docs/coindoor-yt-download-brief.md`
-- Feature [010-video-youtube](../features/010-video-youtube/spec.md)
+- Feature [011-video-youtube](../features/011-video-youtube/spec.md)
 - Spike del 2026-09-10, fuera del repo: `youtu.be/earaCnLVL98` (Golden Axe, id tomado de
   ArcadeDB) — 69 s de video, 5,7 s de descarga, 10,5 MB, h264 960×720 yuv420p + aac
 - yt-dlp 2026.08.19: https://github.com/yt-dlp/yt-dlp · https://github.com/yt-dlp/yt-dlp/wiki/EJS

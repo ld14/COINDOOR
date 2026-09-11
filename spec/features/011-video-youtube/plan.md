@@ -1,4 +1,4 @@
-# 010 · Video desde YouTube — Plan
+# 011 · Video desde YouTube — Plan
 
 _Cómo se implementa lo descrito en `spec.md`. Debe respetar la `constitution/`._
 
@@ -32,7 +32,7 @@ yt-dlp. El modal Sugerir no se toca.
 ## Decisiones
 
 - **yt-dlp como librería, Deno, H.264 ≤720p, tope de 10 min** — ver
-  [`ADR-0017`](../../decisions/0017-descarga-de-video-youtube.md).
+  [`ADR-0020`](../../decisions/0020-descarga-de-video-youtube.md).
 - **URL canónica en vez de la que pega el usuario** — reconstruir `watch?v=<id>` deja afuera
   listas, canales y parámetros de seguimiento: yt-dlp nunca recibe otra cosa.
 - **Descarga en `tmp/<job>` y `os.replace` a `media/`** — un fallo o una cancelación nunca
@@ -46,7 +46,7 @@ yt-dlp. El modal Sugerir no se toca.
 
 - **Muro anti-bot o cambio de YouTube** — el job falla con mensaje; se arregla con
   `uv lock --upgrade-package yt-dlp --upgrade-package yt-dlp-ejs && uv sync`. Si persiste
-  desde la IP de la casa, ver ADR-0017 §Qué habría que revisar.
+  desde la IP de la casa, ver ADR-0020 §Qué habría que revisar.
 - **Deno ausente** — yt-dlp no resuelve los desafíos de YouTube y el job falla; el requisito
   queda en `README.md` y `docs/troubleshooting.md`.
 - **Cancelar durante el merge** — corta al terminar ffmpeg (segundos); el campo no cambia

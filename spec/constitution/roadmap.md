@@ -76,7 +76,7 @@ contra un mock server y no lo necesitan.
 | 5 | **Asíncrono** — manuales con job y cancelación, modal de sugerencias | [`002`](../features/002-sugerencias-multiproveedor/spec.md) | Especificada |
 | 6 | **Exportación** — lista de exportables, "qué incluir", generación del `.zip` | [`001`](../features/001-export-bundle/spec.md) | Especificada |
 | — | **ArcadeDB** — precarga al alta y candidatos reales en los botones Sugerir | [`008`](../features/008-arcadedb/spec.md) | Hecha |
-| — | **Video desde YouTube** — pegar una URL en la sección VIDEO y descargar el gameplay | [`010`](../features/010-video-youtube/spec.md) | Hecha · [`ADR-0017`](../decisions/0017-descarga-de-video-youtube.md) |
+| — | **Video desde YouTube** — pegar una URL en la sección VIDEO y descargar el gameplay | [`011`](../features/011-video-youtube/spec.md) | Hecha · [`ADR-0020`](../decisions/0020-descarga-de-video-youtube.md) |
 
 **Orden de arranque:** 003 → 004 → 005. Las tres primeras son independientes entre sí
 salvo que 004 necesita `contract.json`, y 005 consume el `fielddefs.json` que produce 004.

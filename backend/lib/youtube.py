@@ -1,4 +1,4 @@
-"""Descarga de video de YouTube con yt-dlp, para el campo ``video`` (ADR-0017).
+"""Descarga de video de YouTube con yt-dlp, para el campo ``video`` (ADR-0020).
 
 No conoce HTTP ni el store: recibe una URL ya validada y un directorio, deja
 ``video.mp4`` adentro y devuelve la ruta. Los mensajes de ``YoutubeError`` están

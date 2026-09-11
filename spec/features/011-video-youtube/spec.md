@@ -1,8 +1,8 @@
-# 010 · Video desde YouTube
+# 011 · Video desde YouTube
 
 **Estado:** implementada   <!-- borrador | aprobada | en curso | implementada -->
 
-Decisión en [`ADR-0017`](../../decisions/0017-descarga-de-video-youtube.md).
+Decisión en [`ADR-0020`](../../decisions/0020-descarga-de-video-youtube.md).
 
 ## Qué hace
 
@@ -50,4 +50,4 @@ No están en `docs/claude_diseño/`. Estos son los literales:
 - **Otros sitios de video**, como archive.org o Vimeo.
 - **Videos en la galería:** eso es [009](../009-galeria/spec.md).
 - **Re-encodear** videos sin variante H.264: fallan de forma explícita.
-- **Verificar la licencia del contenido:** es un riesgo abierto en ADR-0017.
+- **Verificar la licencia del contenido:** es un riesgo abierto en ADR-0020.

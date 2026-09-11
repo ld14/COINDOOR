@@ -8,7 +8,7 @@ literal: es lo que el usuario va a buscar. -->
 **Causa.** Al pedir el video, YouTube respondió *"Sign in to confirm you're not a bot"*. Pasa
 por la reputación de la IP —VPN, proxy, muchas descargas seguidas— o porque YouTube cambió
 algo y la versión instalada de yt-dlp quedó vieja
-([`ADR-0017`](../spec/decisions/0017-descarga-de-video-youtube.md)).
+([`ADR-0020`](../spec/decisions/0020-descarga-de-video-youtube.md)).
 
 **Solución.** Actualizar yt-dlp y su componente de JavaScript, y reintentar sin VPN:
 

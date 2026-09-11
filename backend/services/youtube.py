@@ -1,4 +1,4 @@
-"""Descarga del video de un juego desde una URL de YouTube (feature 010, ADR-0017).
+"""Descarga del video de un juego desde una URL de YouTube (feature 011, ADR-0020).
 
 La URL y el juego se validan antes de encolar: un error de entrada responde 422/404
 en vez de aparecer como un job fallido.

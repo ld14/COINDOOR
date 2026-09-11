@@ -23,7 +23,7 @@ def put_media(game_id: str, key: str, file: UploadFile) -> GameOut:
 
 @router.post("/video/youtube")
 def download_youtube_video(game_id: str, payload: YoutubeDownload) -> SuggestionJob:
-    """Descarga el video del juego desde YouTube como un job (ADR-0017)."""
+    """Descarga el video del juego desde YouTube como un job (ADR-0020)."""
     service = YoutubeVideoService(get_settings())
     job = submit(service.run(game_id, payload.url))
     return SuggestionJob(jobId=job.job_id)

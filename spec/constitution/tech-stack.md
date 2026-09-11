@@ -13,9 +13,9 @@
 | Persistencia | **Sin base de datos.** Un `game.json` por juego | — | [`0008`](../decisions/0008-persistencia-en-archivos.md) |
 | Trabajos largos | `ThreadPoolExecutor` en proceso | — | [`0010`](../decisions/0010-jobs-en-proceso.md) |
 | HTTP saliente | httpx (sincrónico) | — | [`0006`](../decisions/0006-fuentes-externas-multiproveedor.md) |
-| Descarga de video | yt-dlp como librería (`yt-dlp[default]`, incluye `yt-dlp-ejs`) | ≥2026.8.19 | [`0017`](../decisions/0017-descarga-de-video-youtube.md) |
-| Runtime JS de yt-dlp | Deno, en el host | ≥2.3 | [`0017`](../decisions/0017-descarga-de-video-youtube.md) |
-| Video: remux y transcode | ffmpeg, en el host | — | [`0017`](../decisions/0017-descarga-de-video-youtube.md) |
+| Descarga de video | yt-dlp como librería (`yt-dlp[default]`, incluye `yt-dlp-ejs`) | ≥2026.8.19 | [`0020`](../decisions/0020-descarga-de-video-youtube.md) |
+| Runtime JS de yt-dlp | Deno, en el host | ≥2.3 | [`0020`](../decisions/0020-descarga-de-video-youtube.md) |
+| Video: remux y transcode | ffmpeg, en el host | — | [`0020`](../decisions/0020-descarga-de-video-youtube.md) |
 | PDF → páginas | pymupdf | — | — |
 | Imágenes / miniaturas / acento | Pillow | — | — |
 | Configuración | pydantic-settings + `.env` fuera del repo | — | — |
@@ -287,7 +287,7 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
   `lib/providers/http.py`
   ([`ADR-0006`](../decisions/0006-fuentes-externas-multiproveedor.md)). yt-dlp no es un
   proveedor: sus reintentos internos se aceptan
-  ([`ADR-0017`](../decisions/0017-descarga-de-video-youtube.md)).
+  ([`ADR-0020`](../decisions/0020-descarga-de-video-youtube.md)).
 - **Un solo patrón de job** para manuales, export, sugerencias y revistas
   ([`ADR-0010`](../decisions/0010-jobs-en-proceso.md)).
 - **El staging del export se limpia siempre**, incluso si el export falla a la mitad.
@@ -315,7 +315,7 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
 - **Cargar, editar y exportar funcionan sin internet.** Solo salen a la red las
   sugerencias, la precarga de ArcadeDB ([`ADR-0015`](../decisions/0015-precarga-con-red-al-alta.md))
   y la descarga de video de YouTube a pedido
-  ([`ADR-0017`](../decisions/0017-descarga-de-video-youtube.md)): solo YouTube, hasta 10 min,
+  ([`ADR-0020`](../decisions/0020-descarga-de-video-youtube.md)): solo YouTube, hasta 10 min,
   MP4 H.264 de 720p o menos.
 - **Sin base de datos.** Descartadas SQLite (con y sin ORM), las bases documentales
   embebidas y el archivo único con toda la colección
@@ -339,7 +339,7 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
   ([`ADR-0007`](../decisions/0007-fastapi-como-framework-backend.md)); Celery, RQ y
   `BackgroundTasks` ([`ADR-0010`](../decisions/0010-jobs-en-proceso.md)); yt-dlp como
   binario por subproceso, un servidor MCP de yt-dlp, video VP9/AV1 y Node como runtime de
-  yt-dlp ([`ADR-0017`](../decisions/0017-descarga-de-video-youtube.md)).
+  yt-dlp ([`ADR-0020`](../decisions/0020-descarga-de-video-youtube.md)).
 
 ## Pendientes que bloquean
 
