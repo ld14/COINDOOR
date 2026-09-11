@@ -19,6 +19,7 @@ beforeEach(() => {
     if (url.pathname === '/api/systems' && method === 'POST') return createSystem(init?.body);
     if (url.pathname === '/api/games' && method === 'GET') return json(gamesPage(url));
     if (url.pathname === '/api/games' && method === 'POST') return createGame(init?.body);
+    if (url.pathname.startsWith('/api/jobs/')) return json({ jobId: url.pathname.split('/')[3], status: 'succeeded', progress: 100, result: null, error: null });
     if (url.pathname.startsWith('/api/games/')) return gameRoute(url, method, init);
     return json({ error: `Unhandled ${method} ${url.pathname}` }, 500);
   }));
@@ -103,6 +104,10 @@ function gameRoute(url: URL, method: string, init?: RequestInit) {
     return missing.length ? json({ error: 'El juego está incompleto', detail: { missing } }, 409) : json(clone(game));
   }
   if (parts[4] === 'fields') return fieldRoute(game, parts[5], method, init);
+  if (parts[4] === 'media' && parts[6] === 'youtube' && method === 'POST') {
+    game.video.video = { status: 'suggested', url: `/media/${game.systemId}/${game.id}/video.mp4`, source: 'YouTube' };
+    return json({ jobId: 'yt-job' });
+  }
   if (parts[4] === 'media' && method === 'PUT') {
     const key = parts[5] as keyof Game['images'];
     if (key in game.images) game.images[key] = { status: 'manual', url: `/media/${game.systemId}/${game.id}/${key}.jpg` };

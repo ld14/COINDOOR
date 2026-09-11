@@ -120,3 +120,58 @@ describe('Edición de ficha', () => {
     expect(within(logoCard).queryByText(/nombre-cliente\.png/)).not.toBeInTheDocument();
   });
 });
+
+describe('Video desde YouTube', () => {
+  beforeEach(() => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  async function pedirDescarga(url: string) {
+    renderApp('/juegos/mslug');
+    await screen.findByRole('heading', { name: 'Metal Slug' });
+    await userEvent.type(screen.getByLabelText('URL de YouTube'), url);
+    await userEvent.click(screen.getByRole('button', { name: 'Descargar' }));
+  }
+
+  it('URL que no es de YouTube muestra el error sin llamar a la API', async () => {
+    await pedirDescarga('https://vimeo.com/76979871');
+
+    expect(await screen.findByText('La URL tiene que ser de un video de youtube.com o youtu.be.')).toBeInTheDocument();
+    expect(vi.mocked(fetch).mock.calls.some(([input]) => String(input).includes('/youtube'))).toBe(false);
+  });
+
+  it('video cargado a mano pide confirmación y, si se cancela, no descarga', async () => {
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    renderApp('/juegos/goldnaxe');
+    await screen.findByRole('heading', { name: 'Golden Axe' });
+    await userEvent.type(screen.getByLabelText('URL de YouTube'), 'https://youtu.be/earaCnLVL98');
+    await userEvent.click(screen.getByRole('button', { name: 'Descargar' }));
+
+    expect(confirmSpy).toHaveBeenCalledWith('El video actual fue cargado a mano. ¿Reemplazarlo con el de YouTube?');
+    expect(vi.mocked(fetch).mock.calls.some(([input]) => String(input).includes('/youtube'))).toBe(false);
+  });
+
+  it('descarga exitosa muestra el video nuevo en el reproductor', async () => {
+    await pedirDescarga('https://youtu.be/earaCnLVL98');
+
+    await waitFor(() => {
+      const fuentes = Array.from(document.querySelectorAll('video'), (video) => video.getAttribute('src'));
+      expect(fuentes).toContainEqual(expect.stringMatching(/^\/media\/arcade\/mslug\/video\.mp4\?v=\d+$/));
+    });
+  });
+
+  it('job fallido muestra su mensaje', async () => {
+    const base = vi.mocked(fetch).getMockImplementation()!;
+    vi.mocked(fetch).mockImplementation(async (input, init) => (String(input).includes('/api/jobs/')
+      ? ({ ok: true, status: 200, json: async () => ({ jobId: 'yt-job', status: 'failed', progress: 0, result: null, error: 'El video dura más de 10 minutos.' }) } as Response)
+      : base(input, init)));
+
+    await pedirDescarga('https://youtu.be/earaCnLVL98');
+
+    expect(await screen.findByText('El video dura más de 10 minutos.')).toBeInTheDocument();
+  });
+});

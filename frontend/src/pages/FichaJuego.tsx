@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, type ReactNode, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   DosButton,
@@ -17,6 +17,7 @@ import { SuggestionsModal } from '@/components/SuggestionsModal';
 import { IdentityBatchModal } from '@/components/IdentityBatchModal';
 import { ImageModal } from '@/components/ImageModal';
 import { GalleryPanel } from '@/components/GalleryPanel';
+import { YoutubeDownload } from '@/components/YoutubeDownload';
 import { useGame } from '@/hooks/useGame';
 import { useGameMutations } from '@/hooks/useGameMutations';
 import { useSystems } from '@/hooks/useSystems';
@@ -511,6 +512,10 @@ function MediaSection({
   onUpload: (key: ImageKey | VideoKey, file: File) => void;
   onGalleryChanged: () => void;
 }) {
+  // Un reemplazo escribe el mismo video.mp4: sin cambiar el src, el reproductor
+  // seguiría mostrando el archivo viejo desde la caché.
+  const [videoVersion, setVideoVersion] = useState(0);
+
   return (
     <>
       <Panel>
@@ -544,7 +549,14 @@ function MediaSection({
               onSuggest={onSuggestVideo}
               onUpload={onUpload}
               ratio={field.ratio}
-            />
+              version={videoVersion}
+            >
+              <YoutubeDownload
+                current={game.video[field.key]}
+                gameId={game.id}
+                onDownloaded={() => setVideoVersion(Date.now())}
+              />
+            </MediaCard>
           ))}
         </div>
       </Panel>
@@ -553,6 +565,7 @@ function MediaSection({
 }
 
 function MediaCard({
+  children,
   field,
   label,
   mediaKey,
@@ -560,7 +573,9 @@ function MediaCard({
   onSuggest,
   onUpload,
   ratio,
+  version,
 }: {
+  children?: ReactNode;
   field?: MediaField;
   label: string;
   mediaKey: ImageKey | VideoKey;
@@ -568,6 +583,7 @@ function MediaCard({
   onSuggest?: () => void;
   onUpload: (key: ImageKey | VideoKey, file: File) => void;
   ratio: string;
+  version?: number;
 }) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const status = field?.status ?? 'empty';
@@ -586,7 +602,7 @@ function MediaCard({
               className={styles.videoPlayer}
               controls
               preload="metadata"
-              src={field.url}
+              src={version ? `${field.url}?v=${version}` : field.url}
             />
           ) : (
             <button
@@ -613,6 +629,7 @@ function MediaCard({
           <DosButton onClick={() => confirmManualDelete(status, () => onDelete(mediaKey))} variant="danger-small">Borrar</DosButton>
         ) : null}
       </div>
+      {children}
       {!isVideo && field?.url ? (
         <ImageModal
           alt={label}

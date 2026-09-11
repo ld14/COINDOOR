@@ -13,3 +13,7 @@ export interface JobOut<T> {
 export function getJob<T>(jobId: string) {
   return fetchJson<JobOut<T>>(`/jobs/${jobId}`);
 }
+
+export function cancelJob(jobId: string) {
+  return fetchJson<JobOut<unknown>>(`/jobs/${jobId}`, { method: 'DELETE' });
+}
