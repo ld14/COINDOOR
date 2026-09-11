@@ -81,7 +81,15 @@
       "Bash(git merge *)",
       "Bash(git grep *)",
       "Bash(npm install *)",
-      "Bash(perl -pi -e 's/0017-descarga-de-video-youtube/0020-descarga-de-video-youtube/g; s/010-video-youtube/011-video-youtube/g; s/ADR-0017/ADR-0020/g; s/feature 010,/feature 011,/g; s/`0017`\\\\]\\\\\\(\\\\.\\\\.\\\\/decisions\\\\/0020-descarga/`0020`]\\(..\\\\/decisions\\\\/0020-descarga/g; s/`010`\\\\]\\\\\\(\\\\.\\\\.\\\\/features\\\\/011-video/`011`]\\(..\\\\/features\\\\/011-video/g; s/\\\\[0017\\\\]\\\\\\(0020-descarga/[0020]\\(0020-descarga/g' spec/decisions/0020-descarga-de-video-youtube.md spec/decisions/README.md spec/features/011-video-youtube/spec.md spec/features/011-video-youtube/plan.md spec/features/011-video-youtube/tasks.md spec/constitution/tech-stack.md spec/constitution/roadmap.md README.md docs/troubleshooting.md backend/lib/youtube.py backend/services/youtube.py backend/api/media.py)"
+      "Bash(perl -pi -e 's/0017-descarga-de-video-youtube/0020-descarga-de-video-youtube/g; s/010-video-youtube/011-video-youtube/g; s/ADR-0017/ADR-0020/g; s/feature 010,/feature 011,/g; s/`0017`\\\\]\\\\\\(\\\\.\\\\.\\\\/decisions\\\\/0020-descarga/`0020`]\\(..\\\\/decisions\\\\/0020-descarga/g; s/`010`\\\\]\\\\\\(\\\\.\\\\.\\\\/features\\\\/011-video/`011`]\\(..\\\\/features\\\\/011-video/g; s/\\\\[0017\\\\]\\\\\\(0020-descarga/[0020]\\(0020-descarga/g' spec/decisions/0020-descarga-de-video-youtube.md spec/decisions/README.md spec/features/011-video-youtube/spec.md spec/features/011-video-youtube/plan.md spec/features/011-video-youtube/tasks.md spec/constitution/tech-stack.md spec/constitution/roadmap.md README.md docs/troubleshooting.md backend/lib/youtube.py backend/services/youtube.py backend/api/media.py)",
+      "Bash(node -e 'for \\(const p of [\"vite\",\"vitest\",\"react-router\",\"react-router-dom\",\"msw\"]\\) { try { const j = require\\(\"./node_modules/\"+p+\"/package.json\"\\); console.log\\(p, j.version, \"engines:\", JSON.stringify\\(j.engines||{}\\)\\); } catch \\(e\\) { console.log\\(p, \"no encontrado\"\\); } }')",
+      "Bash(grep -n '\"engines\"' -A3 package.json)",
+      "Bash(sh -n dev.sh)",
+      "Bash(env PATH=/usr/bin:/bin sh)",
+      "Bash(sh)",
+      "Bash(npm --prefix frontend install)",
+      "Bash(env PATH=/usr/bin:/bin /bin/sh)",
+      "Bash(/bin/sh)"
     ],
     "deny": [
       "Read(./.env)",
