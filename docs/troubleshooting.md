@@ -16,15 +16,30 @@ algo y la versión instalada de yt-dlp quedó vieja
 uv lock --upgrade-package yt-dlp --upgrade-package yt-dlp-ejs && uv sync
 ```
 
+## `Falta ffmpeg en el equipo: instalalo para descargar video de YouTube.`
+
+**Causa.** YouTube sirve el video y el audio por separado, y yt-dlp necesita ffmpeg para
+unirlos en el `video.mp4`. `./dev.sh` avisa al arrancar si no lo encuentra.
+
+**Solución.**
+
+```bash
+brew install ffmpeg        # macOS
+sudo apt install ffmpeg    # WSL / Linux
+ffmpeg -version
+```
+
 ## `No supported JavaScript runtime could be found`
 
 **Causa.** Aparece en el log del proceso cuando Deno no está instalado o no está en el `PATH`.
 Hoy yt-dlp igual descarga, pero YouTube puede ocultar formatos —el job falla entonces con
 `Este video no tiene versión H.264 de 720p o menos.`— y yt-dlp ya marca como deprecada la
-extracción sin runtime.
+extracción sin runtime. `./dev.sh` avisa al arrancar si no lo encuentra.
 
 **Solución.**
 
 ```bash
-brew install deno && deno --version
+brew install deno                                  # macOS
+curl -fsSL https://deno.land/install.sh | sh       # WSL / Linux
+deno --version
 ```

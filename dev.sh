@@ -25,9 +25,13 @@ trap cleanup INT TERM EXIT
 need uv
 need npm
 
-if [ ! -d frontend/node_modules ]; then
-  npm install
-fi
+# Avisan sin cortar el arranque: la app levanta igual, pero la descarga de video de
+# YouTube los usa (ADR-0020).
+command -v ffmpeg >/dev/null 2>&1 || printf '%s\n' "Aviso: falta ffmpeg. Sin él falla la descarga de video de YouTube (ver docs/troubleshooting.md)." >&2
+command -v deno >/dev/null 2>&1 || printf '%s\n' "Aviso: falta deno. yt-dlp puede perder formatos de YouTube (ver docs/troubleshooting.md)." >&2
+
+# Siempre, como uv sync: después de un pull con dependencias nuevas, node_modules queda viejo.
+npm --prefix frontend install
 
 uv sync
 
