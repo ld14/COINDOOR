@@ -18,7 +18,8 @@
 | Video: remux y transcode | ffmpeg, en el host | — | [`0020`](../decisions/0020-descarga-de-video-youtube.md) |
 | PDF → páginas | pymupdf | — | — |
 | Imágenes / miniaturas / acento | Pillow | — | — |
-| Configuración | pydantic-settings + `.env` fuera del repo | — | — |
+| Configuración: credenciales | pydantic-settings + `.env` fuera del repo | — | — |
+| Configuración: ajustes no sensibles | `configuracion.json` en `data_dir`, editable desde `/configuracion` | — | [`0022`](../decisions/0022-configuracion-no-sensible-en-archivo-propio.md) |
 | Gestor de dependencias | uv | — | — |
 | Tests | pytest + `TestClient` + `httpx.MockTransport` | — | — |
 | Lint / format | ruff | — | — |
@@ -335,11 +336,19 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
   ([`ADR-0011`](../decisions/0011-fielddefs-json-compartido.md)).
 - **La salida de `attract doctor` no se parsea.** Solo su código de salida
   ([`ADR-0012`](../decisions/0012-verificacion-attract-por-subproceso.md)).
+- **Instalar el bundle en ATTRACT es un subproceso al instalador que ya existe en
+  `../attract` (`install-coindoor-wsl.sh`), nunca lógica reimplementada en Python.**
+  Misma regla que `attract doctor`: se confía en el código de salida, no se parsea la
+  salida ([`ADR-0021`](../decisions/0021-instalar-bundle-por-subproceso.md)). Solo WSL
+  por ahora; requiere la ruta de ATTRACT configurada en `/configuracion`
+  ([`ADR-0022`](../decisions/0022-configuracion-no-sensible-en-archivo-propio.md)).
 - **Descartados para el backend:** Django, Flask, `http.server` de stdlib y Node
   ([`ADR-0007`](../decisions/0007-fastapi-como-framework-backend.md)); Celery, RQ y
   `BackgroundTasks` ([`ADR-0010`](../decisions/0010-jobs-en-proceso.md)); yt-dlp como
   binario por subproceso, un servidor MCP de yt-dlp, video VP9/AV1 y Node como runtime de
-  yt-dlp ([`ADR-0020`](../decisions/0020-descarga-de-video-youtube.md)).
+  yt-dlp ([`ADR-0020`](../decisions/0020-descarga-de-video-youtube.md)); reimplementar el
+  merge de `install-coindoor.ps1` en Python
+  ([`ADR-0021`](../decisions/0021-instalar-bundle-por-subproceso.md)).
 
 ## Pendientes que bloquean
 

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { Banner, MenuBar, StatusBar } from '@/components/dos';
 import { Catalogo } from '@/pages/_Catalogo';
+import { Configuracion } from '@/pages/Configuracion';
 import { EmptyPage } from '@/pages/EmptyPage';
 import { ExportPage } from '@/pages/ExportPage';
 import { FichaJuego } from '@/pages/FichaJuego';
@@ -25,6 +26,9 @@ export function App() {
       } else if (event.key === 'F4') {
         event.preventDefault();
         navigate('/exportar');
+      } else if (event.key === 'F5') {
+        event.preventDefault();
+        navigate('/configuracion');
       }
     }
 
@@ -47,6 +51,7 @@ export function App() {
             <Route element={<FichaJuego />} path="/juegos/:gameId" />
             <Route element={<ExportPage />} path="/exportar" />
             <Route element={<ExportPage />} path="/exportar/:gameId" />
+            <Route element={<Configuracion />} path="/configuracion" />
             <Route element={<Catalogo />} path="/_catalogo" />
           </Routes>
         </section>

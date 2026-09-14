@@ -75,7 +75,10 @@ carpeta.
 
 Python 3.12 · [uv](https://docs.astral.sh/uv/) · Node 22.12+ · ffmpeg · [Deno](https://deno.com) 2.3+.
 ffmpeg y Deno los usan el video de ArcadeDB y la descarga desde YouTube
-([`ADR-0020`](spec/decisions/0020-descarga-de-video-youtube.md)).
+([`ADR-0020`](spec/decisions/0020-descarga-de-video-youtube.md)). `./dev.sh` los instala solo
+si faltan (`scripts/install-deps.sh`: brew en macOS, apt en WSL/Linux, winget o choco en
+Windows nativo con Git Bash); si no puede, ver
+[`docs/troubleshooting.md`](docs/troubleshooting.md).
 Opcionales: los binarios `mame` y `attract` — sin ellos la aplicación funciona con más
 trabajo manual.
 

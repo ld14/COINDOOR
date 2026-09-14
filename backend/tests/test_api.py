@@ -422,6 +422,108 @@ def test_export_falla_si_la_rom_no_existe(tmp_path: Path) -> None:
     assert result.json()["error"] == "El archivo del juego no se pudo incluir en el paquete"
 
 
+def _export_sync(api: TestClient, game_id: str) -> dict:
+    created = api.post("/api/export", json={"gameId": game_id, "incluir": []})
+    run_id = created.json()["runId"]
+    result = api.get(f"/api/export/{run_id}")
+    for _ in range(20):
+        if result.json()["status"] == "succeeded":
+            break
+        sleep(0.05)
+        result = api.get(f"/api/export/{run_id}")
+    return result.json()["result"]
+
+
+def _fake_installer(attract_dir: Path, body: str) -> None:
+    attract_dir.mkdir(parents=True, exist_ok=True)
+    script = attract_dir / "install-coindoor-wsl.sh"
+    script.write_text(f"#!/usr/bin/env bash\n{body}\n")
+    script.chmod(script.stat().st_mode | 0o111)
+
+
+def test_install_attract_sin_export_previo_falla(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    api.patch("/api/config", json={"attractDir": str(tmp_path / "attract")})
+    game_id = _create_arcade_game(api)
+
+    response = api.post(f"/api/games/{game_id}/install-attract")
+
+    assert response.status_code == 409
+    assert "Exportá el juego primero" in response.json()["error"]
+
+
+def test_install_attract_sin_configurar_falla(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    _make_exportable(api, game_id)
+    _export_sync(api, game_id)
+
+    response = api.post(f"/api/games/{game_id}/install-attract")
+
+    assert response.status_code == 422
+    assert "Configuración" in response.json()["error"]
+
+
+def test_install_attract_ok(tmp_path: Path) -> None:
+    attract_dir = tmp_path / "attract"
+    _fake_installer(attract_dir, 'echo "instalado: $1"; exit 0')
+    api = client(tmp_path)
+    api.patch("/api/config", json={"attractDir": str(attract_dir)})
+    game_id = _create_arcade_game(api)
+    _make_exportable(api, game_id)
+    _export_sync(api, game_id)
+
+    response = api.post(f"/api/games/{game_id}/install-attract")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["ok"] is True
+    assert "instalado:" in payload["salida"]
+
+
+def test_install_attract_falla_muestra_salida_del_script(tmp_path: Path) -> None:
+    attract_dir = tmp_path / "attract"
+    _fake_installer(attract_dir, 'echo "error: falta wslpath" >&2; exit 1')
+    api = client(tmp_path)
+    api.patch("/api/config", json={"attractDir": str(attract_dir)})
+    game_id = _create_arcade_game(api)
+    _make_exportable(api, game_id)
+    _export_sync(api, game_id)
+
+    response = api.post(f"/api/games/{game_id}/install-attract")
+
+    assert response.status_code == 409
+    assert "falta wslpath" in response.json()["error"]
+
+
+def test_config_get_sin_archivo_no_falla(tmp_path: Path) -> None:
+    api = client(tmp_path)
+
+    response = api.get("/api/config")
+
+    assert response.status_code == 200
+    assert response.json() == {"attractDir": None}
+
+
+def test_config_patch_ruta_relativa_falla(tmp_path: Path) -> None:
+    api = client(tmp_path)
+
+    response = api.patch("/api/config", json={"attractDir": "relativo/attract"})
+
+    assert response.status_code == 422
+    assert "La ruta debe ser absoluta" in response.json()["error"]
+
+
+def test_config_patch_vacio_limpia_el_valor(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    api.patch("/api/config", json={"attractDir": str(tmp_path / "attract")})
+
+    response = api.patch("/api/config", json={"attractDir": ""})
+
+    assert response.status_code == 200
+    assert response.json() == {"attractDir": None}
+
+
 def _identidad_minima() -> dict[str, str]:
     return {
         "title": "Dino", "year": "1990", "developer": "Softie", "publisher": "Softie",

@@ -5,6 +5,7 @@ const entries = [
   ['F2', 'Sistemas'],
   ['F3', 'Juegos'],
   ['F4', 'Exportar'],
+  ['F5', 'Configuración'],
   ['Esc', 'Cerrar'],
 ];
 

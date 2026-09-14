@@ -47,7 +47,10 @@ yt-dlp. El modal Sugerir no se toca.
 - **Muro anti-bot o cambio de YouTube** — el job falla con mensaje; se arregla con
   `uv lock --upgrade-package yt-dlp --upgrade-package yt-dlp-ejs && uv sync`. Si persiste
   desde la IP de la casa, ver ADR-0020 §Qué habría que revisar.
-- **Deno ausente** — yt-dlp no resuelve los desafíos de YouTube y el job falla; el requisito
-  queda en `README.md` y `docs/troubleshooting.md`.
+- **Deno ausente** — `dev.sh` lo instala solo vía `scripts/install-deps.sh` (brew/apt); si
+  eso falla, yt-dlp no resuelve los desafíos de YouTube y el job falla. El requisito queda
+  documentado en `README.md` y `docs/troubleshooting.md` como respaldo manual.
+  Antes de usar el instalador shell de Deno, comprobar `unzip` o `7z`; si faltan,
+  indicar cómo instalar el descompresor y devolver error sin cortar el arranque de la app.
 - **Cancelar durante el merge** — corta al terminar ffmpeg (segundos); el campo no cambia
   porque la escritura ocurre después.

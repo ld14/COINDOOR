@@ -8,6 +8,7 @@ from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
+from backend.api.config import router as config_router
 from backend.api.errors import install_error_handlers
 from backend.api.export import router as export_router
 from backend.api.fields import router as fields_router
@@ -21,6 +22,7 @@ from backend.api.roms import router as roms_router
 from backend.api.roms import scan_router as roms_scan_router
 from backend.api.systems import router as systems_router
 from backend.config import Settings, ensure_data_dirs, get_settings
+from backend.store.config import ConfigStore
 from backend.store.cuotas import QuotasStore
 from backend.store.sistemas import SystemsStore
 
@@ -36,9 +38,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     ensure_data_dirs(settings)
     SystemsStore(settings.systems_path)
     QuotasStore(settings.quotas_path)
+    ConfigStore(settings.config_path)
 
     app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
     install_error_handlers(app)
+    app.include_router(config_router)
     app.include_router(systems_router)
     app.include_router(games_router)
     app.include_router(fields_router)

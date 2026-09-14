@@ -272,6 +272,20 @@ class ExportJob(BaseModel):
     runId: str
 
 
+class InstallOut(BaseModel):
+    ok: bool
+    estado: str
+    salida: str
+
+
+class ConfigOut(BaseModel):
+    attractDir: str | None = None
+
+
+class ConfigPatch(BaseModel):
+    attractDir: str = ""
+
+
 class ApplySuggestion(BaseModel):
     candidateId: str
 

@@ -151,6 +151,21 @@ def test_juego_carpeta_ms_dos_se_comprime_y_tratamiento_es_descomprimir(tmp_path
         assert set(archivo.namelist()) == {"DOT.EXE", "DATA.DAT"}
 
 
+def test_romref_apuntando_a_la_raiz_del_disco_falla_explicito(tmp_path: Path) -> None:
+    """Un `romRef` mal cargado (`/`) no puede terminar en un `rglob` sobre todo
+    el filesystem: eso revienta contra algun archivo especial (`/dev/core`, por
+    ejemplo) con un traceback ilegible en vez de un error de dominio."""
+    settings = _settings(tmp_path)
+    game = _game(settings)
+    game["romRef"] = "/"
+
+    with pytest.raises(BadRequest, match="raiz del disco"):
+        build_staging(settings, game, incluir={"juego"}, system_name="MAME")
+
+    # El staging temporal no queda huerfano cuando falla a mitad de camino.
+    assert list(settings.tmp_dir.iterdir()) == []
+
+
 def test_el_zip_del_juego_no_lleva_la_ficha_interna_de_coindoor(tmp_path: Path) -> None:
     """Desde ADR-0017 el `game.json` de COINDOOR vive adentro de la carpeta del juego,
     que es justo lo que se comprime: no debe viajar a la instalacion."""

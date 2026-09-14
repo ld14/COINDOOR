@@ -46,3 +46,13 @@ export function createExport(gameId: string, incluir: string[]) {
 export function getExportStatus(runId: string) {
   return fetchJson<JobOut>(`/export/${runId}`);
 }
+
+export interface InstallResult {
+  ok: boolean;
+  estado: string;
+  salida: string;
+}
+
+export function installAttract(gameId: string) {
+  return fetchJson<InstallResult>(`/games/${gameId}/install-attract`, { method: 'POST' });
+}

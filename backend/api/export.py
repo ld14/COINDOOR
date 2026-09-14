@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from backend.api.errors import NotFound
-from backend.api.schemas import ExportJob, ExportRequest, JobOut
+from backend.api.schemas import ExportJob, ExportRequest, InstallOut, JobOut
 from backend.config import get_settings
 from backend.lib.jobs.ejecutor import submit
 from backend.lib.jobs.registro import JobState, registry
@@ -43,3 +43,8 @@ def get_export(run_id: str) -> JobOut:
     if job is None:
         raise NotFound(f"Export no encontrado: {run_id}")
     return _out(job)
+
+
+@router.post("/games/{game_id}/install-attract")
+def install_attract(game_id: str) -> InstallOut:
+    return InstallOut.model_validate(_service().install(game_id))

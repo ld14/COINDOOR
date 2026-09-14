@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { DosButton, Panel, ProgressBar, SectionHeader, Spinner, SunkenBox } from '@/components/dos';
-import { createExport, getExportOptions, getExportStatus, type ExportOption, type ExportResult } from '@/lib/api/export';
+import {
+  createExport,
+  getExportOptions,
+  getExportStatus,
+  installAttract,
+  type ExportOption,
+  type ExportResult,
+  type InstallResult,
+} from '@/lib/api/export';
 import styles from './ReadPages.module.css';
 
 export function ExportPage() {
@@ -13,6 +21,9 @@ export function ExportPage() {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<ExportResult | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
+  const [installing, setInstalling] = useState(false);
+  const [installResult, setInstallResult] = useState<InstallResult | null>(null);
+  const [installError, setInstallError] = useState('');
 
   useEffect(() => {
     if (!gameId) return;
@@ -92,6 +103,21 @@ export function ExportPage() {
     }
   }
 
+  async function handleInstall() {
+    if (!gameId) return;
+    setInstalling(true);
+    setInstallError('');
+    setInstallResult(null);
+    try {
+      const res = await installAttract(gameId);
+      setInstallResult(res);
+    } catch (err) {
+      setInstallError(err instanceof Error ? err.message : 'Error al instalar en ATTRACT');
+    } finally {
+      setInstalling(false);
+    }
+  }
+
   if (!gameId) {
     return (
       <div className={styles.page}>
@@ -119,7 +145,13 @@ export function ExportPage() {
             <div className={styles.toolbar}>
               <Link to="/juegos"><DosButton variant="primary-small">Volver a Juegos</DosButton></Link>
               <DosButton onClick={() => setResult(null)} variant="ghost-small">Exportar otro</DosButton>
+              <DosButton onClick={handleInstall} variant="ghost-small" disabled={installing}>
+                {installing ? 'Instalando…' : 'Cargar en ATTRACT'}
+              </DosButton>
             </div>
+            {installing ? <Spinner /> : null}
+            {installResult ? <p className={styles.meta}>Instalado en ATTRACT.</p> : null}
+            {installError ? <p className={styles.error}>{installError}</p> : null}
           </SunkenBox>
         </Panel>
       </div>

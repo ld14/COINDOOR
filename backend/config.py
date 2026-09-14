@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     def quotas_path(self) -> Path:
         return self.data_dir / "cuotas.json"
 
+    @property
+    def config_path(self) -> Path:
+        return self.data_dir / "configuracion.json"
+
 
 def ensure_data_dirs(settings: Settings) -> None:
     settings.data_dir.mkdir(parents=True, exist_ok=True)

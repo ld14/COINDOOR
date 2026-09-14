@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from backend.api.errors import BadRequest
 from backend.bundle.datajson import build_datajson
 from backend.bundle.gamejson import build_gamejson
 from backend.config import Settings
@@ -33,34 +34,34 @@ def build_staging(settings: Settings, game: Mapping[str, Any], incluir: Collecti
         media/             <- assets planos
     """
     root = Path(tempfile.mkdtemp(prefix="export-", dir=settings.tmp_dir))
-    media_dir = root / "media"
-    media_dir.mkdir(parents=True, exist_ok=True)
-
-    efectivo = set(incluir)
-    if not _manual_files_exist(settings, game):
-        efectivo.discard("manual")
-
-    _copy_assets(settings, game, media_dir, "images", fielddefs.fields("images"), efectivo)
-    _copy_assets(settings, game, media_dir, "video", fielddefs.fields("videos"), efectivo)
-
-    galeria = _copy_galeria(settings, game, media_dir) if "galeria" in efectivo else []
-    if not galeria:
-        efectivo.discard("galeria")
-
-    # El ROM se copia primero: game.json necesita su nombre real para el campo ``file``.
-    rom_archivo: str | None = None
-    rom_tratamiento: str | None = None
-    rom_nombre: str | None = None
-    if "juego" in efectivo:
-        resultado = _copy_rom(game, root / "juego")
-        if resultado is not None:
-            rom_nombre, rom_tratamiento = resultado
-            rom_archivo = f"juego/{rom_nombre}"
-        else:
-            efectivo.discard("juego")
-
-    escribir_json(root / "data.json", build_datajson(game, efectivo, galeria))
     try:
+        media_dir = root / "media"
+        media_dir.mkdir(parents=True, exist_ok=True)
+
+        efectivo = set(incluir)
+        if not _manual_files_exist(settings, game):
+            efectivo.discard("manual")
+
+        _copy_assets(settings, game, media_dir, "images", fielddefs.fields("images"), efectivo)
+        _copy_assets(settings, game, media_dir, "video", fielddefs.fields("videos"), efectivo)
+
+        galeria = _copy_galeria(settings, game, media_dir) if "galeria" in efectivo else []
+        if not galeria:
+            efectivo.discard("galeria")
+
+        # El ROM se copia primero: game.json necesita su nombre real para el campo ``file``.
+        rom_archivo: str | None = None
+        rom_tratamiento: str | None = None
+        rom_nombre: str | None = None
+        if "juego" in efectivo:
+            resultado = _copy_rom(game, root / "juego")
+            if resultado is not None:
+                rom_nombre, rom_tratamiento = resultado
+                rom_archivo = f"juego/{rom_nombre}"
+            else:
+                efectivo.discard("juego")
+
+        escribir_json(root / "data.json", build_datajson(game, efectivo, galeria))
         escribir_json(root / "game.json", build_gamejson(game, system_name, rom_nombre))
     except Exception:
         shutil.rmtree(root, ignore_errors=True)
@@ -140,6 +141,7 @@ def _copy_rom(game: Mapping[str, Any], juego_dir: Path) -> tuple[str, str] | Non
         return None
     juego_dir.mkdir(parents=True, exist_ok=True)
     if source.is_dir():
+        _validar_carpeta_rom(source)
         nombre = f"{source.name}.zip"
         with zipfile.ZipFile(juego_dir / nombre, "w", zipfile.ZIP_DEFLATED) as archivo:
             for entry in source.rglob("*"):
@@ -148,6 +150,24 @@ def _copy_rom(game: Mapping[str, Any], juego_dir: Path) -> tuple[str, str] | Non
         return nombre, "descomprimir"
     shutil.copy2(source, juego_dir / source.name)
     return source.name, "copiar"
+
+
+def _validar_carpeta_rom(source: Path) -> None:
+    """Corta antes de comprimir una carpeta que en realidad es la raiz del disco.
+
+    Un `romRef` mal cargado (por ejemplo `/`) hace que ``rglob`` recorra todo el
+    filesystem en vez de la carpeta del juego, y termina reventando contra un
+    archivo especial como `/dev/core` con un traceback ilegible en vez de un
+    error explicito. Esto no valida rutas de ROM legitimas fuera de `games/`
+    -- `romSource: path` puede apuntar a cualquier carpeta real del usuario --
+    solo rechaza la raiz del filesystem, que nunca es la carpeta de un juego.
+    """
+    resolved = source.resolve()
+    if resolved == Path(resolved.anchor):
+        raise BadRequest(
+            f"La ruta del ROM ('{source}') es la raiz del disco, no la carpeta "
+            f"del juego. Corregi 'romRef' en la ficha del juego."
+        )
 
 
 def _es_interno(entry: Path, source: Path) -> bool:

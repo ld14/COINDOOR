@@ -6,6 +6,7 @@ const items = [
   { label: 'Juegos', to: '/juegos' },
   { label: 'Nuevo juego', to: '/juegos/nuevo' },
   { label: 'Exportar', to: '/exportar' },
+  { label: 'Configuración', to: '/configuracion' },
 ];
 
 export function MenuBar() {

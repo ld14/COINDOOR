@@ -72,6 +72,11 @@ correspondiente simplemente no se construye — no hay error, el campo se queda 
 | `SEARCH_BASE_URL` / `SEARCH_API_KEY` | Buscador web (Tavily), hoy **solo trucos** ([ADR-0019](../spec/decisions/0019-buscador-mas-modelo-para-trucos.md)). Lo que encuentra lo estructura `AI_PRIMARY` |
 | `DATA_DIR`, `HOST`, `PORT` | Ver `config.py` |
 
+La ruta del checkout de ATTRACT (para "Cargar en ATTRACT" tras exportar) **no** es una
+variable de entorno: se configura desde la pantalla `/configuracion` y vive en
+`configuracion.json`, no en `.env`
+([ADR-0022](../spec/decisions/0022-configuracion-no-sensible-en-archivo-propio.md)).
+
 Trucos es el único campo que **no** cae a los modelos a secas: se midió que sin evidencia
 devuelven vacíos falsos y códigos inventados, y eso es peor que no sugerir nada. Si falta
 `SEARCH_API_KEY`, el campo queda solo con ArcadeDB (arcade) y carga manual.

@@ -6,6 +6,7 @@ from dataclasses import asdict
 from typing import Any
 
 from backend.api.errors import BadRequest, Conflict
+from backend.bundle.install import install_bundle
 from backend.bundle.manifest import build_manifest
 from backend.bundle.pack import pack_staging
 from backend.bundle.seleccion import SeleccionItem, compute_seleccion
@@ -15,6 +16,7 @@ from backend.config import Settings
 from backend.lib.domain.completeness import compute_game_status, missing_required
 from backend.lib.jobs.registro import JobState
 from backend.store.archivo import safe_id
+from backend.store.config import ConfigStore
 from backend.store.juegos import GamesStore
 from backend.store.sistemas import SystemsStore
 
@@ -110,6 +112,28 @@ class ExportService:
         except Exception:
             shutil.rmtree(staging.root, ignore_errors=True)
             raise
+
+    def install(self, game_id: str) -> dict[str, object]:
+        game = self.games.get(game_id)
+        bundle = self.settings.data_dir / "exports" / f"{safe_id(game.id)}.coindoor.zip"
+        if not bundle.exists():
+            raise Conflict("No hay un export para instalar. Exportá el juego primero.")
+
+        attract_dir = ConfigStore(self.settings.config_path).attract_dir()
+        if attract_dir is None:
+            raise BadRequest(
+                "Falta configurar la ruta de ATTRACT en Configuración para instalar."
+            )
+        script = attract_dir / "install-coindoor-wsl.sh"
+        if not script.exists():
+            raise BadRequest(f"No se encontro el instalador en {script}")
+
+        library = attract_dir / "library"
+        resultado = install_bundle(script, bundle, library)
+        if not resultado["ok"]:
+            salida = str(resultado["salida"]).strip() or resultado["estado"]
+            raise Conflict(f"La instalacion en ATTRACT fallo: {salida}")
+        return resultado
 
 
 def _item_out(item: SeleccionItem) -> dict[str, object]:

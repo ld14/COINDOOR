@@ -25,10 +25,13 @@ trap cleanup INT TERM EXIT
 need uv
 need npm
 
-# Avisan sin cortar el arranque: la app levanta igual, pero la descarga de video de
-# YouTube los usa (ADR-0020).
-command -v ffmpeg >/dev/null 2>&1 || printf '%s\n' "Aviso: falta ffmpeg. Sin él falla la descarga de video de YouTube (ver docs/troubleshooting.md)." >&2
-command -v deno >/dev/null 2>&1 || printf '%s\n' "Aviso: falta deno. yt-dlp puede perder formatos de YouTube (ver docs/troubleshooting.md)." >&2
+# Instala ffmpeg y deno si faltan (ADR-0020): no corta el arranque si el instalador falla,
+# solo avisa. La app funciona igual; lo que se pierde es la descarga de video de YouTube.
+sh "$ROOT/scripts/install-deps.sh" || printf '%s\n' "Aviso: no se pudieron instalar todas las dependencias de video (ver docs/troubleshooting.md)." >&2
+
+# El instalador de Deno lo deja en ~/.deno/bin, que puede no estar en el PATH todavía.
+[ -d "$HOME/.deno/bin" ] && PATH="$HOME/.deno/bin:$PATH"
+export PATH
 
 # Siempre, como uv sync: después de un pull con dependencias nuevas, node_modules queda viejo.
 npm --prefix frontend install

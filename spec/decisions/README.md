@@ -50,6 +50,8 @@ de seis meses alguien —tú, o Claude— vuelve a proponer justo lo que ya desc
 | [0018](0018-gemini-con-busqueda-para-trucos.md) | Los trucos los sugiere Gemini con búsqueda de Google, no un modelo de memoria | superseded por [0019](0019-buscador-mas-modelo-para-trucos.md) | 2026-09-09 |
 | [0019](0019-buscador-mas-modelo-para-trucos.md) | Los trucos salen de un buscador propio más el modelo que ya está configurado | accepted | 2026-09-09 |
 | [0020](0020-descarga-de-video-youtube.md) | Descargar video de YouTube a pedido con yt-dlp como librería | accepted | 2026-09-10 |
+| [0021](0021-instalar-bundle-por-subproceso.md) | Instalar el bundle exportado por subproceso, sin esperar a `attract install` | accepted | 2026-09-12 |
+| [0022](0022-configuracion-no-sensible-en-archivo-propio.md) | Configuración no sensible en un archivo propio, editable desde una pantalla nueva | accepted | 2026-09-12 |
 
 Los seis últimos salen del análisis de arquitectura de
 [`docs/arquitectura/`](../../docs/arquitectura/README.md), que conserva la comparación
