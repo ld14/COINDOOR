@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '@/App';
+import { GuiaChecklist } from '@/pages/FichaJuego';
 
 function renderApp(path = '/') {
   return render(
@@ -90,6 +91,35 @@ describe('Edición de ficha', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Guardar sinopsis' }));
 
     await waitFor(() => expect(screen.getByText('● MANUAL')).toBeInTheDocument());
+  });
+
+  it('el objetivo se guarda aparte de la sinopsis y es opcional', async () => {
+    renderApp('/juegos/mslug');
+
+    await screen.findByRole('heading', { name: 'Metal Slug' });
+    const caja = screen.getByLabelText('Objetivo').parentElement!;
+    expect(within(caja).getByText('○ VACÍO')).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText('Objetivo'), 'Rescatar a los prisioneros.');
+    await userEvent.click(screen.getByRole('button', { name: 'Guardar objetivo' }));
+
+    await waitFor(() => expect(within(caja).getByText('● MANUAL')).toBeInTheDocument());
+    expect(screen.getByLabelText('Sinopsis')).toHaveValue('');
+  });
+
+  it('primeros pasos, reglas y modo de la guía se guardan por separado', async () => {
+    renderApp('/juegos/mslug');
+
+    await screen.findByRole('heading', { name: 'Metal Slug' });
+    const pasos = screen.getByLabelText('Primeros pasos').parentElement!;
+    await userEvent.type(screen.getByLabelText('Primeros pasos'), 'Mover la paleta');
+    await userEvent.click(screen.getByRole('button', { name: 'Guardar primeros pasos' }));
+    await waitFor(() => expect(within(pasos).getByText('● MANUAL')).toBeInTheDocument());
+
+    const modo = screen.getByLabelText('Modo multijugador').parentElement!;
+    await userEvent.selectOptions(screen.getByLabelText('Modo multijugador'), 'versus');
+    await userEvent.click(screen.getByRole('button', { name: 'Guardar modo' }));
+    await waitFor(() => expect(within(modo).getByText('● MANUAL')).toBeInTheDocument());
+    expect(within(screen.getByLabelText('Reglas esenciales').parentElement!).getByText('○ VACÍO')).toBeInTheDocument();
   });
 
   it('borrar campo manual pide confirmación y vuelve a vacío sin ocultar la sección', async () => {
@@ -242,5 +272,45 @@ describe('Video desde YouTube', () => {
     await pedirDescarga('https://youtu.be/earaCnLVL98');
 
     expect(await screen.findByText('El video dura más de 10 minutos.')).toBeInTheDocument();
+  });
+});
+
+describe('Checklist de la guía', () => {
+  const items = [
+    { key: 'objetivo', label: 'Objetivo', estado: 'falta' as const, detalle: 'Sin objetivo la guía no se exporta', requerido: true },
+    { key: 'primerosPasos', label: 'Primeros pasos', estado: 'falta' as const, detalle: 'Escribilo o usá Sugerir', requerido: false },
+    { key: 'perifericos', label: 'Periféricos', estado: 'ok' as const, detalle: 'dial', requerido: false },
+    { key: 'acciones', label: 'Acciones de los botones', estado: 'falta' as const, detalle: 'ArcadeDB no publica botones con acción para este juego', requerido: false },
+  ];
+
+  it('marca lo que hay, lo que falta y lo obligatorio, con el motivo', () => {
+    render(<GuiaChecklist fallos={{}} items={items} />);
+
+    const lista = within(screen.getByRole('list', { name: 'Checklist de la guía' }));
+    expect(screen.getByText(/1 de 4 listos/)).toBeInTheDocument();
+    expect(screen.getByText(/Sin objetivo la guía no se exporta\.$/)).toBeInTheDocument();
+    expect(lista.getByText(/Falta \(obligatorio\)/)).toBeInTheDocument();
+    expect(lista.getByText(/Listo — dial/)).toBeInTheDocument();
+    expect(lista.getByText(/ArcadeDB no publica botones con acción/)).toBeInTheDocument();
+    expect(screen.getAllByRole('listitem').map((li) => li.getAttribute('data-estado'))).toEqual(['falta', 'falta', 'ok', 'falta']);
+  });
+
+  it('dice «no se pudo generar» cuando la sugerencia de IA no produjo nada', () => {
+    render(<GuiaChecklist fallos={{ primerosPasos: 'el modelo no conoce el juego', perifericos: 'ignorado' }} items={items} />);
+
+    expect(screen.getByText(/No se pudo generar: el modelo no conoce el juego\. Escribilo o usá Sugerir/)).toBeInTheDocument();
+    // Un ítem que ya está listo no muestra fallos viejos.
+    expect(screen.queryByText(/ignorado/)).toBeNull();
+  });
+
+  it('no dibuja nada si la ficha no trae checklist', () => {
+    const { container } = render(<GuiaChecklist fallos={{}} items={[]} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('la ficha de un mock sin checklist se sigue abriendo', async () => {
+    renderApp('/juegos/goldnaxe');
+    await screen.findByRole('heading', { name: 'Golden Axe' });
+    expect(screen.queryByRole('list', { name: 'Checklist de la guía' })).toBeNull();
   });
 });

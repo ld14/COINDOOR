@@ -1,17 +1,27 @@
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
+from backend.lib.domain.guia import MODOS, lineas
 from backend.lib.providers.base import Candidato, Consulta, Limite, ProviderResult, ProviderTrace
 from backend.lib.providers.http import ProviderHttpClient
 from backend.lib.providers.ia.client import ModelResponseError, OpenAiCompatibleClient
 
+log = logging.getLogger(__name__)
+
 PROMPT_DIR = Path(__file__).parent / "prompts"
 PROMPT_VERSION = "v1"
-CAMPOS = frozenset({"sinopsis", "review", "cheats", "identidad"})
+CAMPOS = frozenset(
+    {"sinopsis", "objetivo", "primerosPasos", "reglasEsenciales", "modo", "review", "cheats", "identidad"}  # noqa: E501
+)
+_OBJETIVO_MAX = 600
+_OBJETIVO_DESCONOCIDO = "DESCONOCIDO"
+_ITEMS_MAX = 5
+_ITEM_LARGO_MAX = 200
 
 # MSDOS/DOS/Windows se tratan como PC: mismo criterio que
 # backend/services/msdos.py:_MSDOS_MARKERS, duplicado acá para no crear un
@@ -49,6 +59,7 @@ class IaGenerador:
             titulo=consulta.title,
             sistema=consulta.system,
             anio=consulta.year or "año desconocido",
+            contexto=consulta.contexto,
         )
         try:
             content = self.client.complete(prompt)
@@ -57,6 +68,7 @@ class IaGenerador:
             else:
                 value = _validate_shape(consulta.key, content)
         except ModelResponseError as exc:
+            log.warning("%s rechazó %s de %r: %s", self.nombre, consulta.key, consulta.title, exc)
             return ProviderResult(
                 (),
                 ProviderTrace(self.nombre, self.tipo, f"respuesta inválida: {exc}"),
@@ -89,6 +101,12 @@ def _load_prompt(key: str, system: str) -> str:
 def _validate_shape(key: str, content: str) -> str:
     if key == "sinopsis":
         return content
+    if key == "objetivo":
+        return _validate_objetivo(content)
+    if key in ("primerosPasos", "reglasEsenciales"):
+        return _validate_lineas(content)
+    if key == "modo":
+        return _validate_modo(content)
     try:
         data = json.loads(content)
     except json.JSONDecodeError as exc:
@@ -98,6 +116,41 @@ def _validate_shape(key: str, content: str) -> str:
     if key == "cheats" and (not isinstance(data, dict) or not isinstance(data.get("groups"), list)):
         raise ModelResponseError("trucos sin 'groups'")
     return json.dumps(data, ensure_ascii=False)
+
+
+def _validate_objetivo(content: str) -> str:
+    texto = content.strip()
+    if not texto or texto.upper().rstrip(".") == _OBJETIVO_DESCONOCIDO:
+        raise ModelResponseError("el modelo no conoce el juego")
+    if len(texto) > _OBJETIVO_MAX:
+        raise ModelResponseError(
+            f"objetivo de {len(texto)} caracteres (máximo {_OBJETIVO_MAX}): {texto[:80]!r}..."
+        )
+    return texto
+
+
+def _validate_lineas(content: str) -> str:
+    texto = content.strip()
+    if not texto or texto.upper().rstrip(".") == _OBJETIVO_DESCONOCIDO:
+        raise ModelResponseError("el modelo no conoce el juego")
+    items = lineas(texto)
+    if not items:
+        raise ModelResponseError("sin líneas útiles")
+    if len(items) > _ITEMS_MAX:
+        raise ModelResponseError(f"{len(items)} líneas (máximo {_ITEMS_MAX})")
+    largo = next((item for item in items if len(item) > _ITEM_LARGO_MAX), None)
+    if largo is not None:
+        raise ModelResponseError(f"una línea de {len(largo)} caracteres: {largo[:60]!r}...")
+    return "\n".join(items)
+
+
+def _validate_modo(content: str) -> str:
+    texto = content.strip().lower().rstrip(".")
+    if texto == _OBJETIVO_DESCONOCIDO.lower():
+        raise ModelResponseError("el modelo no conoce el juego")
+    if texto not in MODOS:
+        raise ModelResponseError(f"modo fuera de vocabulario: {texto[:40]!r}")
+    return texto
 
 
 def _validate_identity_json(content: str) -> str:

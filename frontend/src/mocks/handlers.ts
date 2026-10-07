@@ -20,12 +20,17 @@ export const handlers = [
       systemName: systems.find((system) => system.id === game.systemId)?.name ?? game.systemId,
       identitySource: game.identitySource,
       status: computeGameStatus(game),
+      exportStatus: game.id === 'goldnaxe' ? 'exported' : 'pending',
       coverThumbUrl: game.coverThumbUrl,
     }));
     if (q) items = items.filter((game) => game.title.toLowerCase().includes(q));
     if (systemId) items = items.filter((game) => games.find((full) => full.id === game.id)?.systemId === systemId);
     if (status) items = items.filter((game) => game.status === status);
-    return HttpResponse.json({ items: clone(items), page: 1, perPage: 50, total: items.length });
+    const exportStatus = url.searchParams.get('exportStatus');
+    if (exportStatus) items = items.filter((game) => game.exportStatus === exportStatus);
+    const page = Number(url.searchParams.get('page') || 1);
+    const perPage = Number(url.searchParams.get('perPage') || 50);
+    return HttpResponse.json({ items: clone(items.slice((page - 1) * perPage, page * perPage)), page, perPage, total: items.length });
   }),
   http.get('/api/games/:id', ({ params }) => {
     const game = games.find((item) => item.id === params.id);

@@ -461,6 +461,7 @@ def _correr_precarga(settings: Settings, tmp_path: Path) -> dict:
                 "manufacturer": "Mitchell",
                 "genre": "Shooter / Balloon Popping",
                 "input_controls": "joystick (4-way)",
+                "nplayers": "2P alt",
                 "screen_orientation": "Horizontal",
                 "history": _HISTORY_LARGA,
             }]})
@@ -635,3 +636,26 @@ def test_romset_pobre_igual_llena_lo_que_puede(tmp_path: Path) -> None:
     cargadas = {k for k, v in imagenes.items() if v.url}
     assert cargadas == {"caratula", "poster", "captura", "logo"}
     assert "marquesina" not in cargadas  # sin marquee no se inventa una
+
+
+def test_precarga_guarda_nplayers_en_el_gabinete(tmp_path: Path) -> None:
+    settings = _settings_msdos_libre(tmp_path)
+    assert _correr_precarga(settings, tmp_path)["estado"] == "ok"
+    assert GamesStore(settings.games_dir).get("super-pang").cabinet.nplayers == "2P alt"
+
+
+def test_precarga_completa_nplayers_en_un_gabinete_ya_cargado(tmp_path: Path) -> None:
+    from backend.api.schemas import CabinetInfo
+
+    settings = _settings_msdos_libre(tmp_path)
+    store = GamesStore(settings.games_dir)
+    # Ficha anterior a nplayers: tiene gabinete, pero ese dato no.
+    store.set_cabinet(
+        "super-pang", CabinetInfo(resolution="384x240", controls="mi control", buttons=3),
+    )
+    assert _correr_precarga(settings, tmp_path)["estado"] == "ok"
+
+    cabinet = GamesStore(settings.games_dir).get("super-pang").cabinet
+    assert cabinet.nplayers == "2P alt"
+    # Lo que ya estaba no se pisa.
+    assert (cabinet.resolution, cabinet.controls, cabinet.buttons) == ("384x240", "mi control", 3)

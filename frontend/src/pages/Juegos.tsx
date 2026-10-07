@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { DosInput, DosSelect, Panel, StatusBadge, SunkenBox } from '@/components/dos';
+import { DosButton, DosInput, DosSelect, Panel, StatusBadge, SunkenBox } from '@/components/dos';
 import { useGames } from '@/hooks/useGames';
 import { useSystems } from '@/hooks/useSystems';
 import type { GameStatus } from '@/lib/domain/types';
@@ -12,14 +12,23 @@ const statusOptions: { value: GameStatus | ''; label: string }[] = [
   { value: 'error', label: 'Con errores' },
 ];
 
+const exportOptions = [
+  { value: '', label: 'Todos' },
+  { value: 'pending', label: 'Pendientes de exportar' },
+  { value: 'exported', label: 'Exportados' },
+] as const;
+
 export function Juegos() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const q = params.get('q') ?? '';
   const systemId = params.get('systemId') ?? '';
   const status = (params.get('status') ?? '') as GameStatus | '';
-  const page = Number(params.get('page') ?? '1');
-  const games = useGames({ q, systemId, status, page, perPage: 50 });
+  const rawPage = Number(params.get('page') ?? '1');
+  const page = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+  const rawExportStatus = params.get('exportStatus');
+  const exportStatus = rawExportStatus === 'pending' || rawExportStatus === 'exported' ? rawExportStatus : '';
+  const games = useGames({ q, systemId, status, exportStatus, page, perPage: 50 });
   const systems = useSystems();
 
   function update(key: string, value: string) {
@@ -30,10 +39,23 @@ export function Juegos() {
     setParams(next);
   }
 
+  function goToPage(nextPage: number) {
+    const next = new URLSearchParams(params);
+    next.set('page', String(nextPage));
+    setParams(next);
+  }
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.title}>Juegos</h1>
+      </div>
+      <div aria-label="Filtrar por exportación" className={styles.filters} role="group">
+        {exportOptions.map((option) => (
+          <DosButton aria-pressed={exportStatus === option.value} key={option.value} onClick={() => update('exportStatus', option.value)} pressed={exportStatus === option.value}>
+            {option.label}
+          </DosButton>
+        ))}
       </div>
       <div className={styles.filters}>
         <DosInput aria-label="Buscar juego" onChange={(event) => update('q', event.target.value)} placeholder="Buscar" value={q} />
@@ -55,6 +77,7 @@ export function Juegos() {
               <span>
                 <span className={styles.rowMain}><span className={styles.gameTitle}>{game.title}</span></span>
                 <span className={styles.meta}>{game.systemName} · {game.year || 'Sin Información'} · {game.identitySource}</span>
+                <span className={styles.exportState}>{game.exportStatus === 'exported' ? 'Exportado' : 'Pendiente de exportar'}</span>
               </span>
               <StatusBadge status={game.status} />
             </button>
@@ -64,6 +87,13 @@ export function Juegos() {
           ) : null}
         </SunkenBox>
       </Panel>
+      {games.data ? (
+        <nav aria-label="Páginas de juegos" className={styles.filters}>
+          <DosButton disabled={page <= 1 || games.isFetching} onClick={() => goToPage(page - 1)}>Anterior</DosButton>
+          <span aria-live="polite">{games.data.total} juegos · Página {page} de {Math.max(1, Math.ceil(games.data.total / games.data.perPage))}</span>
+          <DosButton disabled={page * games.data.perPage >= games.data.total || games.isFetching} onClick={() => goToPage(page + 1)}>Siguiente</DosButton>
+        </nav>
+      ) : null}
     </div>
   );
 }

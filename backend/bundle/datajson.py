@@ -4,6 +4,14 @@ from collections.abc import Collection, Mapping
 from typing import Any
 
 from backend.bundle.gamejson import validate_accent
+from backend.lib.domain.guia import (
+    acciones_de,
+    controles_de,
+    lineas,
+    multijugador_de,
+    perifericos_desde,
+    texto_guia,
+)
 
 
 def build_datajson(
@@ -42,7 +50,58 @@ def build_datajson(
             {"file": img["file"], "label": img["label"]} for img in galeria
         ]
 
+    if "objetivo" in incluir:
+        guia = build_guia(game, incluir)
+        if guia:
+            data["guia"] = guia
+
     return data
+
+
+def build_guia(game: Mapping[str, Any], incluir: Collection[str] = ("objetivo",)) -> dict[str, Any]:
+    """Bloque ``guia`` de ADR-0037 (ATTRACT). Vacio si no hay ``objetivo``.
+
+    ``doctor`` rechaza una ``guia`` sin ``objetivo``. Los textos opcionales
+    (``primerosPasos``, ``reglasEsenciales``, ``modo``) viajan solo si se eligieron en
+    ``incluir``; ``acciones`` y ``perifericos`` son datos de ArcadeDB y acompañan al
+    bloque. Nada de aca nombra un boton fisico ni una tecla de salida (los resuelve
+    ATTRACT). ``fuentes`` no se emite: no se guarda la fecha de consulta y ``fecha`` es
+    obligatoria.
+
+    El ``objetivo`` es el texto ``texts.objetivo`` (feature 017), nunca la sinopsis.
+    ``revision`` es ``revisado`` solo si todos los textos que viajan los escribio o
+    guardo una persona (``manual``).
+    """
+    objetivo = texto_guia(game, "objetivo")
+    if objetivo is None:
+        return {}
+
+    guia: dict[str, Any] = {"objetivo": objetivo[0]}
+    revisados = [objetivo[1]]
+
+    acciones = acciones_de(game)
+    if acciones:
+        guia["acciones"] = acciones
+
+    for clave in ("primerosPasos", "reglasEsenciales"):
+        campo = texto_guia(game, clave) if clave in incluir else None
+        items = lineas(campo[0]) if campo else []
+        if items:
+            guia[clave] = items
+            revisados.append(campo[1])  # type: ignore[index]
+
+    multijugador, modo_manual = multijugador_de(game, incluir)
+    if multijugador:
+        guia["multijugador"] = multijugador
+    if modo_manual is not None:
+        revisados.append(modo_manual)
+
+    perifericos = perifericos_desde(controles_de(game))
+    if perifericos:
+        guia["perifericos"] = perifericos
+
+    guia["revision"] = "revisado" if all(revisados) else "borrador"
+    return guia
 
 
 def _review(game: Mapping[str, Any], incluir: Collection[str]) -> dict[str, Any] | None:

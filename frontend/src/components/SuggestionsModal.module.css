@@ -147,3 +147,10 @@
   color: var(--dos-ink-muted);
   font-size: var(--dos-size-field-tag);
 }
+
+.reasons {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  text-align: left;
+  font-size: 12px;
+}

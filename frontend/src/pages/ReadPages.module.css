@@ -280,6 +280,14 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
 }
 
+.exportState {
+  display: block;
+  color: var(--dos-titlebar);
+  font-size: var(--dos-size-meta);
+  font-weight: 700;
+  margin-top: var(--dos-space-1);
+}
+
 .list {
   display: grid;
 }
@@ -738,4 +746,16 @@
   color: var(--dos-ink-muted);
   font-size: var(--dos-size-field-tag);
   white-space: nowrap;
+}
+
+.checklist {
+  display: grid;
+  gap: var(--dos-space-2);
+  list-style: none;
+  margin: var(--dos-space-2) 0 0;
+  padding: 0;
+}
+
+.checklist [data-estado='falta'] .tileMark {
+  color: var(--dos-warn-crt);
 }

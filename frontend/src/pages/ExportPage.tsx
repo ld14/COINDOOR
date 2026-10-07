@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { DosButton, Panel, ProgressBar, SectionHeader, Spinner, SunkenBox } from '@/components/dos';
 import {
@@ -13,6 +14,7 @@ import {
 import styles from './ReadPages.module.css';
 
 export function ExportPage() {
+  const queryClient = useQueryClient();
   const { gameId } = useParams<{ gameId: string }>();
   const [options, setOptions] = useState<{ obligatorio: ExportOption[]; opcional: ExportOption[] } | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -44,6 +46,7 @@ export function ExportPage() {
       getExportStatus(runId).then((job) => {
         setProgress(job.progress);
         if (job.status === 'succeeded') {
+          void queryClient.invalidateQueries({ queryKey: ['games'] });
           setResult(job.result);
           setRunId(null);
           clearInterval(interval);
@@ -55,7 +58,7 @@ export function ExportPage() {
       });
     }, 500);
     return () => clearInterval(interval);
-  }, [runId]);
+  }, [runId, queryClient]);
 
   const toggleOptional = useCallback((key: string) => {
     setSelected((prev) => {
@@ -213,7 +216,9 @@ export function ExportPage() {
                       type="checkbox"
                     />
                     <span className={styles.label}>{opt.label}</span>
-                    <span className={styles.meta}>{opt.disponible ? formatBytes(opt.bytes) : '—'}</span>
+                    <span className={opt.disponible || !opt.motivo ? styles.meta : styles.error}>
+                      {opt.disponible ? formatBytes(opt.bytes) : opt.motivo || '—'}
+                    </span>
                   </label>
                 ))}
               </div>

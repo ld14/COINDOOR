@@ -7,6 +7,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from backend.api.errors import BadRequest
+from backend.api.schemas import StoredGame
 from backend.config import Settings
 from backend.lib.domain.fielddefs import identity_keys
 from backend.lib.providers.base import Candidato, Consulta, Limite, ProviderTrace
@@ -31,6 +32,38 @@ _PARSE_MAX_TOKENS = 16000
 
 _cache: dict[tuple[str, str, str], dict[str, object]] = {}
 _cache_lock = threading.Lock()
+
+
+_GUIA_KEYS = frozenset({"objetivo", "primerosPasos", "reglasEsenciales", "modo"})
+_MODO_JUGADORES = {"alt": "por turnos", "sim": "a la vez"}
+
+
+def _contexto_guia(game: StoredGame) -> str:
+    """Datos de la ficha para que el modelo reconozca el juego de la guia.
+
+    El titulo guardado suele ser el nombre del romset de MAME (`Arkanoidu`, la `u` es la
+    version US) y un modelo no conoce ese nombre: sin esto responde DESCONOCIDO.
+    """
+    identity = game.identity
+    datos = [
+        f"desarrollador: {identity.developer}" if identity.developer else "",
+        f"género: {identity.genre}" if identity.genre else "",
+    ]
+    jugadores = f"jugadores: {identity.players}" if identity.players else ""
+    nplayers = game.cabinet.nplayers.lower()
+    cuando = next((texto for clave, texto in _MODO_JUGADORES.items() if clave in nplayers), "")
+    if jugadores:
+        datos.append(f"{jugadores} ({cuando})" if cuando else jugadores)
+    romset = Path(game.romRef).stem if game.romRef else ""
+    if romset:
+        datos.append(f"nombre del romset de MAME: {romset}")
+    datos = [dato for dato in datos if dato]
+    if not datos:
+        return ""
+    return (
+        "Datos de la ficha: " + "; ".join(datos) + ". El título puede ser el nombre del "
+        "romset y no el nombre comercial: usá estos datos para identificar el juego."
+    )
 
 
 class SuggestionsService:
@@ -62,6 +95,7 @@ class SuggestionsService:
             game.identity.title,
             system.name,
             game.identity.year or None,
+            _contexto_guia(game) if key in _GUIA_KEYS else "",
         )
         providers = providers_for(key, self.settings, cancel_event)
         if source:

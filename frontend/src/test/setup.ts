@@ -120,14 +120,19 @@ function gameRoute(url: URL, method: string, init?: RequestInit) {
   return json({ error: `Unhandled ${method} ${url.pathname}` }, 500);
 }
 
+const TEXT_KEYS = ['sinopsis', 'objetivo', 'primerosPasos', 'reglasEsenciales', 'modo'] as const;
+function isTextKey(key: string): key is (typeof TEXT_KEYS)[number] {
+  return (TEXT_KEYS as readonly string[]).includes(key);
+}
+
 function fieldRoute(game: Game, key: string, method: string, init?: RequestInit) {
   if (method === 'DELETE') {
-    if (key === 'sinopsis') game.texts.sinopsis = { status: 'empty', value: '' };
+    if (isTextKey(key)) game.texts[key] = { status: 'empty', value: '' };
     return json(clone(game));
   }
   if (method !== 'PUT') return json({ error: 'Método inválido' }, 500);
   const payload = bodyAsObject(init?.body);
-  if (key === 'sinopsis') game.texts.sinopsis = { status: 'manual', value: String(payload.value ?? '') };
+  if (isTextKey(key)) game.texts[key] = { status: 'manual', value: String(payload.value ?? '') };
   if (key === 'review') game.review = { status: 'manual', score: payload.score as number | null, cats: payload.cats as Game['review']['cats'] };
   if (key === 'cheats') game.cheats = { status: 'manual', groups: payload.groups as Game['cheats']['groups'] };
   return json(clone(game));
@@ -144,6 +149,7 @@ function gamesPage(url: URL) {
     systemName: storedSystems.find((system) => system.id === game.systemId)?.name ?? game.systemId,
     identitySource: game.identitySource,
     status: computeGameStatus(game),
+    exportStatus: game.id === 'goldnaxe' ? 'exported' : 'pending',
     coverThumbUrl: game.coverThumbUrl,
   }));
   if (q) items = items.filter((game) => game.title.toLowerCase().includes(q));
@@ -151,5 +157,9 @@ function gamesPage(url: URL) {
     items = items.filter((game) => storedGames.find((full) => full.id === game.id)?.systemId === systemId);
   }
   if (status) items = items.filter((game) => game.status === status);
-  return { items: clone(items), page: 1, perPage: 50, total: items.length };
+  const exportStatus = url.searchParams.get('exportStatus');
+  if (exportStatus) items = items.filter((game) => game.exportStatus === exportStatus);
+  const page = Number(url.searchParams.get('page') || 1);
+  const perPage = Number(url.searchParams.get('perPage') || 50);
+  return { items: clone(items.slice((page - 1) * perPage, page * perPage)), page, perPage, total: items.length };
 }

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { DosButton, Modal, Spinner } from '@/components/dos';
 import { useSuggestionsJob } from '@/hooks/useSuggestionsJob';
 import type { SuggestionCandidate, SuggestionTrace } from '@/lib/api/suggestions';
@@ -27,14 +28,25 @@ interface SuggestionsModalProps {
   label: string;
   onApply: (candidateId: string) => void;
   onClose: () => void;
+  // Avisa a la ficha por qué no hubo sugerencia (o `null` si la hubo) para su checklist.
+  onOutcome?: (fieldKey: string, motivo: string | null) => void;
   open: boolean;
   current?: { previewUrl?: string | null; value?: string | null };
 }
 
 const TODAS_LAS_FUENTES = ['ArcadeDB', 'Image Search', 'Launchbox'];
 
-export function SuggestionsModal({ fieldKey, gameId, hasContent, isManual, label, onApply, onClose, open, current }: SuggestionsModalProps) {
+export function SuggestionsModal({ fieldKey, gameId, hasContent, isManual, label, onApply, onClose, onOutcome, open, current }: SuggestionsModalProps) {
   const { phase, result, retry, retrySource } = useSuggestionsJob(gameId, fieldKey, open);
+  const motivos = (result?.fuentes ?? [])
+    .filter((trace) => trace.estado !== 'ok')
+    .map((trace) => `${trace.nombre}: ${trace.estado.replace('respuesta inválida: ', '')}`);
+
+  useEffect(() => {
+    if (phase === 'resultados') onOutcome?.(fieldKey, null);
+    else if (phase === 'sin-resultados') onOutcome?.(fieldKey, motivos[0]?.split(': ').slice(1).join(': ') || 'sin resultados');
+    else if (phase === 'error') onOutcome?.(fieldKey, 'la fuente externa no respondió');
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function pick(candidate: SuggestionCandidate) {
     if (candidate.clase === 'referencia') {
@@ -82,6 +94,11 @@ export function SuggestionsModal({ fieldKey, gameId, hasContent, isManual, label
         <div className={styles.state}>
           <p className={styles.stateTitle}>SIN RESULTADOS</p>
           <p>Pasa seguido con juegos oscuros. Podés reintentar, ajustar la búsqueda o cargar a mano.</p>
+          {motivos.length > 0 ? (
+            <ul className={styles.reasons}>
+              {motivos.map((motivo) => <li key={motivo}>{motivo}</li>)}
+            </ul>
+          ) : null}
           <div className={styles.actions}>
             <DosButton onClick={() => retry()} variant="primary">Reintentar</DosButton>
             <DosButton onClick={onClose} variant="ghost">Cargar a mano</DosButton>

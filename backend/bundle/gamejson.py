@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from backend.api.errors import BadRequest
+from backend.bundle.identidad import set_exportado
 
 HEX6 = re.compile(r"^#[0-9a-fA-F]{6}$")
 
@@ -36,7 +37,7 @@ def build_gamejson(
     result: dict[str, Any] = {
         "schema_version": "1",
         "system": system_name,
-        "set": str(game.get("id", "")),
+        "set": set_exportado(game),
         "title": str(identity.get("title", "")),
     }
 

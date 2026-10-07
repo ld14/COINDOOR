@@ -15,6 +15,8 @@ class Consulta:
     title: str
     system: str
     year: str | None = None
+    # Datos de la ficha que ayudan a un modelo a reconocer el juego (hoy, solo `objetivo`).
+    contexto: str = ""
 
 
 @dataclass(frozen=True)

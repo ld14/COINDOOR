@@ -31,6 +31,8 @@ _TABLE: dict[str, tuple[str, ...]] = {
     **{key: _ARCADEDB_IDENTITY for key in identity_keys()},
     **{key: _ARCADEDB_IMAGE for key in image_keys()},
     "sinopsis": _ARCADEDB_TEXT,
+    # ArcadeDB no tiene un "objetivo": solo la IA, y siempre como candidato a revisar.
+    **{key: ("ia_primary", "ia_backup") for key in ("objetivo", "primerosPasos", "reglasEsenciales", "modo")},  # noqa: E501
     "review": ("ia_primary", "ia_backup"),
     "cheats": _ARCADEDB_CHEATS,
     "video": _ARCADEDB_VIDEO,

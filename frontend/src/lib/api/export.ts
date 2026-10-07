@@ -6,6 +6,7 @@ export interface ExportOption {
   required: boolean;
   disponible: boolean;
   bytes: number;
+  motivo?: string;
 }
 
 export interface ExportOptions {

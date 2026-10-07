@@ -8,6 +8,7 @@ from typing import Any
 
 from backend.config import Settings
 from backend.lib.domain import fielddefs
+from backend.lib.domain.guia import TEXTOS_GUIA, problema_texto
 from backend.store.archivo import media_path
 
 Medir = Callable[[Settings, Mapping[str, Any], str], tuple[bool, int]]
@@ -20,6 +21,8 @@ class SeleccionItem:
     required: bool
     disponible: bool
     bytes: int
+    # Por qué no se puede incluir, cuando hay una razón concreta (hoy, textos de la guía).
+    motivo: str = ""
 
 
 def compute_seleccion(settings: Settings, game: Mapping[str, Any]) -> list[SeleccionItem]:
@@ -27,7 +30,8 @@ def compute_seleccion(settings: Settings, game: Mapping[str, Any]) -> list[Selec
     for key, section, required, medir in _tabla():
         disponible, size = medir(settings, game, key)
         label = _label(section, key)
-        items.append(SeleccionItem(key=key, label=label, required=required, disponible=disponible, bytes=size))  # noqa: E501
+        motivo = (problema_texto(game, key) or "") if key in TEXTOS_GUIA else ""
+        items.append(SeleccionItem(key=key, label=label, required=required, disponible=disponible, bytes=size, motivo=motivo))  # noqa: E501
     return items
 
 
@@ -80,6 +84,9 @@ def _medir_media(section: str) -> Medir:
 
 
 def _medir_texto(settings: Settings, game: Mapping[str, Any], key: str) -> tuple[bool, int]:
+    # Un texto de la guia con placeholder o con el nombre interno del juego no viaja.
+    if key in TEXTOS_GUIA and problema_texto(game, key) is not None:
+        return False, 0
     container = game.get("texts", {})
     field = container.get(key) if isinstance(container, Mapping) else None
     if not isinstance(field, Mapping) or field.get("status") == "empty":

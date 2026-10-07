@@ -17,7 +17,7 @@ export function missingRequired(game: Game): string[] {
   }
 
   for (const field of fielddefs.texts) {
-    if (field.required && game.texts[field.key].status === 'empty') missing.push(field.label);
+    if (field.required && (game.texts[field.key]?.status ?? 'empty') === 'empty') missing.push(field.label);
   }
 
   for (const field of fielddefs.rich) {

@@ -79,6 +79,11 @@ contra un mock server y no lo necesitan.
 | — | **Video desde YouTube** — pegar una URL en la sección VIDEO y descargar el gameplay | [`011`](../features/011-video-youtube/spec.md) | Hecha · [`ADR-0020`](../decisions/0020-descarga-de-video-youtube.md) |
 | — | **Instalar en ATTRACT** — botón en el resultado del export que dispara el instalador WSL existente | [`012`](../features/012-instalar-en-attract/spec.md) | Hecha · [`ADR-0021`](../decisions/0021-instalar-bundle-por-subproceso.md) |
 | — | **Configuración** — pantalla para ajustes no sensibles de esta instalación (hoy, la ruta de ATTRACT) | [`013`](../features/013-configuracion/spec.md) | Hecha · [`ADR-0022`](../decisions/0022-configuracion-no-sensible-en-archivo-propio.md) |
+| — | **Listado por exportación** — vistas de exportados y pendientes, etiquetas y paginación | [`014`](../features/014-listado-exportados/spec.md) | Hecha |
+| — | **`set` con romset real** — `game.json` lleva el romset de MAME, no el slug del título | [`015`](../features/015-set-romset-real/spec.md) | En curso |
+| — | **Bloque `guia` en el export** — `cabinet.button_list` → `guia.acciones` en `data.json` | [`016`](../features/016-guia-en-export/spec.md) | En curso |
+| — | **Objetivo de la guía** — texto «Objetivo» editable y sugerido por IA, como la sinopsis | [`017`](../features/017-objetivo-guia-ia/spec.md) | En curso |
+| — | **Guía completa** — periféricos, primeros pasos, reglas y modo multijugador | [`018`](../features/018-guia-completa/spec.md) | En curso |
 
 **Orden de arranque:** 003 → 004 → 005. Las tres primeras son independientes entre sí
 salvo que 004 necesita `contract.json`, y 005 consume el `fielddefs.json` que produce 004.

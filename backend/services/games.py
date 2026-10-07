@@ -15,6 +15,7 @@ from backend.api.schemas import (
 from backend.config import Settings
 from backend.lib.domain.completeness import compute_game_status, missing_required
 from backend.store.archivo import safe_id
+from backend.store.exports import export_status
 from backend.store.juegos import GamesStore, to_out
 from backend.store.sistemas import SystemsStore
 
@@ -25,7 +26,7 @@ class GamesService:
         self.store = GamesStore(settings.games_dir)
         self.systems = SystemsStore(settings.systems_path)
 
-    def list(self, q: str = "", system_id: str = "", status: str = "", page: int = 1, per_page: int = 50) -> GamesPage:  # noqa: E501
+    def list(self, q: str = "", system_id: str = "", status: str = "", page: int = 1, per_page: int = 50, export_filter: str = "") -> GamesPage:  # noqa: E501
         systems = {system.id: system for system in self.systems.list()}
         games = self.store.list()
         if q:
@@ -38,6 +39,15 @@ class GamesService:
                 game for game in games
                 if compute_game_status(game.model_dump(mode="json")) == status
             ]
+        export_states = {
+            game.id: export_status(
+                self.settings.data_dir / "exports" / f"{safe_id(game.id)}.coindoor.zip",
+                self.store.dir_de(game) / "game.json",
+            )
+            for game in games
+        }
+        if export_filter:
+            games = [game for game in games if export_states[game.id] == export_filter]
         total = len(games)
         start = max(page - 1, 0) * per_page
         page_items = games[start : start + per_page]
@@ -51,6 +61,7 @@ class GamesService:
                     identitySource=game.identitySource,
                     status=compute_game_status(game.model_dump(mode="json")),
                     coverThumbUrl=game.coverThumbUrl,
+                    exportStatus=export_states[game.id],
                 )
                 for game in page_items
             ],
@@ -63,6 +74,7 @@ class GamesService:
         return to_out(self.store.get(game_id))
 
     def create(self, payload: CreateGame) -> GameOut:
+        self.systems.get(payload.systemId)
         if payload.romSource == "path":
             _validar_rom_ref(payload.romRef)
         game = self.store.create(payload, dir_name=self._dir_name(payload))

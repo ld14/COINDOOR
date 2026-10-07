@@ -16,6 +16,32 @@ function renderApp(path = '/') {
 }
 
 describe('Pantallas de lectura', () => {
+  it('separa exportados y pendientes y combina búsqueda con el filtro', async () => {
+    renderApp('/juegos?exportStatus=exported');
+    expect(await screen.findByText('Golden Axe')).toBeInTheDocument();
+    expect(screen.getByText('Exportado')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Exportados' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByText('Metal Slug')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Pendientes de exportar' }));
+    expect(await screen.findByText('Metal Slug')).toBeInTheDocument();
+    expect(screen.queryByText('Golden Axe')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Pendiente de exportar').length).toBeGreaterThan(0);
+    await userEvent.type(screen.getByLabelText('Buscar juego'), 'contra');
+    await waitFor(() => expect(screen.queryByText('Metal Slug')).not.toBeInTheDocument());
+    expect(screen.getByText('Contra')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Siguiente' })).toBeDisabled();
+  });
+
+  it('cambiar el filtro reinicia la página y conserva la búsqueda', async () => {
+    renderApp('/juegos?page=2&q=Golden');
+    await screen.findByText('Ningún juego coincide con la búsqueda o los filtros.');
+    await userEvent.click(screen.getByRole('button', { name: 'Exportados' }));
+    expect(await screen.findByText('Golden Axe')).toBeInTheDocument();
+    expect(screen.getByLabelText('Buscar juego')).toHaveValue('Golden');
+    expect(screen.getByRole('button', { name: 'Anterior' })).toBeDisabled();
+  });
+
   it('renderiza sistemas y marca cabecera inválida', async () => {
     renderApp('/sistemas');
 
@@ -53,7 +79,7 @@ describe('Pantallas de lectura', () => {
     expect(await screen.findByRole('heading', { name: 'Metal Slug' })).toBeInTheDocument();
     expect(screen.getByText('DASHBOARD DE COMPLETITUD')).toBeInTheDocument();
     expect(screen.getByText('Identidad')).toBeInTheDocument();
-    expect(screen.getByText(/campo\(s\) faltante\(s\)/)).toBeInTheDocument();
+    expect(screen.getByText(/\d+ pendiente\(s\)/)).toBeInTheDocument();
     expect(screen.getByLabelText('Año')).toHaveValue('');
     expect(screen.getAllByText(/No Disponible/).length).toBeGreaterThan(0);
   });

@@ -72,8 +72,14 @@ export function useSuggestionsJob(gameId: string, key: string, open: boolean) {
   return { phase, result, retry: retryAll, retrySource };
 }
 
-function deriveFase(result: SuggestionsResult): Phase {
+// Una fuente que contestó pero no dio nada utilizable (p. ej. un modelo que se niega a
+// inventar) respondió: es «sin resultados», no un error de la fuente.
+function respondio(estado: string): boolean {
+  return estado === 'ok' || estado.startsWith('respuesta inválida');
+}
+
+export function deriveFase(result: SuggestionsResult): Phase {
   if (result.candidatos.length > 0) return 'resultados';
-  if (result.respondieron === 0) return 'error';
+  if (result.respondieron === 0 && !result.fuentes.some((fuente) => respondio(fuente.estado))) return 'error';
   return 'sin-resultados';
 }

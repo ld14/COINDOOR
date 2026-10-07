@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+import os
 import zipfile
 from pathlib import Path
 from time import sleep
 
+import pytest
 from fastapi.testclient import TestClient
 
+from backend.bundle.pack import pack_staging
 from backend.config import Settings, set_settings
 from backend.main import create_app
 
@@ -25,6 +28,93 @@ def client(tmp_path: Path) -> TestClient:
     return TestClient(create_app(settings), headers={"host": "127.0.0.1:8765"})
 
 
+def test_export_status_edicion_reexport_y_borrado(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    _make_exportable(api, game_id)
+    assert api.get("/api/games").json()["items"][0]["exportStatus"] == "pending"
+
+    result = _export_sync(api, game_id)
+    assert result is not None
+    assert api.get("/api/games").json()["items"][0]["exportStatus"] == "exported"
+    # La clasificacion sobrevive al reinicio, sin estado en memoria.
+    api = client(tmp_path)
+    assert api.get("/api/games").json()["items"][0]["exportStatus"] == "exported"
+    api.patch(f"/api/games/{game_id}", json={"identity": {"year": "1990"}})
+    item = api.get("/api/games").json()["items"][0]
+    assert item["exportStatus"] == "pending"
+    assert item["status"] == "ready"
+    assert _export_sync(api, game_id) is not None
+    assert api.get("/api/games").json()["items"][0]["exportStatus"] == "exported"
+    Path(result["file"]).unlink()
+    assert api.get("/api/games").json()["items"][0]["exportStatus"] == "pending"
+
+
+def test_export_status_legacy_filtra_antes_de_paginar(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    for title in ("Otro A", "Otro B"):
+        api.post("/api/games", json={
+            "systemId": "arcade", "romSource": "upload", "romRef": "",
+            "identity": {"title": title},
+        })
+    bundle = tmp_path / "data" / "exports" / f"{game_id}.coindoor.zip"
+    bundle.parent.mkdir(parents=True)
+    bundle.write_bytes(b"zip incompleto")
+    assert api.get("/api/games?exportStatus=exported").json()["total"] == 0
+    with zipfile.ZipFile(bundle, "w") as archive:
+        archive.writestr("game.json", "{}")
+    exported = api.get("/api/games?exportStatus=exported&q=Golden&systemId=arcade&status=incomplete").json()  # noqa: E501
+    assert exported["total"] == 1
+    assert exported["items"][0]["id"] == game_id
+    pending = api.get("/api/games?exportStatus=pending&perPage=1&page=2").json()
+    assert pending["total"] == 2
+    assert len(pending["items"]) == 1
+    assert pending["items"][0]["id"] != game_id
+    assert api.get("/api/games?exportStatus=invalid").status_code == 422
+
+
+@pytest.mark.parametrize("existing", [False, True])
+def test_pack_fallido_no_publica_zip_parcial(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, existing: bool,
+) -> None:
+    root = tmp_path / "staging"
+    root.mkdir()
+    (root / "game.json").write_text("{}")
+    output = tmp_path / "exports" / "juego.zip"
+    output.parent.mkdir()
+    if existing:
+        output.write_bytes(b"anterior")
+
+    def fail(*args: object, **kwargs: object) -> None:
+        raise OSError("disco lleno")
+
+    monkeypatch.setattr(zipfile.ZipFile, "write", fail)
+    with pytest.raises(OSError, match="disco lleno"):
+        pack_staging(root, output)
+    assert not root.exists()
+    if existing:
+        assert output.read_bytes() == b"anterior"
+    else:
+        assert not output.exists()
+    assert not list(output.parent.glob("*.tmp"))
+
+
+def test_edicion_durante_export_queda_pendiente(tmp_path: Path) -> None:
+    from backend.store.exports import export_status
+
+    root = tmp_path / "staging"
+    root.mkdir()
+    (root / "game.json").write_text("{}")
+    game_file = tmp_path / "game.json"
+    game_file.write_text("{}")
+    started_ns = game_file.stat().st_mtime_ns
+    os.utime(game_file, ns=(started_ns + 1_000_000_000, started_ns + 1_000_000_000))
+    output = tmp_path / "juego.zip"
+    pack_staging(root, output, started_ns=started_ns)
+    assert export_status(output, game_file) == "pending"
+
+
 def test_host_invalido_rechazado(tmp_path: Path) -> None:
     app = create_app(Settings(data_dir=tmp_path / "data"))
     response = TestClient(app, headers={"host": "evil.com"}).get("/api/systems")
@@ -38,6 +128,26 @@ def test_systems_create_rejects_relative_launch(tmp_path: Path) -> None:
     )
     assert response.status_code == 422
     assert "La ruta debe ser absoluta" in response.json()["error"]
+
+
+def test_games_create_rejects_unregistered_system(tmp_path: Path) -> None:
+    # Una ficha con sistema inexistente rompía después, en la IA y el export.
+    api = client(tmp_path)
+    response = api.post(
+        "/api/games",
+        json={
+            "systemId": "mame",
+            "romSource": "upload",
+            "romRef": "/roms/pacman.zip",
+            "identity": {
+                "title": "Pac-Man", "year": "", "developer": "", "publisher": "",
+                "genre": "", "players": "", "format": ""
+            },
+        },
+    )
+    assert response.status_code == 404
+    assert "Sistema no encontrado: mame" in response.text
+    assert api.get("/api/games").json()["items"] == []
 
 
 def test_games_mark_ready_incomplete_returns_missing(tmp_path: Path) -> None:
@@ -575,3 +685,81 @@ def test_patch_de_romref_rechaza_una_ruta_que_no_existe(tmp_path: Path) -> None:
 
     response = api.patch(f"/api/games/{game_id}", json={"romRef": "/roms/no-existe.zip"})
     assert response.status_code == 422
+
+
+def _export_run(api: TestClient, game_id: str, incluir: list[str]) -> dict:
+    created = api.post("/api/export", json={"gameId": game_id, "incluir": incluir})
+    run_id = created.json()["runId"]
+    result = api.get(f"/api/export/{run_id}")
+    for _ in range(20):
+        if result.json()["status"] in ("succeeded", "failed"):
+            break
+        sleep(0.05)
+        result = api.get(f"/api/export/{run_id}")
+    return result.json()
+
+
+def _guia_exportada(payload: dict) -> dict | None:
+    with zipfile.ZipFile(payload["file"]) as archive:
+        return json.loads(archive.read("data.json")).get("guia")
+
+
+def _opciones(api: TestClient, game_id: str) -> dict[str, dict]:
+    opciones = api.get(f"/api/games/{game_id}/export-options").json()
+    return {item["key"]: item for item in opciones["obligatorio"] + opciones["opcional"]}
+
+
+def test_un_texto_de_ejemplo_no_se_ofrece_ni_se_exporta(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    _make_exportable(api, game_id)
+    api.put(f"/api/games/{game_id}/fields/objetivo", json={"value": "Vencer a todos los rivales."})
+    api.put(f"/api/games/{game_id}/fields/primerosPasos", json={"value": "EJEMPLO: Mover"})
+
+    opciones = _opciones(api, game_id)
+    assert opciones["objetivo"]["disponible"] is True
+    assert opciones["primerosPasos"]["disponible"] is False
+    assert "EJEMPLO" in opciones["primerosPasos"]["motivo"]
+
+    # Pedirlo igual por la API se rechaza con el motivo, sin generar paquete.
+    rechazado = _export_run(api, game_id, ["objetivo", "primerosPasos"])
+    assert rechazado["status"] == "failed"
+    assert "primerosPasos" in rechazado["error"]
+    assert "EJEMPLO" in rechazado["error"]
+
+    # Sin ese texto, el resto de la guía viaja y el ejemplo nunca aparece.
+    exportado = _export_run(api, game_id, ["objetivo"])["result"]
+    guia = _guia_exportada(exportado)
+    assert guia["objetivo"] == "Vencer a todos los rivales."
+    assert "primerosPasos" not in guia
+    assert "EJEMPLO" not in json.dumps(guia)
+
+
+def test_objetivo_de_ejemplo_deja_el_paquete_sin_guia(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    _make_exportable(api, game_id)
+    api.put(f"/api/games/{game_id}/fields/objetivo", json={"value": "ejemplo: texto de prueba"})
+
+    assert _opciones(api, game_id)["objetivo"]["disponible"] is False
+    assert _export_run(api, game_id, ["objetivo"])["status"] == "failed"
+    assert _guia_exportada(_export_run(api, game_id, [])["result"]) is None
+
+
+def test_objetivo_con_el_nombre_interno_del_juego_no_se_exporta(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    _make_exportable(api, game_id)
+    api.patch(f"/api/games/{game_id}", json={"identity": {"title": "Golden Axe"}})
+    # El romset es `goldnaxe` (goldnaxe.zip); el título comercial es otro.
+    api.put(f"/api/games/{game_id}/fields/objetivo", json={"value": "En GOLDNAXE hay que avanzar."})
+
+    objetivo = _opciones(api, game_id)["objetivo"]
+    assert objetivo["disponible"] is False
+    assert "goldnaxe" in objetivo["motivo"]
+    rechazado = _export_run(api, game_id, ["objetivo"])
+    assert rechazado["status"] == "failed"
+    assert "goldnaxe" in rechazado["error"]
+
+    api.put(f"/api/games/{game_id}/fields/objetivo", json={"value": "En Golden Axe hay que avanzar."})
+    assert _opciones(api, game_id)["objetivo"]["disponible"] is True

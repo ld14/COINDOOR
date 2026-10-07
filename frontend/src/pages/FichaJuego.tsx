@@ -28,6 +28,7 @@ import { FIELDDEFS } from '@/lib/domain/types';
 import type {
   CheatGroup,
   Game,
+  GuiaChecklistItem,
   Identity,
   IdentityKey,
   ImageKey,
@@ -62,6 +63,10 @@ const SUGGESTABLE_LABELS: Record<string, string> = {
   ...Object.fromEntries(FIELDDEFS.identity.map((field) => [field.key, field.label])),
   ...Object.fromEntries(FIELDDEFS.images.map((field) => [field.key, field.label])),
   sinopsis: 'Sinopsis',
+  objetivo: 'Objetivo',
+  primerosPasos: 'Primeros pasos',
+  reglasEsenciales: 'Reglas esenciales',
+  modo: 'Modo multijugador',
   review: 'Reseña',
   cheats: 'Trucos',
   video: 'Video de gameplay',
@@ -87,8 +92,8 @@ function suggestionStatus(game: Game, key: string): SuggestionCurrent {
     const img = game.images[key as ImageKey];
     return { hasContent: img?.status !== 'empty', isManual: img?.status === 'manual', previewUrl: img?.url };
   }
-  if (key === 'sinopsis') {
-    const t = game.texts.sinopsis;
+  if (FIELDDEFS.texts.some((field) => field.key === key)) {
+    const t = game.texts[key as TextKey] ?? { status: 'empty', value: '' };
     return { hasContent: t.value !== '', isManual: t.status === 'manual', value: t.value };
   }
   if (key === 'review') {
@@ -113,6 +118,8 @@ export function FichaJuego() {
   const { data: systems = [] } = useSystems();
   const [missingAfterReady, setMissingAfterReady] = useState<string[]>([]);
   const [suggestField, setSuggestField] = useState<string | null>(null);
+  // Por qué una sugerencia de IA no produjo nada, para mostrarlo en el checklist de la guía.
+  const [fallosIA, setFallosIA] = useState<Record<string, string>>({});
   const [suggestIdentityBatch, setSuggestIdentityBatch] = useState(false);
   const [precargaLoading, setPrecargaLoading] = useState(false);
   const sectionRefs = useRef<Record<string, SaveHandle | null>>({});
@@ -267,9 +274,10 @@ export function FichaJuego() {
           ref={(r) => { sectionRefs.current.texts = r; }}
           game={game}
           onDelete={(key) => mutations.deleteField.mutate(key)}
-          onSuggest={() => setSuggestField('sinopsis')}
+          onSuggest={setSuggestField}
           onText={(key, value) => mutations.setTextField.mutate({ key, value })}
         />
+        <GuiaChecklist items={game.guiaChecklist ?? []} fallos={fallosIA} />
         <ReviewSection
           ref={(r) => { sectionRefs.current.review = r; }}
           game={game}
@@ -306,6 +314,10 @@ export function FichaJuego() {
           label={SUGGESTABLE_LABELS[suggestField]}
           onApply={(candidateId) => mutations.applySuggestion.mutate({ key: suggestField, candidateId })}
           onClose={() => setSuggestField(null)}
+          onOutcome={(key, motivo) => setFallosIA((prev) => {
+            const { [key]: _anterior, ...resto } = prev;
+            return motivo ? { ...resto, [key]: motivo } : resto;
+          })}
           open
           current={{ previewUrl: suggestionStatus(game, suggestField).previewUrl, value: suggestionStatus(game, suggestField).value }}
         />
@@ -669,15 +681,38 @@ function MediaCard({
   );
 }
 
+// Textos opcionales del bloque `guia` («Cómo se juega»). Las listas llevan un ítem por línea.
+const GUIA_TEXTOS: { key: TextKey; label: string; aria: string; guardar: string; ayuda?: string }[] = [
+  { key: 'objetivo', label: 'Objetivo (Cómo se juega)', aria: 'Objetivo', guardar: 'Guardar objetivo' },
+  { key: 'primerosPasos', label: 'Primeros pasos (Cómo se juega)', aria: 'Primeros pasos', guardar: 'Guardar primeros pasos', ayuda: 'Un paso por línea.' },
+  { key: 'reglasEsenciales', label: 'Reglas esenciales (Cómo se juega)', aria: 'Reglas esenciales', guardar: 'Guardar reglas esenciales', ayuda: 'Una regla por línea.' },
+];
+const MODOS_MULTIJUGADOR = ['individual', 'cooperativo', 'versus'] as const;
+const GUIA_KEYS: TextKey[] = [...GUIA_TEXTOS.map((texto) => texto.key), 'modo'];
+
 const TextSection = forwardRef<SaveHandle, {
   game: Game;
   onDelete: (key: string) => void;
-  onSuggest: () => void;
+  onSuggest: (key: TextKey) => void;
   onText: (key: TextKey, value: string) => void;
 }>(function TextSection({ game, onDelete, onSuggest, onText }, ref) {
   const [sinopsis, setSinopsis] = useState(game.texts.sinopsis.value);
   useEffect(() => setSinopsis(game.texts.sinopsis.value), [game.texts.sinopsis.value]);
-  useImperativeHandle(ref, () => ({ save: () => onText('sinopsis', sinopsis) }), [onText, sinopsis]);
+  const guardado = (key: TextKey) => game.texts[key]?.value ?? '';
+  const [guia, setGuia] = useState<Record<string, string>>(() => Object.fromEntries(GUIA_KEYS.map((key) => [key, guardado(key)])));
+  const firma = JSON.stringify(GUIA_KEYS.map(guardado));
+  useEffect(() => setGuia(Object.fromEntries(GUIA_KEYS.map((key) => [key, guardado(key)]))), [firma]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Los textos de la guía son opcionales: guardar todo no debe marcar como escrito a mano uno sin tocar.
+  useImperativeHandle(ref, () => ({
+    save: () => {
+      onText('sinopsis', sinopsis);
+      for (const key of GUIA_KEYS) {
+        if (guia[key].trim() && guia[key] !== guardado(key)) onText(key, guia[key]);
+      }
+    },
+  }), [onText, sinopsis, guia, firma]); // eslint-disable-line react-hooks/exhaustive-deps
+  const estado = (key: TextKey) => game.texts[key]?.status ?? 'empty';
+  const cambiar = (key: TextKey, value: string) => setGuia((prev) => ({ ...prev, [key]: value }));
 
   return (
     <Panel>
@@ -687,13 +722,71 @@ const TextSection = forwardRef<SaveHandle, {
         <DosTextarea aria-label="Sinopsis" maxLength={FIELDDEFS.texts[0].maxLength} onChange={(event) => setSinopsis(event.target.value)} value={sinopsis} />
         <div className={styles.toolbar}>
           <DosButton onClick={() => onText('sinopsis', sinopsis)} variant="primary-small">Guardar sinopsis</DosButton>
-          <DosButton onClick={onSuggest} variant="ghost-small">Sugerir</DosButton>
+          <DosButton onClick={() => onSuggest('sinopsis')} variant="ghost-small">Sugerir</DosButton>
           <DosButton onClick={() => confirmManualDelete(game.texts.sinopsis.status, () => onDelete('sinopsis'))} variant="danger-small">Borrar</DosButton>
+        </div>
+      </SunkenBox>
+      {GUIA_TEXTOS.map((texto) => (
+        <SunkenBox key={texto.key}>
+          <div className={styles.fieldTop}><span className={styles.name}>{texto.label}</span><FieldTag status={estado(texto.key)} /></div>
+          {texto.ayuda ? <p className={styles.meta}>{texto.ayuda}</p> : null}
+          <DosTextarea aria-label={texto.aria} maxLength={FIELDDEFS.texts.find((field) => field.key === texto.key)?.maxLength} onChange={(event) => cambiar(texto.key, event.target.value)} value={guia[texto.key]} />
+          <div className={styles.toolbar}>
+            <DosButton onClick={() => onText(texto.key, guia[texto.key])} variant="primary-small">{texto.guardar}</DosButton>
+            <DosButton onClick={() => onSuggest(texto.key)} variant="ghost-small">Sugerir</DosButton>
+            <DosButton onClick={() => confirmManualDelete(estado(texto.key), () => onDelete(texto.key))} variant="danger-small">Borrar</DosButton>
+          </div>
+        </SunkenBox>
+      ))}
+      <SunkenBox>
+        <div className={styles.fieldTop}><span className={styles.name}>Modo multijugador (Cómo se juega)</span><FieldTag status={estado('modo')} /></div>
+        <p className={styles.meta}>Vacío: ATTRACT lo deduce solo en juegos de un jugador o por turnos.</p>
+        <DosSelect aria-label="Modo multijugador" onChange={(event) => cambiar('modo', event.target.value)} value={guia.modo}>
+          <option value="">Sin elegir</option>
+          {MODOS_MULTIJUGADOR.map((modo) => <option key={modo} value={modo}>{modo}</option>)}
+        </DosSelect>
+        <div className={styles.toolbar}>
+          <DosButton onClick={() => onText('modo', guia.modo)} variant="primary-small">Guardar modo</DosButton>
+          <DosButton onClick={() => onSuggest('modo')} variant="ghost-small">Sugerir</DosButton>
+          <DosButton onClick={() => confirmManualDelete(estado('modo'), () => onDelete('modo'))} variant="danger-small">Borrar</DosButton>
         </div>
       </SunkenBox>
     </Panel>
   );
 });
+
+export function GuiaChecklist({ items, fallos }: { items: GuiaChecklistItem[]; fallos: Record<string, string> }) {
+  if (items.length === 0) return null;
+  const listos = items.filter((item) => item.estado === 'ok').length;
+  const sinObjetivo = items.some((item) => item.requerido && item.estado === 'falta');
+  return (
+    <Panel>
+      <SectionHeader>CÓMO SE JUEGA — CHECKLIST</SectionHeader>
+      <SunkenBox>
+        <p className={styles.meta}>
+          {listos} de {items.length} listos.{sinObjetivo ? ' Sin objetivo la guía no se exporta.' : ''}
+        </p>
+        <ul aria-label="Checklist de la guía" className={styles.checklist}>
+          {items.map((item) => {
+            const falla = item.estado === 'falta' ? fallos[item.key] : undefined;
+            const marca = item.estado === 'ok' ? '✓' : item.requerido ? '✗' : '○';
+            return (
+              <li className={styles.completionTile} data-estado={item.estado} key={item.key}>
+                <span aria-hidden className={styles.tileMark}>{marca}</span>
+                <span className={styles.name}>{item.label}</span>
+                <span className={styles.meta}>
+                  {item.estado === 'ok' ? 'Listo' : item.requerido ? 'Falta (obligatorio)' : 'Falta'}
+                  {' — '}
+                  {falla ? `No se pudo generar: ${falla}. ${item.detalle}` : item.detalle}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </SunkenBox>
+    </Panel>
+  );
+}
 
 const ReviewSection = forwardRef<SaveHandle, { game: Game; onReview: (score: number | null, cats: Partial<Record<ReviewCat, number>>) => void; onSuggest: () => void }>(function ReviewSection({ game, onReview, onSuggest }, ref) {
   const [reviewScore, setReviewScore] = useState(String(game.review.score ?? ''));

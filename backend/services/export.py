@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 from collections.abc import Sequence
 from dataclasses import asdict
+from time import time_ns
 from typing import Any
 
 from backend.api.errors import BadRequest, Conflict
@@ -47,6 +48,8 @@ class ExportService:
         incluir: Sequence[str],
         job: JobState | None = None,
     ) -> dict[str, object]:
+        started_ns = time_ns()
+        self.games.rebuild_index()
         game = self.games.get(game_id)
         game_data = game.model_dump(mode="json")
         if compute_game_status(game_data) != "ready":
@@ -102,7 +105,7 @@ class ExportService:
             if job is not None:
                 job.progress = 80
             output = self.settings.data_dir / "exports" / f"{safe_id(game.id)}.coindoor.zip"
-            pack_staging(staging.root, output)
+            pack_staging(staging.root, output, started_ns=started_ns)
             return {
                 "file": str(output),
                 "bytes": output.stat().st_size,
@@ -148,4 +151,5 @@ def _validate_incluir(incluir: set[str], items: list[SeleccionItem]) -> None:
     for key in incluir:
         item = by_key[key]
         if not item.disponible:
-            raise BadRequest(f"Campo no disponible para exportar: {key}")
+            motivo = f" ({item.motivo})" if item.motivo else ""
+            raise BadRequest(f"Campo no disponible para exportar: {key}{motivo}")

@@ -2,6 +2,7 @@ import type { Game, GameStatus, Identity, RomSource } from '@/lib/domain/types';
 import { fetchJson } from './client';
 
 export interface GamesQuery {
+  exportStatus?: 'pending' | 'exported' | '';
   q?: string;
   systemId?: string;
   status?: GameStatus | '';
@@ -10,6 +11,7 @@ export interface GamesQuery {
 }
 
 export interface GameSummary {
+  exportStatus: 'pending' | 'exported';
   id: string;
   title: string;
   year: string;
@@ -31,6 +33,7 @@ export function listGames(query: GamesQuery = {}) {
   if (query.q) params.set('q', query.q);
   if (query.systemId) params.set('systemId', query.systemId);
   if (query.status) params.set('status', query.status);
+  if (query.exportStatus) params.set('exportStatus', query.exportStatus);
   if (query.page) params.set('page', String(query.page));
   if (query.perPage) params.set('perPage', String(query.perPage));
   const suffix = params.toString() ? `?${params}` : '';

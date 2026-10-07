@@ -19,7 +19,11 @@
     { "key": "video", "label": "Video de gameplay", "ratio": "16:9", "required": false, "contractAsset": "video" }
   ],
   "texts": [
-    { "key": "sinopsis", "label": "Sinopsis", "required": true, "contractField": "summary", "maxLength": 700 }
+    { "key": "sinopsis", "label": "Sinopsis", "required": true, "contractField": "summary", "maxLength": 700 },
+    { "key": "objetivo", "label": "Objetivo (Cómo se juega)", "required": false, "contractField": "guia", "maxLength": 600 },
+    { "key": "primerosPasos", "label": "Primeros pasos (Cómo se juega)", "required": false, "contractField": "guia", "maxLength": 600 },
+    { "key": "reglasEsenciales", "label": "Reglas esenciales (Cómo se juega)", "required": false, "contractField": "guia", "maxLength": 600 },
+    { "key": "modo", "label": "Modo multijugador (Cómo se juega)", "required": false, "contractField": "guia", "maxLength": 20 }
   ],
   "rich": [
     { "key": "review", "label": "Reseña", "required": false, "contractField": "review" },

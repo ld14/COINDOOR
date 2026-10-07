@@ -446,7 +446,13 @@ class ArcadeDbPrecargaService:
             return
         actual = data.get("cabinet", {})
         if actual.get("resolution") or actual.get("controls"):
-            omitidos.append("cabinet")
+            # Gabinete ya cargado: no se pisa, pero `nplayers` es un dato nuevo que las
+            # fichas anteriores no tienen y se completa solo ese.
+            if game.nplayers and not actual.get("nplayers"):
+                data["cabinet"] = {**actual, "nplayers": game.nplayers}
+                escritos.append("cabinet")
+            else:
+                omitidos.append("cabinet")
             return
         from backend.api.schemas import CabinetButton, CabinetInfo
 
@@ -459,6 +465,7 @@ class ArcadeDbPrecargaService:
             orientation=game.screen_orientation,
             controls=game.input_controls,
             buttons=game.input_buttons,
+            nplayers=game.nplayers,
             button_list=button_list,
         )
         data["cabinet"] = cabinet.model_dump(mode="json")

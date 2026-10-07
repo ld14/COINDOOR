@@ -118,7 +118,16 @@ export interface CabinetInfo {
   orientation: string;
   controls: string;
   buttons: number;
+  nplayers?: string;
   button_list: CabinetButton[];
+}
+
+export interface GuiaChecklistItem {
+  key: string;
+  label: string;
+  estado: 'ok' | 'falta';
+  detalle: string;
+  requerido: boolean;
 }
 
 export interface Game {
@@ -133,7 +142,10 @@ export interface Game {
   errors: FormatError[];
   images: Record<ImageKey, MediaField>;
   video: Record<VideoKey, MediaField>;
-  texts: Record<TextKey, TextField>;
+  // `sinopsis` es obligatoria; los demas textos son opcionales y una ficha anterior no los trae.
+  texts: Record<'sinopsis', TextField> & Partial<Record<TextKey, TextField>>;
+  // Lo calcula el backend con las mismas reglas del export; una ficha de mock puede no traerlo.
+  guiaChecklist?: GuiaChecklistItem[];
   review: ReviewField;
   cheats: CheatsField;
   accent: FieldStatus;

@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from backend.lib.domain.completeness import compute_game_status
+from backend.lib.domain.guia import guia_checklist
 
 FieldStatus = Literal["empty", "manual", "suggested"]
 GameStatus = Literal["ready", "incomplete", "error"]
@@ -127,11 +128,13 @@ class CabinetInfo(BaseModel):
     orientation: str = ""
     controls: str = ""
     buttons: int = 0
+    # `2P alt` (por turnos) / `2P sim` (simultaneo), tal como lo publica ArcadeDB.
+    nplayers: str = ""
     button_list: list[CabinetButton] = Field(default_factory=list)
 
 
 class StoredGame(BaseModel):
-    version: int = 1
+    version: int = 2
     id: str
     # Nombre de la carpeta bajo `juegos/<sistema>/` donde vive este `game.json`.
     # Cuando el juego se dio de alta desde una carpeta ya instalada es el nombre real
@@ -166,13 +169,23 @@ class StoredGame(BaseModel):
     cabinet: CabinetInfo = Field(default_factory=CabinetInfo)
 
 
+class GuiaChecklistItem(BaseModel):
+    key: str
+    label: str
+    estado: Literal["ok", "falta"]
+    detalle: str
+    requerido: bool = False
+
+
 class GameOut(StoredGame):
     status: GameStatus
+    guiaChecklist: list[GuiaChecklistItem] = Field(default_factory=list)
 
     @classmethod
     def from_stored(cls, game: StoredGame) -> GameOut:
         data = game.model_dump()
         data["status"] = compute_game_status(data)
+        data["guiaChecklist"] = guia_checklist(data)
         return cls.model_validate(data)
 
 
@@ -183,6 +196,7 @@ class GameSummary(BaseModel):
     systemName: str
     identitySource: IdentitySource
     status: GameStatus
+    exportStatus: Literal["pending", "exported"] = "pending"
     coverThumbUrl: str | None = None
 
 

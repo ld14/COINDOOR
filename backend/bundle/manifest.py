@@ -4,6 +4,8 @@ from collections.abc import Collection, Mapping
 from datetime import UTC, datetime
 from typing import Any
 
+from backend.bundle.identidad import set_exportado
+
 # Placeholder hasta que ATTRACT publique su propia versión de contrato (ADR-0001,
 # ver spec.md 001 §Decisiones resueltas antes de implementar).
 CONTRATO_VERSION = "1"
@@ -23,7 +25,7 @@ def build_manifest(
         "generado": datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "contrato": CONTRATO_VERSION,
         "coleccion": coleccion,
-        "set": str(game.get("id", "")),
+        "set": set_exportado(game),
         "identidad": {
             "origen": _origen(game),
             "campos": _identity_fields(game),
