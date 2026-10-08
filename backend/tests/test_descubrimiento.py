@@ -336,3 +336,36 @@ def test_alta_con_rom_fuera_de_juegos_no_mueve_nada(tmp_path: Path) -> None:
     assert Path(str(creado["romRef"])) == rom.resolve()
     ficha = tmp_path / "data" / "juegos" / "arcade" / "metal-slug" / "game.json"
     assert ficha.exists()
+
+
+def _ficha(juegos: Path, rom_ref: str) -> None:
+    GamesStore(juegos).create(
+        CreateGame(
+            systemId="arcade",
+            romSource="path",
+            romRef=rom_ref,
+            identity=Identity(title="Street Fighter II", year="1991"),
+        )
+    )
+
+
+def test_rom_con_ficha_en_carpeta_fisica_distinta_no_es_candidata(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    mame = tmp_path / "data" / "juegos" / "mame"
+    mame.mkdir(parents=True)
+    (mame / "sf2.zip").write_bytes(b"rom")
+    (mame / "otro.zip").write_bytes(b"rom")
+    _ficha(tmp_path / "data" / "juegos", r"D:\x\juegos\mame\sf2.zip")
+
+    assert {item["id"] for item in candidatos(api)} == {"otro"}
+
+
+def test_ficha_no_oculta_rom_homonima_de_otro_sistema(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    juegos = tmp_path / "data" / "juegos"
+    for carpeta in ("mame", "nes"):
+        (juegos / carpeta).mkdir(parents=True)
+        (juegos / carpeta / "sf2.zip").write_bytes(b"rom")
+    _ficha(juegos, "/mnt/d/data/juegos/mame/sf2.zip")
+
+    assert [item["systemId"] for item in candidatos(api)] == ["nes"]

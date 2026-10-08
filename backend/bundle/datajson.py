@@ -110,6 +110,8 @@ def _review(game: Mapping[str, Any], incluir: Collection[str]) -> dict[str, Any]
         return None
     if review.get("status") == "empty" or "review" not in incluir:
         return None
+    if review.get("score") is None and not review.get("cats"):
+        return None
     return {"score": review.get("score"), "cats": dict(review.get("cats") or {})}
 
 
@@ -126,7 +128,7 @@ def _cheats(game: Mapping[str, Any]) -> dict[str, list[dict[str, str]]]:
             for entry in group.get("entries", [])
         ]
         for group in groups
-        if isinstance(group, Mapping)
+        if isinstance(group, Mapping) and group.get("entries")
     }
 
 

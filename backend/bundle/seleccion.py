@@ -98,6 +98,8 @@ def _medir_review(settings: Settings, game: Mapping[str, Any], key: str) -> tupl
     review = game.get("review", {})
     if not isinstance(review, Mapping) or review.get("status") == "empty":
         return False, 0
+    if review.get("score") is None and not review.get("cats"):
+        return False, 0
     payload = {"score": review.get("score"), "cats": review.get("cats", {})}
     return True, len(json.dumps(payload).encode("utf-8"))
 
@@ -106,7 +108,12 @@ def _medir_cheats(settings: Settings, game: Mapping[str, Any], key: str) -> tupl
     cheats = game.get("cheats", {})
     if not isinstance(cheats, Mapping) or cheats.get("status") == "empty":
         return False, 0
-    return True, len(json.dumps(cheats.get("groups", [])).encode("utf-8"))
+    groups = cheats.get("groups", [])
+    if not isinstance(groups, list) or not any(
+        isinstance(g, Mapping) and g.get("entries") for g in groups
+    ):
+        return False, 0
+    return True, len(json.dumps(groups).encode("utf-8"))
 
 
 def _medir_accent(settings: Settings, game: Mapping[str, Any], key: str) -> tuple[bool, int]:

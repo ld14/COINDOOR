@@ -68,6 +68,13 @@ class DescubrimientoService:
             # identifica por su stem, uno carpeta por su nombre entero.
             ocupadas.add((system_dir, safe_id(ultimo)))
             ocupadas.add((system_dir, safe_id(Path(ultimo).stem)))
+            # La carpeta física real de la ROM: las fichas arcade apuntan a zips en
+            # `juegos/mame/` aunque su systemId sea otro. La clave lleva la carpeta,
+            # así que no choca con candidatos de otros sistemas.
+            padre = _penultimo_segmento(game.romRef)
+            if padre:
+                ocupadas.add((safe_id(padre), safe_id(ultimo)))
+                ocupadas.add((safe_id(padre), safe_id(Path(ultimo).stem)))
         return ocupadas
 
     def _del_sistema(
@@ -128,6 +135,13 @@ def _ultimo_segmento(rom_ref: str) -> str:
     if not limpio:
         return ""
     return re.split(r"[\\/]+", limpio)[-1]
+
+
+def _penultimo_segmento(rom_ref: str) -> str:
+    """Carpeta que contiene la ROM (separador barra o contrabarra); vacío si no tiene padre."""
+    limpio = rom_ref.strip().rstrip("/\\")
+    partes = [p for p in re.split(r"[\\/]+", limpio) if p]
+    return partes[-2] if len(partes) >= 2 else ""
 
 
 def _tamano_dir(path: Path) -> int:

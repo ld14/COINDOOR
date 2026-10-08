@@ -226,6 +226,14 @@ def _create_arcade_game(api: TestClient) -> str:
     return str(created["id"])
 
 
+def test_systems_game_count_se_calcula_al_leer(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    api.post("/api/systems", json={"name": "nes", "shortName": "nes", "launchCmd": "/usr/local/bin/fceux"})  # noqa: E501
+    _create_arcade_game(api)
+    counts = {s["id"]: s["gameCount"] for s in api.get("/api/systems").json()}
+    assert counts == {"nes": 0, "arcade": 1}
+
+
 def test_media_upload_sets_field_and_serves_file(tmp_path: Path) -> None:
     api = client(tmp_path)
     game_id = _create_arcade_game(api)
