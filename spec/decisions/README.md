@@ -52,6 +52,7 @@ de seis meses alguien —tú, o Claude— vuelve a proponer justo lo que ya desc
 | [0020](0020-descarga-de-video-youtube.md) | Descargar video de YouTube a pedido con yt-dlp como librería | accepted | 2026-09-10 |
 | [0021](0021-instalar-bundle-por-subproceso.md) | Instalar el bundle exportado por subproceso, sin esperar a `attract install` | accepted | 2026-09-12 |
 | [0022](0022-configuracion-no-sensible-en-archivo-propio.md) | Configuración no sensible en un archivo propio, editable desde una pantalla nueva | accepted | 2026-09-12 |
+| [0023](0023-estetica-flyer-reemplaza-dos.md) | La estética "Flyer 80s" reemplaza a la estética DOS | accepted | 2026-10-08 |
 
 Los seis últimos salen del análisis de arquitectura de
 [`docs/arquitectura/`](../../docs/arquitectura/README.md), que conserva la comparación

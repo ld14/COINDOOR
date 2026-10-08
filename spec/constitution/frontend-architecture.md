@@ -31,9 +31,10 @@ paquete de diseño.
 |---|---|
 | `/sistemas` | Sistemas / plataformas |
 | `/juegos` | Lista de juegos (default) |
-| `/juegos/nuevo` | Alta de un juego, dos pasos |
+| `/juegos/nuevo` | Alta de un juego, cuatro pasos ([`ADR-0023`](../decisions/0023-estetica-flyer-reemplaza-dos.md)) |
 | `/juegos/:gameId` | Ficha del juego |
-| `/exportar` | Exportar |
+| `/exportar` | Cola de exportación; `/exportar/:gameId` exporta un juego ([`ADR-0023`](../decisions/0023-estetica-flyer-reemplaza-dos.md)) |
+| `/configuracion` | Configuración ([`ADR-0022`](../decisions/0022-configuracion-no-sensible-en-archivo-propio.md)) |
 
 Filtros y buscadores viven en la query string, para que la vista sobreviva al refresh.
 

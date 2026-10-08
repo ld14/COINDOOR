@@ -1,0 +1,134 @@
+/*
+ * COINDOOR · tema Flyer 80s
+ * Destino sugerido: src/styles/tokens.css (reemplaza el bloque :root actual)
+ *
+ * 1) Tokens nuevos (fuente de verdad).
+ * 2) Alias de los --dos-* existentes → tokens nuevos, para que los CSS modules
+ *    actuales tomen la paleta nueva sin tocarlos. Se van borrando a medida que
+ *    cada componente migra a los tokens nuevos (fase 2+).
+ *
+ * Fuentes (offline, sin Google Fonts en runtime):
+ *   npm i @fontsource/bungee @fontsource/rubik @fontsource/ibm-plex-mono
+ *   y en main.tsx:
+ *   import '@fontsource/bungee/400.css';
+ *   import '@fontsource/rubik/400.css'; import '@fontsource/rubik/500.css';
+ *   import '@fontsource/rubik/600.css'; import '@fontsource/rubik/700.css';
+ *   import '@fontsource/ibm-plex-mono/400.css'; import '@fontsource/ibm-plex-mono/600.css';
+ */
+
+:root {
+  /* ---------- Color ---------- */
+  --surface-0: #f3e6cc;        /* fondo de la app (papel) */
+  --surface-1: #fff8ea;        /* tarjetas y paneles */
+  --surface-2: #ffffff;        /* campos, slots, filas internas */
+  --surface-inverse: #1b1a2e;  /* topbar, statusbar, panel "Siguiente pendiente" */
+
+  --ink: #1b1a2e;              /* texto principal */
+  --ink-muted: #57536c;        /* texto secundario (≥4.5:1 sobre surface-1/2) */
+  --ink-inverse: #fff8ea;      /* texto sobre surface-inverse */
+
+  --line: #1b1a2e;             /* bordes de tarjetas y controles */
+  --line-soft: #e4d4b2;        /* divisores internos; nunca único borde de un control */
+
+  --accent: #c8233a;           /* acción primaria, paso activo, Manual */
+  --ink-on-accent: #ffffff;
+  --accent-soft: #ffdfe2;
+  --accent-2: #ffc93c;         /* Sugerido / pendiente de revisar (solo RELLENO) */
+  --ink-on-accent-2: #1b1a2e;
+  --accent-3: #2b59c3;         /* dato de ArcadeDB / origen externo, Exportado */
+
+  --ok: #1e7a4a;
+  --warn: #8a5a00;
+  --error: #b3122a;
+  --focus: #2b59c3;
+
+  /* ---------- Tipografía ---------- */
+  --font-display: Bungee, Impact, sans-serif;           /* títulos de página y de sección */
+  --font-body: Rubik, system-ui, sans-serif;            /* todo lo que se lee y se carga */
+  --font-mono: "IBM Plex Mono", Consolas, monospace;    /* rutas, hex, tamaños, romsets, atajos */
+
+  --text-title: 40px;     /* h1 de página/juego, line-height 1.05 */
+  --text-section: 18px;   /* h2 de tarjeta (Bungee) */
+  --text-body: 15px;      /* line-height 22px */
+  --text-label: 13px;     /* etiquetas de campo, weight 600 */
+  --text-meta: 12px;      /* ayudas, metadatos */
+
+  /* ---------- Espaciado (escala 4/8) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* ---------- Radios ---------- */
+  --radius-sm: 2px;
+  --radius-md: 6px;      /* controles */
+  --radius-lg: 12px;     /* tarjetas */
+  --radius-pill: 999px;  /* chips, pasos, barras de progreso */
+
+  /* ---------- Bordes y sombras ---------- */
+  --border-card: 3px;
+  --border-control: 2px;
+  --shadow-card: 5px 5px 0 #1b1a2e;
+  --shadow-pop: 3px 3px 0 #1b1a2e;
+  --focus-ring: 0 0 0 2px var(--surface-1), 0 0 0 4px var(--focus);
+
+  /* ---------- Layout ---------- */
+  --rail-width: 200px;
+  --side-column: 300px;
+  --page-max-width: 1440px;
+}
+
+/* ===================================================================
+ * Alias de compatibilidad: --dos-*  →  tokens Flyer
+ * (borrar cada línea cuando ya no quede ningún uso: grep -r "var(--dos-")
+ * =================================================================== */
+:root {
+  --dos-desktop: var(--surface-0);
+  --dos-panel: var(--surface-1);
+  --dos-panel-light: var(--surface-2);
+  --dos-titlebar: var(--surface-inverse);
+  --dos-accent: var(--accent-soft);
+  --dos-terminal: var(--surface-inverse);
+  --dos-ink: var(--ink);
+  --dos-ink-soft: var(--ink-muted);
+  --dos-ink-muted: var(--ink-muted);
+  --dos-ink-invert: var(--ink-inverse);
+  --dos-ok: var(--ok);
+  --dos-warn: var(--warn);
+  --dos-error: var(--error);
+  --dos-info: var(--accent-3);
+  --dos-ok-crt: var(--ok);
+  --dos-warn-crt: var(--accent-2);
+  --dos-error-crt: var(--error);
+  --dos-info-crt: var(--accent-3);
+  --dos-banner: var(--accent-2);
+  --dos-edge-light: var(--surface-2);
+  --dos-edge-dark: var(--line);
+  --dos-font-family: var(--font-body);
+  --dos-size-title: var(--text-title);
+  --dos-size-body: var(--text-body);
+  --dos-size-meta: var(--text-meta);
+  --dos-focus-outline: 2px solid var(--focus);
+  --dos-hard-shadow: var(--shadow-card);
+  --dos-row-border: var(--line-soft);
+  --dos-field-empty: var(--ink-muted);
+  --dos-accent-preset-gold: var(--accent-2);
+  --dos-page-max-width: var(--page-max-width);
+  /* El resto de --dos-* (tamaños, espaciados, alturas) se mantiene con sus
+     valores actuales hasta migrar cada componente. */
+}
+
+body {
+  background: var(--surface-0);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 22px;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}

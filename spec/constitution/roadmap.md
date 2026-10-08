@@ -84,6 +84,7 @@ contra un mock server y no lo necesitan.
 | — | **Bloque `guia` en el export** — `cabinet.button_list` → `guia.acciones` en `data.json` | [`016`](../features/016-guia-en-export/spec.md) | En curso |
 | — | **Objetivo de la guía** — texto «Objetivo» editable y sugerido por IA, como la sinopsis | [`017`](../features/017-objetivo-guia-ia/spec.md) | En curso |
 | — | **Guía completa** — periféricos, primeros pasos, reglas y modo multijugador | [`018`](../features/018-guia-completa/spec.md) | En curso |
+| — | **Rediseño Flyer 80s** — tokens, primitivas, shell, ficha, alta, export y autosave | [`019`](../features/019-rediseno-flyer/spec.md) | En curso · [`ADR-0023`](../decisions/0023-estetica-flyer-reemplaza-dos.md) |
 
 **Orden de arranque:** 003 → 004 → 005. Las tres primeras son independientes entre sí
 salvo que 004 necesita `contract.json`, y 005 consume el `fielddefs.json` que produce 004.

@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="es" data-theme="flyer"><head><meta charset="utf-8"><title>COINDOOR · 02-ficha-en-carga</title>
+<style>
+/* tokens (ver tokens/flyer-tokens.css) */
+:root, [data-theme="flyer"]{--surface-0:#f3e6cc;--surface-1:#fff8ea;--surface-2:#ffffff;--surface-inverse:#1b1a2e;--ink:#1b1a2e;--ink-muted:#57536c;--ink-inverse:#fff8ea;--line:#1b1a2e;--line-soft:#e4d4b2;--accent:#c8233a;--ink-on-accent:#ffffff;--accent-soft:#ffdfe2;--accent-2:#ffc93c;--ink-on-accent-2:#1b1a2e;--accent-3:#2b59c3;--ok:#1e7a4a;--warn:#8a5a00;--error:#b3122a;--focus:#2b59c3;--shadow-card:5px 5px 0 #1b1a2e;--shadow-pop:3px 3px 0 #1b1a2e;}
+[data-theme="refinado"]{--surface-0:#e6e3d3;--surface-1:#fbf8ec;--surface-2:#ffffff;--surface-inverse:#2b2d2a;--ink:#23251f;--ink-muted:#5b5f57;--ink-inverse:#fffbea;--line:#2e302d;--line-soft:#d4cfb8;--accent:#1f6f63;--ink-on-accent:#ffffff;--accent-soft:#cdeee0;--accent-2:#d4a017;--ink-on-accent-2:#23251f;--accent-3:#2a6f9b;--ok:#2e6b4e;--warn:#8a6d00;--error:#9b2c2c;--focus:#1f6f63;--shadow-card:3px 3px 0 #2e302d;--shadow-pop:2px 2px 0 #2e302d;}
+[data-theme="cabina"]{--surface-0:#0b0e12;--surface-1:#141920;--surface-2:#1c232c;--surface-inverse:#05070a;--ink:#e6efe9;--ink-muted:#9aa8a2;--ink-inverse:#e6efe9;--line:#5d6e7e;--line-soft:#242d37;--accent:#4be39a;--ink-on-accent:#05140c;--accent-soft:#11301f;--accent-2:#ffc94a;--ink-on-accent-2:#1a1300;--accent-3:#6cc7ff;--ok:#4be39a;--warn:#ffc94a;--error:#ff7a7a;--focus:#ffc94a;--shadow-card:0 10px 28px rgba(0,0,0,0.45);--shadow-pop:0 0 0 1px #4be39a, 0 0 18px rgba(75,227,154,0.35);}
+:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--radius-sm:2px;--radius-md:6px;--radius-lg:12px;--radius-pill:999px;}
+</style></head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=Silkscreen:wght@400;700&family=Chakra+Petch:wght@400;500;600&family=Bungee&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--surface-0)}
+.app{background:var(--surface-0);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:22px;display:grid;grid-template-columns:var(--rail-w,200px) 1fr;grid-template-rows:auto 1fr auto;grid-template-areas:"top top" "rail main" "status status";min-height:100vh;width:1280px}
+button,input,textarea{font:inherit;color:inherit}
+.topbar{grid-area:top;display:flex;align-items:center;gap:24px;padding:10px 20px;background:var(--surface-inverse);color:var(--ink-inverse)}
+.brand{display:flex;align-items:center;gap:10px}.brand b{font-family:var(--f-display);font-size:16px;letter-spacing:.06em}.brand small{font-size:12px;opacity:.75}
+.logo-mark{display:grid;grid-template-columns:repeat(3,6px);gap:2px}.logo-mark i{height:6px;background:var(--accent-2)}.logo-mark i:nth-child(2){background:var(--accent)}.logo-mark i:nth-child(3){background:var(--accent-3)}
+.search{flex:1;max-width:460px;display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);border-radius:var(--r-ctl)}
+.search input{flex:1;background:none;border:0;outline:0;color:var(--ink-inverse)}.search input::placeholder{color:var(--ink-inverse);opacity:.7}
+kbd{font-family:var(--f-mono);font-size:11px;padding:1px 5px;border:1px solid currentColor;border-radius:3px;opacity:.85}
+.autosave{margin-left:auto;font-size:12px;display:flex;align-items:center;gap:8px}.pulse{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.rail{grid-area:rail;padding:16px 10px;display:flex;flex-direction:column;gap:4px;border-right:var(--bw) solid var(--line-soft);background:var(--surface-1)}
+.rail-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-ctl);font-weight:500;cursor:pointer}
+.rail-item .ri{width:20px;text-align:center;font-family:var(--f-mono)}
+.rail-item em{margin-left:auto;font-style:normal;font-size:12px;color:var(--ink-muted)}
+.rail-item.is-active{background:var(--accent-soft);color:var(--ink);box-shadow:inset 3px 0 0 var(--accent)}
+.rail-foot{margin-top:auto;font-size:12px;color:var(--ink-muted);padding:10px}
+.main{grid-area:main;padding:20px 28px 32px;min-width:0}
+.crumbs{display:flex;gap:8px;font-size:13px;color:var(--ink-muted);margin-bottom:12px}.crumbs b{color:var(--ink)}
+.card{background:var(--surface-1);border:var(--bw) solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-card)}
+.hero{display:flex;gap:24px;padding:20px;margin-bottom:20px}
+.hero-cover{width:132px;height:176px;flex:none;overflow:hidden;border:var(--bw) solid var(--line);border-radius:var(--r-ctl)}
+.hero-cover svg,.thumb svg{width:100%;height:100%;display:block}
+.hero-info{flex:1;display:flex;flex-direction:column;gap:10px}
+.hero-badges{display:flex;gap:8px}
+.badge{font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;border:1px solid var(--line)}
+.badge-ok{background:var(--ok);color:var(--surface-1);border-color:var(--ok)}
+.badge-sys{font-family:var(--f-mono);font-size:11px;color:var(--ink-muted);border-color:var(--line-soft)}
+h1{font-family:var(--f-display);font-size:var(--h1-size,30px);line-height:1.1;font-weight:var(--h1-w,600)}
+.hero-meta{color:var(--ink-muted)}
+.progress{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--ink-muted)}.progress b{color:var(--ink)}
+.progress-bar{width:260px;height:10px;border:1px solid var(--line);border-radius:var(--r-bar,0);background:var(--surface-2);overflow:hidden}.progress-bar i{display:block;height:100%;background:var(--accent)}
+.hero-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:4px}.sync{font-size:12px;color:var(--ink-muted)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:var(--bw) solid var(--line);border-radius:var(--r-ctl);background:var(--surface-2);font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.btn-primary{background:var(--accent);color:var(--ink-on-accent);border-color:var(--accent);box-shadow:var(--shadow-pop)}
+.btn-secondary{background:var(--surface-2)}
+.btn-ghost{background:transparent;border-color:transparent;text-decoration:underline;text-underline-offset:3px}
+.btn-sm{padding:4px 10px;font-size:13px}
+.danger{color:var(--error)}
+.icon-btn{width:26px;height:26px;border:1px solid var(--line-soft);border-radius:var(--r-ctl);background:var(--surface-2);cursor:pointer;font-size:13px;color:var(--ink-muted)}
+.sections{position:sticky;top:0;z-index:2;display:flex;gap:4px;margin-bottom:20px;padding:6px;background:var(--surface-1);border:var(--bw) solid var(--line);border-radius:var(--r-card)}
+.sec{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:var(--r-ctl);font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap}
+.sec .n{display:none}.sec em{font-style:normal;font-size:11px;color:var(--ink-muted)}
+.sec .dot{width:8px;height:8px;border-radius:50%;background:var(--line-soft)}
+.st-ok .dot{background:var(--ok)}.st-warn .dot{background:var(--accent-2);outline:1px solid var(--warn)}
+.sec.is-active{background:var(--accent);color:var(--ink-on-accent)}.sec.is-active em{color:inherit}
+.cols{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+.col-main{display:flex;flex-direction:column;gap:20px;min-width:0}
+.col-side{position:sticky;top:64px;display:flex;flex-direction:column;gap:16px}
+.sec-card{padding:0 0 18px}
+.card-head{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-soft);margin-bottom:16px}
+.card-head h2{font-family:var(--f-section);font-size:var(--h2-size,13px);letter-spacing:var(--h2-ls,.08em);text-transform:var(--h2-tt,uppercase);font-weight:600;display:flex;align-items:center;gap:8px}
+.hn{display:none}
+.card-head .btn{margin-left:auto}.legend{display:flex;gap:6px;margin-left:auto}.legend + .btn{margin-left:0}
+.hint{font-size:13px;color:var(--ink-muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;padding:0 18px}
+.field{display:flex;flex-direction:column;gap:6px;padding:0 18px 14px}.grid .field{padding:0}
+.field-head{display:flex;align-items:center;gap:8px}.field-head label{font-weight:600;font-size:13px}
+.field-head .icon-btn{margin-left:auto}.field-head .push{margin-left:auto}.count{margin-left:auto;font-size:12px;color:var(--ink-muted);font-family:var(--f-mono)}
+input,textarea{width:100%;padding:8px 10px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-ctl);outline:0}
+textarea{resize:vertical;line-height:22px}
+input:focus,textarea:focus{box-shadow:0 0 0 2px var(--surface-1),0 0 0 4px var(--focus)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid var(--line-soft);color:var(--ink-muted);white-space:nowrap;background:var(--surface-2)}
+.chip i{width:7px;height:7px;border-radius:50%}
+.chip-adb i{background:var(--accent-3)}.chip-manual i{background:var(--accent)}.chip-empty i{background:transparent;border:1px solid var(--ink-muted)}
+.chip-sug{background:var(--accent-2);color:var(--ink-on-accent-2);border-color:var(--accent-2)}.chip-sug i{background:var(--ink-on-accent-2)}
+.has-sugg input{border-color:var(--accent-2)}
+.sugg{display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 8px;background:var(--surface-2);border:1px dashed var(--accent-2);border-radius:var(--r-ctl)}.sugg span{flex:1}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--r-ctl);width:max-content;background:var(--surface-2)}.stepper button{width:34px;height:36px;border:0;background:none;font-size:18px;cursor:pointer}.stepper b{width:40px;text-align:center}
+.slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:0 18px}
+.slot{display:flex;flex-direction:column;gap:6px;min-width:0}.drop .btn{white-space:normal;text-align:center;justify-content:center}
+.thumb{aspect-ratio:3/4;border:1px solid var(--line);border-radius:var(--r-ctl);overflow:hidden;background:var(--surface-2)}
+.slot-wide .thumb{aspect-ratio:3/4;display:flex;align-items:center}.slot-wide .thumb svg{height:auto}
+.slot figcaption{display:flex;flex-direction:column;gap:4px;font-size:13px}.slot figcaption .chip{align-self:flex-start}
+.slot-actions{display:flex;gap:2px}.slot-actions .btn{padding:2px 4px;font-size:12px}
+.drop{aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:8px;overflow:hidden;border:2px dashed var(--ink-muted);border-radius:var(--r-ctl);font-size:12px;color:var(--ink-muted);background:var(--surface-2)}
+.drop b{color:var(--ink);font-size:13px}.drop-ico{font-size:22px;color:var(--accent)}
+.list-ed{list-style:none;border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--surface-2)}
+.list-ed li{display:flex;gap:10px;padding:8px 10px;border-bottom:1px solid var(--line-soft);font-size:14px}.list-ed li:last-child{border:0}
+.grip{color:var(--ink-muted);letter-spacing:-3px;cursor:grab}
+.list-ed .add{color:var(--accent);font-weight:600;cursor:pointer}
+.checks{list-style:none;padding:0 18px;display:flex;flex-direction:column;gap:8px}
+.checks li{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line-soft);border-radius:var(--r-ctl);background:var(--surface-2);font-weight:500;font-size:14px}
+.checks li b{width:22px;height:22px;display:grid;place-items:center;border-radius:50%;font-size:12px;background:var(--ok);color:var(--surface-1)}
+.checks li.todo{border-color:var(--accent-2)}.checks li.todo b{background:var(--accent-2);color:var(--ink-on-accent-2)}
+.checks li span{font-size:13px;color:var(--ink-muted);font-weight:400}.checks li .seg,.checks li .btn{margin-left:auto}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r-ctl);overflow:hidden;background:var(--surface-2)}
+.seg button{border:0;background:none;padding:5px 12px;font-size:13px;font-weight:500;cursor:pointer;border-right:1px solid var(--line-soft)}.seg button:last-child{border:0}
+.seg button.on{background:var(--accent);color:var(--ink-on-accent)}
+.seg-full{display:flex}.seg-full button{flex:1}
+.side-card{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.side-card h3{font-family:var(--f-section);font-size:var(--h3-size,12px);letter-spacing:var(--h2-ls,.08em);text-transform:var(--h2-tt,uppercase);font-weight:600}
+.mini{font-size:12px;color:var(--ink-muted)}
+.file{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line-soft);border-radius:var(--r-ctl);background:var(--surface-2)}
+.file-ico{font-family:var(--f-mono);font-size:10px;font-weight:600;padding:8px 6px;background:var(--surface-inverse);color:var(--ink-inverse);border-radius:3px}
+.file div{flex:1;display:flex;flex-direction:column;font-size:14px}.file small{font-size:12px;color:var(--ink-muted)}
+.swatches{display:flex;gap:8px;align-items:center}.swatches i{width:28px;height:28px;border:1px solid var(--line);border-radius:var(--r-ctl);position:relative}
+.swatches i.sel{box-shadow:0 0 0 2px var(--surface-1),0 0 0 4px var(--focus)}
+.assigned{display:flex;flex-direction:column;gap:4px;font-size:13px}.assigned span{display:flex;align-items:center;gap:8px}.assigned i{width:12px;height:12px;border:1px solid var(--line)}
+code{font-family:var(--f-mono);font-size:12px;color:var(--ink-muted)}
+.specs{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px}.specs dt{color:var(--ink-muted)}.specs dd{font-family:var(--f-mono);font-size:12px}
+.todo-list{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:14px}.todo-list li{display:flex;align-items:center;gap:8px}
+.todo-list b{width:8px;height:8px;border-radius:50%}.todo-list .w{background:var(--accent-2);outline:1px solid var(--warn)}.todo-list .i{background:var(--accent-3)}
+.statusbar{grid-area:status;display:flex;gap:18px;align-items:center;padding:6px 20px;background:var(--surface-inverse);color:var(--ink-inverse);font-size:12px}
+.statusbar kbd{margin-right:6px}.statusbar .push{margin-left:auto}
+
+.v-flyer{--f-body:Rubik,system-ui,sans-serif;--f-mono:"IBM Plex Mono",monospace;--f-display:Bungee,Impact,sans-serif;--f-section:Bungee,Impact,sans-serif;--r-ctl:var(--radius-md);--r-card:var(--radius-lg);--bw:3px;--r-bar:var(--radius-pill);--h1-size:44px;--h1-w:400;--h2-size:18px;--h2-ls:0;--h2-tt:none;--h3-size:14px}
+.v-flyer .topbar{background:var(--surface-inverse);border-bottom:6px solid var(--accent-2)}
+.v-flyer .brand b{font-family:Bungee,sans-serif;font-size:20px;color:var(--accent-2);letter-spacing:.02em}
+.v-flyer .rail{border-right:3px solid var(--line)}
+.v-flyer .rail-item.is-active{background:var(--accent);color:var(--ink-on-accent);box-shadow:var(--shadow-pop)}.v-flyer .rail-item.is-active em{color:inherit}
+.v-flyer .sections{background:transparent;border:0;padding:0;gap:10px;flex-wrap:wrap}
+.v-flyer .sections{gap:6px}.v-flyer .sec{border:2px solid var(--line);border-radius:999px;background:var(--surface-1);padding:3px 10px 3px 3px;font-size:13px;gap:6px}.v-flyer .sec em{display:none}
+.v-flyer .sec .n{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--surface-inverse);color:var(--ink-inverse);font-family:Bungee,sans-serif;font-size:12px}
+.v-flyer .sec.st-ok .n{background:var(--ok);color:#fff}.v-flyer .sec.st-warn .n{background:var(--accent-2);color:var(--ink-on-accent-2)}
+.v-flyer .sec .dot{display:none}
+.v-flyer .sec.is-active{background:var(--accent);color:var(--ink-on-accent);box-shadow:var(--shadow-pop)}
+.v-flyer .card-head{background:var(--band);border-bottom:3px solid var(--line);border-radius:9px 9px 0 0}
+.v-flyer .card-head h2,.v-flyer .card-head .hint{color:#fff}
+.v-flyer .sec-card[style*="accent-2"] .card-head h2,.v-flyer .sec-card[style*="accent-2"] .card-head .hint,.v-flyer .sec-card[style*="warn"] .card-head h2{color:var(--ink-on-accent-2)}
+.v-flyer .sec-card[style*="warn"] .card-head{background:var(--accent-2)}.v-flyer .sec-card[style*="warn"] .card-head .hint{color:var(--ink-on-accent-2)}
+.v-flyer .hn{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--surface-1);color:var(--ink);border:2px solid var(--line);font-size:13px}
+.v-flyer .card-head .btn{border-width:2px}
+.v-flyer .hero{background:var(--accent-2);position:relative}
+.v-flyer .hero .hero-meta,.v-flyer .hero .progress,.v-flyer .hero .sync{color:var(--ink-on-accent-2)}
+.v-flyer .hero .badge-sys{color:var(--ink-on-accent-2);border-color:var(--ink-on-accent-2)}
+.v-flyer h1{text-shadow:3px 3px 0 var(--accent)}
+.v-flyer .hero-cover{transform:rotate(-3deg);box-shadow:var(--shadow-pop)}
+.v-flyer input,.v-flyer textarea,.v-flyer .list-ed,.v-flyer .seg,.v-flyer .stepper{border-width:2px}
+.v-flyer .side-card h3{color:var(--accent)}
+
+.carga{grid-template-areas:"top top" "rail main" "rail status"}
+.carga .badge-wip{background:var(--surface-1);color:var(--ink);border:2px solid var(--line)}
+.carga .hero{padding:16px 20px}.carga .hero-cover{width:112px;height:150px}
+.blockers{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--ink-on-accent-2);flex-wrap:wrap}
+.blk{background:var(--surface-1);color:var(--error);border:2px solid var(--line);border-radius:999px;padding:1px 10px;font-weight:600;cursor:pointer;text-decoration:none}
+.blk::before{content:"✕ "}
+.precarga{display:flex;align-items:center;gap:14px;padding:12px 16px;margin-bottom:18px;background:var(--surface-1)}
+.pc-ico{width:40px;height:40px;display:grid;place-items:center;background:var(--accent-3);color:#fff;border-radius:50%;font-family:var(--f-display);font-size:13px;border:2px solid var(--line)}
+.pc-txt{display:flex;flex-direction:column;font-size:14px;flex:1}.pc-txt span{color:var(--ink-muted);font-size:13px}.pc-txt strong{color:var(--ink)}
+.pc-bar{width:120px;height:8px;border:2px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface-2)}.pc-bar i{display:block;height:100%;background:var(--accent-3)}
+.carga .sec.st-err .n{background:var(--error);color:#fff}
+.carga .sec em{display:inline;font-size:11px;color:var(--ink-muted)}
+.carga .sec.is-active em{color:inherit;opacity:.9}
+.carga .sec.st-ok .n{font-size:12px}
+.req{font-style:normal;font-size:11px;font-weight:600;color:var(--error);margin-left:6px;text-transform:uppercase;letter-spacing:.03em}
+.span2{grid-column:1 / -1}
+.is-req .field-head label{color:var(--ink)}
+.pick{display:flex;gap:8px;flex-wrap:wrap}
+.pk{display:flex;flex-direction:column;align-items:flex-start;padding:8px 14px;border:2px solid var(--line);border-radius:var(--r-ctl);background:var(--surface-2);font-weight:600;cursor:pointer}
+.pk small{font-weight:400;font-size:11px;color:var(--ink-muted)}
+.pk.on-hint{border-style:dashed;border-color:var(--accent-3);background:var(--surface-1)}
+.cands{margin:0 18px 16px;padding:12px;border:2px dashed var(--accent-2);border-radius:var(--r-ctl);background:var(--surface-2)}
+.cands-head{font-size:13px;margin-bottom:10px;color:var(--ink-muted)}.cands-head b{color:var(--ink)}
+.cands-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.cand{display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink-muted);cursor:pointer}
+.cand .thumb{border:2px solid var(--line-soft)}
+.cand.sel .thumb{border:3px solid var(--accent);box-shadow:var(--shadow-pop)}
+.cand.sel span{color:var(--ink);font-weight:600}.cand.sel span::before{content:"● "; color:var(--accent)}
+.slots-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.slot.is-sug .thumb{border:2px dashed var(--accent-2)}
+.rev{display:flex;gap:4px;align-items:center}.rev .btn{padding:3px 8px;font-size:12px}
+.okline{font-size:12px;font-weight:600;color:var(--ok)}
+.video-in{display:grid;grid-template-columns:200px 1fr;gap:16px;padding:0 18px;align-items:start}
+.drop-wide{aspect-ratio:auto;height:120px}
+.yt{padding:0}.inline{display:flex;gap:8px}
+.upl{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink-muted);margin-top:6px}
+.upl-bar{width:160px;height:8px;border:2px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface-2)}.upl-bar i{display:block;height:100%;background:var(--accent-3)}
+.is-focus{outline:4px solid var(--accent-2);outline-offset:3px}
+.row-actions{display:flex;gap:10px;align-items:center}
+.is-err textarea,.is-err input{border-color:var(--error);border-width:2px;background:var(--surface-2)}
+textarea::placeholder,input::placeholder{color:var(--ink-muted)}
+.err-msg{font-size:13px;font-weight:600;color:var(--error)}
+.list-ed li.typing{padding:4px 10px;align-items:center}.list-ed li.typing input{border:0;padding:6px 0;box-shadow:none}
+.list-ed .grip{letter-spacing:0;font-family:var(--f-display);font-size:12px;color:var(--ink-muted);width:14px}
+.list-ed .add kbd{margin-left:6px;color:var(--ink-muted)}
+.checks li.err{border-color:var(--error);border-width:2px}.checks li.err b{background:var(--error);color:#fff}
+.seg button:disabled{color:var(--ink-muted);text-decoration:line-through;cursor:not-allowed}
+.trucos{list-style:none;padding:0 18px;display:flex;flex-direction:column;gap:8px}
+.truco{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);border-radius:var(--r-ctl);background:var(--surface-2)}
+.truco div{flex:1}.truco b{font-size:14px;display:block;margin-bottom:2px}.truco p{font-size:13px;line-height:19px;color:var(--ink-muted)}
+.truco.off{border-style:dashed;border-color:var(--line-soft);opacity:.75}
+.tick input{display:none}.tick span{display:grid;place-items:center;width:22px;height:22px;border:2px solid var(--line);border-radius:6px;background:var(--surface-1);margin-top:2px}
+.tick input:checked + span{background:var(--accent);border-color:var(--accent)}.tick input:checked + span::after{content:"✓";color:#fff;font-size:13px;font-weight:700}
+.trucos .more{font-size:13px;font-weight:600;color:var(--accent);padding:4px 2px;cursor:pointer}
+.warnbox{font-size:13px;padding:8px 10px;background:var(--accent-2);color:var(--ink-on-accent-2);border:2px solid var(--line);border-radius:var(--r-ctl)}
+.picker{display:grid;grid-template-columns:150px 1fr;gap:16px}
+.pick-src{display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--ink-muted)}.pick-src .thumb{cursor:crosshair}
+.pick-opts{display:flex;flex-direction:column;gap:8px}
+.swatches.big i{width:40px;height:40px;border-width:2px;cursor:pointer}
+.swatches.dim i{width:24px;height:24px;opacity:.85}
+.hexrow{display:flex;gap:8px;align-items:center}.hexsw{width:32px;height:32px;border:2px solid var(--line);border-radius:var(--r-ctl);background:repeating-linear-gradient(45deg,var(--surface-2) 0 4px,var(--line-soft) 4px 8px)}
+.hexrow input{width:110px;font-family:var(--f-mono)}.hexrow input.bad{border:2px solid var(--error)}
+.err-inline{font-size:12px;font-weight:600;color:var(--error)}
+.next{background:var(--surface-inverse);color:var(--ink-inverse);border-color:var(--line)}
+.next h3{color:var(--accent-2)!important}.next p{font-size:15px}.next .btn-primary{align-self:flex-start}.next kbd{margin-left:4px}
+.queue{list-style:none;display:flex;flex-direction:column;gap:4px;font-size:13px;border-top:1px solid rgba(255,255,255,.2);padding-top:10px}
+.queue li{display:flex;align-items:center;gap:8px}.queue li::before{content:"";width:8px;height:8px;border-radius:50%}
+.queue .err::before{background:#ff6b7d}.queue .warn::before{background:var(--accent-2)}
+.btnmap{width:100%;border-collapse:collapse;font-size:12px}.btnmap th{text-align:left;color:var(--ink-muted);font-weight:500;padding:4px 0;border-bottom:1px solid var(--line-soft)}
+.btnmap td{padding:4px 0;border-bottom:1px solid var(--line-soft)}.btnmap td:last-child{font-family:var(--f-mono);font-size:11px}
+.btnmap td i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;border:1px solid var(--line)}
+.actionbar{grid-area:status;position:relative;display:flex;align-items:center;gap:16px;padding:10px 28px;background:var(--surface-1);border-top:3px solid var(--line);box-shadow:0 -4px 0 var(--accent-2)}
+.ab-prog{display:flex;align-items:center;gap:10px;font-size:13px}.ab-prog .progress-bar{width:140px}
+.keys{margin-left:auto;font-size:12px;color:var(--ink-muted)}.keys kbd{margin:0 4px 0 10px;color:var(--ink)}
+.actionbar .btn-primary[disabled]{background:var(--surface-2);color:var(--ink-muted);border-color:var(--line-soft);box-shadow:none;cursor:not-allowed}
+.actionbar small{font-weight:400}
+</style>
+
+<div class="app v-flyer carga" data-theme="flyer">
+  <header class="topbar">
+    <div class="brand"><span class="logo-mark"><i></i><i></i><i></i></span><b>COINDOOR</b><small>preparador de metadata arcade</small></div>
+    <div class="search"><span>⌕</span><input placeholder="Buscar juego, sistema o romset…"><kbd>/</kbd></div>
+    <div class="autosave"><span class="pulse"></span>Guardado automáticamente · hace 2 s</div>
+  </header>
+  <nav class="rail"><a class="rail-item "><span class="ri">▦</span><span class="rl">Sistemas</span></a><a class="rail-item is-active"><span class="ri">▶</span><span class="rl">Juegos</span><em>128</em></a><a class="rail-item "><span class="ri">+</span><span class="rl">Nuevo juego</span></a><a class="rail-item "><span class="ri">⇪</span><span class="rl">Exportar</span></a><a class="rail-item "><span class="ri">⚙</span><span class="rl">Configuración</span></a><div class="rail-foot">128 juegos · 3 sistemas</div></nav>
+  <main class="main">
+    <div class="crumbs"><a>Juegos</a><span>/</span><a>Arcade</a><span>/</span><b>Lethal Enforcers</b></div>
+
+    <section class="hero card">
+      <div class="hero-cover"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="400" fill="#0b1020"/><rect x="0" y="205" width="24" height="195" fill="#1d2a4a"/><rect x="11" y="296" width="3" height="4" fill="#f2c14e"/><rect x="9" y="336" width="3" height="4" fill="#f2c14e"/><rect x="26" y="193" width="40" height="207" fill="#1d2a4a"/><rect x="45" y="364" width="3" height="4" fill="#f2c14e"/><rect x="58" y="303" width="3" height="4" fill="#f2c14e"/><rect x="68" y="233" width="52" height="167" fill="#1d2a4a"/><rect x="94" y="359" width="3" height="4" fill="#f2c14e"/><rect x="91" y="330" width="3" height="4" fill="#f2c14e"/><rect x="80" y="272" width="3" height="4" fill="#f2c14e"/><rect x="72" y="320" width="3" height="4" fill="#f2c14e"/><rect x="94" y="374" width="3" height="4" fill="#f2c14e"/><rect x="102" y="388" width="3" height="4" fill="#f2c14e"/><rect x="122" y="290" width="26" height="110" fill="#1d2a4a"/><rect x="134" y="364" width="3" height="4" fill="#f2c14e"/><rect x="135" y="384" width="3" height="4" fill="#f2c14e"/><rect x="140" y="295" width="3" height="4" fill="#f2c14e"/><rect x="135" y="388" width="3" height="4" fill="#f2c14e"/><rect x="139" y="334" width="3" height="4" fill="#f2c14e"/><rect x="138" y="349" width="3" height="4" fill="#f2c14e"/><rect x="150" y="295" width="43" height="105" fill="#1d2a4a"/><rect x="157" y="386" width="3" height="4" fill="#f2c14e"/><rect x="180" y="382" width="3" height="4" fill="#f2c14e"/><rect x="195" y="300" width="39" height="100" fill="#1d2a4a"/><rect x="228" y="308" width="3" height="4" fill="#f2c14e"/><rect x="197" y="304" width="3" height="4" fill="#f2c14e"/><rect x="212" y="357" width="3" height="4" fill="#f2c14e"/><rect x="219" y="318" width="3" height="4" fill="#f2c14e"/><rect x="204" y="323" width="3" height="4" fill="#f2c14e"/><rect x="236" y="173" width="43" height="227" fill="#1d2a4a"/><rect x="254" y="264" width="3" height="4" fill="#f2c14e"/><rect x="271" y="377" width="3" height="4" fill="#f2c14e"/><rect x="259" y="319" width="3" height="4" fill="#f2c14e"/><rect x="239" y="323" width="3" height="4" fill="#f2c14e"/><rect x="238" y="319" width="3" height="4" fill="#f2c14e"/><rect x="281" y="270" width="47" height="130" fill="#1d2a4a"/><rect x="286" y="293" width="3" height="4" fill="#f2c14e"/><rect x="321" y="331" width="3" height="4" fill="#f2c14e"/><rect x="288" y="336" width="3" height="4" fill="#f2c14e"/><rect x="308" y="389" width="3" height="4" fill="#f2c14e"/><circle cx="180.0" cy="168.0" r="42.00000000000001" fill="none" stroke="#e8463c" stroke-width="5.0"/><path d="M116.99999999999999 168.0H243.0M180.0 104.99999999999999V231.0" stroke="#e8463c" stroke-width="3.4"/></svg></div>
+      <div class="hero-info">
+        <div class="hero-badges"><span class="badge badge-wip">● En carga</span><span class="badge badge-sys">ARCADE</span><span class="badge badge-sys">lethalen.zip</span></div>
+        <h1>Lethal Enforcers</h1>
+        <p class="hero-meta">1993 · Konami · Disparos / Armas · 2 jugadores · Lightgun</p>
+        <div class="progress"><div class="progress-bar"><i style="width:60%"></i></div><span><b>60%</b> · 3 obligatorios pendientes</span></div>
+        <div class="blockers"><span>Para exportar falta:</span><a class="blk">Formato</a><a class="blk">Objetivo</a><a class="blk">Color primario</a></div>
+      </div>
+    </section>
+
+    <section class="precarga card">
+      <div class="pc-ico">DB</div>
+      <div class="pc-txt"><b>ArcadeDB trajo 21 datos para este juego</b><span>12 ya aplicados · <strong>9 sugerencias esperan tu revisión</strong> (imágenes, sinopsis, trucos)</span></div>
+      <div class="pc-bar"><i style="width:57%"></i></div>
+      <button class="btn btn-secondary btn-sm">Aceptar todo</button>
+      <button class="btn btn-primary btn-sm">Revisar una por una →</button>
+    </section>
+
+    <nav class="sections"><a class="sec st-warn "><span class="n">1</span><span class="t">Identidad</span><em>falta Formato</em></a><a class="sec st-warn "><span class="n">2</span><span class="t">Imágenes</span><em>3 por revisar</em></a><a class="sec st-idle "><span class="n">3</span><span class="t">Video</span><em>vacío</em></a><a class="sec st-err is-active"><span class="n">!</span><span class="t">Textos</span><em>Objetivo obligatorio</em></a><a class="sec st-warn "><span class="n">5</span><span class="t">Cómo se juega</span><em>3/7</em></a><a class="sec st-warn "><span class="n">6</span><span class="t">Trucos</span><em>5 sugeridos</em></a><a class="sec st-err "><span class="n">!</span><span class="t">Presentación</span><em>sin color</em></a><a class="sec st-ok "><span class="n">✓</span><span class="t">Gabinete</span></a></nav>
+
+    <div class="cols">
+      <div class="col-main">
+
+        <section class="card sec-card" style="--band: var(--accent-3)">
+          <header class="card-head"><h2><span class="hn">1</span>Identidad</h2><span class="hint">6 de 7 · falta Formato</span><button class="btn btn-secondary btn-sm">↻ Sugerir todo</button></header>
+          <div class="grid">
+            <div class="field"><div class="field-head"><label>Título</label><span class="chip chip-adb"><i></i>ArcadeDB</span></div><input value="Lethal Enforcers"></div>
+            <div class="field"><div class="field-head"><label>Año</label><span class="chip chip-adb"><i></i>ArcadeDB</span></div><input value="1993"></div>
+            <div class="field"><div class="field-head"><label>Desarrollador</label><span class="chip chip-adb"><i></i>ArcadeDB</span></div><input value="Konami"></div>
+            <div class="field"><div class="field-head"><label>Editor</label><span class="chip chip-adb"><i></i>ArcadeDB</span></div><input value="Konami"></div>
+            <div class="field"><div class="field-head"><label>Género</label><span class="chip chip-adb"><i></i>ArcadeDB</span></div><input value="Disparos / Armas"></div>
+            <div class="field"><div class="field-head"><label>Jugadores</label><span class="chip chip-adb"><i></i>ArcadeDB</span></div><div class="stepper"><button>−</button><b>2</b><button>+</button></div></div>
+            <div class="field span2 is-req"><div class="field-head"><label>Formato <i class="req">obligatorio</i></label><span class="chip chip-empty"><i></i>Vacío</span></div>
+              <div class="pick"><button class="pk on-hint">Arcade<small>recomendado por el romset MAME</small></button><button class="pk">Consola</button><button class="pk">Computadora</button><button class="pk">Handheld</button></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card sec-card" style="--band: var(--accent-2)">
+          <header class="card-head"><h2><span class="hn">2</span>Imágenes</h2><span class="hint">2 aceptadas · 3 por revisar</span><button class="btn btn-secondary btn-sm">✓ Aceptar las 3</button></header>
+          <div class="cands">
+            <div class="cands-head"><b>Carátula</b> · ArcadeDB encontró 3 opciones — elegí una</div>
+            <div class="cands-row">
+              <label class="cand sel"><div class="thumb"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="400" fill="#0b1020"/><rect x="0" y="205" width="24" height="195" fill="#1d2a4a"/><rect x="11" y="296" width="3" height="4" fill="#f2c14e"/><rect x="9" y="336" width="3" height="4" fill="#f2c14e"/><rect x="26" y="193" width="40" height="207" fill="#1d2a4a"/><rect x="45" y="364" width="3" height="4" fill="#f2c14e"/><rect x="58" y="303" width="3" height="4" fill="#f2c14e"/><rect x="68" y="233" width="52" height="167" fill="#1d2a4a"/><rect x="94" y="359" width="3" height="4" fill="#f2c14e"/><rect x="91" y="330" width="3" height="4" fill="#f2c14e"/><rect x="80" y="272" width="3" height="4" fill="#f2c14e"/><rect x="72" y="320" width="3" height="4" fill="#f2c14e"/><rect x="94" y="374" width="3" height="4" fill="#f2c14e"/><rect x="102" y="388" width="3" height="4" fill="#f2c14e"/><rect x="122" y="290" width="26" height="110" fill="#1d2a4a"/><rect x="134" y="364" width="3" height="4" fill="#f2c14e"/><rect x="135" y="384" width="3" height="4" fill="#f2c14e"/><rect x="140" y="295" width="3" height="4" fill="#f2c14e"/><rect x="135" y="388" width="3" height="4" fill="#f2c14e"/><rect x="139" y="334" width="3" height="4" fill="#f2c14e"/><rect x="138" y="349" width="3" height="4" fill="#f2c14e"/><rect x="150" y="295" width="43" height="105" fill="#1d2a4a"/><rect x="157" y="386" width="3" height="4" fill="#f2c14e"/><rect x="180" y="382" width="3" height="4" fill="#f2c14e"/><rect x="195" y="300" width="39" height="100" fill="#1d2a4a"/><rect x="228" y="308" width="3" height="4" fill="#f2c14e"/><rect x="197" y="304" width="3" height="4" fill="#f2c14e"/><rect x="212" y="357" width="3" height="4" fill="#f2c14e"/><rect x="219" y="318" width="3" height="4" fill="#f2c14e"/><rect x="204" y="323" width="3" height="4" fill="#f2c14e"/><rect x="236" y="173" width="43" height="227" fill="#1d2a4a"/><rect x="254" y="264" width="3" height="4" fill="#f2c14e"/><rect x="271" y="377" width="3" height="4" fill="#f2c14e"/><rect x="259" y="319" width="3" height="4" fill="#f2c14e"/><rect x="239" y="323" width="3" height="4" fill="#f2c14e"/><rect x="238" y="319" width="3" height="4" fill="#f2c14e"/><rect x="281" y="270" width="47" height="130" fill="#1d2a4a"/><rect x="286" y="293" width="3" height="4" fill="#f2c14e"/><rect x="321" y="331" width="3" height="4" fill="#f2c14e"/><rect x="288" y="336" width="3" height="4" fill="#f2c14e"/><rect x="308" y="389" width="3" height="4" fill="#f2c14e"/><circle cx="180.0" cy="168.0" r="42.00000000000001" fill="none" stroke="#e8463c" stroke-width="5.0"/><path d="M116.99999999999999 168.0H243.0M180.0 104.99999999999999V231.0" stroke="#e8463c" stroke-width="3.4"/></svg></div><span>ArcadeDB · 600×800</span></label>
+              <label class="cand"><div class="thumb"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="400" fill="#20101a"/><rect x="0" y="205" width="24" height="195" fill="#3a1d2e"/><rect x="11" y="296" width="3" height="4" fill="#f2c14e"/><rect x="9" y="336" width="3" height="4" fill="#f2c14e"/><rect x="26" y="193" width="40" height="207" fill="#3a1d2e"/><rect x="45" y="364" width="3" height="4" fill="#f2c14e"/><rect x="58" y="303" width="3" height="4" fill="#f2c14e"/><rect x="68" y="233" width="52" height="167" fill="#3a1d2e"/><rect x="94" y="359" width="3" height="4" fill="#f2c14e"/><rect x="91" y="330" width="3" height="4" fill="#f2c14e"/><rect x="80" y="272" width="3" height="4" fill="#f2c14e"/><rect x="72" y="320" width="3" height="4" fill="#f2c14e"/><rect x="94" y="374" width="3" height="4" fill="#f2c14e"/><rect x="102" y="388" width="3" height="4" fill="#f2c14e"/><rect x="122" y="290" width="26" height="110" fill="#3a1d2e"/><rect x="134" y="364" width="3" height="4" fill="#f2c14e"/><rect x="135" y="384" width="3" height="4" fill="#f2c14e"/><rect x="140" y="295" width="3" height="4" fill="#f2c14e"/><rect x="135" y="388" width="3" height="4" fill="#f2c14e"/><rect x="139" y="334" width="3" height="4" fill="#f2c14e"/><rect x="138" y="349" width="3" height="4" fill="#f2c14e"/><rect x="150" y="295" width="43" height="105" fill="#3a1d2e"/><rect x="157" y="386" width="3" height="4" fill="#f2c14e"/><rect x="180" y="382" width="3" height="4" fill="#f2c14e"/><rect x="195" y="300" width="39" height="100" fill="#3a1d2e"/><rect x="228" y="308" width="3" height="4" fill="#f2c14e"/><rect x="197" y="304" width="3" height="4" fill="#f2c14e"/><rect x="212" y="357" width="3" height="4" fill="#f2c14e"/><rect x="219" y="318" width="3" height="4" fill="#f2c14e"/><rect x="204" y="323" width="3" height="4" fill="#f2c14e"/><rect x="236" y="173" width="43" height="227" fill="#3a1d2e"/><rect x="254" y="264" width="3" height="4" fill="#f2c14e"/><rect x="271" y="377" width="3" height="4" fill="#f2c14e"/><rect x="259" y="319" width="3" height="4" fill="#f2c14e"/><rect x="239" y="323" width="3" height="4" fill="#f2c14e"/><rect x="238" y="319" width="3" height="4" fill="#f2c14e"/><rect x="281" y="270" width="47" height="130" fill="#3a1d2e"/><rect x="286" y="293" width="3" height="4" fill="#f2c14e"/><rect x="321" y="331" width="3" height="4" fill="#f2c14e"/><rect x="288" y="336" width="3" height="4" fill="#f2c14e"/><rect x="308" y="389" width="3" height="4" fill="#f2c14e"/><circle cx="180.0" cy="168.0" r="42.00000000000001" fill="none" stroke="#e8463c" stroke-width="5.0"/><path d="M116.99999999999999 168.0H243.0M180.0 104.99999999999999V231.0" stroke="#e8463c" stroke-width="3.4"/></svg></div><span>LaunchBox · 1000×1400</span></label>
+              <label class="cand"><div class="thumb"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="400" fill="#101a14"/><rect x="0" y="205" width="24" height="195" fill="#1f3a2a"/><rect x="11" y="296" width="3" height="4" fill="#f2c14e"/><rect x="9" y="336" width="3" height="4" fill="#f2c14e"/><rect x="26" y="193" width="40" height="207" fill="#1f3a2a"/><rect x="45" y="364" width="3" height="4" fill="#f2c14e"/><rect x="58" y="303" width="3" height="4" fill="#f2c14e"/><rect x="68" y="233" width="52" height="167" fill="#1f3a2a"/><rect x="94" y="359" width="3" height="4" fill="#f2c14e"/><rect x="91" y="330" width="3" height="4" fill="#f2c14e"/><rect x="80" y="272" width="3" height="4" fill="#f2c14e"/><rect x="72" y="320" width="3" height="4" fill="#f2c14e"/><rect x="94" y="374" width="3" height="4" fill="#f2c14e"/><rect x="102" y="388" width="3" height="4" fill="#f2c14e"/><rect x="122" y="290" width="26" height="110" fill="#1f3a2a"/><rect x="134" y="364" width="3" height="4" fill="#f2c14e"/><rect x="135" y="384" width="3" height="4" fill="#f2c14e"/><rect x="140" y="295" width="3" height="4" fill="#f2c14e"/><rect x="135" y="388" width="3" height="4" fill="#f2c14e"/><rect x="139" y="334" width="3" height="4" fill="#f2c14e"/><rect x="138" y="349" width="3" height="4" fill="#f2c14e"/><rect x="150" y="295" width="43" height="105" fill="#1f3a2a"/><rect x="157" y="386" width="3" height="4" fill="#f2c14e"/><rect x="180" y="382" width="3" height="4" fill="#f2c14e"/><rect x="195" y="300" width="39" height="100" fill="#1f3a2a"/><rect x="228" y="308" width="3" height="4" fill="#f2c14e"/><rect x="197" y="304" width="3" height="4" fill="#f2c14e"/><rect x="212" y="357" width="3" height="4" fill="#f2c14e"/><rect x="219" y="318" width="3" height="4" fill="#f2c14e"/><rect x="204" y="323" width="3" height="4" fill="#f2c14e"/><rect x="236" y="173" width="43" height="227" fill="#1f3a2a"/><rect x="254" y="264" width="3" height="4" fill="#f2c14e"/><rect x="271" y="377" width="3" height="4" fill="#f2c14e"/><rect x="259" y="319" width="3" height="4" fill="#f2c14e"/><rect x="239" y="323" width="3" height="4" fill="#f2c14e"/><rect x="238" y="319" width="3" height="4" fill="#f2c14e"/><rect x="281" y="270" width="47" height="130" fill="#1f3a2a"/><rect x="286" y="293" width="3" height="4" fill="#f2c14e"/><rect x="321" y="331" width="3" height="4" fill="#f2c14e"/><rect x="288" y="336" width="3" height="4" fill="#f2c14e"/><rect x="308" y="389" width="3" height="4" fill="#f2c14e"/></svg></div><span>ImageSearch · 480×640</span></label>
+              <div class="drop"><span class="drop-ico">⇣</span><b>Usar la mía</b><span>Soltá o pegá con Ctrl+V</span></div>
+            </div>
+          </div>
+          <div class="slots slots-4">
+            <figure class="slot is-sug"><div class="thumb"><svg viewBox="0 0 320 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="320" height="100" fill="#151515"/><rect x="0" y="30" width="46" height="70" fill="#2a2a2a"/><rect x="32" y="68" width="3" height="4" fill="#f2c14e"/><rect x="6" y="66" width="3" height="4" fill="#f2c14e"/><rect x="48" y="60" width="49" height="40" fill="#2a2a2a"/><rect x="53" y="77" width="3" height="4" fill="#f2c14e"/><rect x="52" y="79" width="3" height="4" fill="#f2c14e"/><rect x="76" y="87" width="3" height="4" fill="#f2c14e"/><rect x="99" y="34" width="23" height="66" fill="#2a2a2a"/><rect x="106" y="63" width="3" height="4" fill="#f2c14e"/><rect x="107" y="89" width="3" height="4" fill="#f2c14e"/><rect x="101" y="72" width="3" height="4" fill="#f2c14e"/><rect x="124" y="38" width="52" height="62" fill="#2a2a2a"/><rect x="167" y="67" width="3" height="4" fill="#f2c14e"/><rect x="170" y="53" width="3" height="4" fill="#f2c14e"/><rect x="163" y="63" width="3" height="4" fill="#f2c14e"/><rect x="166" y="87" width="3" height="4" fill="#f2c14e"/><rect x="178" y="37" width="27" height="63" fill="#2a2a2a"/><rect x="194" y="81" width="3" height="4" fill="#f2c14e"/><rect x="191" y="69" width="3" height="4" fill="#f2c14e"/><rect x="207" y="66" width="41" height="34" fill="#2a2a2a"/><rect x="213" y="75" width="3" height="4" fill="#f2c14e"/><rect x="212" y="71" width="3" height="4" fill="#f2c14e"/><rect x="211" y="79" width="3" height="4" fill="#f2c14e"/><rect x="250" y="45" width="34" height="55" fill="#2a2a2a"/><rect x="263" y="83" width="3" height="4" fill="#f2c14e"/><rect x="274" y="79" width="3" height="4" fill="#f2c14e"/><rect x="254" y="66" width="3" height="4" fill="#f2c14e"/><rect x="286" y="61" width="36" height="39" fill="#2a2a2a"/><rect x="288" y="75" width="3" height="4" fill="#f2c14e"/><rect x="290" y="83" width="3" height="4" fill="#f2c14e"/><rect x="297" y="65" width="3" height="4" fill="#f2c14e"/><rect x="305" y="81" width="3" height="4" fill="#f2c14e"/><rect x="291" y="78" width="3" height="4" fill="#f2c14e"/><rect x="312" y="90" width="3" height="4" fill="#f2c14e"/><circle cx="192.0" cy="42.0" r="14.000000000000002" fill="none" stroke="#e8463c" stroke-width="2.0"/><path d="M171.0 42.0H213.0M192.0 20.999999999999996V63.0" stroke="#e8463c" stroke-width="1.5"/></svg></div><figcaption><b>Marquesina</b><span class="chip chip-sug"><i></i>Sugerida</span></figcaption><div class="rev"><button class="btn btn-sm btn-primary">✓ Aceptar</button><button class="btn btn-sm btn-ghost">Cambiar</button></div></figure>
+            <figure class="slot is-ok"><div class="thumb"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="400" fill="#1a0f08"/><rect x="0" y="205" width="24" height="195" fill="#3a2412"/><rect x="11" y="296" width="3" height="4" fill="#f2c14e"/><rect x="9" y="336" width="3" height="4" fill="#f2c14e"/><rect x="26" y="193" width="40" height="207" fill="#3a2412"/><rect x="45" y="364" width="3" height="4" fill="#f2c14e"/><rect x="58" y="303" width="3" height="4" fill="#f2c14e"/><rect x="68" y="233" width="52" height="167" fill="#3a2412"/><rect x="94" y="359" width="3" height="4" fill="#f2c14e"/><rect x="91" y="330" width="3" height="4" fill="#f2c14e"/><rect x="80" y="272" width="3" height="4" fill="#f2c14e"/><rect x="72" y="320" width="3" height="4" fill="#f2c14e"/><rect x="94" y="374" width="3" height="4" fill="#f2c14e"/><rect x="102" y="388" width="3" height="4" fill="#f2c14e"/><rect x="122" y="290" width="26" height="110" fill="#3a2412"/><rect x="134" y="364" width="3" height="4" fill="#f2c14e"/><rect x="135" y="384" width="3" height="4" fill="#f2c14e"/><rect x="140" y="295" width="3" height="4" fill="#f2c14e"/><rect x="135" y="388" width="3" height="4" fill="#f2c14e"/><rect x="139" y="334" width="3" height="4" fill="#f2c14e"/><rect x="138" y="349" width="3" height="4" fill="#f2c14e"/><rect x="150" y="295" width="43" height="105" fill="#3a2412"/><rect x="157" y="386" width="3" height="4" fill="#f2c14e"/><rect x="180" y="382" width="3" height="4" fill="#f2c14e"/><rect x="195" y="300" width="39" height="100" fill="#3a2412"/><rect x="228" y="308" width="3" height="4" fill="#f2c14e"/><rect x="197" y="304" width="3" height="4" fill="#f2c14e"/><rect x="212" y="357" width="3" height="4" fill="#f2c14e"/><rect x="219" y="318" width="3" height="4" fill="#f2c14e"/><rect x="204" y="323" width="3" height="4" fill="#f2c14e"/><rect x="236" y="173" width="43" height="227" fill="#3a2412"/><rect x="254" y="264" width="3" height="4" fill="#f2c14e"/><rect x="271" y="377" width="3" height="4" fill="#f2c14e"/><rect x="259" y="319" width="3" height="4" fill="#f2c14e"/><rect x="239" y="323" width="3" height="4" fill="#f2c14e"/><rect x="238" y="319" width="3" height="4" fill="#f2c14e"/><rect x="281" y="270" width="47" height="130" fill="#3a2412"/><rect x="286" y="293" width="3" height="4" fill="#f2c14e"/><rect x="321" y="331" width="3" height="4" fill="#f2c14e"/><rect x="288" y="336" width="3" height="4" fill="#f2c14e"/><rect x="308" y="389" width="3" height="4" fill="#f2c14e"/><circle cx="180.0" cy="168.0" r="42.00000000000001" fill="none" stroke="#e8463c" stroke-width="5.0"/><path d="M116.99999999999999 168.0H243.0M180.0 104.99999999999999V231.0" stroke="#e8463c" stroke-width="3.4"/></svg></div><figcaption><b>Póster</b><span class="chip chip-manual"><i></i>Revisada</span></figcaption><div class="rev"><span class="okline">✓ Aceptada</span><button class="btn btn-sm btn-ghost">Cambiar</button></div></figure>
+            <figure class="slot is-sug"><div class="thumb"><svg viewBox="0 0 320 120" aria-hidden="true"><rect width="320" height="120" fill="#101010"/><text x="160" y="70" text-anchor="middle" font-family="Bungee, Impact, sans-serif" font-size="26" fill="#e8e8e8">LETHAL ENFORCERS</text></svg></div><figcaption><b>Logo</b><span class="chip chip-sug"><i></i>Sugerida</span></figcaption><div class="rev"><button class="btn btn-sm btn-primary">✓ Aceptar</button><button class="btn btn-sm btn-ghost">Cambiar</button></div></figure>
+            <figure class="slot is-ok"><div class="thumb"><svg viewBox="0 0 288 224" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="288" height="224" fill="#081018"/><rect x="0" y="166" width="40" height="58" fill="#1a3040"/><rect x="14" y="181" width="3" height="4" fill="#f2c14e"/><rect x="16" y="196" width="3" height="4" fill="#f2c14e"/><rect x="42" y="127" width="22" height="97" fill="#1a3040"/><rect x="50" y="144" width="3" height="4" fill="#f2c14e"/><rect x="53" y="179" width="3" height="4" fill="#f2c14e"/><rect x="45" y="198" width="3" height="4" fill="#f2c14e"/><rect x="51" y="136" width="3" height="4" fill="#f2c14e"/><rect x="57" y="140" width="3" height="4" fill="#f2c14e"/><rect x="66" y="108" width="22" height="116" fill="#1a3040"/><rect x="75" y="159" width="3" height="4" fill="#f2c14e"/><rect x="82" y="191" width="3" height="4" fill="#f2c14e"/><rect x="74" y="196" width="3" height="4" fill="#f2c14e"/><rect x="68" y="170" width="3" height="4" fill="#f2c14e"/><rect x="90" y="84" width="44" height="140" fill="#1a3040"/><rect x="112" y="163" width="3" height="4" fill="#f2c14e"/><rect x="92" y="112" width="3" height="4" fill="#f2c14e"/><rect x="115" y="141" width="3" height="4" fill="#f2c14e"/><rect x="136" y="80" width="31" height="144" fill="#1a3040"/><rect x="146" y="122" width="3" height="4" fill="#f2c14e"/><rect x="140" y="142" width="3" height="4" fill="#f2c14e"/><rect x="140" y="182" width="3" height="4" fill="#f2c14e"/><rect x="144" y="149" width="3" height="4" fill="#f2c14e"/><rect x="161" y="177" width="3" height="4" fill="#f2c14e"/><rect x="141" y="149" width="3" height="4" fill="#f2c14e"/><rect x="169" y="162" width="48" height="62" fill="#1a3040"/><rect x="206" y="202" width="3" height="4" fill="#f2c14e"/><rect x="173" y="174" width="3" height="4" fill="#f2c14e"/><rect x="219" y="145" width="22" height="79" fill="#1a3040"/><rect x="221" y="211" width="3" height="4" fill="#f2c14e"/><rect x="234" y="156" width="3" height="4" fill="#f2c14e"/><rect x="228" y="156" width="3" height="4" fill="#f2c14e"/><rect x="243" y="105" width="48" height="119" fill="#1a3040"/><rect x="285" y="136" width="3" height="4" fill="#f2c14e"/><rect x="285" y="140" width="3" height="4" fill="#f2c14e"/><rect x="254" y="122" width="3" height="4" fill="#f2c14e"/><rect x="259" y="186" width="3" height="4" fill="#f2c14e"/><rect x="274" y="178" width="3" height="4" fill="#f2c14e"/><rect x="276" y="194" width="3" height="4" fill="#f2c14e"/><circle cx="172.79999999999998" cy="94.08" r="31.360000000000003" fill="none" stroke="#e8463c" stroke-width="3.8"/><path d="M125.75999999999998 94.08H219.83999999999997M172.79999999999998 47.03999999999999V141.12" stroke="#e8463c" stroke-width="2.5"/></svg></div><figcaption><b>Captura</b><span class="chip chip-manual"><i></i>Revisada</span></figcaption><div class="rev"><span class="okline">✓ Aceptada</span><button class="btn btn-sm btn-ghost">Cambiar</button></div></figure>
+          </div>
+        </section>
+
+        <section class="card sec-card" style="--band: var(--accent-3)">
+          <header class="card-head"><h2><span class="hn">3</span>Video</h2><span class="hint">opcional · vacío</span></header>
+          <div class="video-in">
+            <div class="drop drop-wide"><span class="drop-ico">⇣</span><b>Soltá un .mp4 de gameplay</b><span>o</span></div>
+            <div class="field yt"><div class="field-head"><label>Pegá una URL de YouTube</label></div>
+              <div class="inline"><input value="https://youtu.be/xK3f9…" ><button class="btn btn-primary">Descargar</button></div>
+              <div class="upl"><div class="upl-bar"><i style="width:45%"></i></div><span>Descargando · 45% · 12 MB de 27 MB</span><button class="btn btn-ghost btn-sm">Cancelar</button></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card sec-card is-focus" style="--band: var(--accent)">
+          <header class="card-head"><h2><span class="hn">4</span>Textos</h2><span class="hint">Objetivo es obligatorio para exportar la guía</span></header>
+          <div class="field"><div class="field-head"><label>Sinopsis</label><span class="chip chip-sug"><i></i>Sugerido · sin revisar</span><span class="count">248 / 600</span></div>
+            <textarea rows="3">Como agente encubierto, el jugador debe detener a bandas criminales que incluyen ladrones de bancos, secuestradores y otros delincuentes, persiguiéndolos por distintos escenarios de la ciudad.</textarea>
+            <div class="row-actions"><button class="btn btn-sm btn-primary">✓ Aceptar como está</button><span class="mini">o editalo y queda como Manual</span></div></div>
+          <div class="field is-req is-err"><div class="field-head"><label>Objetivo <i class="req">obligatorio</i></label><span class="chip chip-empty"><i></i>Vacío</span><span class="count">0 / 280</span></div>
+            <textarea rows="2" placeholder="En una frase: qué tiene que lograr el jugador. Ej.: «Eliminá a los criminales de cada escenario sin dispararle a los civiles.»"></textarea>
+            <div class="err-msg">✕ Sin objetivo la guía de “Cómo se juega” no se exporta.</div>
+            <div class="row-actions"><button class="btn btn-sm btn-secondary">✦ Proponer un objetivo</button><span class="mini">a partir de la sinopsis y el género</span></div></div>
+          <div class="field"><div class="field-head"><label>Primeros pasos</label><span class="chip chip-empty"><i></i>Vacío</span><button class="btn btn-sm btn-secondary push">✦ Proponer 3 pasos</button></div>
+            <ol class="list-ed">
+              <li class="typing"><span class="grip">1</span><input value="Apuntá con la pistola y apretá el gatillo para disparar|" ></li>
+              <li class="add">+ Agregar paso <kbd>Enter</kbd></li>
+            </ol></div>
+        </section>
+
+        <section class="card sec-card" style="--band: var(--warn)">
+          <header class="card-head"><h2><span class="hn">5</span>Cómo se juega</h2><span class="hint">3 de 7 listos</span></header>
+          <ul class="checks">
+            <li class="err"><b>✕</b>Objetivo<span>obligatorio</span><button class="btn btn-sm btn-secondary">Escribir ↑</button></li>
+            <li class="todo"><b>!</b>Primeros pasos<span>1 en curso</span><button class="btn btn-sm btn-secondary">Seguir ↑</button></li>
+            <li class="todo"><b>!</b>Reglas esenciales<span>vacío</span><button class="btn btn-sm btn-secondary">✦ Proponer</button></li>
+            <li class="todo"><b>!</b>Modo multijugador<span>juego simultáneo</span><div class="seg"><button disabled>Individual</button><button>Cooperativo</button><button>Versus</button></div></li>
+            <li class="ok"><b>✓</b>Cantidad de jugadores<span>2</span></li>
+            <li class="ok"><b>✓</b>Periféricos<span>lightgun</span></li>
+            <li class="ok"><b>✓</b>Acciones de los botones<span>5 acciones</span></li>
+          </ul>
+        </section>
+
+        <section class="card sec-card" style="--band: var(--accent-2)">
+          <header class="card-head"><h2><span class="hn">6</span>Trucos</h2><span class="hint">5 sugeridos · 2 incluidos</span><button class="btn btn-secondary btn-sm">+ Agregar truco</button></header>
+          <ul class="trucos"><li class="truco "><label class="tick"><input type="checkbox" checked><span></span></label><div><b contenteditable>Rifle de asalto en el Stage 1</b><p>En el primer área del Stage 1 (el atraco al banco), un hombre armado enmascarado aparece detrás del escritorio, a la izquierda. Si le disparás apenas aparece, suelta un rifle de asalto.</p></div><button class="icon-btn" title="Editar">✎</button></li><li class="truco "><label class="tick"><input type="checkbox" checked><span></span></label><div><b contenteditable>Segundo rifle detrás del banco</b><p>En la calle detrás del banco, casi al final del área, aparece otro enmascarado a la izquierda. Disparale rápido y suelta otro rifle.</p></div><button class="icon-btn" title="Editar">✎</button></li><li class="truco off"><label class="tick"><input type="checkbox" ><span></span></label><div><b contenteditable>Terroristas en las cajas del aeropuerto</b><p>En el tercer área del Stage 3 hay dos terroristas escondidos en cajas que necesitan dos disparos.</p></div><button class="icon-btn" title="Editar">✎</button></li><li class="more">Ver 2 más</li></ul>
+        </section>
+
+        <section class="card sec-card is-req-card" style="--band: var(--accent)">
+          <header class="card-head"><h2><span class="hn">7</span>Presentación</h2><span class="hint">Color primario obligatorio</span></header>
+          <div class="field"><div class="field-head"><label>Color de acento primario <i class="req">obligatorio</i></label></div>
+            <div class="warnbox">Los colores detectados en la carátula son casi negros (#101010, #303030…). Elegí uno con más presencia:</div>
+            <div class="picker">
+              <div class="pick-src"><div class="thumb"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="400" fill="#0b1020"/><rect x="0" y="205" width="24" height="195" fill="#1d2a4a"/><rect x="11" y="296" width="3" height="4" fill="#f2c14e"/><rect x="9" y="336" width="3" height="4" fill="#f2c14e"/><rect x="26" y="193" width="40" height="207" fill="#1d2a4a"/><rect x="45" y="364" width="3" height="4" fill="#f2c14e"/><rect x="58" y="303" width="3" height="4" fill="#f2c14e"/><rect x="68" y="233" width="52" height="167" fill="#1d2a4a"/><rect x="94" y="359" width="3" height="4" fill="#f2c14e"/><rect x="91" y="330" width="3" height="4" fill="#f2c14e"/><rect x="80" y="272" width="3" height="4" fill="#f2c14e"/><rect x="72" y="320" width="3" height="4" fill="#f2c14e"/><rect x="94" y="374" width="3" height="4" fill="#f2c14e"/><rect x="102" y="388" width="3" height="4" fill="#f2c14e"/><rect x="122" y="290" width="26" height="110" fill="#1d2a4a"/><rect x="134" y="364" width="3" height="4" fill="#f2c14e"/><rect x="135" y="384" width="3" height="4" fill="#f2c14e"/><rect x="140" y="295" width="3" height="4" fill="#f2c14e"/><rect x="135" y="388" width="3" height="4" fill="#f2c14e"/><rect x="139" y="334" width="3" height="4" fill="#f2c14e"/><rect x="138" y="349" width="3" height="4" fill="#f2c14e"/><rect x="150" y="295" width="43" height="105" fill="#1d2a4a"/><rect x="157" y="386" width="3" height="4" fill="#f2c14e"/><rect x="180" y="382" width="3" height="4" fill="#f2c14e"/><rect x="195" y="300" width="39" height="100" fill="#1d2a4a"/><rect x="228" y="308" width="3" height="4" fill="#f2c14e"/><rect x="197" y="304" width="3" height="4" fill="#f2c14e"/><rect x="212" y="357" width="3" height="4" fill="#f2c14e"/><rect x="219" y="318" width="3" height="4" fill="#f2c14e"/><rect x="204" y="323" width="3" height="4" fill="#f2c14e"/><rect x="236" y="173" width="43" height="227" fill="#1d2a4a"/><rect x="254" y="264" width="3" height="4" fill="#f2c14e"/><rect x="271" y="377" width="3" height="4" fill="#f2c14e"/><rect x="259" y="319" width="3" height="4" fill="#f2c14e"/><rect x="239" y="323" width="3" height="4" fill="#f2c14e"/><rect x="238" y="319" width="3" height="4" fill="#f2c14e"/><rect x="281" y="270" width="47" height="130" fill="#1d2a4a"/><rect x="286" y="293" width="3" height="4" fill="#f2c14e"/><rect x="321" y="331" width="3" height="4" fill="#f2c14e"/><rect x="288" y="336" width="3" height="4" fill="#f2c14e"/><rect x="308" y="389" width="3" height="4" fill="#f2c14e"/><circle cx="180.0" cy="168.0" r="42.00000000000001" fill="none" stroke="#e8463c" stroke-width="5.0"/><path d="M116.99999999999999 168.0H243.0M180.0 104.99999999999999V231.0" stroke="#e8463c" stroke-width="3.4"/></svg></div><span>Clic en la carátula para tomar un color</span></div>
+              <div class="pick-opts">
+                <label class="mini">Sugeridos con buen contraste</label>
+                <div class="swatches big"><i style="background:#e8463c"></i><i style="background:#f2c14e"></i><i style="background:#3fa7f5"></i><i style="background:#1d2a4a"></i></div>
+                <label class="mini">Detectados</label>
+                <div class="swatches dim"><i style="background:#101010"></i><i style="background:#303030"></i><i style="background:#101030"></i><i style="background:#301030"></i></div>
+                <div class="hexrow"><span class="hexsw"></span><input value="#E8463" class="bad"><span class="err-inline">Hex incompleto: 6 dígitos</span></div>
+              </div>
+            </div></div>
+        </section>
+      </div>
+
+      <aside class="col-side">
+        <section class="card side-card next">
+          <h3>Siguiente pendiente</h3>
+          <p><b>Objetivo</b> · Textos</p>
+          <button class="btn btn-primary">Ir → <kbd>N</kbd></button>
+          <ol class="queue"><li class="err">Objetivo</li><li class="err">Formato</li><li class="err">Color primario</li><li class="warn">3 imágenes sugeridas</li><li class="warn">Modo multijugador</li><li class="warn">Reglas esenciales</li></ol>
+        </section>
+        <section class="card side-card">
+          <h3>Archivo del juego</h3>
+          <div class="file"><span class="file-ico">ZIP</span><div><b>lethalen.zip</b><small>romset MAME · /games/juegos/mame</small></div><button class="icon-btn" title="Cambiar archivo">⇄</button></div>
+          <div class="seg seg-full"><button class="on">Copiar romset</button><button>Descomprimir</button></div>
+        </section>
+        <section class="card side-card">
+          <h3>Gabinete</h3>
+          <dl class="specs"><dt>Resolución</dt><dd>288×224 @ 59.64 Hz</dd><dt>Orientación</dt><dd>Horizontal</dd><dt>Controles</dt><dd>Lightgun</dd></dl>
+          <table class="btnmap"><tr><th>Acción</th><th>Entrada</th></tr><tr><td><i style="background:#c8233a"></i>Fire</td><td>P1_BUTTON1</td></tr><tr><td>Aim ←→</td><td>P1_LIGHTGUN_X</td></tr><tr><td>Aim ↑↓</td><td>P1_LIGHTGUN_Y</td></tr></table>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <footer class="actionbar">
+    <div class="ab-prog"><div class="progress-bar"><i style="width:60%"></i></div><span><b>60%</b> · 3 obligatorios · 6 para revisar</span></div>
+    <span class="keys"><kbd>Enter</kbd> aceptar sugerencia <kbd>N</kbd> siguiente pendiente <kbd>Ctrl+K</kbd> comandos</span>
+    <button class="btn btn-secondary">Guardar borrador y salir</button>
+    <button class="btn btn-primary" disabled title="Faltan 3 obligatorios">⇪ Exportar <small>(faltan 3)</small></button>
+  </footer>
+</div>
+<script>/* maqueta estática */</script>
+
+</body></html>
