@@ -63,6 +63,11 @@ def apply_suggestion(game_id: str, key: str, payload: ApplySuggestion) -> GameOu
     return _service().apply_suggestion(game_id, key, payload.candidateId)
 
 
+@router.post("/{key}/accept")
+def accept_field(game_id: str, key: str) -> GameOut:
+    return _service().accept(game_id, key)
+
+
 @router.put("/{key}")
 def put_field(game_id: str, key: str, payload: dict[str, Any]) -> GameOut:
     if key == "review":

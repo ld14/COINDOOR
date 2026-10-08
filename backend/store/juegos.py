@@ -4,7 +4,7 @@ import shutil
 import threading
 from pathlib import Path
 
-from backend.api.errors import NotFound
+from backend.api.errors import Conflict, NotFound
 from backend.api.schemas import (
     CabinetInfo,
     CreateGame,
@@ -134,7 +134,7 @@ class GamesStore:
         data = game.model_dump()
         if key not in text_keys():
             raise NotFound(f"Campo no encontrado: {key}")
-        data["texts"][key] = {"status": "manual", "value": value}
+        data["texts"][key] = {"status": "manual", "value": value, "source": "manual"}
         updated = StoredGame.model_validate(data)
         self.save(updated)
         return updated
@@ -147,7 +147,7 @@ class GamesStore:
     ) -> StoredGame:
         game = self.get(game_id)
         data = game.model_dump()
-        data["review"] = {"status": "manual", "score": score, "cats": cats}
+        data["review"] = {"status": "manual", "source": "manual", "score": score, "cats": cats}
         updated = StoredGame.model_validate(data)
         self.save(updated)
         return updated
@@ -155,7 +155,7 @@ class GamesStore:
     def set_cheats_field(self, game_id: str, groups: list[dict[str, object]]) -> StoredGame:
         game = self.get(game_id)
         data = game.model_dump()
-        data["cheats"] = {"status": "manual", "groups": groups}
+        data["cheats"] = {"status": "manual", "source": "manual", "groups": groups}
         updated = StoredGame.model_validate(data)
         self.save(updated)
         return updated
@@ -216,11 +216,32 @@ class GamesStore:
         game = self.get(game_id)
         data = game.model_dump()
         if key in image_keys():
-            data["images"][key] = {"status": "manual", "url": url}
+            data["images"][key] = {"status": "manual", "url": url, "source": "manual"}
         elif key in video_keys():
-            data["video"][key] = {"status": "manual", "url": url}
+            data["video"][key] = {"status": "manual", "url": url, "source": "manual"}
         else:
             raise NotFound(f"Campo no encontrado: {key}")
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
+    def accept_field(self, game_id: str, key: str) -> StoredGame:
+        """Pasa un campo `suggested` a `manual` conservando valor y `source`."""
+        game = self.get(game_id)
+        data = game.model_dump()
+        if key in image_keys():
+            field = data["images"].get(key) or {}
+        elif key in video_keys():
+            field = data["video"].get(key) or {}
+        elif key in text_keys():
+            field = data["texts"].get(key) or {}
+        elif key in ("review", "cheats"):
+            field = data[key] or {}
+        else:
+            raise NotFound(f"Campo no encontrado: {key}")
+        if field.get("status") != "suggested":
+            raise Conflict(f"El campo {key} no está sugerido")
+        field["status"] = "manual"
         updated = StoredGame.model_validate(data)
         self.save(updated)
         return updated

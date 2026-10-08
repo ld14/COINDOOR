@@ -30,6 +30,10 @@ class FieldsService:
         self._validate_key(key)
         return to_out(self.store.delete_field(game_id, key))
 
+    def accept(self, game_id: str, key: str) -> GameOut:
+        self._validate_key(key)
+        return to_out(self.store.accept_field(game_id, key))
+
     def set_review(self, game_id: str, payload: ReviewValue) -> GameOut:
         return to_out(self.store.set_review_field(game_id, payload.score, payload.cats))
 
