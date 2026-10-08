@@ -1,3 +1,5 @@
+import type { ContractStatus } from '@/lib/contractStatus';
+import { ContractBadge } from './ContractBadge';
 import styles from './StatusBar.module.css';
 
 const entries = [
@@ -5,10 +7,22 @@ const entries = [
   ['F2', 'Sistemas'],
   ['F3', 'Juegos'],
   ['F4', 'Exportar'],
-  ['F5', 'Configuración'],
+  ['F5', 'Config'],
+  ['/', 'Buscar'],
   ['Esc', 'Cerrar'],
 ];
 
-export function StatusBar() {
-  return <footer className={styles.bar}>{entries.map(([key, label]) => <span key={key}><span className={styles.key}>{key}</span> {label}</span>)}</footer>;
+interface StatusBarProps {
+  contract?: ContractStatus;
+}
+
+export function StatusBar({ contract }: StatusBarProps) {
+  return (
+    <footer className={styles.bar}>
+      <div className={styles.keys}>
+        {entries.map(([key, label]) => <span key={key}><kbd className={styles.key}>{key}</kbd> {label}</span>)}
+      </div>
+      <ContractBadge status={contract} />
+    </footer>
+  );
 }

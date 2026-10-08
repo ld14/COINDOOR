@@ -1,8 +1,24 @@
 .banner {
-  background: var(--dos-banner);
-  border: var(--dos-border-2) solid var(--dos-edge-dark);
-  color: var(--dos-ink);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: var(--dos-space-3);
+  align-items: center;
+  background: var(--accent-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink-on-accent-2);
+  display: flex;
+  font-weight: 600;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.icon {
+  align-items: center;
+  background: var(--surface-inverse);
+  border-radius: var(--radius-pill);
+  color: var(--ink-inverse);
+  display: inline-flex;
+  flex: none;
+  font-family: var(--font-display);
+  height: 22px;
+  justify-content: center;
+  width: 22px;
 }

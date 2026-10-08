@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Banner, DosButton, DosInput, DosSelect, DosTextarea, FieldTag, MenuBar, Modal, Panel, ProgressBar, SectionHeader, Spinner, StatusBadge, StatusBar, SunkenBox } from '@/components/dos';
+import { Banner, DosButton, DosInput, DosSelect, DosTextarea, FieldTag, Modal, Panel, ProgressBar, Rail, SectionHeader, Spinner, StatusBadge, StatusBar, SunkenBox } from '@/components/dos';
 import styles from './_Catalogo.module.css';
 
 export function Catalogo() {
@@ -28,7 +28,7 @@ export function Catalogo() {
         <Panel><SectionHeader>Progreso</SectionHeader><div className={styles.stack}><ProgressBar value={42} /><Spinner /></div></Panel>
         <Panel><SectionHeader>Modal</SectionHeader><DosButton onClick={() => setOpen(true)} variant="primary-small">Abrir modal</DosButton></Panel>
         <Panel><SectionHeader>Preview</SectionHeader><div className={styles.preview}>carátula · 3:4</div></Panel>
-        <Panel className={styles.menuPreview}><SectionHeader>MenuBar</SectionHeader><MenuBar /></Panel>
+        <Panel className={styles.menuPreview}><SectionHeader>Rail</SectionHeader><Rail counts={{ games: 29, systems: 4, romsWithoutSheet: 7, pendingExport: 2 }} /></Panel>
         <Panel className={styles.statusPreview}><SectionHeader>StatusBar</SectionHeader><StatusBar /></Panel>
       </div>
       <Modal onClose={() => setOpen(false)} open={open} title="Modal de catálogo">

@@ -17,8 +17,19 @@ describe('style contract', () => {
     expect(offenders).toEqual([]);
   });
 
-  it('no usa border-radius fuera del spinner', () => {
-    const offenders = files(src).filter((file) => !file.endsWith('Spinner.module.css')).filter((file) => /border-radius\s*:\s*(?!0\b)/.test(readFileSync(file, 'utf8'))).map((file) => relative(src, file));
+  it('los radios salen de los tokens --radius-* (ADR-0023)', () => {
+    // Se admite 0 y 50% (el spinner es un círculo); cualquier otro valor va por token.
+    const allowed = /^(0|0px|50%|var\(--radius-(sm|md|lg|pill)\))$/;
+    const offenders = files(src)
+      .filter((file) => file.endsWith('.css') && !file.endsWith('tokens.css'))
+      .flatMap((file) => [...readFileSync(file, 'utf8').matchAll(/border(?:-[a-z]+){0,2}-radius\s*:\s*([^;}]+)/g)]
+        .filter((match) => !match[1].trim().split(/\s+(?![^(]*\))/).every((value) => allowed.test(value)))
+        .map((match) => `${relative(src, file)}: ${match[0]}`));
+    expect(offenders).toEqual([]);
+  });
+
+  it('no hay valores de radio sueltos en estilos inline de TSX', () => {
+    const offenders = files(src).filter((file) => file.endsWith('.tsx')).filter((file) => /borderRadius/.test(readFileSync(file, 'utf8'))).map((file) => relative(src, file));
     expect(offenders).toEqual([]);
   });
 });
