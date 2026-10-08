@@ -1,12 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
-import { Banner, DosButton, DosInput, DosSelect, DosTextarea, FieldTag, MenuBar, Modal, Panel, ProgressBar, SectionHeader, Spinner, StatusBadge, StatusBar, SunkenBox } from '@/components/dos';
+import { Banner, DosButton, DosInput, DosSelect, DosTextarea, FieldTag, Modal, Panel, ProgressBar, Rail, SectionHeader, Spinner, StatusBadge, StatusBar, SunkenBox } from '@/components/dos';
 
 describe('DOS primitives', () => {
   it('renderizan sin props opcionales', () => {
-    render(<MemoryRouter><Banner /><DosButton /><DosInput /><DosSelect /><DosTextarea /><FieldTag /><MenuBar /><Panel /><ProgressBar /><SectionHeader /><Spinner /><StatusBadge /><StatusBar /><SunkenBox /></MemoryRouter>);
-    expect(screen.getByText('COINDOOR')).toBeInTheDocument();
+    render(<MemoryRouter><Banner /><DosButton /><DosInput /><DosSelect /><DosTextarea /><FieldTag /><Rail /><Panel /><ProgressBar /><SectionHeader /><Spinner /><StatusBadge /><StatusBar /><SunkenBox /></MemoryRouter>);
+    expect(screen.getByRole('navigation', { name: 'Secciones' })).toBeInTheDocument();
   });
 
   it('no dispara onClick si DosButton está deshabilitado', () => {

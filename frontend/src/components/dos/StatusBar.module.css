@@ -1,15 +1,26 @@
 .bar {
   align-items: center;
-  background: var(--dos-terminal);
-  color: var(--dos-ink-invert);
+  background: var(--surface-inverse);
+  color: var(--ink-inverse);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--dos-space-3);
+  font-size: var(--text-meta);
+  gap: var(--space-3) var(--space-5);
+  justify-content: space-between;
   min-height: var(--dos-control-height);
-  padding: var(--dos-space-2) var(--dos-space-3);
+  padding: var(--space-2) var(--space-5);
+}
+
+.keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
 }
 
 .key {
-  color: var(--dos-warn-crt);
-  font-weight: 700;
+  border: var(--border-control) solid var(--ink-inverse);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  padding: 0 var(--space-1);
 }

@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
-import { Banner, MenuBar, StatusBar } from '@/components/dos';
+import { Banner, Rail, StatusBar, TopBar } from '@/components/dos';
+import { useShellCounts } from '@/hooks/useShellCounts';
+import { contractStatus, type ContractStatus } from '@/lib/contractStatus';
 import { Catalogo } from '@/pages/_Catalogo';
 import { Configuracion } from '@/pages/Configuracion';
 import { EmptyPage } from '@/pages/EmptyPage';
@@ -11,8 +13,14 @@ import { NuevoJuego } from '@/pages/NuevoJuego';
 import { Sistemas } from '@/pages/Sistemas';
 import styles from './App.module.css';
 
-export function App() {
+interface AppProps {
+  /** Solo para tests: por defecto es el estado del contrato vendoreado. */
+  contract?: ContractStatus;
+}
+
+export function App({ contract = contractStatus }: AppProps) {
   const navigate = useNavigate();
+  const counts = useShellCounts();
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -38,11 +46,11 @@ export function App() {
 
   return (
     <div className={styles.app}>
-      <header className={styles.titlebar}>COINDOOR · Preparador de metadata arcade</header>
-      <main className={styles.body}>
-        <MenuBar />
-        <section className={styles.content}>
-          <Banner />
+      <TopBar contract={contract} />
+      <div className={styles.body}>
+        <Rail counts={counts} />
+        <main className={styles.content}>
+          {!contract.ok && <Banner>{contract.problem}</Banner>}
           <Routes>
             <Route element={<Navigate replace to="/juegos" />} path="/" />
             <Route element={<Sistemas />} path="/sistemas" />
@@ -54,9 +62,9 @@ export function App() {
             <Route element={<Configuracion />} path="/configuracion" />
             <Route element={<Catalogo />} path="/_catalogo" />
           </Routes>
-        </section>
-      </main>
-      <StatusBar />
+        </main>
+      </div>
+      <StatusBar contract={contract} />
     </div>
   );
 }

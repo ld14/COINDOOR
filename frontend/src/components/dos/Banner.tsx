@@ -5,6 +5,7 @@ interface BannerProps {
   children?: ReactNode;
 }
 
-export function Banner({ children = 'Contrato ATTRACT cargado como dato versionado.' }: BannerProps) {
-  return <div className={styles.banner}>{children}</div>;
+/** Aviso de un problema. No se usa para informar que todo anda bien. */
+export function Banner({ children }: BannerProps) {
+  return <div className={styles.banner} role="alert"><span aria-hidden="true" className={styles.icon}>!</span><div>{children}</div></div>;
 }

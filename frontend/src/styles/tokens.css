@@ -1,31 +1,124 @@
+/*
+ * COINDOOR · tema Flyer 80s
+ * Destino sugerido: src/styles/tokens.css (reemplaza el bloque :root actual)
+ *
+ * 1) Tokens nuevos (fuente de verdad).
+ * 2) Alias de los --dos-* existentes → tokens nuevos, para que los CSS modules
+ *    actuales tomen la paleta nueva sin tocarlos. Se van borrando a medida que
+ *    cada componente migra a los tokens nuevos (fase 2+).
+ *
+ * Fuentes (offline, sin Google Fonts en runtime):
+ *   npm i @fontsource/bungee @fontsource/rubik @fontsource/ibm-plex-mono
+ *   y en main.tsx:
+ *   import '@fontsource/bungee/400.css';
+ *   import '@fontsource/rubik/400.css'; import '@fontsource/rubik/500.css';
+ *   import '@fontsource/rubik/600.css'; import '@fontsource/rubik/700.css';
+ *   import '@fontsource/ibm-plex-mono/400.css'; import '@fontsource/ibm-plex-mono/600.css';
+ */
+
 :root {
-  --dos-desktop: #B9B9B3;
-  --dos-panel: #F1EEDC;
-  --dos-panel-light: #FFFBEA;
-  --dos-titlebar: #373A36;
-  --dos-accent: #BDEEDB;
-  --dos-terminal: #2B2D2A;
-  --dos-ink: #2E302D;
-  --dos-ink-soft: #4A4D49;
-  --dos-ink-muted: #6A6D67;
-  --dos-ink-invert: #FFFBEA;
-  --dos-ok: #2E6B4E;
-  --dos-warn: #8A6D00;
-  --dos-error: #9B2C2C;
-  --dos-info: #2A6F68;
-  --dos-ok-crt: #9EF2B8;
-  --dos-warn-crt: #F4E46B;
-  --dos-error-crt: #FF8A8A;
-  --dos-info-crt: #BDEEDB;
-  --dos-banner: #F7F1A6;
-  --dos-edge-light: #FFFDF2;
-  --dos-edge-dark: #373A36;
-  --dos-font-family: 'Consolas', 'Courier New', monospace;
-  --dos-size-title: 24px;
+  /* ---------- Color ---------- */
+  --surface-0: #f3e6cc;        /* fondo de la app (papel) */
+  --surface-1: #fff8ea;        /* tarjetas y paneles */
+  --surface-2: #ffffff;        /* campos, slots, filas internas */
+  --surface-inverse: #1b1a2e;  /* topbar, statusbar, panel "Siguiente pendiente" */
+
+  --ink: #1b1a2e;              /* texto principal */
+  --ink-muted: #57536c;        /* texto secundario (≥4.5:1 sobre surface-1/2) */
+  --ink-inverse: #fff8ea;      /* texto sobre surface-inverse */
+
+  --line: #1b1a2e;             /* bordes de tarjetas y controles */
+  --line-soft: #e4d4b2;        /* divisores internos; nunca único borde de un control */
+
+  --accent: #c8233a;           /* acción primaria, paso activo, Manual */
+  --ink-on-accent: #ffffff;
+  --accent-soft: #ffdfe2;
+  --accent-2: #ffc93c;         /* Sugerido / pendiente de revisar (solo RELLENO) */
+  --ink-on-accent-2: #1b1a2e;
+  --accent-3: #2b59c3;         /* dato de ArcadeDB / origen externo, Exportado */
+
+  --ok: #1e7a4a;
+  --warn: #8a5a00;
+  --error: #b3122a;
+  --focus: #2b59c3;
+
+  /* ---------- Tipografía ---------- */
+  --font-display: Bungee, Impact, sans-serif;           /* títulos de página y de sección */
+  --font-body: Rubik, system-ui, sans-serif;            /* todo lo que se lee y se carga */
+  --font-mono: "IBM Plex Mono", Consolas, monospace;    /* rutas, hex, tamaños, romsets, atajos */
+
+  --text-title: 40px;     /* h1 de página/juego, line-height 1.05 */
+  --text-section: 18px;   /* h2 de tarjeta (Bungee) */
+  --text-body: 15px;      /* line-height 22px */
+  --text-label: 13px;     /* etiquetas de campo, weight 600 */
+  --text-meta: 12px;      /* ayudas, metadatos */
+
+  /* ---------- Espaciado (escala 4/8) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* ---------- Radios ---------- */
+  --radius-sm: 2px;
+  --radius-md: 6px;      /* controles */
+  --radius-lg: 12px;     /* tarjetas */
+  --radius-pill: 999px;  /* chips, pasos, barras de progreso */
+
+  /* ---------- Bordes y sombras ---------- */
+  --border-card: 3px;
+  --border-control: 2px;
+  --shadow-card: 5px 5px 0 #1b1a2e;
+  --shadow-pop: 3px 3px 0 #1b1a2e;
+  --focus-ring: 0 0 0 2px var(--surface-1), 0 0 0 4px var(--focus);
+
+  /* ---------- Layout ---------- */
+  --rail-width: 200px;
+  --side-column: 300px;
+  --page-max-width: 1440px;
+}
+
+/* ===================================================================
+ * Alias de compatibilidad: --dos-*  →  tokens Flyer
+ * (borrar cada línea cuando ya no quede ningún uso: grep -r "var(--dos-")
+ * =================================================================== */
+:root {
+  --dos-desktop: var(--surface-0);
+  --dos-panel: var(--surface-1);
+  --dos-panel-light: var(--surface-2);
+  --dos-titlebar: var(--surface-inverse);
+  --dos-accent: var(--accent-soft);
+  --dos-terminal: var(--surface-inverse);
+  --dos-ink: var(--ink);
+  --dos-ink-soft: var(--ink-muted);
+  --dos-ink-muted: var(--ink-muted);
+  --dos-ink-invert: var(--ink-inverse);
+  --dos-ok: var(--ok);
+  --dos-warn: var(--warn);
+  --dos-error: var(--error);
+  --dos-info: var(--accent-3);
+  --dos-ok-crt: var(--ok);
+  --dos-warn-crt: var(--accent-2);
+  --dos-error-crt: var(--error);
+  --dos-info-crt: var(--accent-3);
+  --dos-banner: var(--accent-2);
+  --dos-edge-light: var(--surface-2);
+  --dos-edge-dark: var(--line);
+  --dos-font-family: var(--font-body);
+  --dos-size-title: var(--text-title);
+  --dos-size-body: var(--text-body);
+  --dos-size-meta: var(--text-meta);
+  --dos-focus-outline: 2px solid var(--focus);
+  --dos-hard-shadow: var(--shadow-card);
+  --dos-row-border: var(--line-soft);
+  --dos-field-empty: var(--ink-muted);
+  --dos-accent-preset-gold: var(--accent-2);
+  --dos-page-max-width: var(--page-max-width);
+  /* Se conservan con sus valores actuales hasta migrar cada componente. */
   --dos-size-titlebar: 13.5px;
   --dos-size-section: 12.5px;
-  --dos-size-body: 13px;
-  --dos-size-meta: 11.5px;
   --dos-size-field-tag: 10.5px;
   --dos-space-1: 4px;
   --dos-space-2: 6px;
@@ -53,20 +146,13 @@
   --dos-modal-small: 420px;
   --dos-modal-medium: 460px;
   --dos-modal-large: 620px;
-  --dos-focus-outline: 2px dotted var(--dos-ink);
-  --dos-hard-shadow: 8px 8px 0 var(--dos-accent);
   --dos-backdrop: rgba(43, 45, 42, 0.62);
-  --dos-row-border: #5A5D57;
-  --dos-field-empty: #777A73;
-  --dos-accent-preset-gold: #D4A017;
   --dos-swatch-size: 22px;
   --dos-hex-input-width: 100px;
   --dos-hero-preview-height: 260px;
   --dos-media-preview-height: 150px;
   --dos-completion-tile-min: 150px;
-  --dos-page-max-width: 1320px;
   --dos-editorial-gutter: 28px;
   --dos-block-min-height: 120px;
   --dos-candidates-max-height: 240px;
-  --dos-ascii-shadow-offset: 14px;
 }
