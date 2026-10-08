@@ -121,3 +121,23 @@ def test_accent2_vacio_no_disponible(tmp_path: Path) -> None:
     items = compute_seleccion(_settings(tmp_path), _base_game())
     assert _by_key(items, "accent2").disponible is False
     assert _by_key(items, "accent2").required is False
+
+
+def test_cheats_y_review_vacios_no_estan_disponibles(tmp_path: Path) -> None:
+    game = _base_game()
+    game["cheats"] = {"status": "ready", "groups": []}
+    game["review"] = {"status": "ready", "score": None, "cats": {}}
+    items = compute_seleccion(_settings(tmp_path), game)
+    assert _by_key(items, "cheats").disponible is False
+    assert _by_key(items, "review").disponible is False
+
+    game["cheats"] = {"status": "ready", "groups": [{"name": "Vidas", "entries": []}]}
+    items = compute_seleccion(_settings(tmp_path), game)
+    assert _by_key(items, "cheats").disponible is False
+
+    entry = {"name": "a", "input": "b"}
+    game["cheats"] = {"status": "ready", "groups": [{"name": "Vidas", "entries": [entry]}]}
+    game["review"] = {"status": "ready", "score": 8, "cats": {}}
+    items = compute_seleccion(_settings(tmp_path), game)
+    assert _by_key(items, "cheats").disponible is True
+    assert _by_key(items, "review").disponible is True

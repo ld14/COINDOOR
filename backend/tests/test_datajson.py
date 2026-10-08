@@ -184,3 +184,16 @@ def test_cheats_de_referencia_van_en_un_solo_renglon() -> None:
         for entry in entries:
             assert "\n" not in entry["name"]
             assert "\n" not in entry["input"]
+
+
+def test_cheats_vacios_no_se_exportan() -> None:
+    game: dict[str, Any] = {
+        "accentValue": "#000000",
+        "cheats": {"status": "ready", "groups": [{"name": "Vacío", "entries": []}]},
+        "review": {"status": "ready", "score": None, "cats": {}},
+    }
+    data = build_datajson(game, {"cheats", "review"})
+    assert "cheats" not in data
+    assert data["review"] is None
+    game["cheats"]["groups"].append({"name": "Vidas", "entries": [{"name": "a", "input": "b"}]})
+    assert build_datajson(game, {"cheats"})["cheats"] == {"Vidas": [{"name": "a", "input": "b"}]}
