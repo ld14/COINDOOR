@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatHace, saveStatusStore, useSaveStatus } from '@/hooks/useSaveStatus';
 import type { ContractStatus } from '@/lib/contractStatus';
 import { ContractBadge } from './ContractBadge';
 import styles from './TopBar.module.css';
@@ -11,6 +12,38 @@ interface TopBarProps {
 function isTypingTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
   return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+}
+
+/** Estado del autosave (DESIGN_SPEC §4). No ocupa lugar mientras nada se guardó en la sesión. */
+function SaveIndicator() {
+  const status = useSaveStatus();
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (status.kind !== 'saved') return undefined;
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [status]);
+
+  if (status.kind === 'idle') return <span className={styles.save} role="status" />;
+  if (status.kind === 'saving') {
+    return <span className={styles.save} role="status"><i aria-hidden="true" className={[styles.dot, styles.dotSaving].join(' ')} />Guardando…</span>;
+  }
+  if (status.kind === 'saved') {
+    return <span className={styles.save} role="status"><i aria-hidden="true" className={styles.dot} />{`Guardado · ${formatHace(status.savedAt, now)}`}</span>;
+  }
+  return (
+    <span className={[styles.save, styles.saveError].join(' ')} role="status" title={status.message}>
+      Error al guardar
+      {status.canRetry ? (
+        <>
+          {' — '}
+          <button className={styles.retry} onClick={() => saveStatusStore.retry()} type="button">Reintentar</button>
+        </>
+      ) : null}
+    </span>
+  );
 }
 
 /** Barra superior: marca, búsqueda global (`/` la enfoca) e indicador del contrato.
@@ -62,6 +95,7 @@ export function TopBar({ contract }: TopBarProps) {
         />
         <kbd aria-hidden="true" className={styles.kbd}>/</kbd>
       </form>
+      <SaveIndicator />
       <ContractBadge status={contract} />
     </header>
   );

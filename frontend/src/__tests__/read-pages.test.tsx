@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
@@ -73,13 +73,15 @@ describe('Pantallas de lectura', () => {
     expect(screen.getByText('Contra')).toBeInTheDocument();
   });
 
-  it('renderiza ficha con dashboard y secciones vacías visibles', async () => {
+  it('renderiza ficha con progreso, pasos y secciones vacías visibles', async () => {
     renderApp('/juegos/mslug');
 
     expect(await screen.findByRole('heading', { name: 'Metal Slug' })).toBeInTheDocument();
-    expect(screen.getByText('DASHBOARD DE COMPLETITUD')).toBeInTheDocument();
-    expect(screen.getByText('Identidad')).toBeInTheDocument();
-    expect(screen.getByText(/\d+ pendiente\(s\)/)).toBeInTheDocument();
+    expect(screen.getByText(/\d+% completo/)).toBeInTheDocument();
+    expect(screen.getByText('Para exportar falta:')).toBeInTheDocument();
+    const pasos = screen.getByRole('navigation', { name: 'Secciones de la ficha' });
+    expect(within(pasos).getByRole('button', { name: /Identidad/ })).toBeInTheDocument();
+    expect(document.getElementById('seccion-identidad')).not.toBeNull();
     expect(screen.getByLabelText('Año')).toHaveValue('');
     expect(screen.getAllByText(/No Disponible/).length).toBeGreaterThan(0);
   });
