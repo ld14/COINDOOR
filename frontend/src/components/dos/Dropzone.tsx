@@ -6,7 +6,11 @@ import styles from './Dropzone.module.css';
 interface DropzoneProps {
   /** Mismo formato que el atributo `accept` de un input file (ej. "image/*,.png"). */
   accept?: string;
-  onFile: (file: File) => void;
+  /** Un archivo por vez (comportamiento original). */
+  onFile?: (file: File) => void;
+  /** Con `multiple`, recibe todos los archivos válidos juntos (si no se define, se llama `onFile` con cada uno). */
+  onFiles?: (files: File[]) => void;
+  multiple?: boolean;
   /** Si está definido (0-100), se muestra el estado de progreso en lugar del cuerpo. */
   progress?: number;
   onCancel?: () => void;
@@ -15,37 +19,39 @@ interface DropzoneProps {
   disabled?: boolean;
 }
 
-export function Dropzone({ accept, onFile, progress, onCancel, label = 'Soltá una imagen acá o pegala con Ctrl+V', secondaryAction, disabled = false }: DropzoneProps) {
+export function Dropzone({ accept, onFile, onFiles, multiple = false, progress, onCancel, label = 'Soltá una imagen acá o pegala con Ctrl+V', secondaryAction, disabled = false }: DropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
   const [rejected, setRejected] = useState(false);
   const busy = progress !== undefined;
   const inactive = disabled || busy;
 
-  function deliver(file: File | null | undefined) {
-    if (!file) return;
-    if (!aceptaArchivo(file, accept)) {
-      setRejected(true);
-      return;
-    }
-    setRejected(false);
-    onFile(file);
+  function deliver(candidates: Array<File | null | undefined> | ArrayLike<File> | null | undefined) {
+    const lista = Array.from((candidates ?? []) as ArrayLike<File | null | undefined>).filter((file): file is File => !!file);
+    if (lista.length === 0) return;
+    const candidatos = multiple ? lista : lista.slice(0, 1);
+    const validos = candidatos.filter((file) => aceptaArchivo(file, accept));
+    setRejected(validos.length < candidatos.length);
+    if (validos.length === 0) return;
+    if (multiple && onFiles) onFiles(validos);
+    else validos.forEach((file) => onFile?.(file));
   }
 
   function onDrop(event: DragEvent) {
     event.preventDefault();
     setOver(false);
     if (inactive) return;
-    deliver(event.dataTransfer.files?.[0]);
+    deliver(event.dataTransfer.files);
   }
 
   function onPaste(event: ClipboardEvent) {
     if (inactive) return;
     const files = Array.from(event.clipboardData.files ?? []);
-    const file = files.find((candidate) => aceptaArchivo(candidate, accept)) ?? files[0];
-    if (file) {
+    const validos = files.filter((candidate) => aceptaArchivo(candidate, accept));
+    const elegidos = validos.length > 0 ? validos : files.slice(0, 1);
+    if (elegidos.length > 0) {
       event.preventDefault();
-      deliver(file);
+      deliver(elegidos);
     }
   }
 
@@ -62,7 +68,7 @@ export function Dropzone({ accept, onFile, progress, onCancel, label = 'Soltá u
     return (
       <div className={styles.wrap}>
         <div className={[styles.zone, styles.busy].join(' ')}>
-          <span className={styles.label}>Subiendo… {Math.round(value)}%</span>
+          <span aria-live="polite" className={styles.label} role="status">Subiendo… {Math.round(value)}%</span>
           <div aria-label="Progreso de subida" aria-valuemax={100} aria-valuemin={0} aria-valuenow={Math.round(value)} className={styles.track} role="progressbar">
             <div className={styles.fill} style={{ width: `${value}%` }} />
           </div>
@@ -99,8 +105,9 @@ export function Dropzone({ accept, onFile, progress, onCancel, label = 'Soltá u
           className={styles.input}
           data-testid="dropzone-input"
           disabled={disabled}
+          multiple={multiple || undefined}
           onChange={(event) => {
-            deliver(event.target.files?.[0]);
+            deliver(event.target.files);
             event.target.value = '';
           }}
           onClick={(event) => event.stopPropagation()}

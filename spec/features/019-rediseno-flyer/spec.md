@@ -1,6 +1,6 @@
 # 019 · Rediseño "Flyer 80s"
 
-**Estado:** aprobada (Fase 0 hecha; falta el sub-plan de las fases 4 y 5)
+**Estado:** implementada (fases 0–7), **pendiente de verificación visual** contra los mockups y de los ítems de backend listados en `docs/coindoor-rediseno/PROGRESS.md`. No está "Hecha" en el roadmap.
 
 ## Qué hace
 

@@ -32,4 +32,25 @@ describe('style contract', () => {
     const offenders = files(src).filter((file) => file.endsWith('.tsx')).filter((file) => /borderRadius/.test(readFileSync(file, 'utf8'))).map((file) => relative(src, file));
     expect(offenders).toEqual([]);
   });
+  it('no quedan alias --dos-* (fase 7): todo usa los tokens nuevos', () => {
+    const offenders = files(src).filter((file) => /\.(css|tsx?)$/.test(file) && !file.includes('__tests__')).filter((file) => /--dos-/.test(readFileSync(file, 'utf8'))).map((file) => relative(src, file));
+    expect(offenders).toEqual([]);
+  });
+
+  it('accesibilidad (DESIGN_SPEC §6): transiciones de 150 ms o menos y reduced-motion global', () => {
+    const cssFiles = files(src).filter((file) => file.endsWith('.css'));
+    const largas = cssFiles.flatMap((file) => [...readFileSync(file, 'utf8').matchAll(/transition[^;{}]*?(\d*\.?\d+)(ms|s)(?![a-z])/g)]
+      .filter((match) => (match[2] === 's' ? Number(match[1]) * 1000 : Number(match[1])) > 150)
+      .map((match) => `${relative(src, file)}: ${match[0]}`));
+    expect(largas).toEqual([]);
+    expect(readFileSync(join(src, 'styles', 'reset.css'), 'utf8')).toMatch(/prefers-reduced-motion: reduce/);
+  });
+
+  it('accesibilidad: todo CSS que saca el outline repone el foco con --focus-ring', () => {
+    const offenders = files(src)
+      .filter((file) => file.endsWith('.css'))
+      .filter((file) => { const css = readFileSync(file, 'utf8'); return /outline:\s*(none|0)(?![.\d])/.test(css) && !css.includes('--focus-ring'); })
+      .map((file) => relative(src, file));
+    expect(offenders).toEqual([]);
+  });
 });

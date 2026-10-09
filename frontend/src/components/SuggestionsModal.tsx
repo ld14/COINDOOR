@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { DosButton, Modal, Spinner } from '@/components/dos';
 import { useSuggestionsJob } from '@/hooks/useSuggestionsJob';
-import type { SuggestionCandidate, SuggestionTrace } from '@/lib/api/suggestions';
+import type { SuggestionCandidate } from '@/lib/api/suggestions';
 import styles from './SuggestionsModal.module.css';
 
 const MANUAL_REPLACE_CONFIRM = 'Este campo fue cargado a mano. ¿Reemplazarlo por la sugerencia elegida?';

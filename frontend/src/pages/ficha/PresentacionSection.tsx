@@ -4,6 +4,7 @@ import { Card, DosInput, OriginChip } from '@/components/dos';
 import { InlineSuggestion } from '@/components/dos/InlineSuggestion';
 import { useDominantColors } from '@/hooks/useDominantColors';
 import type { Game } from '@/lib/domain/types';
+import { consumirProximoAcento, reiniciarProximoAcento, useProximoAcento } from './acentoSlot';
 import { useFichaAutosave } from './autosaveContext';
 import type { AccentSlot, PresentationHandle } from './types';
 import styles from './presentacion.module.css';
@@ -55,9 +56,10 @@ type Props = {
 export const PresentationSection = forwardRef<PresentationHandle, Props>(function PresentationSection({ game, onSave }, ref) {
   const [accentValue, setAccentValue] = useState(game.accentValue);
   const [accent2Value, setAccent2Value] = useState(game.accent2Value);
-  const [siguiente, setSiguiente] = useState<AccentSlot>(0);
+  const siguiente = useProximoAcento();
   const [ignorada, setIgnorada] = useState(false);
   const { aceptar, markDirty } = useFichaAutosave();
+  useEffect(() => { reiniciarProximoAcento(); }, [game.id]);
   useEffect(() => setAccentValue(game.accentValue), [game.accentValue]);
   useEffect(() => setAccent2Value(game.accent2Value), [game.accent2Value]);
 
@@ -78,19 +80,19 @@ export const PresentationSection = forwardRef<PresentationHandle, Props>(functio
       onSave(a, b);
     },
     // Los colores predominantes de la carátula viven en el Hero (otro componente): entran por acá.
-    setAccent: (slot: AccentSlot, value: string) => {
-      if (slot === 0) setAccentValue(value);
+    // El slot lo decide el contador compartido: el que pasa el orquestador se ignora para no desfasar.
+    setAccent: (_slot: AccentSlot, value: string) => {
+      if (consumirProximoAcento() === 0) setAccentValue(value);
       else setAccent2Value(value);
       markDirty('presentacion');
     },
   }), [onSave, accentValue, accent2Value, markDirty]);
 
   const aplicar = useCallback((value: string) => {
-    if (siguiente === 0) setAccentValue(value);
+    if (consumirProximoAcento() === 0) setAccentValue(value);
     else setAccent2Value(value);
-    setSiguiente((slot) => (slot === 0 ? 1 : 0));
     markDirty('presentacion');
-  }, [siguiente, markDirty]);
+  }, [markDirty]);
 
   // Toma el color del píxel clicado leyendo la carátula en un canvas (falla en silencio si el navegador no deja).
   const tomarDeCaratula = (event: MouseEvent<HTMLImageElement>) => {

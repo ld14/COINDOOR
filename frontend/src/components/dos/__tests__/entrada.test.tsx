@@ -178,6 +178,30 @@ describe('Dropzone', () => {
     expect(onFile).toHaveBeenCalledWith(file);
   });
 
+  it('con multiple entrega todos los archivos válidos juntos por onFiles', () => {
+    const onFiles = vi.fn();
+    const onFile = vi.fn();
+    render(<Dropzone accept=".pdf" multiple onFile={onFile} onFiles={onFiles} />);
+    const a = new File(['x'], 'a.pdf', { type: 'application/pdf' });
+    const b = new File(['y'], 'b.pdf', { type: 'application/pdf' });
+    const txt = new File(['z'], 'c.txt', { type: 'text/plain' });
+    fireEvent.drop(screen.getByRole('button'), { dataTransfer: { files: [a, b, txt] } });
+    expect(onFiles).toHaveBeenCalledWith([a, b]);
+    expect(onFile).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByTestId('dropzone-input')).toHaveAttribute('multiple');
+  });
+
+  it('sin multiple sigue entregando un solo archivo', () => {
+    const onFile = vi.fn();
+    render(<Dropzone accept=".pdf" onFile={onFile} />);
+    const a = new File(['x'], 'a.pdf', { type: 'application/pdf' });
+    const b = new File(['y'], 'b.pdf', { type: 'application/pdf' });
+    fireEvent.drop(screen.getByRole('button'), { dataTransfer: { files: [a, b] } });
+    expect(onFile).toHaveBeenCalledTimes(1);
+    expect(onFile).toHaveBeenCalledWith(a);
+  });
+
   it('rechaza tipos no admitidos', () => {
     const onFile = vi.fn();
     render(<Dropzone accept="image/*" onFile={onFile} />);

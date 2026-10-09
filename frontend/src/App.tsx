@@ -5,7 +5,6 @@ import { useShellCounts } from '@/hooks/useShellCounts';
 import { contractStatus, type ContractStatus } from '@/lib/contractStatus';
 import { Catalogo } from '@/pages/_Catalogo';
 import { Configuracion } from '@/pages/Configuracion';
-import { EmptyPage } from '@/pages/EmptyPage';
 import { ExportPage } from '@/pages/ExportPage';
 import { FichaJuego } from '@/pages/FichaJuego';
 import { Juegos } from '@/pages/Juegos';

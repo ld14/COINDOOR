@@ -20,10 +20,32 @@ function tamano(bytes?: number): string {
   return bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
 }
 
-export function ManualSection({ game, onUpload, onDelete }: { game: Game; onUpload: (file: File) => void; onDelete: (id: string) => void }) {
+interface ManualSectionProps {
+  game: Game;
+  onUpload: (file: File) => void;
+  /** Si se pasa, varios PDF se suben de a uno, esperando a que termine cada guardado (evita pisarse en el `game.json`). */
+  onUploadAsync?: (file: File) => Promise<unknown>;
+  onDelete: (id: string) => void;
+}
+
+export function ManualSection({ game, onUpload, onUploadAsync, onDelete }: ManualSectionProps) {
   const [searching, setSearching] = useState(false);
   const [searched, setSearched] = useState(false);
   const [results, setResults] = useState<ResultadoManual[]>([]);
+
+  const subirTodos = async (files: File[]) => {
+    if (!onUploadAsync) {
+      files.forEach((file) => onUpload(file));
+      return;
+    }
+    for (const file of files) {
+      try {
+        await onUploadAsync(file);
+      } catch {
+        // El fallo ya lo muestra el indicador de guardado; se sigue con el resto.
+      }
+    }
+  };
 
   const handleSearch = async () => {
     setSearching(true);
@@ -70,7 +92,7 @@ export function ManualSection({ game, onUpload, onDelete }: { game: Game; onUplo
             ))}
           </ul>
         ) : null}
-        <Dropzone accept=".pdf,application/pdf" label="Soltá el manual en PDF acá" onFile={onUpload} />
+        <Dropzone accept=".pdf,application/pdf" label="Soltá los manuales en PDF acá" multiple onFiles={(files) => void subirTodos(files)} />
 
         {searching ? (
           <div className={styles.busqueda}>

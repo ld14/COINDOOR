@@ -120,6 +120,35 @@ describe('Manual y revistas', () => {
     expect(onUpload).toHaveBeenCalledWith(archivo);
   });
 
+  it('sube varios PDF juntos, uno por llamada a onUpload', async () => {
+    const onUpload = vi.fn();
+    render(<ManualSection game={juego()} onDelete={vi.fn()} onUpload={onUpload} />);
+    const a = new File(['x'], 'a.pdf', { type: 'application/pdf' });
+    const b = new File(['y'], 'b.pdf', { type: 'application/pdf' });
+    await userEvent.upload(screen.getByTestId('dropzone-input'), [a, b]);
+    expect(onUpload).toHaveBeenCalledTimes(2);
+    expect(onUpload).toHaveBeenNthCalledWith(1, a);
+    expect(onUpload).toHaveBeenNthCalledWith(2, b);
+  });
+
+  it('con onUploadAsync los PDF se suben de a uno, esperando a cada uno', async () => {
+    const orden: string[] = [];
+    let liberar: () => void = () => undefined;
+    const onUploadAsync = vi.fn((file: File) => {
+      orden.push(`inicio ${file.name}`);
+      return new Promise<void>((resolve) => { liberar = () => { orden.push(`fin ${file.name}`); resolve(); }; });
+    });
+    render(<ManualSection game={juego()} onDelete={vi.fn()} onUpload={vi.fn()} onUploadAsync={onUploadAsync} />);
+    const a = new File(['x'], 'a.pdf', { type: 'application/pdf' });
+    const b = new File(['y'], 'b.pdf', { type: 'application/pdf' });
+    await userEvent.upload(screen.getByTestId('dropzone-input'), [a, b]);
+    expect(orden).toEqual(['inicio a.pdf']);
+    liberar();
+    await vi.waitFor(() => expect(orden).toContain('inicio b.pdf'));
+    liberar();
+    await vi.waitFor(() => expect(orden).toEqual(['inicio a.pdf', 'fin a.pdf', 'inicio b.pdf', 'fin b.pdf']));
+  });
+
   it('revistas: estado vacío claro y acción Buscar con IA, sin descarga ni estado roto', () => {
     conCliente(<MagazineSection game={juego()} />);
     expect(screen.getByRole('button', { name: 'Buscar con IA' })).toBeInTheDocument();
@@ -146,5 +175,17 @@ describe('Gabinete', () => {
   it('sin datos dice que no hay información', () => {
     render(<CabinetSection game={juego()} />);
     expect(screen.getByText(/Sin información de gabinete/)).toBeInTheDocument();
+  });
+});
+
+describe('Acento primario/secundario compartido', () => {
+  it('Hero y Presentación alternan el mismo contador y no se desfasan', async () => {
+    const { consumirProximoAcento, leerProximoAcento, reiniciarProximoAcento } = await import('@/pages/ficha/acentoSlot');
+    reiniciarProximoAcento();
+    expect(leerProximoAcento()).toBe(0);
+    expect(consumirProximoAcento()).toBe(0); // clic en un color predominante del Hero
+    expect(consumirProximoAcento()).toBe(1); // clic en la carátula de Presentación
+    expect(leerProximoAcento()).toBe(0);
+    reiniciarProximoAcento();
   });
 });

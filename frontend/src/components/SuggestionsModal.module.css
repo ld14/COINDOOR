@@ -1,15 +1,15 @@
 .subtitle {
-  color: var(--dos-ink-muted);
-  font-size: var(--dos-size-meta);
-  margin: 0 0 var(--dos-space-4);
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
+  margin: 0 0 var(--space-3);
 }
 
 .state {
   align-items: center;
   display: grid;
-  gap: var(--dos-space-3);
+  gap: var(--space-2);
   justify-items: center;
-  padding: var(--dos-space-6) 0;
+  padding: var(--space-4) 0;
   text-align: center;
 }
 
@@ -18,46 +18,52 @@
 }
 
 .error {
-  color: var(--dos-error);
-  font-size: var(--dos-size-meta);
-  margin: 0 0 var(--dos-space-4);
+  color: var(--error);
+  font-size: var(--text-meta);
+  margin: 0 0 var(--space-3);
 }
 
 .grid {
   display: grid;
-  gap: var(--dos-space-3);
+  gap: var(--space-2);
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
 }
 
 .candidate {
-  background: var(--dos-panel-light);
-  border: var(--dos-border-2) outset var(--dos-panel);
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
   cursor: pointer;
   display: grid;
-  gap: var(--dos-space-2);
-  padding: var(--dos-space-3);
+  gap: var(--space-1);
+  padding: var(--space-2);
   text-align: left;
 }
 
-.candidate:hover,
+.candidate:hover {
+  border-color: var(--accent);
+}
+
 .candidate:focus-visible {
-  border-style: inset;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+  outline: none;
 }
 
 .current {
-  background: var(--dos-ok-crt);
+  background: var(--accent-2);
 }
 
 .preview {
   align-items: center;
-  background: var(--dos-terminal);
-  color: var(--dos-ink-invert);
+  background: var(--surface-inverse);
+  color: var(--ink-inverse);
   display: flex;
-  font-size: var(--dos-size-field-tag);
+  font-size: var(--text-meta);
   justify-content: center;
   min-height: 4.5rem;
   overflow-wrap: anywhere;
-  padding: var(--dos-space-2);
+  padding: var(--space-1);
   text-align: center;
 }
 
@@ -68,8 +74,8 @@
 }
 
 .previewText {
-  font-family: var(--dos-font-mono);
-  font-size: var(--dos-size-field-tag);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
   margin: 0;
   overflow-wrap: anywhere;
   text-align: left;
@@ -78,74 +84,75 @@
 }
 
 .name {
-  font-size: var(--dos-size-body);
+  font-size: var(--text-body);
   font-weight: 700;
 }
 
 .source {
-  color: var(--dos-ink-muted);
-  font-size: var(--dos-size-field-tag);
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
 }
 
 .iaBadge {
-  background: var(--dos-info);
-  color: var(--dos-ink-invert);
-  font-size: var(--dos-size-field-tag);
+  background: var(--accent-3);
+  color: var(--ink-inverse);
+  font-size: var(--text-meta);
   font-weight: 700;
-  padding: 0 var(--dos-space-1);
+  padding: 0 var(--space-1);
   width: fit-content;
 }
 
 .referenciaBadge {
-  color: var(--dos-info);
-  font-size: var(--dos-size-field-tag);
+  color: var(--accent-3);
+  font-size: var(--text-meta);
 }
 
 .count {
-  color: var(--dos-ink-muted);
-  font-size: var(--dos-size-meta);
-  margin-top: var(--dos-space-4);
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
+  margin-top: var(--space-3);
 }
 
 .actions {
   display: flex;
-  gap: var(--dos-space-3);
+  gap: var(--space-2);
   justify-content: center;
-  margin-top: var(--dos-space-4);
+  margin-top: var(--space-3);
 }
 
 .batchField {
   display: grid;
-  gap: var(--dos-space-2);
-  padding: var(--dos-space-3);
-  border: var(--dos-border-2) inset var(--dos-panel);
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: var(--border-control) solid var(--line-soft);
+  border-radius: var(--radius-md);
 }
 
 .empty {
-  color: var(--dos-ink-muted);
-  font-size: var(--dos-size-meta);
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
   font-style: italic;
 }
 
 .sourceSection {
-  margin-bottom: var(--dos-space-3);
+  margin-bottom: var(--space-2);
 }
 
 .sourceHeaderRow {
   align-items: center;
   display: flex;
-  gap: var(--dos-space-2);
+  gap: var(--space-1);
 }
 
 .sourceHeader {
-  font-size: var(--dos-size-body);
+  font-size: var(--text-body);
   font-weight: 700;
   margin: 0;
 }
 
 .sourceCount {
-  color: var(--dos-ink-muted);
-  font-size: var(--dos-size-field-tag);
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
 }
 
 .reasons {
