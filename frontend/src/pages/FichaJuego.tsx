@@ -265,7 +265,19 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
         />
       ),
     },
-    { clave: 'guia', node: <GuiaChecklist items={game.guiaChecklist ?? []} fallos={fallosIA} /> },
+    {
+      clave: 'guia',
+      node: (
+        <GuiaChecklist
+          items={game.guiaChecklist ?? []}
+          fallos={fallosIA}
+          game={game}
+          onDelete={(key) => mutations.deleteField.mutate(key)}
+          onSuggest={setSuggestField}
+          onText={(key, value) => mutations.setTextField.mutate({ key, value })}
+        />
+      ),
+    },
     {
       clave: 'trucos',
       node: (
