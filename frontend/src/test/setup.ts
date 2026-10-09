@@ -4,6 +4,7 @@ import { afterEach, beforeEach, vi } from 'vitest';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
 import type { RomCandidate } from '@/lib/api/roms';
 import type { Game, GameStatus, System } from '@/lib/domain/types';
+import { saveStatusStore } from '@/hooks/useSaveStatus';
 import { games, romCandidates, systems } from '@/mocks/seed';
 
 const clone = <T>(value: T): T => structuredClone(value);
@@ -30,6 +31,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  saveStatusStore.reset();
   vi.unstubAllGlobals();
   cleanup();
 });
@@ -107,7 +109,7 @@ function gameRoute(url: URL, method: string, init?: RequestInit) {
     const missing = missingRequired(game);
     return missing.length ? json({ error: 'El juego está incompleto', detail: { missing } }, 409) : json(clone(game));
   }
-  if (parts[4] === 'fields') return fieldRoute(game, parts[5], method, init);
+  if (parts[4] === 'fields') return fieldRoute(game, parts[5], method, init, parts[6]);
   if (parts[4] === 'media' && parts[6] === 'youtube' && method === 'POST') {
     game.video.video = { status: 'suggested', url: `/media/${game.systemId}/${game.id}/video.mp4`, source: 'YouTube' };
     return json({ jobId: 'yt-job' });
@@ -125,7 +127,8 @@ function isTextKey(key: string): key is (typeof TEXT_KEYS)[number] {
   return (TEXT_KEYS as readonly string[]).includes(key);
 }
 
-function fieldRoute(game: Game, key: string, method: string, init?: RequestInit) {
+function fieldRoute(game: Game, key: string, method: string, init?: RequestInit, accion?: string) {
+  if (accion === 'accept' && method === 'POST') return acceptRoute(game, key);
   if (method === 'DELETE') {
     if (isTextKey(key)) game.texts[key] = { status: 'empty', value: '' };
     return json(clone(game));
@@ -162,4 +165,14 @@ function gamesPage(url: URL) {
   const page = Number(url.searchParams.get('page') || 1);
   const perPage = Number(url.searchParams.get('perPage') || 50);
   return { items: clone(items.slice((page - 1) * perPage, page * perPage)), page, perPage, total: items.length };
+}
+
+function acceptRoute(game: Game, key: string) {
+  const campo = [game.images as Record<string, { status: string }>, game.video as Record<string, { status: string }>, game.texts as Record<string, { status: string }>, { review: game.review, cheats: game.cheats }]
+    .map((grupo) => grupo[key])
+    .find((valor) => valor !== undefined);
+  if (!campo) return json({ error: `Campo no encontrado: ${key}` }, 404);
+  if (campo.status !== 'suggested') return json({ error: `El campo ${key} no está sugerido` }, 409);
+  campo.status = 'manual';
+  return json(clone(game));
 }

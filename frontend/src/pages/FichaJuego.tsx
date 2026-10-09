@@ -1,41 +1,83 @@
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useIsMutating, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { DosButton, Panel, SectionHeader, SunkenBox } from '@/components/dos';
+import { Card } from '@/components/dos';
 import { SuggestionsModal } from '@/components/SuggestionsModal';
 import { IdentityBatchModal } from '@/components/IdentityBatchModal';
+import { useAutosave, useCongeladoMientrasEdita } from '@/hooks/useAutosave';
+import { useFichaProgress, type PendienteFicha } from '@/hooks/useFichaProgress';
 import { useGame } from '@/hooks/useGame';
-import { useGameMutations } from '@/hooks/useGameMutations';
+import { invalidarListas, useGameMutations } from '@/hooks/useGameMutations';
+import { saveStatusStore } from '@/hooks/useSaveStatus';
 import { useSystems } from '@/hooks/useSystems';
 import { soportaArcadeDb, soportaMsdos } from '@/lib/domain/arcade';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
+import type { Game } from '@/lib/domain/types';
 import { startPrecarga, startPrecargaMsdos } from '@/lib/api/games';
+import { ArchivoPanel } from './ficha/ArchivoPanel';
 import { CabinetSection } from './ficha/GabineteSection';
 import { CheatsSection } from './ficha/TrucosSection';
-import { CompletionDashboard } from './ficha/CompletionDashboard';
-import { GameHero } from './ficha/GameHero';
+import { FichaPage, type FichaSeccion } from './ficha/FichaPage';
 import { GuiaChecklist } from './ficha/ComoSeJuegaSection';
 import { IdentitySection } from './ficha/IdentidadSection';
 import { MagazineSection } from './ficha/RevistasSection';
 import { ManualSection } from './ficha/ManualSection';
 import { MediaSection } from './ficha/ImagenesSection';
-import { PrecargaBanner } from './ficha/PrecargaBanner';
+import { PrecargaBanner, PrecargaResumen } from './ficha/PrecargaBanner';
+import { PrecargaCard } from './ficha/PrecargaCard';
 import { PresentationSection } from './ficha/PresentacionSection';
 import { ReviewSection } from './ficha/ResenaSection';
 import { TextSection } from './ficha/TextosSection';
 import { SUGGESTABLE_LABELS, suggestionStatus } from './ficha/helpers';
+import { irAPendiente } from './ficha/navegacion';
+import { resumenPrecarga } from './ficha/precarga';
 import type { AccentSlot, PresentationHandle, SaveHandle } from './ficha/types';
-import styles from './ReadPages.module.css';
+import styles from './ficha/ficha.module.css';
 
 // Re-export: los tests y otros módulos importan GuiaChecklist desde acá.
 export { GuiaChecklist };
 
+/** Resuelve cuando no queda ninguna mutación en vuelo. */
+function esperarMutaciones(queryClient: QueryClient): Promise<void> {
+  if (queryClient.isMutating() === 0) return Promise.resolve();
+  return new Promise((resolve) => {
+    const cancelar = queryClient.getMutationCache().subscribe(() => {
+      if (queryClient.isMutating() === 0) {
+        cancelar();
+        resolve();
+      }
+    });
+  });
+}
+
 export function FichaJuego() {
   const { gameId = '' } = useParams();
+  const { data: game, error, isLoading, refetch } = useGame(gameId);
+
+  if (isLoading) return <p className={styles.meta}>Cargando ficha…</p>;
+  if (error || !game) {
+    return (
+      <div className={styles.ficha}>
+        <Link className={styles.volver} to="/juegos">&lt;&lt; Juegos</Link>
+        <Card band="var(--error)" title="Error">
+          <p className={styles.error}>Juego no encontrado.</p>
+        </Card>
+      </div>
+    );
+  }
+  return <FichaContenido game={game} key={game.id} refetchGame={() => void refetch()} />;
+}
+
+/**
+ * Orquestador de la ficha: carga las mutaciones, cablea el autosave a las secciones y arma la lista
+ * de secciones para `FichaPage`. El contrato de las secciones está documentado en `ficha/FichaPage.tsx`.
+ */
+function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGame: () => void }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const precargaJobId = searchParams.get('precarga');
   const navigate = useNavigate();
-  const { data: game, error, isLoading, refetch: refetchGame } = useGame(gameId);
-  const mutations = useGameMutations(gameId);
+  const queryClient = useQueryClient();
+  const mutations = useGameMutations(gameVivo.id);
   const { data: systems = [] } = useSystems();
   const [missingAfterReady, setMissingAfterReady] = useState<string[]>([]);
   const [suggestField, setSuggestField] = useState<string | null>(null);
@@ -43,44 +85,64 @@ export function FichaJuego() {
   const [fallosIA, setFallosIA] = useState<Record<string, string>>({});
   const [suggestIdentityBatch, setSuggestIdentityBatch] = useState(false);
   const [precargaLoading, setPrecargaLoading] = useState(false);
-  const sectionRefs = useRef<Record<string, SaveHandle | null>>({});
-  const presentationRef = useRef<PresentationHandle | null>(null);
+  const [aceptando, setAceptando] = useState(false);
   const [proximoAcento, setProximoAcento] = useState<AccentSlot>(0);
+  const manejadores = useRef<Record<string, SaveHandle | null>>({});
+  const presentationRef = useRef<PresentationHandle | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const revision = useRef(0);
 
-  const saveAll = () => {
-    for (const ref of Object.values(sectionRefs.current)) ref?.save();
+  const escribiendo = useIsMutating() > 0;
+  // El formulario no se recarga bajo los dedos: con un campo con foco o un guardado en vuelo
+  // las secciones siguen viendo el último dato previo; el Hero y el progreso usan siempre el vivo.
+  const game = useCongeladoMientrasEdita(gameVivo, containerRef, escribiendo);
+
+  const progress = useFichaProgress(gameVivo);
+  const missing = missingRequired(gameVivo);
+  const status = computeGameStatus(gameVivo);
+  const isArcade = soportaArcadeDb(gameVivo.systemId);
+  const isMsdos = soportaMsdos(gameVivo.systemId);
+
+  const autosave = useAutosave({
+    containerRef,
+    save: (secciones) => {
+      for (const clave of secciones) manejadores.current[clave]?.save();
+    },
+    waitIdle: () => esperarMutaciones(queryClient),
+    isSaving: () => queryClient.isMutating() > 0,
+  });
+
+  // Al salir de la ficha se refrescan los listados que se difirieron mientras se editaba.
+  useEffect(() => () => { void invalidarListas(queryClient); }, [queryClient]);
+
+  const registrar = (clave: string) => (handle: SaveHandle | null) => { manejadores.current[clave] = handle; };
+
+  /** Guarda lo pendiente y espera; `false` si el guardado falló (no hay que navegar). */
+  const guardarYEsperar = async (): Promise<boolean> => {
+    await autosave.flushAndWait();
+    return saveStatusStore.getSnapshot().kind !== 'error';
   };
 
-  // Cada clic en un color predominante alterna: primero el acento primario,
-  // después el secundario. Queda cargado en Presentación, no guardado — se
-  // persiste con "Guardar presentación" o "Guardar todo", como el resto.
+  const guardarYSalir = async () => {
+    if (await guardarYEsperar()) navigate('/juegos');
+  };
+  const exportar = async () => {
+    if (await guardarYEsperar()) navigate(`/exportar/${gameVivo.id}`);
+  };
+
+  // Cada clic en un color predominante alterna: primero el acento primario, después el secundario.
+  // Queda cargado en Presentación y se guarda solo, como el resto.
   const aplicarColorDominante = (hex: string) => {
     presentationRef.current?.setAccent(proximoAcento, hex);
     setProximoAcento((slot) => (slot === 0 ? 1 : 0));
   };
 
-  if (isLoading) return <p className={styles.meta}>Cargando ficha…</p>;
-  if (error || !game) {
-    return (
-      <div className={styles.page}>
-        <Link className={styles.backLink} to="/juegos">&lt;&lt; Juegos</Link>
-        <Panel>
-          <SectionHeader>Error</SectionHeader>
-          <SunkenBox><p className={styles.error}>Juego no encontrado.</p></SunkenBox>
-        </Panel>
-      </div>
-    );
-  }
-
-  const isArcade = soportaArcadeDb(game.systemId);
-  const isMsdos = soportaMsdos(game.systemId);
-
   const handlePrecarga = async () => {
     setPrecargaLoading(true);
     try {
       const result = isMsdos
-        ? await startPrecargaMsdos(game.id)
-        : await startPrecarga(game.id);
+        ? await startPrecargaMsdos(gameVivo.id)
+        : await startPrecarga(gameVivo.id);
       setSearchParams({ precarga: result.jobId });
     } catch {
       // Error silenciado: el usuario puede reintentar.
@@ -89,131 +151,139 @@ export function FichaJuego() {
     }
   };
 
-  const missing = missingRequired(game);
-  const status = computeGameStatus(game);
+  const aceptarUna = async (clave: string) => {
+    await autosave.flushAndWait();
+    if (clave === 'accent') {
+      // El color de acento no tiene endpoint de "aceptar": se confirma con el mismo PATCH que usa Presentación.
+      await mutations.patchGame.mutateAsync({ accent: 'manual', accentValue: gameVivo.accentValue, accent2Value: gameVivo.accent2Value });
+    } else {
+      await mutations.acceptField.mutateAsync(clave);
+    }
+  };
 
-  return (
-    <div className={styles.page}>
-      {precargaJobId ? (
-        <PrecargaBanner
-          jobId={precargaJobId}
-          onComplete={() => {
-            setSearchParams({});
-            void refetchGame();
-          }}
-        />
-      ) : null}
-      {isArcade && !precargaJobId ? (
-        <Panel>
-          <SectionHeader>PRECARGA DE ARCADEDB</SectionHeader>
-          <SunkenBox className={styles.stack}>
-            <p className={styles.meta}>Buscar datos del juego en Arcade Database (identidad, imágenes, sinopsis, trucos, gabinete).</p>
-            <div className={styles.toolbar}>
-              <DosButton disabled={precargaLoading} onClick={handlePrecarga} variant="primary-small">
-                {precargaLoading ? 'Iniciando…' : 'Precargar ArcadeDB'}
-              </DosButton>
-            </div>
-          </SunkenBox>
-        </Panel>
-      ) : null}
-      {isMsdos && !precargaJobId ? (
-        <Panel>
-          <SectionHeader>PRECARGA DE MSDOS</SectionHeader>
-          <SunkenBox className={styles.stack}>
-            <p className={styles.meta}>Buscar datos del juego en Launchbox + IA (año, imágenes, identidad, sinopsis).</p>
-            <div className={styles.toolbar}>
-              <DosButton disabled={precargaLoading} onClick={handlePrecarga} variant="primary-small">
-                {precargaLoading ? 'Iniciando…' : 'Precargar Launchbox + IA'}
-              </DosButton>
-            </div>
-          </SunkenBox>
-        </Panel>
-      ) : null}
-      <GameHero
-        game={game}
-        systems={systems}
-        missing={missing}
-        onSaveAll={saveAll}
-        onSystemChange={(systemId) => mutations.patchGame.mutate({ systemId })}
-        onMarkReady={() => {
-          setMissingAfterReady(missing);
-          if (missing.length === 0) void mutations.markReady.mutateAsync();
-        }}
-        onSaveTratamiento={(tratamiento) => mutations.patchGame.mutate({ tratamiento })}
-        onSaveRomRef={(romRef) => mutations.patchGame.mutate({ romRef })}
-        onUploadRom={(file) => mutations.uploadRom.mutate(file)}
-        onExport={() => { saveAll(); navigate(`/exportar/${game.id}`); }}
-        onPickColor={aplicarColorDominante}
-        proximoAcento={proximoAcento}
-        status={status}
-      />
+  const aceptarTodo = async () => {
+    setAceptando(true);
+    try {
+      await autosave.flushAndWait();
+      // De a una: cada aceptación reescribe el game.json del juego.
+      for (const pendiente of progress.sugerencias) {
+        if (pendiente.aceptarClave) await aceptarUna(pendiente.aceptarClave);
+      }
+    } catch {
+      // El error queda en el indicador de la TopBar; las que faltan siguen como sugeridas.
+    } finally {
+      setAceptando(false);
+    }
+  };
 
+  /** Recorre las sugerencias: lleva a la próxima y abre el modal de candidatas si el campo lo admite. */
+  const revisarUnaPorUna = () => {
+    const lista = progress.sugerencias;
+    if (lista.length === 0) return;
+    const pendiente: PendienteFicha = lista[revision.current % lista.length];
+    revision.current += 1;
+    if (containerRef.current) irAPendiente(containerRef.current, pendiente, false);
+    if (pendiente.aceptarClave && SUGGESTABLE_LABELS[pendiente.aceptarClave]) setSuggestField(pendiente.aceptarClave);
+  };
+
+  const resumen = useMemo(() => resumenPrecarga(gameVivo), [gameVivo]);
+  const fuente = resumen.fuentes.length === 1
+    ? resumen.fuentes[0]
+    : isArcade ? 'ArcadeDB' : isMsdos ? 'Launchbox + IA' : 'Las fuentes';
+
+  const banner = precargaJobId ? (
+    <PrecargaBanner
+      jobId={precargaJobId}
+      onComplete={() => {
+        setSearchParams({});
+        refetchGame();
+      }}
+    />
+  ) : (
+    <PrecargaResumen
+      aceptando={aceptando}
+      fuente={fuente}
+      onAcceptAll={() => void aceptarTodo()}
+      onReviewOneByOne={revisarUnaPorUna}
+      resumen={resumen}
+    />
+  );
+
+  const avisos = (
+    <>
       {mutations.patchGame.error ? (
-        <Panel>
-          <SectionHeader>NO SE GUARDÓ EL CAMBIO:</SectionHeader>
-          <SunkenBox>
-            <p className={styles.error}>{mutations.patchGame.error.message}</p>
-          </SunkenBox>
-        </Panel>
+        <Card band="var(--error)" title="NO SE GUARDÓ EL CAMBIO:">
+          <p className={styles.error}>{mutations.patchGame.error.message}</p>
+        </Card>
       ) : null}
-
-      <CompletionDashboard game={game} missing={missing} />
 
       {missingAfterReady.length > 0 ? (
-        <Panel>
-          <SectionHeader>NO SE PUEDE MARCAR COMO LISTO — faltan campos requeridos:</SectionHeader>
-          <SunkenBox>
-            {missingAfterReady.map((item) => <p className={styles.error} key={item}>- {item}</p>)}
-          </SunkenBox>
-        </Panel>
+        <Card band="var(--error)" title="NO SE PUEDE MARCAR COMO LISTO — faltan campos requeridos:">
+          {missingAfterReady.map((item) => <p className={styles.error} key={item}>- {item}</p>)}
+        </Card>
       ) : null}
 
-      {game.errors.length > 0 ? (
-        <Panel>
-          <SectionHeader>ERRORES DE FORMATO (bloquean el export):</SectionHeader>
-          <SunkenBox>
-            {game.errors.map((item) => (
-              <p className={styles.error} key={`${item.field}-${item.message}`}>
-                - {item.field} — {item.message}
-              </p>
-            ))}
-          </SunkenBox>
-        </Panel>
+      {gameVivo.errors.length > 0 ? (
+        <Card band="var(--error)" title="ERRORES DE FORMATO (bloquean el export):">
+          {gameVivo.errors.map((item) => (
+            <p className={styles.error} key={`${item.field}-${item.message}`}>
+              - {item.field} — {item.message}
+            </p>
+          ))}
+        </Card>
       ) : null}
+    </>
+  );
 
-      <div className={styles.sections}>
-        <IdentitySection ref={(r) => { sectionRefs.current.identity = r; }} game={game} onSave={(identity) => mutations.patchGame.mutate({ identity })} onSuggest={setSuggestField} onSuggestBatch={() => setSuggestIdentityBatch(true)} />
+  const secciones: FichaSeccion[] = [
+    {
+      clave: 'identidad',
+      node: <IdentitySection ref={registrar('identidad')} game={game} onSave={(identity) => mutations.patchGame.mutate({ identity })} onSuggest={setSuggestField} onSuggestBatch={() => setSuggestIdentityBatch(true)} />,
+    },
+    {
+      clave: 'imagenes',
+      node: (
         <MediaSection
           game={game}
           onDelete={(key) => mutations.deleteField.mutate(key)}
           onSuggestVideo={() => setSuggestField('video')}
           onSuggestImage={(key) => setSuggestField(key)}
           onUpload={(key, file) => mutations.uploadMedia.mutate({ key, file })}
-          onGalleryChanged={() => void refetchGame()}
+          onGalleryChanged={refetchGame}
         />
+      ),
+    },
+    {
+      clave: 'textos',
+      node: (
         <TextSection
-          ref={(r) => { sectionRefs.current.texts = r; }}
+          ref={registrar('textos')}
           game={game}
           onDelete={(key) => mutations.deleteField.mutate(key)}
           onSuggest={setSuggestField}
           onText={(key, value) => mutations.setTextField.mutate({ key, value })}
         />
-        <GuiaChecklist items={game.guiaChecklist ?? []} fallos={fallosIA} />
-        <ReviewSection
-          ref={(r) => { sectionRefs.current.review = r; }}
-          game={game}
-          onReview={(score, cats) => mutations.setReview.mutate({ score, cats })}
-          onSuggest={() => setSuggestField('review')}
-        />
+      ),
+    },
+    { clave: 'guia', node: <GuiaChecklist items={game.guiaChecklist ?? []} fallos={fallosIA} /> },
+    {
+      clave: 'trucos',
+      node: (
         <CheatsSection
-          ref={(r) => { sectionRefs.current.cheats = r; }}
+          ref={registrar('trucos')}
           game={game}
           onCheats={(groups) => mutations.setCheats.mutate({ groups })}
           onDelete={() => mutations.deleteField.mutate('cheats')}
           onSuggest={() => setSuggestField('cheats')}
         />
+      ),
+    },
+    {
+      clave: 'presentacion',
+      soloAlSalir: true, // un hex a medio escribir no es un color válido
+      node: (
         <PresentationSection
-          ref={(r) => { sectionRefs.current.presentation = r; presentationRef.current = r; }}
+          ref={(handle) => { manejadores.current.presentacion = handle; presentationRef.current = handle; }}
           game={game}
           onSave={(accentValue, accent2Value) => mutations.patchGame.mutate({
             accent: accentValue ? 'manual' : 'empty',
@@ -221,22 +291,89 @@ export function FichaJuego() {
             accent2Value,
           })}
         />
-        <ManualSection game={game} onUpload={(file) => mutations.uploadManual.mutate(file)} onDelete={(id) => mutations.deleteManual.mutate(id)} />
-        <MagazineSection game={game} />
-        <CabinetSection game={game} />
-      </div>
+      ),
+    },
+    {
+      clave: 'resena',
+      node: (
+        <ReviewSection
+          ref={registrar('resena')}
+          game={game}
+          onReview={(score, cats) => mutations.setReview.mutate({ score, cats })}
+          onSuggest={() => setSuggestField('review')}
+        />
+      ),
+    },
+    {
+      clave: 'manual',
+      node: (
+        <>
+          <ManualSection game={game} onUpload={(file) => mutations.uploadManual.mutate(file)} onDelete={(id) => mutations.deleteManual.mutate(id)} />
+          <MagazineSection game={game} />
+        </>
+      ),
+    },
+  ];
+
+  const lateral: FichaSeccion[] = [
+    {
+      clave: 'archivo',
+      node: (
+        <ArchivoPanel
+          ref={registrar('archivo')}
+          game={game}
+          onSaveRomRef={(romRef) => mutations.patchGame.mutate({ romRef })}
+          onSaveTratamiento={(tratamiento) => mutations.patchGame.mutate({ tratamiento })}
+          onUploadRom={(file) => mutations.uploadRom.mutate(file)}
+        />
+      ),
+    },
+    { clave: 'gabinete', node: <CabinetSection game={game} /> },
+    {
+      clave: 'precarga',
+      node: (isArcade || isMsdos) && !precargaJobId
+        ? <PrecargaCard cargando={precargaLoading} onPrecargar={() => void handlePrecarga()} tipo={isMsdos ? 'msdos' : 'arcade'} />
+        : null,
+    },
+  ];
+
+  return (
+    <>
+      <FichaPage
+        autosave={autosave}
+        avisos={avisos}
+        banner={banner}
+        containerRef={containerRef}
+        game={gameVivo}
+        lateral={lateral}
+        onAcceptKey={(clave) => void aceptarUna(clave).catch(() => undefined)}
+        onExport={() => void exportar()}
+        onMarkReady={() => {
+          setMissingAfterReady(missing);
+          if (missing.length === 0) void mutations.markReady.mutateAsync().catch(() => undefined);
+        }}
+        onPickColor={aplicarColorDominante}
+        onSaveDraft={() => void guardarYSalir()}
+        onSystemChange={(systemId) => mutations.patchGame.mutate({ systemId })}
+        progress={progress}
+        proximoAcento={proximoAcento}
+        secciones={secciones}
+        status={status}
+        systems={systems}
+      />
 
       {suggestField ? (
         <SuggestionsModal
           fieldKey={suggestField}
-          gameId={game.id}
+          gameId={gameVivo.id}
           hasContent={suggestionStatus(game, suggestField).hasContent}
           isManual={suggestionStatus(game, suggestField).isManual}
           label={SUGGESTABLE_LABELS[suggestField]}
           onApply={(candidateId) => mutations.applySuggestion.mutate({ key: suggestField, candidateId })}
           onClose={() => setSuggestField(null)}
           onOutcome={(key, motivo) => setFallosIA((prev) => {
-            const { [key]: _anterior, ...resto } = prev;
+            const resto = { ...prev };
+            delete resto[key];
             return motivo ? { ...resto, [key]: motivo } : resto;
           })}
           open
@@ -246,12 +383,12 @@ export function FichaJuego() {
 
       {suggestIdentityBatch ? (
         <IdentityBatchModal
-          gameId={game.id}
+          gameId={gameVivo.id}
           open={suggestIdentityBatch}
           onClose={() => setSuggestIdentityBatch(false)}
-          onApplied={() => void refetchGame()}
+          onApplied={refetchGame}
         />
       ) : null}
-    </div>
+    </>
   );
 }

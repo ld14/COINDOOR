@@ -26,6 +26,11 @@ export function setCheats(gameId: string, cheats: Pick<CheatsField, 'groups'>) {
   });
 }
 
+/** Pasa un campo `suggested` a `manual` conservando valor y `source` (endpoint aditivo del backend). */
+export function acceptField(gameId: string, key: string) {
+  return fetchJson<Game>(`/games/${gameId}/fields/${key}/accept`, { method: 'POST' });
+}
+
 export function parseCheatsText(gameId: string, text: string) {
   return fetchJson<Pick<CheatsField, 'groups'>>(`/games/${gameId}/fields/cheats/parse-text`, {
     method: 'POST',

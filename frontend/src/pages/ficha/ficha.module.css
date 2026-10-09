@@ -1,0 +1,393 @@
+/*
+ * Andamiaje de la ficha (feature 019, DESIGN_SPEC §5.1). Solo tokens nuevos.
+ * Los estilos internos de cada sección siguen en ReadPages.module.css hasta que la Ola 4 los migre.
+ */
+
+.ficha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.meta {
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
+  margin: 0;
+}
+
+.error {
+  color: var(--error);
+  font-weight: 600;
+  margin: 0;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.volver {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---------- Crumbs ---------- */
+
+.crumbs {
+  align-items: center;
+  color: var(--ink-muted);
+  display: flex;
+  font-size: var(--text-label);
+  gap: var(--space-2);
+}
+
+.crumbs a {
+  color: var(--ink-muted);
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  align-items: flex-start;
+  display: flex;
+  gap: var(--space-5);
+}
+
+.cover {
+  align-items: center;
+  background: var(--accent-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-pop);
+  display: flex;
+  flex: none;
+  height: 150px;
+  justify-content: center;
+  overflow: hidden;
+  transform: rotate(-3deg);
+  width: 112px;
+}
+
+.coverImg {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.coverVacia {
+  color: var(--ink-on-accent-2);
+  font-size: var(--text-meta);
+  padding: var(--space-2);
+  text-align: center;
+}
+
+.heroInfo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.heroBadges {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.sysChip {
+  border: var(--border-control) solid var(--line-soft);
+  border-radius: var(--radius-pill);
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  padding: 0 var(--space-3);
+  word-break: break-all;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 400;
+  line-height: 1.05;
+  margin: 0;
+  overflow-wrap: anywhere;
+  text-shadow: 2px 2px 0 var(--accent);
+}
+
+.heroMeta {
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.progreso {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  max-width: 460px;
+}
+
+.progreso > :first-child {
+  flex: 1 1 200px;
+}
+
+.progresoTexto {
+  color: var(--ink-muted);
+  font-size: var(--text-label);
+}
+
+.progresoTexto strong {
+  color: var(--ink);
+}
+
+.faltan {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.faltanRotulo {
+  font-size: var(--text-label);
+  font-weight: 700;
+}
+
+.faltanOk {
+  color: var(--ok);
+  font-size: var(--text-label);
+  font-weight: 700;
+}
+
+.pildoras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pildora {
+  background: var(--surface-1);
+  border: var(--border-control) solid var(--error);
+  border-radius: var(--radius-pill);
+  color: var(--error);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-meta);
+  font-weight: 700;
+  padding: 2px var(--space-3);
+}
+
+.pildora:hover {
+  background: var(--error);
+  color: var(--surface-1);
+}
+
+.heroAcciones {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.systemSelect {
+  max-width: 260px;
+}
+
+.paleta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.paletaRotulo {
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.muestras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.muestra {
+  align-items: center;
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  cursor: crosshair;
+  display: inline-flex;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+}
+
+.muestraColor {
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  height: 18px;
+  width: 18px;
+}
+
+.muestraHex {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+}
+
+/* ---------- Banner de precarga ---------- */
+
+.banner {
+  align-items: center;
+  background: var(--surface-1);
+  border: var(--border-card) solid var(--line);
+  border-left: var(--space-3) solid var(--accent-2);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+}
+
+.bannerTexto {
+  display: flex;
+  flex: 1 1 320px;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bannerTitulo {
+  margin: 0;
+}
+
+.bannerAcciones {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.filaProgreso {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+}
+
+.nombre {
+  font-weight: 600;
+}
+
+/* ---------- Columnas ---------- */
+
+.cols {
+  align-items: start;
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 1fr) var(--side-column);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: sticky;
+  top: calc(var(--space-6) * 2);
+}
+
+/* Ancla de cada sección: deja libre el StepNav sticky al hacer scroll. */
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  scroll-margin-top: calc(var(--space-6) * 2 + var(--space-4));
+}
+
+.seccion:empty {
+  display: none;
+}
+
+.cols :global([data-resaltado='true']) {
+  outline: 3px solid var(--accent-2);
+  outline-offset: 3px;
+}
+
+/* ---------- Archivo del juego ---------- */
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.etiqueta {
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.archivoNombre {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  overflow-wrap: anywhere;
+}
+
+.adjuntar {
+  cursor: pointer;
+  display: inline-block;
+}
+
+.archivoInput {
+  height: 1px;
+  opacity: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.adjuntarBoton {
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  display: inline-block;
+  font-size: var(--text-label);
+  font-weight: 600;
+  padding: var(--space-1) var(--space-3);
+}
+
+.archivoInput:focus-visible + .adjuntarBoton {
+  box-shadow: var(--focus-ring);
+}
+
+/* ---------- Responsive: por debajo de 900 px la columna lateral baja ---------- */
+
+@media (max-width: 56.25rem) {
+  .hero {
+    flex-direction: column;
+  }
+
+  .cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .side {
+    position: static;
+  }
+
+  .title {
+    font-size: calc(var(--text-title) * 0.7);
+  }
+}
