@@ -106,12 +106,13 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
   const isArcade = soportaArcadeDb(gameVivo.systemId);
   const isMsdos = soportaMsdos(gameVivo.systemId);
 
-  // Candidatas del primer slot de imagen sugerido: la sección no llama a la API, las busca el orquestador.
-  // Sin imagen sugerida no se busca nada; si la búsqueda falla, la fila no aparece y queda el modal.
-  const imagenSugerida: ImageKey | null = FIELDDEFS.images.find((f) => game.images[f.key]?.status === 'suggested')?.key ?? null;
-  const candidatasJob = useSuggestionsJob(gameVivo.id, imagenSugerida ?? '', imagenSugerida !== null);
-  const candidatasImagen = imagenSugerida && candidatasJob.phase === 'resultados' && candidatasJob.result
-    ? { key: imagenSugerida, candidatos: candidatasJob.result.candidatos.filter((c) => c.key === imagenSugerida) } // evita candidatas de otro slot en el render previo al reinicio del job
+  // Candidatas de un slot de imagen: la sección no llama a la API, las busca el orquestador. La búsqueda
+  // sale a la red, así que corre SOLO a pedido (clic en ↻ o «Cambiar»), nunca al abrir la ficha
+  // (tech-stack §Convenciones, ADR-0015). Si falla, la fila no aparece y queda el modal.
+  const [candidatasPedidas, setCandidatasPedidas] = useState<ImageKey | null>(null);
+  const candidatasJob = useSuggestionsJob(gameVivo.id, candidatasPedidas ?? '', candidatasPedidas !== null);
+  const candidatasImagen = candidatasPedidas && candidatasJob.phase === 'resultados' && candidatasJob.result
+    ? { key: candidatasPedidas, candidatos: candidatasJob.result.candidatos.filter((c) => c.key === candidatasPedidas) } // evita candidatas de otro slot en el render previo al reinicio del job
     : null;
   const numeroDe = (clave: string) => progress.secciones.find((s) => s.clave === clave)?.numero;
 
@@ -265,7 +266,7 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
           game={game}
           onDelete={(key) => mutations.deleteField.mutate(key)}
           onPickCandidata={(key, candidateId) => mutations.applySuggestion.mutate({ key, candidateId })}
-          onSuggestImage={(key) => setSuggestField(key)}
+          onSuggestImage={(key) => { setCandidatasPedidas(key); setSuggestField(key); }}
           onUpload={(key, file) => mutations.uploadMedia.mutate({ key, file })}
         />
       ),
