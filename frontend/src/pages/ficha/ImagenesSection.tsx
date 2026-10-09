@@ -1,154 +1,151 @@
-import { type ReactNode, useState } from 'react';
-import { DosButton, FieldTag, Panel, SectionHeader } from '@/components/dos';
-import { ImageModal } from '@/components/ImageModal';
+import { useEffect, useRef, useState } from 'react';
+import { Card, DosButton, OriginChip } from '@/components/dos';
+import { Dropzone } from '@/components/dos/entrada';
 import { GalleryPanel } from '@/components/GalleryPanel';
-import { YoutubeDownload } from '@/components/YoutubeDownload';
+import { ImageModal } from '@/components/ImageModal';
 import { FIELDDEFS } from '@/lib/domain/types';
 import type { Game, ImageKey, MediaField, VideoKey } from '@/lib/domain/types';
+import { useFichaAutosave } from './autosaveContext';
 import { confirmManualDelete } from './helpers';
-import styles from '../ReadPages.module.css';
+import { VideoSection } from './VideoSection';
+import styles from './ImagenesSection.module.css';
 
-export function MediaSection({
-  game,
-  onDelete,
-  onSuggestVideo,
-  onSuggestImage,
-  onUpload,
-  onGalleryChanged,
-}: {
+// Los pasos 2 (Imágenes) y 3 (Video) son dos Cards; Video vive en su archivo pero se monta junto
+// con las imágenes mientras el orquestador tenga una sola sección `imagenes` (ver reporte de la unidad).
+export { VideoSection };
+
+const SUGERIR = 'Sugerir desde ArcadeDB';
+/** Si una aceptación no se refleja en la ficha (falló), se sigue con la próxima pasado este tiempo. */
+const ESPERA_ACEPTAR_MS = 10000;
+
+interface MediaSectionProps {
   game: Game;
   onDelete: (key: ImageKey | VideoKey) => void;
   onSuggestVideo: () => void;
   onSuggestImage: (key: ImageKey) => void;
   onUpload: (key: ImageKey | VideoKey, file: File) => void;
   onGalleryChanged: () => void;
-}) {
-  // Un reemplazo escribe el mismo video.mp4: sin cambiar el src, el reproductor
-  // seguiría mostrando el archivo viejo desde la caché.
-  const [videoVersion, setVideoVersion] = useState(0);
+}
 
+export function MediaSection({ game, onDelete, onSuggestVideo, onSuggestImage, onUpload, onGalleryChanged }: MediaSectionProps) {
   return (
     <>
-      <Panel>
-        <SectionHeader>IMÁGENES</SectionHeader>
-        <div className={styles.mediaGrid}>
-          {FIELDDEFS.images.map((field) => (
-            <MediaCard
-              field={game.images[field.key]}
-              key={field.key}
-              label={field.label}
-              mediaKey={field.key}
-              onDelete={onDelete}
-              onSuggest={() => onSuggestImage(field.key)}
-              onUpload={onUpload}
-              ratio={field.ratio}
-            />
-          ))}
-        </div>
-      </Panel>
+      <ImagenesSection game={game} onDelete={onDelete} onSuggestImage={onSuggestImage} onUpload={onUpload} />
+      <VideoSection game={game} onDelete={onDelete} onSuggestVideo={onSuggestVideo} onUpload={onUpload} />
       <GalleryPanel gallery={game.gallery ?? []} gameId={game.id} onChanged={onGalleryChanged} />
-      <Panel>
-        <SectionHeader>VIDEO</SectionHeader>
-        <div className={styles.mediaGrid}>
-          {FIELDDEFS.videos.map((field) => (
-            <MediaCard
-              field={game.video[field.key]}
-              key={field.key}
-              label={field.label}
-              mediaKey={field.key}
-              onDelete={onDelete}
-              onSuggest={onSuggestVideo}
-              onUpload={onUpload}
-              ratio={field.ratio}
-              version={videoVersion}
-            >
-              <YoutubeDownload
-                current={game.video[field.key]}
-                gameId={game.id}
-                onDownloaded={() => setVideoVersion(Date.now())}
-              />
-            </MediaCard>
-          ))}
-        </div>
-      </Panel>
     </>
   );
 }
 
-function MediaCard({
-  children,
-  field,
-  label,
-  mediaKey,
-  onDelete,
-  onSuggest,
-  onUpload,
-  ratio,
-  version,
-}: {
-  children?: ReactNode;
+export function ImagenesSection({ game, onDelete, onSuggestImage, onUpload }: Omit<MediaSectionProps, 'onSuggestVideo' | 'onGalleryChanged'>) {
+  const { aceptar } = useFichaAutosave();
+  const sugeridas = FIELDDEFS.images.filter((f) => game.images[f.key]?.status === 'suggested').map((f) => f.key);
+  const cargadas = FIELDDEFS.images.filter((f) => (game.images[f.key]?.status ?? 'empty') !== 'empty').length;
+
+  // "Aceptar las N": de a una, esperando que la ficha refleje cada aceptación (cada una reescribe el game.json).
+  const [cola, setCola] = useState<string[]>([]);
+  const emitida = useRef<string | null>(null);
+  useEffect(() => {
+    if (cola.length === 0) {
+      emitida.current = null;
+      return undefined;
+    }
+    const cabeza = cola[0];
+    if (emitida.current !== cabeza) {
+      emitida.current = cabeza;
+      aceptar(cabeza);
+    }
+    if (game.images[cabeza as ImageKey]?.status !== 'suggested') {
+      setCola((actual) => actual.slice(1));
+      return undefined;
+    }
+    const espera = setTimeout(() => setCola((actual) => actual.slice(1)), ESPERA_ACEPTAR_MS);
+    return () => clearTimeout(espera);
+  }, [cola, game.images, aceptar]);
+
+  return (
+    <Card
+      actions={sugeridas.length > 0 ? (
+        <DosButton disabled={cola.length > 0} onClick={() => setCola(sugeridas)} size="sm" variant="ghost">
+          ✓ Aceptar las {sugeridas.length}
+        </DosButton>
+      ) : undefined}
+      band="var(--accent-2)"
+      bandInk="var(--ink-on-accent-2)"
+      hint={`${cargadas} de ${FIELDDEFS.images.length} · arrastrá para reemplazar`}
+      number={2}
+      title="Imágenes"
+    >
+      <div className={styles.grid}>
+        {FIELDDEFS.images.map((field) => (
+          <ImageSlot
+            field={game.images[field.key]}
+            key={field.key}
+            label={field.label}
+            mediaKey={field.key}
+            onAccept={() => aceptar(field.key)}
+            onDelete={onDelete}
+            onSuggest={() => onSuggestImage(field.key)}
+            onUpload={onUpload}
+            ratio={field.ratio}
+            required={field.required}
+          />
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function ImageSlot({ field, label, mediaKey, onAccept, onDelete, onSuggest, onUpload, ratio, required }: {
   field?: MediaField;
   label: string;
-  mediaKey: ImageKey | VideoKey;
-  onDelete: (key: ImageKey | VideoKey) => void;
-  onSuggest?: () => void;
-  onUpload: (key: ImageKey | VideoKey, file: File) => void;
+  mediaKey: ImageKey;
+  onAccept: () => void;
+  onDelete: (key: ImageKey) => void;
+  onSuggest: () => void;
+  onUpload: (key: ImageKey, file: File) => void;
   ratio: string;
-  version?: number;
+  required: boolean;
 }) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const status = field?.status ?? 'empty';
-  const isVideo = mediaKey === 'video';
+  const bloquea = status === 'empty' && required;
+  const aceptada = status === 'manual' && !!field?.source && field.source.trim().toLowerCase() !== 'manual';
+  const clase = [styles.slot, status === 'suggested' ? styles.suggested : '', bloquea ? styles.blocking : ''].filter(Boolean).join(' ');
 
   return (
-    <Panel className={styles.stack}>
-      <div className={styles.fieldTop}>
+    <div aria-label={label} className={clase} data-campo={mediaKey} role="group">
+      <div className={styles.head}>
         <span className={styles.name}>{label}</span>
-        <FieldTag status={status} />
       </div>
+      <OriginChip required={bloquea} source={field?.source} status={status} />
+      <button aria-label={`Sugerir ${label}`} className={styles.suggest} onClick={onSuggest} title={SUGERIR} type="button">↻</button>
       <div className={styles.preview}>
         {field?.url ? (
-          isVideo ? (
-            <video
-              className={styles.videoPlayer}
-              controls
-              preload="metadata"
-              src={version ? `${field.url}?v=${version}` : field.url}
-            />
-          ) : (
-            <button
-              className={styles.imageButton}
-              onClick={() => setImageModalOpen(true)}
-              type="button"
-            >
-              <img alt={label} className={styles.previewImage} src={field.url} />
-            </button>
-          )
+          <button className={styles.imageButton} onClick={() => setImageModalOpen(true)} type="button">
+            <img alt={label} className={styles.image} src={field.url} />
+          </button>
         ) : `${label.toLowerCase()} · ${ratio} · No Disponible`}
       </div>
-      <input
-        aria-label={`Cargar ${label}`}
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file) onUpload(mediaKey, file);
-        }}
-        type="file"
-      />
-      <div className={styles.toolbar}>
-        {onSuggest ? <DosButton onClick={onSuggest} variant="ghost-small">Sugerir</DosButton> : null}
-        {status !== 'empty' ? (
-          <DosButton onClick={() => confirmManualDelete(status, () => onDelete(mediaKey))} variant="danger-small">Borrar</DosButton>
-        ) : null}
-      </div>
-      {children}
-      {!isVideo && field?.url ? (
-        <ImageModal
-          alt={label}
-          onClose={() => setImageModalOpen(false)}
-          open={imageModalOpen}
-          src={field.url}
-        />
+      {bloquea ? <span className={styles.blocks}>✕ Bloquea la exportación</span> : null}
+      {status === 'suggested' ? (
+        <div className={styles.actions}>
+          <DosButton onClick={onAccept} size="sm" variant="primary">✓ Aceptar</DosButton>
+          <DosButton onClick={onSuggest} size="sm" variant="ghost">Cambiar</DosButton>
+        </div>
       ) : null}
-    </Panel>
+      {aceptada ? <span className={styles.accepted}>✓ Aceptada</span> : null}
+      <Dropzone
+        accept="image/*"
+        label={field?.url ? 'Soltá otra imagen para reemplazar' : 'Soltá una imagen acá o pegala con Ctrl+V'}
+        onFile={(file) => onUpload(mediaKey, file)}
+      />
+      {status !== 'empty' ? (
+        <DosButton onClick={() => confirmManualDelete(status, () => onDelete(mediaKey))} size="sm" variant="danger">Borrar</DosButton>
+      ) : null}
+      {field?.url ? (
+        <ImageModal alt={label} onClose={() => setImageModalOpen(false)} open={imageModalOpen} src={field.url} />
+      ) : null}
+    </div>
   );
 }

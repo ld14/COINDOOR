@@ -4,7 +4,7 @@ import { DosButton, DosInput, ProgressBar } from '@/components/dos';
 import { cancelJob, getJob } from '@/lib/api/jobs';
 import { startYoutubeDownload } from '@/lib/api/media';
 import type { MediaField } from '@/lib/domain/types';
-import styles from '@/pages/ReadPages.module.css';
+import styles from './YoutubeDownload.module.css';
 
 const POLL_MS = 500;
 const HOSTS = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be']);
@@ -70,21 +70,22 @@ export function YoutubeDownload({ gameId, current, onDownloaded }: YoutubeDownlo
   const progress = job?.progress ?? 0;
 
   return (
-    <form className={styles.stack} onSubmit={submit}>
+    <form className={styles.form} onSubmit={submit}>
       <label className={styles.field}>
         <span className={styles.label}>URL de YouTube</span>
         <DosInput
           disabled={download.isPending}
           onChange={(event) => setUrl(event.target.value)}
+          placeholder="https://youtu.be/earaCnLVL98"
           value={url}
         />
       </label>
-      <div className={styles.toolbar}>
+      <div className={styles.row}>
         <DosButton disabled={download.isPending} type="submit" variant="primary-small">Descargar</DosButton>
       </div>
       {download.isPending ? (
         <>
-          <div className={styles.fieldTop}>
+          <div className={styles.row}>
             <span className={styles.meta}>Descargando de YouTube… {progress}%</span>
             <DosButton
               disabled={!job}

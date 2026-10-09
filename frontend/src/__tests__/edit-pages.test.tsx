@@ -153,9 +153,9 @@ describe('Edición de ficha', () => {
     renderApp('/juegos/mslug');
 
     await screen.findByRole('heading', { name: 'Metal Slug' });
-    const logoCard = screen.getByText('Logo').closest('div')!.parentElement!;
+    const logoCard = screen.getByRole('group', { name: 'Logo' });
     const file = new File(['data'], 'nombre-cliente.png', { type: 'image/png' });
-    const input = within(logoCard).getByLabelText('Cargar Logo');
+    const input = within(logoCard).getByTestId('dropzone-input');
     await userEvent.upload(input, file);
 
     await waitFor(() => expect(within(logoCard).getByRole('img', { name: 'Logo' })).toHaveAttribute('src', '/media/arcade/mslug/logo.jpg'));
