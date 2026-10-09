@@ -1,0 +1,30 @@
+.demo {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.field {
+  display: grid;
+  font-size: var(--text-label);
+  font-weight: 600;
+  gap: var(--space-1);
+  align-content: start;
+}

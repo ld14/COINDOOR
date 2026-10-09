@@ -1,22 +1,33 @@
 .badge {
-  background: var(--dos-terminal);
-  font-size: var(--dos-size-meta);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-pill);
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: var(--text-meta);
   font-weight: 700;
-  padding: var(--dos-space-titlebar-y) var(--dos-space-badge-x);
+  padding: 2px var(--space-3);
   white-space: nowrap;
 }
 
-.ready {
-  border: var(--dos-px-1) solid var(--dos-ok);
-  color: var(--dos-ok-crt);
+.incomplete {
+  background: var(--accent-2);
+  color: var(--ink-on-accent-2);
 }
 
-.incomplete {
-  border: var(--dos-px-1) solid var(--dos-warn);
-  color: var(--dos-warn-crt);
+.ready {
+  background: var(--surface-1);
+  border-color: var(--ok);
+  color: var(--ok);
 }
 
 .error {
-  border: var(--dos-px-1) solid var(--dos-error);
-  color: var(--dos-error-crt);
+  background: var(--surface-1);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.exported {
+  background: var(--surface-1);
+  border-color: var(--accent-3);
+  color: var(--accent-3);
 }

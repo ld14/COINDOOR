@@ -1,51 +1,74 @@
 .button {
-  border: var(--dos-border-2) solid var(--dos-edge-dark);
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink);
   cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
   font-weight: 700;
-  letter-spacing: 0.03em;
+  line-height: 1.2;
+  padding: var(--space-2) var(--space-4);
+}
+
+.button:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.small {
+  font-size: var(--text-meta);
+  padding: var(--space-1) var(--space-3);
+}
+
+.primary {
+  background: var(--accent);
+  box-shadow: var(--shadow-pop);
+  color: var(--ink-on-accent);
+}
+
+.secondary {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.danger {
+  background: transparent;
+  border-color: transparent;
+  color: var(--error);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .button:active:not(:disabled),
 .pressed {
-  border-style: inset;
+  transform: translate(2px, 2px);
+}
+
+.primary:active:not(:disabled),
+.primary.pressed {
+  box-shadow: none;
 }
 
 .button:disabled {
-  color: var(--dos-edge-dark);
-  cursor: default;
+  background: var(--surface-2);
+  border-color: var(--line-soft);
+  box-shadow: none;
+  color: var(--ink-muted);
+  cursor: not-allowed;
+  text-decoration: none;
 }
 
-.primary {
-  background: var(--dos-accent);
-  color: var(--dos-ink);
-  font-size: var(--dos-size-body);
-  padding: var(--dos-space-2) var(--dos-space-5);
-}
-
-.primarySmall {
-  background: var(--dos-accent);
-  color: var(--dos-ink);
-  font-size: var(--dos-size-section);
-  padding: var(--dos-space-button-y) var(--dos-space-4);
-}
-
-.ghost {
-  background: var(--dos-panel-light);
-  color: var(--dos-ink);
-  font-size: var(--dos-size-section);
-  padding: var(--dos-space-2) var(--dos-space-5);
-}
-
-.ghostSmall {
-  background: var(--dos-panel-light);
-  color: var(--dos-ink);
-  font-size: var(--dos-size-meta);
-  padding: var(--dos-space-1) var(--dos-space-3);
-}
-
-.dangerSmall {
-  background: var(--dos-panel-light);
-  color: var(--dos-error);
-  font-size: var(--dos-size-meta);
-  padding: var(--dos-space-1) var(--dos-space-3);
+.ghost:disabled,
+.danger:disabled {
+  background: transparent;
+  border-color: transparent;
 }

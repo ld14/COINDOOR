@@ -1,20 +1,22 @@
-.progress {
-  appearance: none;
-  background: var(--dos-panel-light);
-  border: var(--dos-border-2) solid var(--dos-edge-dark);
-  height: var(--dos-progress-height);
+.track {
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-pill);
+  height: 10px;
   overflow: hidden;
   width: 100%;
 }
 
-.progress::-webkit-progress-bar {
-  background: var(--dos-panel-light);
+.fill {
+  background: var(--accent);
+  height: 100%;
+  transition: width 0.2s ease;
 }
 
-.progress::-webkit-progress-value {
-  background: var(--dos-accent);
+.ok .fill {
+  background: var(--ok);
 }
 
-.progress::-moz-progress-bar {
-  background: var(--dos-accent);
+.error .fill {
+  background: var(--error);
 }

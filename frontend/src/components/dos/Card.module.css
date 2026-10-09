@@ -1,0 +1,62 @@
+.card {
+  background: var(--surface-1);
+  border: var(--border-card) solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+}
+
+/* Sin encabezado (alias Panel): el contenido cuelga directo de la tarjeta. */
+.plain {
+  padding: var(--space-4);
+}
+
+.head {
+  align-items: center;
+  background: var(--card-band);
+  border-bottom: var(--border-card) solid var(--line);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  color: var(--card-band-ink);
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.number {
+  align-items: center;
+  background: var(--surface-1);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  display: inline-flex;
+  flex: none;
+  font-family: var(--font-display);
+  font-size: var(--text-meta);
+  height: 26px;
+  justify-content: center;
+  width: 26px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-section);
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.hint {
+  font-family: var(--font-body);
+  font-size: var(--text-meta);
+}
+
+.actions {
+  align-items: center;
+  display: flex;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.body {
+  padding: var(--space-4);
+}

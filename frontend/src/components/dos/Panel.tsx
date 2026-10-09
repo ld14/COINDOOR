@@ -1,10 +1,8 @@
-import type { HTMLAttributes, ReactNode } from 'react';
-import styles from './Panel.module.css';
+import { Card, type CardProps } from './Card';
 
-interface PanelProps extends HTMLAttributes<HTMLDivElement> {
-  children?: ReactNode;
-}
+export type PanelProps = CardProps;
 
-export function Panel({ children, className, ...props }: PanelProps) {
-  return <div className={[styles.panel, className].filter(Boolean).join(' ')} {...props}>{children}</div>;
+/** Alias histórico de {@link Card}. Sin `title` se comporta como la tarjeta sin encabezado de siempre. */
+export function Panel(props: PanelProps) {
+  return <Card {...props} />;
 }
