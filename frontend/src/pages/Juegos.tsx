@@ -1,22 +1,62 @@
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { DosButton, DosInput, DosSelect, Panel, StatusBadge, SunkenBox } from '@/components/dos';
+import { useQueries } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { DosButton, DosInput, DosSelect, FilterChips, FilterTabs, SegmentedControl } from '@/components/dos';
+import type { FilterChipItem, FilterTabItem } from '@/components/dos';
 import { useGames } from '@/hooks/useGames';
+import { useRomCandidates } from '@/hooks/useRomCandidates';
 import { useSystems } from '@/hooks/useSystems';
+import { listGames, type GameSummary } from '@/lib/api/games';
 import type { GameStatus } from '@/lib/domain/types';
-import styles from './ReadPages.module.css';
+import { ContinueBand } from './juegos/ContinueBand';
+import { GameCard, type VistaJuegos } from './juegos/GameCard';
+import styles from './Juegos.module.css';
 
-const statusOptions: { value: GameStatus | ''; label: string }[] = [
-  { value: '', label: 'Todos los estados' },
-  { value: 'ready', label: 'Listo' },
-  { value: 'incomplete', label: 'Incompleto' },
-  { value: 'error', label: 'Con errores' },
+type TabId = 'todos' | 'carga' | 'listos' | 'exportados' | 'errores';
+type Orden = '' | 'titulo' | 'sistema';
+
+interface TabFilter { status: GameStatus | ''; exportStatus: 'pending' | 'exported' | '' }
+
+const tabFilters: Record<TabId, TabFilter> = {
+  todos: { status: '', exportStatus: '' },
+  carga: { status: 'incomplete', exportStatus: '' },
+  listos: { status: 'ready', exportStatus: 'pending' },
+  exportados: { status: '', exportStatus: 'exported' },
+  errores: { status: 'error', exportStatus: '' },
+};
+
+const tabLabels: [TabId, string][] = [
+  ['todos', 'Todos'],
+  ['carga', 'En carga'],
+  ['listos', 'Listos sin exportar'],
+  ['exportados', 'Exportados'],
+  ['errores', 'Con errores'],
 ];
 
-const exportOptions = [
-  { value: '', label: 'Todos' },
-  { value: 'pending', label: 'Pendientes de exportar' },
-  { value: 'exported', label: 'Exportados' },
-] as const;
+function tabActiva(status: string, exportStatus: string): TabId {
+  if (exportStatus === 'exported') return 'exportados';
+  if (exportStatus === 'pending') return 'listos';
+  if (status === 'error') return 'errores';
+  if (status === 'incomplete') return 'carga';
+  return 'todos';
+}
+
+const ordenOptions: { value: Orden; label: string }[] = [
+  { value: '', label: 'Orden: por defecto' },
+  { value: 'titulo', label: 'Título A–Z (esta página)' },
+  { value: 'sistema', label: 'Sistema (esta página)' },
+];
+
+const vistaOptions = [
+  { value: 'grilla', label: '▦ Grilla' },
+  { value: 'lista', label: '☰ Lista' },
+];
+
+function ordenar(items: GameSummary[], orden: Orden): GameSummary[] {
+  if (!orden) return items;
+  const key = (game: GameSummary) => (orden === 'titulo' ? game.title : `${game.systemName} ${game.title}`);
+  return [...items].sort((a, b) => key(a).localeCompare(key(b), 'es'));
+}
 
 export function Juegos() {
   const [params, setParams] = useSearchParams();
@@ -27,14 +67,51 @@ export function Juegos() {
   const rawPage = Number(params.get('page') ?? '1');
   const page = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
   const rawExportStatus = params.get('exportStatus');
-  const exportStatus = rawExportStatus === 'pending' || rawExportStatus === 'exported' ? rawExportStatus : '';
+  const exportStatus: TabFilter['exportStatus'] = rawExportStatus === 'pending' || rawExportStatus === 'exported' ? rawExportStatus : '';
+  const rawOrden = params.get('orden');
+  const orden: Orden = rawOrden === 'titulo' || rawOrden === 'sistema' ? rawOrden : '';
+  const vista: VistaJuegos = params.get('vista') === 'lista' ? 'lista' : 'grilla';
+  const tab = tabActiva(status, exportStatus);
+
   const games = useGames({ q, systemId, status, exportStatus, page, perPage: 50 });
   const systems = useSystems();
+  const roms = useRomCandidates();
+  const totalFichas = useGames({ perPage: 1 });
+  const paraExportar = useGames({ status: 'ready', exportStatus: 'pending', perPage: 1 });
+
+  // Contadores de las pestañas (respetan búsqueda y sistema) y de los chips (respetan la búsqueda).
+  const tabCounts = useQueries({
+    queries: tabLabels.map(([id]) => {
+      const query = { q, systemId, ...tabFilters[id], perPage: 1 };
+      return { queryKey: ['games', query], queryFn: () => listGames(query) };
+    }),
+  });
+  const systemList = useMemo(() => systems.data ?? [], [systems.data]);
+  const systemCounts = useQueries({
+    queries: systemList.map((system) => {
+      const query = { q, systemId: system.id, status, exportStatus, perPage: 1 };
+      return { queryKey: ['games', query], queryFn: () => listGames(query) };
+    }),
+  });
+
+  const tabItems: FilterTabItem[] = tabLabels.map(([id, label], index) => ({ id, label, count: tabCounts[index]?.data?.total }));
+  const chipItems: FilterChipItem[] = systemList.map((system, index) => ({ id: system.id, label: system.name, count: systemCounts[index]?.data?.total }));
 
   function update(key: string, value: string) {
     const next = new URLSearchParams(params);
     if (value) next.set(key, value);
     else next.delete(key);
+    next.delete('page');
+    setParams(next);
+  }
+
+  function selectTab(id: string) {
+    const filter = tabFilters[id as TabId];
+    const next = new URLSearchParams(params);
+    for (const [key, value] of Object.entries(filter)) {
+      if (value) next.set(key, value);
+      else next.delete(key);
+    }
     next.delete('page');
     setParams(next);
   }
@@ -45,50 +122,52 @@ export function Juegos() {
     setParams(next);
   }
 
+  const sinFicha = roms.data?.length;
+  const subtitulo = [
+    totalFichas.data ? `${totalFichas.data.total} fichas` : null,
+    paraExportar.data ? `${paraExportar.data.total} para exportar` : null,
+    sinFicha !== undefined ? `${sinFicha} ROMs instalados sin ficha` : null,
+  ].filter(Boolean).join(' · ');
+  const items = ordenar(games.data?.items ?? [], orden);
+
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Juegos</h1>
-      </div>
-      <div aria-label="Filtrar por exportación" className={styles.filters} role="group">
-        {exportOptions.map((option) => (
-          <DosButton aria-pressed={exportStatus === option.value} key={option.value} onClick={() => update('exportStatus', option.value)} pressed={exportStatus === option.value}>
-            {option.label}
-          </DosButton>
-        ))}
-      </div>
-      <div className={styles.filters}>
-        <DosInput aria-label="Buscar juego" onChange={(event) => update('q', event.target.value)} placeholder="Buscar" value={q} />
-        <DosSelect aria-label="Sistema" onChange={(event) => update('systemId', event.target.value)} value={systemId}>
-          <option value="">Todos los sistemas</option>
-          {(systems.data ?? []).map((system) => <option key={system.id} value={system.id}>{system.name}</option>)}
+      <header className={styles.head}>
+        <div>
+          <h1 className={styles.title}>Juegos</h1>
+          {subtitulo ? <p className={styles.sub}>{subtitulo}</p> : null}
+        </div>
+        <div className={styles.headActions}>
+          {sinFicha ? <DosButton onClick={() => navigate('/juegos/nuevo')} variant="secondary">Ver {sinFicha} ROMs sin ficha</DosButton> : null}
+          <DosButton onClick={() => navigate('/juegos/nuevo')} variant="primary">+ Nuevo juego</DosButton>
+        </div>
+      </header>
+
+      <FilterTabs aria-label="Filtrar por estado" items={tabItems} onChange={selectTab} value={tab} />
+
+      <div className={styles.toolbar}>
+        <DosInput aria-label="Buscar juego" className={styles.search} onChange={(event) => update('q', event.target.value)} placeholder="Buscar" value={q} />
+        <FilterChips aria-label="Sistema" items={chipItems} mode="single" onChange={(value) => update('systemId', value[0] ?? '')} value={systemId ? [systemId] : []} />
+        <DosSelect aria-label="Ordenar" onChange={(event) => update('orden', event.target.value)} value={orden}>
+          {ordenOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
         </DosSelect>
-        <DosSelect aria-label="Estado" onChange={(event) => update('status', event.target.value)} value={status}>
-          {statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-        </DosSelect>
+        <SegmentedControl ariaLabel="Vista" onChange={(value) => update('vista', value === 'lista' ? 'lista' : '')} options={vistaOptions} value={vista} />
       </div>
 
+      <ContinueBand />
+
       {games.error ? <p className={styles.error}>No se pudieron cargar los juegos.</p> : null}
-      <Panel>
-        <SunkenBox className={styles.list}>
-          {(games.data?.items ?? []).map((game) => (
-            <button className={styles.gameRow} key={game.id} onClick={() => navigate(`/juegos/${game.id}`)} type="button">
-              {game.coverThumbUrl ? <img alt="" className={styles.thumbImage} src={game.coverThumbUrl} /> : <span className={styles.thumb}>{initials(game.title)}</span>}
-              <span>
-                <span className={styles.rowMain}><span className={styles.gameTitle}>{game.title}</span></span>
-                <span className={styles.meta}>{game.systemName} · {game.year || 'Sin Información'} · {game.identitySource}</span>
-                <span className={styles.exportState}>{game.exportStatus === 'exported' ? 'Exportado' : 'Pendiente de exportar'}</span>
-              </span>
-              <StatusBadge status={game.status} />
-            </button>
-          ))}
-          {!games.isLoading && games.data?.items.length === 0 ? (
-            <p className={styles.empty}>Ningún juego coincide con la búsqueda o los filtros.</p>
-          ) : null}
-        </SunkenBox>
-      </Panel>
+      {items.length > 0 ? (
+        <ul aria-label="Juegos" className={vista === 'lista' ? styles.list : styles.grid}>
+          {items.map((game) => <GameCard game={game} key={game.id} vista={vista} />)}
+        </ul>
+      ) : null}
+      {!games.isLoading && games.data?.items.length === 0 ? (
+        <p className={styles.empty}>Ningún juego coincide con la búsqueda o los filtros.</p>
+      ) : null}
+
       {games.data ? (
-        <nav aria-label="Páginas de juegos" className={styles.filters}>
+        <nav aria-label="Páginas de juegos" className={styles.pager}>
           <DosButton disabled={page <= 1 || games.isFetching} onClick={() => goToPage(page - 1)}>Anterior</DosButton>
           <span aria-live="polite">{games.data.total} juegos · Página {page} de {Math.max(1, Math.ceil(games.data.total / games.data.perPage))}</span>
           <DosButton disabled={page * games.data.perPage >= games.data.total || games.isFetching} onClick={() => goToPage(page + 1)}>Siguiente</DosButton>
@@ -96,8 +175,4 @@ export function Juegos() {
       ) : null}
     </div>
   );
-}
-
-function initials(title: string) {
-  return title.split(' ').map((part) => part[0]).join('').slice(0, 3).toUpperCase();
 }

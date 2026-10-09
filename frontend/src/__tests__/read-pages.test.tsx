@@ -18,26 +18,25 @@ function renderApp(path = '/') {
 describe('Pantallas de lectura', () => {
   it('separa exportados y pendientes y combina búsqueda con el filtro', async () => {
     renderApp('/juegos?exportStatus=exported');
-    expect(await screen.findByText('Golden Axe')).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Golden Axe' })).toBeInTheDocument();
     expect(screen.getByText('Exportado')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Exportados' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.queryByText('Metal Slug')).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Exportados/ })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.queryByRole('link', { name: 'Metal Slug' })).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Pendientes de exportar' }));
-    expect(await screen.findByText('Metal Slug')).toBeInTheDocument();
-    expect(screen.queryByText('Golden Axe')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('tab', { name: /Todos/ }));
+    expect(await screen.findByRole('link', { name: 'Metal Slug' })).toBeInTheDocument();
     expect(screen.getAllByText('Pendiente de exportar').length).toBeGreaterThan(0);
     await userEvent.type(screen.getByLabelText('Buscar juego'), 'contra');
-    await waitFor(() => expect(screen.queryByText('Metal Slug')).not.toBeInTheDocument());
-    expect(screen.getByText('Contra')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('link', { name: 'Metal Slug' })).not.toBeInTheDocument());
+    expect(screen.getByRole('link', { name: 'Contra' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Siguiente' })).toBeDisabled();
   });
 
   it('cambiar el filtro reinicia la página y conserva la búsqueda', async () => {
     renderApp('/juegos?page=2&q=Golden');
     await screen.findByText('Ningún juego coincide con la búsqueda o los filtros.');
-    await userEvent.click(screen.getByRole('button', { name: 'Exportados' }));
-    expect(await screen.findByText('Golden Axe')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('tab', { name: /Exportados/ }));
+    expect(await screen.findByRole('link', { name: 'Golden Axe' })).toBeInTheDocument();
     expect(screen.getByLabelText('Buscar juego')).toHaveValue('Golden');
     expect(screen.getByRole('button', { name: 'Anterior' })).toBeDisabled();
   });
@@ -65,12 +64,12 @@ describe('Pantallas de lectura', () => {
   it('renderiza lista, placeholder y filtros en query string', async () => {
     renderApp('/juegos');
 
-    expect(await screen.findByText('Golden Axe')).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Golden Axe' })).toBeInTheDocument();
     expect(screen.getByText('MS')).toBeInTheDocument();
 
     await userEvent.type(screen.getByLabelText('Buscar juego'), 'contra');
-    await waitFor(() => expect(screen.queryByText('Golden Axe')).not.toBeInTheDocument());
-    expect(screen.getByText('Contra')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('link', { name: 'Golden Axe' })).not.toBeInTheDocument());
+    expect(screen.getByRole('link', { name: 'Contra' })).toBeInTheDocument();
   });
 
   it('renderiza ficha con dashboard y secciones vacías visibles', async () => {
