@@ -1,0 +1,22 @@
+/* Gabinete (feature 019, columna lateral, solo lectura). Solo tokens nuevos. */
+
+.stack { display: flex; flex-direction: column; gap: var(--space-3); }
+.meta { color: var(--ink-muted); font-size: var(--text-meta); margin: 0; }
+.rotulo { font-size: var(--text-label); font-weight: 600; padding-bottom: var(--space-1); text-align: left; }
+.vacio { color: var(--ink-muted); margin: 0; }
+
+.specs { display: flex; flex-direction: column; gap: var(--space-1); margin: 0; }
+.spec {
+  border-bottom: 1px solid var(--line-soft);
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  padding-bottom: var(--space-1);
+}
+.spec dt { color: var(--ink-muted); font-size: var(--text-label); }
+.spec dd { font-family: var(--font-mono); font-size: var(--text-meta); margin: 0; text-align: right; }
+
+.tabla { border-collapse: collapse; font-size: var(--text-meta); width: 100%; }
+.tabla th { border-bottom: var(--border-control) solid var(--line); color: var(--ink-muted); font-weight: 600; padding: var(--space-1); text-align: left; }
+.tabla td { border-bottom: 1px solid var(--line-soft); padding: var(--space-1); }
+.tabla code { font-family: var(--font-mono); }

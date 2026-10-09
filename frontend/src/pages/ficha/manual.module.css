@@ -1,0 +1,30 @@
+/* Manual y revistas (feature 019, sección 10). Solo tokens nuevos. */
+
+.stack { display: flex; flex-direction: column; gap: var(--space-3); }
+.meta { color: var(--ink-muted); font-size: var(--text-meta); margin: 0; }
+.nombre { font-weight: 600; overflow-wrap: anywhere; }
+.rotulo { font-size: var(--text-label); font-weight: 600; }
+.vacio {
+  background: var(--surface-2);
+  border: var(--border-control) dashed var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink-muted);
+  margin: 0;
+  padding: var(--space-3);
+}
+.lista { display: flex; flex-direction: column; gap: var(--space-2); list-style: none; margin: 0; padding: 0; }
+.fila {
+  align-items: center;
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+}
+.filaTexto { display: flex; flex: 1; flex-direction: column; gap: var(--space-1); min-width: 160px; }
+.acciones { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.barra { display: flex; flex-direction: column; gap: var(--space-1); width: 100%; }
+.busqueda { align-items: center; display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.separador { margin-top: var(--space-4); }

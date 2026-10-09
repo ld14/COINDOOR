@@ -1,70 +1,58 @@
-import { Panel, SectionHeader, SunkenBox } from '@/components/dos';
+import { Card } from '@/components/dos';
 import type { Game } from '@/lib/domain/types';
-import styles from '../ReadPages.module.css';
+import styles from './gabinete.module.css';
 
+/** Gabinete (columna lateral, solo lectura): especificaciones y mapa de botones del juego arcade. */
 export function CabinetSection({ game }: { game: Game }) {
   const cabinet = game.cabinet;
-  const hasData = cabinet?.resolution || cabinet?.orientation || cabinet?.controls;
+  const specs = [
+    ['Resolución', cabinet?.resolution],
+    ['Orientación', cabinet?.orientation],
+    ['Controles', cabinet?.controls],
+    ['Botones', cabinet?.buttons ? String(cabinet.buttons) : ''],
+  ].filter((spec): spec is [string, string] => !!spec[1]);
+  const botones = cabinet?.button_list ?? [];
 
   return (
-    <Panel>
-      <SectionHeader>GABINETE</SectionHeader>
-      <SunkenBox className={styles.stack}>
-        {hasData ? (
+    <Card band="var(--accent-3)" title="Gabinete">
+      <div className={styles.stack}>
+        {specs.length > 0 || botones.length > 0 ? (
           <>
-            <div className={styles.fieldTop}>
-              <span className={styles.name}>Especificaciones</span>
-            </div>
-            <div className={styles.cheatLedger}>
-              {cabinet?.resolution ? (
-                <div className={styles.cheatEntry}>
-                  <span>Resolución</span>
-                  <span className={styles.meta}>{cabinet.resolution}</span>
-                </div>
-              ) : null}
-              {cabinet?.orientation ? (
-                <div className={styles.cheatEntry}>
-                  <span>Orientación</span>
-                  <span className={styles.meta}>{cabinet.orientation}</span>
-                </div>
-              ) : null}
-              {cabinet?.controls ? (
-                <div className={styles.cheatEntry}>
-                  <span>Controles</span>
-                  <span className={styles.meta}>{cabinet.controls}</span>
-                </div>
-              ) : null}
-              {cabinet?.buttons ? (
-                <div className={styles.cheatEntry}>
-                  <span>Botones</span>
-                  <span className={styles.meta}>{cabinet.buttons}</span>
-                </div>
-              ) : null}
-            </div>
-            {cabinet?.button_list.length ? (
-              <>
-                <div className={styles.fieldTop}>
-                  <span className={styles.name}>Mapa de botones</span>
-                </div>
-                <div className={styles.cheatLedger}>
-                  {cabinet.button_list.map((btn, idx) => (
-                    <div className={styles.cheatEntry} key={`${btn.control}-${idx}`}>
-                      <span>{btn.action}</span>
-                      <code>{btn.control}</code>
-                      <span className={styles.meta}>{btn.color}</span>
-                    </div>
+            {specs.length > 0 ? (
+              <dl className={styles.specs}>
+                {specs.map(([nombre, valor]) => (
+                  <div className={styles.spec} key={nombre}>
+                    <dt>{nombre}</dt>
+                    <dd>{valor}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+            {botones.length > 0 ? (
+              <table className={styles.tabla}>
+                <caption className={styles.rotulo}>Mapa de botones</caption>
+                <thead>
+                  <tr><th scope="col">Acción</th><th scope="col">Control</th><th scope="col">Color</th></tr>
+                </thead>
+                <tbody>
+                  {botones.map((btn, idx) => (
+                    <tr key={`${btn.control}-${idx}`}>
+                      <td>{btn.action}</td>
+                      <td><code>{btn.control}</code></td>
+                      <td>{btn.color}</td>
+                    </tr>
                   ))}
-                </div>
-              </>
+                </tbody>
+              </table>
             ) : null}
           </>
         ) : (
-          <p className={styles.empty}>Sin Información</p>
+          <p className={styles.vacio}>Sin información de gabinete para este juego.</p>
         )}
         <p className={styles.meta}>
           Fuente: Arcade Database (motoschifo) — adb.arcadeitalia.net · Historia (C) arcade-history.com
         </p>
-      </SunkenBox>
-    </Panel>
+      </div>
+    </Card>
   );
 }
