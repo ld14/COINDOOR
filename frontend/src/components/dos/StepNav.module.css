@@ -1,0 +1,97 @@
+.nav {
+  background: var(--surface-0);
+  padding: var(--space-2) 0;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.step {
+  align-items: center;
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: 600;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+}
+
+.step:hover {
+  box-shadow: var(--shadow-pop);
+}
+
+.step:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.active {
+  background: var(--accent-soft);
+  box-shadow: var(--shadow-pop);
+}
+
+.marker {
+  align-items: center;
+  background: var(--surface-1);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  font-weight: 600;
+  height: 24px;
+  justify-content: center;
+  width: 24px;
+}
+
+.complete .marker {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.blocking .marker {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.review .marker {
+  background: var(--accent-2);
+  color: var(--ink-on-accent-2);
+}
+
+.hint {
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
+  font-weight: 400;
+}
+
+.blocking .hint {
+  color: var(--error);
+  font-weight: 600;
+}
+
+.srOnly {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}

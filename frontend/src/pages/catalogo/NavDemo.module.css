@@ -1,0 +1,32 @@
+.demo {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.block {
+  background: var(--surface-1);
+  border: var(--border-card) solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-section);
+  font-weight: 400;
+  margin: 0;
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.side {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(var(--side-column), 1fr));
+}
