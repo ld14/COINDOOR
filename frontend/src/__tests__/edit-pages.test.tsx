@@ -31,38 +31,37 @@ describe('Edición de ficha', () => {
     await screen.findByRole('heading', { name: 'Metal Slug' });
     const sinopsis = screen.getByLabelText('Sinopsis');
     await userEvent.type(sinopsis, 'Una sinopsis nueva.');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar sinopsis' }));
+    await userEvent.tab(); // el autosave guarda al salir del campo
 
-    await waitFor(() => expect(screen.getByText('● Manual')).toBeInTheDocument());
+    await waitFor(() => expect(within(sinopsis.closest('[data-grupo]') as HTMLElement).getByText('● Manual')).toBeInTheDocument());
   });
 
   it('el objetivo se guarda aparte de la sinopsis y es opcional', async () => {
     renderApp('/juegos/mslug');
 
     await screen.findByRole('heading', { name: 'Metal Slug' });
-    const caja = screen.getByLabelText('Objetivo').parentElement!;
+    const caja = screen.getByLabelText('Objetivo').closest('[data-grupo]') as HTMLElement;
     expect(within(caja).getByText('○ Vacío')).toBeInTheDocument();
     await userEvent.type(screen.getByLabelText('Objetivo'), 'Rescatar a los prisioneros.');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar objetivo' }));
+    await userEvent.tab();
 
     await waitFor(() => expect(within(caja).getByText('● Manual')).toBeInTheDocument());
     expect(screen.getByLabelText('Sinopsis')).toHaveValue('');
   });
 
-  it('primeros pasos, reglas y modo de la guía se guardan por separado', async () => {
+  it('primeros pasos y reglas de la guía se guardan por separado', async () => {
     renderApp('/juegos/mslug');
 
     await screen.findByRole('heading', { name: 'Metal Slug' });
-    const pasos = screen.getByLabelText('Primeros pasos').parentElement!;
-    await userEvent.type(screen.getByLabelText('Primeros pasos'), 'Mover la paleta');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar primeros pasos' }));
+    const lista = screen.getByRole('list', { name: 'Primeros pasos' });
+    await userEvent.click(screen.getAllByRole('button', { name: '+ Agregar paso' })[0]);
+    await userEvent.type(within(lista).getByLabelText('Paso 1'), 'Mover la paleta');
+    await userEvent.tab();
+    const pasos = lista.closest('[data-grupo]') as HTMLElement;
     await waitFor(() => expect(within(pasos).getByText('● Manual')).toBeInTheDocument());
 
-    const modo = screen.getByLabelText('Modo multijugador').parentElement!;
-    await userEvent.selectOptions(screen.getByLabelText('Modo multijugador'), 'versus');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar modo' }));
-    await waitFor(() => expect(within(modo).getByText('● Manual')).toBeInTheDocument());
-    expect(within(screen.getByLabelText('Reglas esenciales').parentElement!).getByText('○ Vacío')).toBeInTheDocument();
+    const reglas = screen.getByRole('list', { name: 'Reglas esenciales' }).closest('[data-grupo]') as HTMLElement;
+    expect(within(reglas).getByText('○ Vacío')).toBeInTheDocument();
   });
 
   it('borrar campo manual pide confirmación y vuelve a vacío sin ocultar la sección', async () => {
@@ -70,7 +69,7 @@ describe('Edición de ficha', () => {
 
     await screen.findByRole('heading', { name: 'Golden Axe' });
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
-    const sinopsisBox = screen.getByLabelText('Sinopsis').parentElement!;
+    const sinopsisBox = screen.getByLabelText('Sinopsis').closest('[data-grupo]') as HTMLElement;
     await userEvent.click(within(sinopsisBox).getByRole('button', { name: 'Borrar' }));
 
     expect(confirmSpy).toHaveBeenCalled();
@@ -82,7 +81,7 @@ describe('Edición de ficha', () => {
     renderApp('/juegos/goldnaxe');
 
     await screen.findByRole('heading', { name: 'Golden Axe' });
-    const sinopsisBox = screen.getByLabelText('Sinopsis').parentElement!;
+    const sinopsisBox = screen.getByLabelText('Sinopsis').closest('[data-grupo]') as HTMLElement;
     await userEvent.click(within(sinopsisBox).getByRole('button', { name: 'Borrar' }));
 
     expect(screen.getByLabelText('Sinopsis')).toHaveValue('Sinopsis cargada para pruebas.');
@@ -230,10 +229,12 @@ describe('Checklist de la guía', () => {
     render(<GuiaChecklist fallos={{}} items={items} />);
 
     const lista = within(screen.getByRole('list', { name: 'Checklist de la guía' }));
-    expect(screen.getByText(/1 de 4 listos/)).toBeInTheDocument();
+    expect(screen.getByText('1 de 4 listos')).toBeInTheDocument();
     expect(screen.getByText(/Sin objetivo la guía no se exporta\.$/)).toBeInTheDocument();
-    expect(lista.getByText(/Falta \(obligatorio\)/)).toBeInTheDocument();
-    expect(lista.getByText(/Listo — dial/)).toBeInTheDocument();
+    expect(lista.getByRole('img', { name: 'Falta (obligatorio)' })).toBeInTheDocument();
+    expect(lista.getAllByRole('img', { name: 'Revisar' })).toHaveLength(2);
+    expect(lista.getByRole('img', { name: 'Listo' })).toBeInTheDocument();
+    expect(lista.getByText('dial')).toBeInTheDocument();
     expect(lista.getByText(/ArcadeDB no publica botones con acción/)).toBeInTheDocument();
     expect(screen.getAllByRole('listitem').map((li) => li.getAttribute('data-estado'))).toEqual(['falta', 'falta', 'ok', 'falta']);
   });

@@ -1,0 +1,81 @@
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.cabecera {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+.rotulo {
+  color: var(--ink);
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.contador {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+}
+
+.contadorLleno {
+  color: var(--error);
+  font-weight: 700;
+}
+
+.acciones {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.ayuda {
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
+  margin: 0;
+}
+
+.error {
+  color: var(--error);
+  font-size: var(--text-meta);
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Sugerido: borde punteado accent-2 (el relleno queda para el chip). */
+.sugerido textarea {
+  border-color: var(--accent-2);
+  border-style: dashed;
+}
+
+.sugerido ol {
+  border: var(--border-control) dashed var(--accent-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+}
+
+.pie {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+.atajo {
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
+}

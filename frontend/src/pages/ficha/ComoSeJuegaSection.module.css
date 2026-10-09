@@ -1,0 +1,99 @@
+.resumen {
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
+  margin: 0 0 var(--space-3);
+}
+
+.resumenError {
+  color: var(--error);
+  font-weight: 700;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fila {
+  align-items: center;
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line-soft);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: var(--space-1) var(--space-3);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding: var(--space-2) var(--space-3);
+}
+
+/* Faltante obligatorio: borde de error; revisar: ámbar; listo: sin énfasis. */
+.fila[data-estado='falta'][data-requerido='true'] {
+  border-color: var(--error);
+}
+
+.fila[data-estado='falta'][data-requerido='false'] {
+  border-color: var(--warn);
+}
+
+.marca {
+  align-items: center;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  font-weight: 700;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+}
+
+.marcaOk {
+  color: var(--ok);
+}
+
+.marcaError {
+  color: var(--error);
+}
+
+.marcaRevisar {
+  color: var(--warn);
+}
+
+.nombre {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.etiqueta {
+  color: var(--ink);
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.detalle {
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
+}
+
+.detalleError {
+  color: var(--error);
+  font-weight: 600;
+}
+
+.accion {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.modoControl {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
