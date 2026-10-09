@@ -236,7 +236,7 @@ export const CheatsSection = forwardRef<SaveHandle, {
             value={pegado}
           />
           <div className={styles.fila}>
-            <DosButton disabled={separando || !pegado.trim()} onClick={() => void separar()} size="sm" variant="secondary">
+            <DosButton disabled={separando || !pegado.trim()} disabledReason={!pegado.trim() ? 'Pegá primero el texto de los trucos.' : undefined} onClick={() => void separar()} size="sm" variant="secondary">
               {separando ? 'Separando…' : '✦ Separar en trucos'}
             </DosButton>
             {separando ? <Spinner /> : <span className={styles.ayuda}>la propuesta se revisa antes de entrar</span>}

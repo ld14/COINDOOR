@@ -10,7 +10,7 @@
 .fill {
   background: var(--accent);
   height: 100%;
-  transition: width 0.2s ease;
+  transition: width 0.15s ease;
 }
 
 .ok .fill {

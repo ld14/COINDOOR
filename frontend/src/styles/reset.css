@@ -27,3 +27,13 @@ button, input, select, textarea {
 a {
   color: inherit;
 }
+
+/* DESIGN_SPEC §6: con movimiento reducido no hay transiciones ni animaciones (el Spinner repite su giro más lento, regla propia). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,6 +1,6 @@
 /*
  * Andamiaje de la ficha (feature 019, DESIGN_SPEC §5.1). Solo tokens nuevos.
- * Los estilos internos de cada sección siguen en ReadPages.module.css hasta que la Ola 4 los migre.
+ * Cada sección tiene su propio .module.css con tokens nuevos.
  */
 
 .ficha {

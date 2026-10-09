@@ -1,5 +1,5 @@
 .badge {
-  border: var(--dos-border-2) solid currentColor;
+  border: var(--border-control) solid currentColor;
   border-radius: var(--radius-pill);
   font-family: var(--font-mono);
   font-size: var(--text-meta);

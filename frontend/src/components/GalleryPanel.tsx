@@ -175,6 +175,7 @@ function GalleryPicker({
       .catch((err) => setError(err instanceof Error ? err.message : 'No se pudieron traer las imágenes.'));
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- recarga solo al cambiar de juego
   useEffect(() => { cargar(); }, [gameId]);
 
   const reintentar = async (source: string) => {
@@ -310,6 +311,7 @@ function GalleryPicker({
         <div className={styles.toolbar}>
           <DosButton
             disabled={elegidos.size === 0 || guardando}
+            disabledReason={elegidos.size === 0 ? 'Elegí al menos una imagen para guardar.' : undefined}
             onClick={() => void guardar()}
             variant="primary-small"
           >

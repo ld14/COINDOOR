@@ -74,6 +74,68 @@ ADR: [`0023`](../../spec/decisions/0023-estetica-flyer-reemplaza-dos.md)
   no tienen cambios sin commitear sobre `FichaJuego.tsx`.
 - Correr `npx tsc --noEmit`, lint y tests para fijar la línea base.
 
+## Qué se hizo, por unidad
+
+| Fase | Unidad (commit `rediseno: <unidad>`) | Resultado |
+|---|---|---|
+| 0 | fase 0 | Feature 019, ADR 0023, decisiones de autosave y de origen. |
+| 0 | backend-bugs, backend-source | `gameCount` real, candidatos de ROM sin ficha, cheats/review vacíos; edición manual escribe `source: manual` y existe el endpoint `accept`. |
+| 1 | fundacion | Tokens Flyer, fuentes offline y shell (Topbar, Rail con contadores, StatusBar). |
+| 2 | prim-base, prim-entrada, prim-nav | Primitivas nuevas y demos en `/_catalogo`. |
+| 3 | juegos, sistemas-config | Juegos con pestañas, chips y banda "Seguís con…"; Sistemas con validación de ruta; Configuración con [Probar]. |
+| 5 | nuevo-juego | Asistente de cuatro pasos, etiquetas de `fielddefs.json`. |
+| 6 | exportar | Grupos en Card, selección por defecto corregida, total en vivo, cola en `/exportar`. |
+| 4 | ficha-split, ficha-andamiaje y secciones | Ficha dividida en `pages/ficha/*`, autosave, hero, StepNav, ActionBar. |
+| 7 | limpieza-qa (Ola 5) | Ver abajo. |
+
+### Fase 7 · limpieza-qa
+
+- **Funcionalidad restaurada.** Subida de varios PDF de manuales juntos (`Dropzone` con
+  `multiple` + `onFiles`, `onFile` intacto). `ManualSection` acepta `onUploadAsync` para subirlos de a uno; **falta cablearlo en `FichaJuego.tsx`** (`onUploadAsync={(f) => mutations.uploadManual.mutateAsync(f)}`): sin eso suben en paralelo y pueden pisarse en el `game.json`. La alternancia primario/secundario al tomar
+  color de la carátula usa un único contador (`pages/ficha/acentoSlot.ts`) que leen el Hero
+  y Presentación: ya no se desfasan. `FichaJuego.tsx` conserva su `proximoAcento`, ahora
+  sin efecto (se puede borrar cuando se destrabe ese archivo).
+- **Migración de CSS.** `SuggestionsModal`, `DosFileInput`, `StatusBar`, `ContractBadge` y
+  `/_catalogo` pasaron a tokens nuevos; `ImageModal`, `GalleryPanel` y `YoutubeDownload`
+  ya los usaban. Lint sin errores (`SuggestionTrace` y `EmptyPage` sin uso eliminados).
+- **Limpieza.** Fuera los alias `--dos-*` de `tokens.css`, `pages/ReadPages.module.css` y
+  `EmptyPage`. Se conservan `SectionHeader` (lo usan `/_catalogo` y el demo) y
+  `DosFileInput` (lo usa el paso Archivo de Nuevo juego). Un test impide reintroducir
+  `--dos-*`.
+- **Accesibilidad (DESIGN_SPEC §6).** Test de contrato: transiciones de 150 ms o menos,
+  `prefers-reduced-motion` global en `reset.css`, y todo CSS que quita el outline repone
+  `--focus-ring`. `aria-live` en la subida del `Dropzone`; motivo del botón deshabilitado
+  (`disabledReason`) en Galería (Guardar) y Trucos (Separar).
+
 ## Diferencias contra los mockups
 
-_(se completa al cerrar cada fase)_
+- **[Usar] en resultados de búsqueda de manuales:** queda [Abrir]. La API actual
+  (`lib/api/manuals.ts`) solo sube un archivo o lista resultados; no hay endpoint para
+  adjuntar un resultado por URL y descargarlo desde el navegador chocaría con CORS.
+- **Juegos:** sin orden por última modificación ni "Exportado 02/10".
+- **Configuración:** sin estado de servicios ni defaults.
+- **Sistemas:** sin "Editar sistema".
+- **Nuevo juego:** sin [Examinar…] (un navegador no entrega rutas del disco).
+- **Trucos y Galería:** sin "va en el paquete" por truco ni tilde por miniatura.
+- **Exportar:** sin descarga real del `.zip` desde la pantalla.
+
+## PENDIENTES
+
+1. Backend: `exportedAt` y fecha de modificación en el listado (Juegos no puede ordenar
+   por última modificación ni mostrar "Exportado 02/10").
+2. Editar sistema.
+3. [Examinar…] en Nuevo juego (¿selector nativo vía el backend local?).
+4. [Probar] real de ATTRACT (hoy valida la ruta; no ejecuta `attract doctor`).
+5. Estado de servicios y defaults en Configuración.
+6. "Va en el paquete" por truco y tilde por miniatura de galería: requieren cambio de
+   modelo y un ADR.
+7. Descarga real del `.zip`.
+8. Propuesta de trucos persistida como `suggested`.
+9. Adjuntar un resultado de búsqueda de manual ([Usar]): endpoint nuevo.
+10. **Verificación visual (e2e) contra los mockups a 1280 px: no se hizo, no hubo navegador.**
+    Hasta entonces la feature no se marca "Hecha" en el roadmap.
+11. `tsc` falla en `src/pages/FichaJuego.tsx` (línea 365: `markReady.mutateAsync()` sin
+    argumentos); es del cableado de la ficha, no de esta unidad.
+12. En este entorno: `npm test` con el pool por defecto se cae (usar `--pool=threads`
+    con 2 hilos) y fallan 3 tests por falta de Python/Zod (`arcade`, `parity`,
+    `validation`).

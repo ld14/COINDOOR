@@ -3,7 +3,7 @@ import { useDominantColors } from '@/hooks/useDominantColors';
 import type { FichaProgress, PendienteFicha } from '@/hooks/useFichaProgress';
 import type { computeGameStatus } from '@/lib/domain/completeness';
 import type { Game, System } from '@/lib/domain/types';
-import type { AccentSlot } from './types';
+import { useProximoAcento } from './acentoSlot';
 import styles from './ficha.module.css';
 
 export interface FichaHeroProps {
@@ -11,7 +11,8 @@ export interface FichaHeroProps {
   systems: System[];
   status: ReturnType<typeof computeGameStatus>;
   progress: FichaProgress;
-  proximoAcento: AccentSlot;
+  /** Obsoleto: el slot sale de `acentoSlot`, compartido con Presentación. */
+  proximoAcento?: unknown;
   onSystemChange: (systemId: string) => void;
   onMarkReady: () => void;
   /** Clic en una píldora "✕ obligatorio": lleva al campo. */
@@ -29,7 +30,7 @@ function metadatos(game: Game): string {
   return [year, developer, publisher, genre, players ? `${players} jugadores` : ''].filter((valor) => valor.trim() !== '').join(' · ');
 }
 
-export function FichaHero({ game, systems, status, progress, proximoAcento, onSystemChange, onMarkReady, onGoPendiente, onPickColor }: FichaHeroProps) {
+export function FichaHero({ game, systems, status, progress, onSystemChange, onMarkReady, onGoPendiente, onPickColor }: FichaHeroProps) {
   const coverUrl = game.images.caratula?.url;
   const heroMedia = coverUrl ?? game.video.video?.url;
   const { colors } = useDominantColors(coverUrl, 4);
@@ -37,6 +38,7 @@ export function FichaHero({ game, systems, status, progress, proximoAcento, onSy
   const archivo = game.romRef ? nombreDeArchivo(game.romRef) : '';
   const meta = metadatos(game);
   const { percent, faltantes } = progress;
+  const proximoAcento = useProximoAcento();
   const slot = proximoAcento === 0 ? 'primario' : 'secundario';
 
   return (

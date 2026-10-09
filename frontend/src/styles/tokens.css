@@ -3,9 +3,7 @@
  * Destino sugerido: src/styles/tokens.css (reemplaza el bloque :root actual)
  *
  * 1) Tokens nuevos (fuente de verdad).
- * 2) Alias de los --dos-* existentes → tokens nuevos, para que los CSS modules
- *    actuales tomen la paleta nueva sin tocarlos. Se van borrando a medida que
- *    cada componente migra a los tokens nuevos (fase 2+).
+ * Los alias de compatibilidad del tema anterior ya no existen: todos los CSS usan los tokens nuevos (fase 7).
  *
  * Fuentes (offline, sin Google Fonts en runtime):
  *   npm i @fontsource/bungee @fontsource/rubik @fontsource/ibm-plex-mono
@@ -78,81 +76,4 @@
   --rail-width: 200px;
   --side-column: 300px;
   --page-max-width: 1440px;
-}
-
-/* ===================================================================
- * Alias de compatibilidad: --dos-*  →  tokens Flyer
- * (borrar cada línea cuando ya no quede ningún uso: grep -r "var(--dos-")
- * =================================================================== */
-:root {
-  --dos-desktop: var(--surface-0);
-  --dos-panel: var(--surface-1);
-  --dos-panel-light: var(--surface-2);
-  --dos-titlebar: var(--surface-inverse);
-  --dos-accent: var(--accent-soft);
-  --dos-terminal: var(--surface-inverse);
-  --dos-ink: var(--ink);
-  --dos-ink-soft: var(--ink-muted);
-  --dos-ink-muted: var(--ink-muted);
-  --dos-ink-invert: var(--ink-inverse);
-  --dos-ok: var(--ok);
-  --dos-warn: var(--warn);
-  --dos-error: var(--error);
-  --dos-info: var(--accent-3);
-  --dos-ok-crt: var(--ok);
-  --dos-warn-crt: var(--accent-2);
-  --dos-error-crt: var(--error);
-  --dos-info-crt: var(--accent-3);
-  --dos-banner: var(--accent-2);
-  --dos-edge-light: var(--surface-2);
-  --dos-edge-dark: var(--line);
-  --dos-font-family: var(--font-body);
-  --dos-size-title: var(--text-title);
-  --dos-size-body: var(--text-body);
-  --dos-size-meta: var(--text-meta);
-  --dos-focus-outline: 2px solid var(--focus);
-  --dos-hard-shadow: var(--shadow-card);
-  --dos-row-border: var(--line-soft);
-  --dos-field-empty: var(--ink-muted);
-  --dos-accent-preset-gold: var(--accent-2);
-  --dos-page-max-width: var(--page-max-width);
-  /* Se conservan con sus valores actuales hasta migrar cada componente. */
-  --dos-size-titlebar: 13.5px;
-  --dos-size-section: 12.5px;
-  --dos-size-field-tag: 10.5px;
-  --dos-space-1: 4px;
-  --dos-space-2: 6px;
-  --dos-space-3: 8px;
-  --dos-space-4: 10px;
-  --dos-space-5: 14px;
-  --dos-space-6: 18px;
-  --dos-space-7: 20px;
-  --dos-menu-width: 190px;
-  --dos-px-1: 1px;
-  --dos-border-2: 2px;
-  --dos-border-thick: 5px;
-  --dos-modal-close-width: 26px;
-  --dos-modal-close-height: 22px;
-  --dos-spinner-size: 16px;
-  --dos-progress-height: 14px;
-  --dos-empty-min-height: 78px;
-  --dos-space-titlebar-y: 3px;
-  --dos-space-button-y: 5px;
-  --dos-space-badge-x: 9px;
-  --dos-space-content-x: 22px;
-  --dos-control-height: 30px;
-  --dos-textarea-height: 150px;
-  --dos-catalog-min-column: 240px;
-  --dos-modal-small: 420px;
-  --dos-modal-medium: 460px;
-  --dos-modal-large: 620px;
-  --dos-backdrop: rgba(43, 45, 42, 0.62);
-  --dos-swatch-size: 22px;
-  --dos-hex-input-width: 100px;
-  --dos-hero-preview-height: 260px;
-  --dos-media-preview-height: 150px;
-  --dos-completion-tile-min: 150px;
-  --dos-editorial-gutter: 28px;
-  --dos-block-min-height: 120px;
-  --dos-candidates-max-height: 240px;
 }
