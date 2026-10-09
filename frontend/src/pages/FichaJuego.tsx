@@ -9,10 +9,11 @@ import { useFichaProgress, type PendienteFicha } from '@/hooks/useFichaProgress'
 import { useGame } from '@/hooks/useGame';
 import { invalidarListas, useGameMutations } from '@/hooks/useGameMutations';
 import { saveStatusStore } from '@/hooks/useSaveStatus';
+import { useSuggestionsJob } from '@/hooks/useSuggestionsJob';
 import { useSystems } from '@/hooks/useSystems';
 import { soportaArcadeDb, soportaMsdos } from '@/lib/domain/arcade';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
-import type { Game } from '@/lib/domain/types';
+import { FIELDDEFS, type Game, type ImageKey } from '@/lib/domain/types';
 import { startPrecarga, startPrecargaMsdos } from '@/lib/api/games';
 import { ArchivoPanel } from './ficha/ArchivoPanel';
 import { CabinetSection } from './ficha/GabineteSection';
@@ -22,7 +23,9 @@ import { GuiaChecklist } from './ficha/ComoSeJuegaSection';
 import { IdentitySection } from './ficha/IdentidadSection';
 import { MagazineSection } from './ficha/RevistasSection';
 import { ManualSection } from './ficha/ManualSection';
-import { MediaSection } from './ficha/ImagenesSection';
+import { GaleriaSection } from './ficha/GaleriaSection';
+import { ImagenesSection } from './ficha/ImagenesSection';
+import { VideoSection } from './ficha/VideoSection';
 import { PrecargaBanner, PrecargaResumen } from './ficha/PrecargaBanner';
 import { PrecargaCard } from './ficha/PrecargaCard';
 import { PresentationSection } from './ficha/PresentacionSection';
@@ -103,6 +106,15 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
   const isArcade = soportaArcadeDb(gameVivo.systemId);
   const isMsdos = soportaMsdos(gameVivo.systemId);
 
+  // Candidatas del primer slot de imagen sugerido: la sección no llama a la API, las busca el orquestador.
+  // Sin imagen sugerida no se busca nada; si la búsqueda falla, la fila no aparece y queda el modal.
+  const imagenSugerida: ImageKey | null = FIELDDEFS.images.find((f) => game.images[f.key]?.status === 'suggested')?.key ?? null;
+  const candidatasJob = useSuggestionsJob(gameVivo.id, imagenSugerida ?? '', imagenSugerida !== null);
+  const candidatasImagen = imagenSugerida && candidatasJob.phase === 'resultados' && candidatasJob.result
+    ? { key: imagenSugerida, candidatos: candidatasJob.result.candidatos.filter((c) => c.key === imagenSugerida) } // evita candidatas de otro slot en el render previo al reinicio del job
+    : null;
+  const numeroDe = (clave: string) => progress.secciones.find((s) => s.clave === clave)?.numero;
+
   const autosave = useAutosave({
     containerRef,
     save: (secciones) => {
@@ -176,7 +188,12 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
     }
   };
 
-  /** Recorre las sugerencias: lleva a la próxima y abre el modal de candidatas si el campo lo admite. */
+  /**
+   * Recorre las sugerencias: lleva a la próxima y abre el modal de candidatas si el campo lo admite.
+   * "Revisar una por una" y "Aceptar todo" salen de `progress.sugerencias`, así que cubren imágenes, video,
+   * textos, cómo se juega, trucos, acento y reseña. Identidad queda fuera: sus campos no tienen estado
+   * `suggested` (se resuelven con el lote de identidad); Galería tampoco.
+   */
   const revisarUnaPorUna = () => {
     const lista = progress.sugerencias;
     if (lista.length === 0) return;
@@ -243,13 +260,24 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
     {
       clave: 'imagenes',
       node: (
-        <MediaSection
+        <ImagenesSection
+          candidatas={candidatasImagen}
+          game={game}
+          onDelete={(key) => mutations.deleteField.mutate(key)}
+          onPickCandidata={(key, candidateId) => mutations.applySuggestion.mutate({ key, candidateId })}
+          onSuggestImage={(key) => setSuggestField(key)}
+          onUpload={(key, file) => mutations.uploadMedia.mutate({ key, file })}
+        />
+      ),
+    },
+    {
+      clave: 'video',
+      node: (
+        <VideoSection
           game={game}
           onDelete={(key) => mutations.deleteField.mutate(key)}
           onSuggestVideo={() => setSuggestField('video')}
-          onSuggestImage={(key) => setSuggestField(key)}
           onUpload={(key, file) => mutations.uploadMedia.mutate({ key, file })}
-          onGalleryChanged={refetchGame}
         />
       ),
     },
@@ -281,9 +309,11 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
     {
       clave: 'trucos',
       node: (
+        // TODO(backend): casilla «va en el paquete» por truco; requiere un campo nuevo en el modelo (ADR).
         <CheatsSection
           ref={registrar('trucos')}
           game={game}
+          numero={numeroDe('trucos')}
           onCheats={(groups) => mutations.setCheats.mutate({ groups })}
           onDelete={() => mutations.deleteField.mutate('cheats')}
           onSuggest={() => setSuggestField('cheats')}
@@ -306,11 +336,17 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
       ),
     },
     {
+      clave: 'galeria',
+      // TODO(backend): tilde «va en el paquete» por miniatura; requiere cambiar el contrato de la galería (ADR).
+      node: <GaleriaSection game={game} numero={numeroDe('galeria')} onChanged={refetchGame} />,
+    },
+    {
       clave: 'resena',
       node: (
         <ReviewSection
           ref={registrar('resena')}
           game={game}
+          numero={numeroDe('resena')}
           onReview={(score, cats) => mutations.setReview.mutate({ score, cats })}
           onSuggest={() => setSuggestField('review')}
         />

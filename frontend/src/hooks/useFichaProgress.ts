@@ -18,10 +18,12 @@ import type { Game } from '@/lib/domain/types';
 export type SeccionClave =
   | 'identidad'
   | 'imagenes'
+  | 'video'
   | 'textos'
   | 'guia'
   | 'trucos'
   | 'presentacion'
+  | 'galeria'
   | 'resena'
   | 'manual';
 
@@ -31,14 +33,16 @@ export interface SeccionDef {
   label: string;
 }
 
-/** Orden de DESIGN_SPEC §5.1. La Ola 4 puede partir una sección (p. ej. Video, Galería) sumando claves. */
+/** Orden y numeración de DESIGN_SPEC §5.1 (el Gabinete vive en la columna lateral y no es un paso). */
 export const FICHA_SECCIONES: readonly SeccionDef[] = [
   { clave: 'identidad', label: 'Identidad' },
-  { clave: 'imagenes', label: 'Imágenes y video' },
+  { clave: 'imagenes', label: 'Imágenes' },
+  { clave: 'video', label: 'Video' },
   { clave: 'textos', label: 'Textos' },
   { clave: 'guia', label: 'Cómo se juega' },
   { clave: 'trucos', label: 'Trucos' },
   { clave: 'presentacion', label: 'Presentación' },
+  { clave: 'galeria', label: 'Galería' },
   { clave: 'resena', label: 'Reseña' },
   { clave: 'manual', label: 'Manual y revistas' },
 ];
@@ -97,7 +101,7 @@ function destinosDeFaltantes(): Map<string, Destino> {
   const mapa = new Map<string, Destino>();
   for (const f of FIELDDEFS.identity) mapa.set(`Identidad: ${f.label}`, { seccion: 'identidad', campo: f.key, etiquetas: [f.label] });
   for (const f of FIELDDEFS.images) mapa.set(f.label, { seccion: 'imagenes', campo: f.key, etiquetas: [f.label, `Cargar ${f.label}`] });
-  for (const f of FIELDDEFS.videos) mapa.set(f.label, { seccion: 'imagenes', campo: f.key, etiquetas: [f.label, `Cargar ${f.label}`] });
+  for (const f of FIELDDEFS.videos) mapa.set(f.label, { seccion: 'video', campo: f.key, etiquetas: [f.label, `Cargar ${f.label}`] });
   for (const f of FIELDDEFS.texts) mapa.set(f.label, { seccion: 'textos', campo: f.key, etiquetas: [f.label] });
   for (const f of FIELDDEFS.rich) {
     if (f.key === 'accent') mapa.set(`Presentación: ${f.label}`, { seccion: 'presentacion', campo: 'accent', etiquetas: [f.label] });
@@ -151,7 +155,7 @@ function sugerenciasDe(game: Game): PendienteFicha[] {
     if (game.images[f.key]?.status === 'suggested') sumar('imagenes', f.key, f.label, f.key, [f.label, `Cargar ${f.label}`]);
   }
   for (const f of FIELDDEFS.videos) {
-    if (game.video[f.key]?.status === 'suggested') sumar('imagenes', f.key, f.label, f.key, [f.label, `Cargar ${f.label}`]);
+    if (game.video[f.key]?.status === 'suggested') sumar('video', f.key, f.label, f.key, [f.label, `Cargar ${f.label}`]);
   }
   for (const f of FIELDDEFS.texts) {
     if (game.texts[f.key]?.status === 'suggested') sumar(GUIA_KEYS.has(f.key) ? 'guia' : 'textos', f.key, sinParentesis(f.label), f.key);
@@ -172,6 +176,10 @@ function tieneContenido(game: Game, clave: SeccionClave): boolean {
       return true; // su contenido es obligatorio: sin faltantes está completa
     case 'guia':
       return (game.guiaChecklist?.length ?? 0) > 0;
+    case 'video':
+      return Object.values(game.video).some((v) => v && v.status !== 'empty');
+    case 'galeria':
+      return (game.gallery?.length ?? 0) > 0;
     case 'trucos':
       return game.cheats.status !== 'empty';
     case 'resena':

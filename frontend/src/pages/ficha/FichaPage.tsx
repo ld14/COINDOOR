@@ -9,9 +9,9 @@
  * página la envuelve; la sección NO dibuja ancla, StepNav ni botones de guardado.
  *
  * 1. Ancla. El wrapper es `<section id="seccion-<clave>" data-seccion="<clave>">`. `<clave>` es
- *    una de `FICHA_SECCIONES` (hooks/useFichaProgress): identidad, imagenes, textos, guia,
- *    trucos, presentacion, resena, manual. Para sumar un paso (p. ej. `video`, `galeria`) se agrega
- *    a `FICHA_SECCIONES` y se parte el nodo en FichaJuego; el StepNav y el progreso lo toman solos.
+ *    una de `FICHA_SECCIONES` (hooks/useFichaProgress), en el orden de DESIGN_SPEC §5.1: identidad,
+ *    imagenes, video, textos, guia, trucos, presentacion, galeria, resena, manual. Para sumar un paso se
+ *    agrega a `FICHA_SECCIONES` y se monta su nodo en FichaJuego; el StepNav y el progreso lo toman solos.
  *    `scroll-margin-top` ya compensa el StepNav sticky.
  *
  * 2. Props. La sección recibe `game` (siempre el último dato del servidor... salvo mientras hay un

@@ -16,20 +16,25 @@ export function useSuggestionsJob(gameId: string, key: string, open: boolean) {
     setPhase('buscando');
     setResult(null);
     void (async () => {
-      const { jobId } = await createSuggestionJob(gameId, key, reintentar, source);
-      while (requestId.current === id) {
-        const job = await getJob<SuggestionsResult>(jobId);
-        if (requestId.current !== id) return;
-        if (job.status === 'succeeded' && job.result) {
-          setResult(job.result);
-          setPhase(deriveFase(job.result));
-          return;
+      try {
+        const { jobId } = await createSuggestionJob(gameId, key, reintentar, source);
+        while (requestId.current === id) {
+          const job = await getJob<SuggestionsResult>(jobId);
+          if (requestId.current !== id) return;
+          if (job.status === 'succeeded' && job.result) {
+            setResult(job.result);
+            setPhase(deriveFase(job.result));
+            return;
+          }
+          if (job.status === 'failed' || job.status === 'cancelled') {
+            setPhase('error');
+            return;
+          }
+          await new Promise((resolve) => setTimeout(resolve, POLL_MS));
         }
-        if (job.status === 'failed' || job.status === 'cancelled') {
-          setPhase('error');
-          return;
-        }
-        await new Promise((resolve) => setTimeout(resolve, POLL_MS));
+      } catch {
+        // Una caída de la API no puede dejar una promesa sin atrapar: la fase pasa a error.
+        if (requestId.current === id) setPhase('error');
       }
     })();
   }, [gameId, key]);
@@ -66,7 +71,7 @@ export function useSuggestionsJob(gameId: string, key: string, open: boolean) {
         }
         await new Promise((resolve) => setTimeout(resolve, POLL_MS));
       }
-    })();
+    })().catch(() => setPhase('error'));
   }, [gameId, key]);
 
   return { phase, result, retry: retryAll, retrySource };

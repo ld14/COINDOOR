@@ -12,7 +12,7 @@ describe('computeFichaProgress', () => {
     const p = computeFichaProgress(undefined);
     expect(p.percent).toBe(0);
     expect(p.cola).toEqual([]);
-    expect(p.secciones.map((s) => s.clave)).toEqual(['identidad', 'imagenes', 'textos', 'guia', 'trucos', 'presentacion', 'resena', 'manual']);
+    expect(p.secciones.map((s) => s.clave)).toEqual(['identidad', 'imagenes', 'video', 'textos', 'guia', 'trucos', 'presentacion', 'galeria', 'resena', 'manual']);
   });
 
   it('una ficha completa marca 100% y no deja pendientes', () => {

@@ -20,6 +20,8 @@ const llamadas = (): LlamadaFetch[] => vi.mocked(fetch).mock.calls as LlamadaFet
 const llamadasA = (metodo: string, fragmento: string) =>
   llamadas().filter(([url, init]) => (init?.method ?? 'GET') === metodo && String(url).includes(fragmento));
 
+const CLAVES = ['identidad', 'imagenes', 'video', 'textos', 'guia', 'trucos', 'presentacion', 'galeria', 'resena', 'manual'];
+
 describe('Andamiaje de la ficha', () => {
   it('arma crumbs, hero con progreso, StepNav, columna lateral y ActionBar', async () => {
     renderApp('/juegos/mslug');
@@ -28,12 +30,44 @@ describe('Andamiaje de la ficha', () => {
     expect(screen.getByRole('navigation', { name: 'Ruta' })).toBeInTheDocument();
     expect(screen.getByRole('progressbar', { name: 'Completitud de la ficha' })).toBeInTheDocument();
     const pasos = screen.getByRole('navigation', { name: 'Secciones de la ficha' });
-    expect(within(pasos).getAllByRole('button')).toHaveLength(8);
+    expect(within(pasos).getAllByRole('button')).toHaveLength(10);
     expect(screen.getByRole('complementary', { name: 'Pendientes y archivo' })).toBeInTheDocument();
     expect(screen.getByText('Siguiente pendiente')).toBeInTheDocument();
-    for (const clave of ['identidad', 'imagenes', 'textos', 'guia', 'trucos', 'presentacion', 'resena', 'manual']) {
+    for (const clave of CLAVES) {
       expect(document.getElementById(`seccion-${clave}`)).not.toBeNull();
     }
+  });
+
+  it('monta las 10 secciones en el orden y con la numeración de DESIGN_SPEC §5.1', async () => {
+    renderApp('/juegos/mslug');
+    await screen.findByRole('heading', { name: 'Metal Slug' });
+
+    const anclas = [...document.querySelectorAll('section[data-seccion]')].map((el) => el.getAttribute('data-seccion'));
+    expect(anclas.filter((c) => CLAVES.includes(String(c)))).toEqual(CLAVES);
+    const pasos = screen.getByRole('navigation', { name: 'Secciones de la ficha' });
+    expect(within(pasos).getAllByRole('button').map((b) => b.textContent)).toEqual(
+      expect.arrayContaining([expect.stringContaining('Video'), expect.stringContaining('Galería')]),
+    );
+    // «Cómo se juega» no dibuja su Card si el juego no trae checklist: ahí no hay número que verificar.
+    for (const [i, clave] of CLAVES.entries()) {
+      const numero = document.getElementById(`seccion-${clave}`)?.querySelector('header span[aria-hidden="true"]');
+      if (clave === 'guia' && !numero) continue;
+      expect(numero?.textContent, clave).toBe(String(i + 1));
+    }
+    expect(document.getElementById('seccion-gabinete')?.closest('aside')).not.toBeNull();
+  });
+
+  it('el StepNav lleva a las anclas de Video y Galería', async () => {
+    renderApp('/juegos/mslug');
+    await screen.findByRole('heading', { name: 'Metal Slug' });
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+
+    const pasos = screen.getByRole('navigation', { name: 'Secciones de la ficha' });
+    await userEvent.click(within(pasos).getByRole('button', { name: /Galería/ }));
+    expect(scroll.mock.contexts.at(-1)).toBe(document.getElementById('seccion-galeria'));
+    await userEvent.click(within(pasos).getByRole('button', { name: /Video/ }));
+    expect(scroll.mock.contexts.at(-1)).toBe(document.getElementById('seccion-video'));
   });
 
   it('ya no hay botones de guardado global ni de la cabecera', async () => {

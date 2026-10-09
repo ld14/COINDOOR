@@ -1,43 +1,78 @@
 import { useEffect, useRef, useState } from 'react';
 import { Card, DosButton, OriginChip } from '@/components/dos';
 import { Dropzone } from '@/components/dos/entrada';
-import { GalleryPanel } from '@/components/GalleryPanel';
 import { ImageModal } from '@/components/ImageModal';
+import type { SuggestionCandidate } from '@/lib/api/suggestions';
 import { FIELDDEFS } from '@/lib/domain/types';
 import type { Game, ImageKey, MediaField, VideoKey } from '@/lib/domain/types';
 import { useFichaAutosave } from './autosaveContext';
 import { confirmManualDelete } from './helpers';
-import { VideoSection } from './VideoSection';
 import styles from './ImagenesSection.module.css';
-
-// Los pasos 2 (Imágenes) y 3 (Video) son dos Cards; Video vive en su archivo pero se monta junto
-// con las imágenes mientras el orquestador tenga una sola sección `imagenes` (ver reporte de la unidad).
-export { VideoSection };
 
 const SUGERIR = 'Sugerir desde ArcadeDB';
 /** Si una aceptación no se refleja en la ficha (falló), se sigue con la próxima pasado este tiempo. */
 const ESPERA_ACEPTAR_MS = 10000;
 
-interface MediaSectionProps {
-  game: Game;
-  onDelete: (key: ImageKey | VideoKey) => void;
-  onSuggestVideo: () => void;
-  onSuggestImage: (key: ImageKey) => void;
-  onUpload: (key: ImageKey | VideoKey, file: File) => void;
-  onGalleryChanged: () => void;
+/** Candidatas de un slot de imagen, buscadas por el orquestador (esta sección no llama a la API). */
+export interface CandidatasImagen {
+  key: ImageKey;
+  candidatos: SuggestionCandidate[];
 }
 
-export function MediaSection({ game, onDelete, onSuggestVideo, onSuggestImage, onUpload, onGalleryChanged }: MediaSectionProps) {
+interface ImagenesSectionProps {
+  game: Game;
+  onDelete: (key: ImageKey | VideoKey) => void;
+  onSuggestImage: (key: ImageKey) => void;
+  onUpload: (key: ImageKey | VideoKey, file: File) => void;
+  /** Fila «N opciones — elegí una»; solo aparece con dos o más candidatas aplicables. */
+  candidatas?: CandidatasImagen | null;
+  onPickCandidata?: (key: ImageKey, candidateId: string) => void;
+}
+
+/** Las candidatas que se pueden aplicar con un clic: tienen miniatura y no son solo una referencia. */
+function aplicables(candidatas?: CandidatasImagen | null): SuggestionCandidate[] {
+  return (candidatas?.candidatos ?? []).filter((c) => c.kind === 'media' && c.clase === 'aplicable' && (c.previewUrl || c.mediaUrl));
+}
+
+function FilaCandidatas({ candidatas, field, label, onPick, onUpload }: {
+  candidatas: CandidatasImagen;
+  field?: MediaField;
+  label: string;
+  onPick: (candidateId: string) => void;
+  onUpload: (file: File) => void;
+}) {
+  const lista = aplicables(candidatas);
+  const fuentes = [...new Set(lista.map((c) => c.fuente))];
+  const origen = fuentes.length === 1 ? fuentes[0] : 'Las fuentes';
+  // Resalta la que la precarga dejó puesta (misma fuente que el slot), nunca una a ojo.
+  const elegida = field?.source ? lista.find((c) => c.fuente === field.source)?.id : undefined;
   return (
-    <>
-      <ImagenesSection game={game} onDelete={onDelete} onSuggestImage={onSuggestImage} onUpload={onUpload} />
-      <VideoSection game={game} onDelete={onDelete} onSuggestVideo={onSuggestVideo} onUpload={onUpload} />
-      <GalleryPanel gallery={game.gallery ?? []} gameId={game.id} onChanged={onGalleryChanged} />
-    </>
+    <div aria-label={`Opciones de ${label}`} className={styles.cands} role="group">
+      <p className={styles.candsHead}><b>{label}</b> · {origen} encontró {lista.length} opciones — elegí una</p>
+      <div className={styles.candsRow}>
+        {lista.map((c) => (
+          <button
+            aria-label={`Usar la opción de ${c.fuente}`}
+            aria-pressed={c.id === elegida}
+            className={[styles.cand, c.id === elegida ? styles.candSel : ''].filter(Boolean).join(' ')}
+            key={c.id}
+            onClick={() => onPick(c.id)}
+            type="button"
+          >
+            <img alt="" className={styles.candThumb} src={c.previewUrl ?? c.mediaUrl ?? ''} />
+            <span>{c.fuente}</span>
+          </button>
+        ))}
+        <div className={styles.candDrop}>
+          <b>Usar la mía</b>
+          <Dropzone accept="image/*" label="Soltá o pegá con Ctrl+V" onFile={onUpload} />
+        </div>
+      </div>
+    </div>
   );
 }
 
-export function ImagenesSection({ game, onDelete, onSuggestImage, onUpload }: Omit<MediaSectionProps, 'onSuggestVideo' | 'onGalleryChanged'>) {
+export function ImagenesSection({ game, onDelete, onSuggestImage, onUpload, candidatas, onPickCandidata }: ImagenesSectionProps) {
   const { aceptar } = useFichaAutosave();
   const sugeridas = FIELDDEFS.images.filter((f) => game.images[f.key]?.status === 'suggested').map((f) => f.key);
   const cargadas = FIELDDEFS.images.filter((f) => (game.images[f.key]?.status ?? 'empty') !== 'empty').length;
@@ -76,6 +111,15 @@ export function ImagenesSection({ game, onDelete, onSuggestImage, onUpload }: Om
       number={2}
       title="Imágenes"
     >
+      {candidatas && aplicables(candidatas).length >= 2 ? (
+        <FilaCandidatas
+          candidatas={candidatas}
+          field={game.images[candidatas.key]}
+          label={FIELDDEFS.images.find((f) => f.key === candidatas.key)?.label ?? candidatas.key}
+          onPick={(id) => onPickCandidata?.(candidatas.key, id)}
+          onUpload={(file) => onUpload(candidatas.key, file)}
+        />
+      ) : null}
       <div className={styles.grid}>
         {FIELDDEFS.images.map((field) => (
           <ImageSlot

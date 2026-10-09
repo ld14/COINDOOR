@@ -7,8 +7,7 @@ import type { Game } from '@/lib/domain/types';
  * en `media/_gallery/` si se tilda «Galería» al exportar (ADR-0016). No tiene estado local ni `save()`:
  * cada acción (traer, usar como…, borrar) escribe directo y avisa con `onChanged`.
  *
- * Para montarla, FichaJuego la usa como `node` de una sección `galeria` (hay que sumarla a `FICHA_SECCIONES`)
- * o la deja debajo de «Imágenes y video» en lugar del `GalleryPanel` viejo.
+ * FichaJuego la monta como `node` de la sección `galeria` (paso 8, ancla `seccion-galeria`).
  */
 export function GaleriaSection({ game, onChanged, numero = 8 }: {
   game: Game;
