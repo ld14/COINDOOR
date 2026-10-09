@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { Banner, DosButton, DosInput, DosSelect, DosTextarea, FieldTag, Modal, Panel, ProgressBar, Rail, SectionHeader, Spinner, StatusBadge, StatusBar, SunkenBox } from '@/components/dos';
+import { BaseDemo } from './catalogo/BaseDemo';
+import { EntradaDemo } from './catalogo/EntradaDemo';
+import { NavDemo } from './catalogo/NavDemo';
 import styles from './_Catalogo.module.css';
 
 export function Catalogo() {
@@ -31,6 +34,9 @@ export function Catalogo() {
         <Panel className={styles.menuPreview}><SectionHeader>Rail</SectionHeader><Rail counts={{ games: 29, systems: 4, romsWithoutSheet: 7, pendingExport: 2 }} /></Panel>
         <Panel className={styles.statusPreview}><SectionHeader>StatusBar</SectionHeader><StatusBar /></Panel>
       </div>
+      <BaseDemo />
+      <EntradaDemo />
+      <NavDemo />
       <Modal onClose={() => setOpen(false)} open={open} title="Modal de catálogo">
         <div className={styles.stack}>
           <DosInput aria-label="Campo dentro del modal" defaultValue="Foco atrapado" />

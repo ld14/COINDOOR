@@ -1,4 +1,8 @@
 export { Banner } from './Banner';
+export { Card } from './Card';
+export type { CardProps } from './Card';
+export { OriginChip } from './OriginChip';
+export type { OriginStatus } from './OriginChip';
 export { DosButton } from './DosButton';
 export type { DosButtonVariant } from './DosButton';
 export { DosFileInput } from './DosFileInput';
@@ -20,3 +24,5 @@ export type { GameStatus } from './StatusBadge';
 export { StatusBar } from './StatusBar';
 export { SunkenBox } from './SunkenBox';
 export { TopBar } from './TopBar';
+export * from './entrada';
+export * from './nav';
