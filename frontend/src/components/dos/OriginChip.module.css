@@ -1,0 +1,49 @@
+.wrap {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.chip {
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: var(--text-meta);
+  font-weight: 600;
+  padding: 1px var(--space-2);
+  white-space: nowrap;
+}
+
+.empty {
+  background: transparent;
+  border-color: var(--line-soft);
+  color: var(--ink-muted);
+}
+
+.suggested {
+  background: var(--accent-2);
+  color: var(--ink-on-accent-2);
+}
+
+/* El punto (primer carácter) lleva el color de origen; el texto queda en tinta. */
+.manual::first-letter {
+  color: var(--accent);
+}
+
+.external::first-letter {
+  color: var(--accent-3);
+}
+
+.required {
+  background: var(--error);
+  border-radius: var(--radius-sm);
+  color: var(--ink-on-accent);
+  font-family: var(--font-body);
+  font-size: var(--text-meta);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 1px var(--space-2);
+}

@@ -90,7 +90,7 @@ describe('Edición de ficha', () => {
     await userEvent.type(sinopsis, 'Una sinopsis nueva.');
     await userEvent.click(screen.getByRole('button', { name: 'Guardar sinopsis' }));
 
-    await waitFor(() => expect(screen.getByText('● MANUAL')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('● Manual')).toBeInTheDocument());
   });
 
   it('el objetivo se guarda aparte de la sinopsis y es opcional', async () => {
@@ -98,11 +98,11 @@ describe('Edición de ficha', () => {
 
     await screen.findByRole('heading', { name: 'Metal Slug' });
     const caja = screen.getByLabelText('Objetivo').parentElement!;
-    expect(within(caja).getByText('○ VACÍO')).toBeInTheDocument();
+    expect(within(caja).getByText('○ Vacío')).toBeInTheDocument();
     await userEvent.type(screen.getByLabelText('Objetivo'), 'Rescatar a los prisioneros.');
     await userEvent.click(screen.getByRole('button', { name: 'Guardar objetivo' }));
 
-    await waitFor(() => expect(within(caja).getByText('● MANUAL')).toBeInTheDocument());
+    await waitFor(() => expect(within(caja).getByText('● Manual')).toBeInTheDocument());
     expect(screen.getByLabelText('Sinopsis')).toHaveValue('');
   });
 
@@ -113,13 +113,13 @@ describe('Edición de ficha', () => {
     const pasos = screen.getByLabelText('Primeros pasos').parentElement!;
     await userEvent.type(screen.getByLabelText('Primeros pasos'), 'Mover la paleta');
     await userEvent.click(screen.getByRole('button', { name: 'Guardar primeros pasos' }));
-    await waitFor(() => expect(within(pasos).getByText('● MANUAL')).toBeInTheDocument());
+    await waitFor(() => expect(within(pasos).getByText('● Manual')).toBeInTheDocument());
 
     const modo = screen.getByLabelText('Modo multijugador').parentElement!;
     await userEvent.selectOptions(screen.getByLabelText('Modo multijugador'), 'versus');
     await userEvent.click(screen.getByRole('button', { name: 'Guardar modo' }));
-    await waitFor(() => expect(within(modo).getByText('● MANUAL')).toBeInTheDocument());
-    expect(within(screen.getByLabelText('Reglas esenciales').parentElement!).getByText('○ VACÍO')).toBeInTheDocument();
+    await waitFor(() => expect(within(modo).getByText('● Manual')).toBeInTheDocument());
+    expect(within(screen.getByLabelText('Reglas esenciales').parentElement!).getByText('○ Vacío')).toBeInTheDocument();
   });
 
   it('borrar campo manual pide confirmación y vuelve a vacío sin ocultar la sección', async () => {

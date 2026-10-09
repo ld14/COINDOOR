@@ -1,17 +1,14 @@
-import styles from './FieldTag.module.css';
+import { OriginChip } from './OriginChip';
 
 export type FieldTagStatus = 'manual' | 'suggested' | 'empty';
 
-const label: Record<FieldTagStatus, string> = {
-  manual: '● MANUAL',
-  suggested: '◔ SUGERIDO',
-  empty: '○ VACÍO',
-};
-
 interface FieldTagProps {
+  required?: boolean;
+  source?: string;
   status?: FieldTagStatus;
 }
 
-export function FieldTag({ status = 'empty' }: FieldTagProps) {
-  return <span className={[styles.tag, styles[status]].join(' ')}>{label[status]}</span>;
+/** Alias histórico de {@link OriginChip}; los usos nuevos deberían importar OriginChip. */
+export function FieldTag({ required, source, status = 'empty' }: FieldTagProps) {
+  return <OriginChip required={required} source={source} status={status} />;
 }

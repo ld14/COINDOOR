@@ -1,14 +1,34 @@
 .input {
-  background: var(--dos-panel-light);
-  border: var(--dos-border-2) solid var(--dos-edge-dark);
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
   box-sizing: border-box;
-  color: var(--dos-ink);
-  font: inherit;
-  min-height: var(--dos-control-height);
-  padding: var(--dos-space-1) var(--dos-space-3);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  min-height: 40px;
+  padding: var(--space-2) var(--space-3);
   width: 100%;
 }
 
+.input::placeholder {
+  color: var(--ink-muted);
+}
+
 .input:disabled {
-  color: var(--dos-edge-dark);
+  background: var(--surface-1);
+  border-color: var(--line-soft);
+  color: var(--ink-muted);
+}
+
+.invalid {
+  border-color: var(--error);
+}
+
+.error {
+  color: var(--error);
+  display: block;
+  font-size: var(--text-meta);
+  font-weight: 600;
+  margin-top: var(--space-1);
 }

@@ -1,58 +1,45 @@
 .backdrop {
   align-items: center;
-  background: var(--dos-backdrop);
+  background: color-mix(in srgb, var(--surface-inverse) 62%, transparent);
   display: flex;
   inset: 0;
   justify-content: center;
-  padding: var(--dos-space-6);
+  padding: var(--space-5);
   position: fixed;
   z-index: 10;
 }
 
 .window {
-  background: var(--dos-panel);
-  border: var(--dos-border-2) outset var(--dos-panel);
-  box-shadow: var(--dos-hard-shadow);
   max-width: 100%;
-  width: var(--dos-modal-medium);
+  width: 520px;
 }
 
 .small {
-  width: var(--dos-modal-small);
+  width: 420px;
 }
 
 .large {
-  width: var(--dos-modal-large);
+  width: 720px;
 }
 
-.titlebar {
-  align-items: center;
-  background: var(--dos-titlebar);
-  color: var(--dos-ink-invert);
+.card {
   display: flex;
-  font-size: var(--dos-size-titlebar);
-  font-weight: 700;
-  justify-content: space-between;
-  padding: var(--dos-space-titlebar-y) var(--dos-space-3);
+  flex-direction: column;
+  max-height: 85vh;
+}
+
+.card > div:last-child {
+  overflow-y: auto;
 }
 
 .close {
-  background: var(--dos-panel);
-  border: var(--dos-border-2) outset var(--dos-panel);
-  color: var(--dos-ink);
+  background: var(--surface-1);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink);
   cursor: pointer;
+  font-family: var(--font-body);
   font-weight: 700;
-  height: var(--dos-modal-close-height);
   line-height: 1;
-  width: var(--dos-modal-close-width);
-}
-
-.close:active {
-  border-style: inset;
-}
-
-.body {
-  max-height: 70vh;
-  overflow-y: auto;
-  padding: var(--dos-space-6);
+  padding: var(--space-1) var(--space-2);
 }
