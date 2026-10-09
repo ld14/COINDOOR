@@ -1,0 +1,45 @@
+.group {
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.segment {
+  background: transparent;
+  border: 0;
+  border-right: var(--border-control) solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+}
+
+.segment:last-child {
+  border-right: 0;
+}
+
+.segment:focus-visible {
+  box-shadow: inset var(--focus-ring);
+  outline: none;
+}
+
+.active {
+  background: var(--accent);
+  color: var(--ink-on-accent);
+}
+
+.segment:disabled {
+  cursor: not-allowed;
+}
+
+.segment:disabled:not(.active) {
+  color: var(--ink-muted);
+}
+
+.impossible {
+  text-decoration: line-through;
+}

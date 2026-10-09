@@ -1,0 +1,102 @@
+.wrap {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.zone {
+  align-items: center;
+  background: var(--surface-2);
+  border: var(--border-control) dashed var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-5) var(--space-4);
+  text-align: center;
+}
+
+.zone:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.over {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.disabled {
+  color: var(--ink-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.rejected {
+  border-color: var(--error);
+}
+
+.busy {
+  cursor: default;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 600;
+}
+
+.hint {
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
+}
+
+.error {
+  color: var(--error);
+  font-size: var(--text-meta);
+  font-weight: 600;
+}
+
+.input {
+  display: none;
+}
+
+.track {
+  background: var(--surface-1);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-pill);
+  height: 12px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.fill {
+  background: var(--accent);
+  height: 100%;
+}
+
+.action {
+  align-self: center;
+  background: var(--surface-1);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: 600;
+  padding: var(--space-2) var(--space-3);
+}
+
+.action:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.action:disabled {
+  color: var(--ink-muted);
+  cursor: not-allowed;
+}
