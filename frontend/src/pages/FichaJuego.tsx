@@ -13,7 +13,7 @@ import { useSuggestionsJob } from '@/hooks/useSuggestionsJob';
 import { useSystems } from '@/hooks/useSystems';
 import { soportaArcadeDb, soportaMsdos } from '@/lib/domain/arcade';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
-import { FIELDDEFS, type Game, type ImageKey } from '@/lib/domain/types';
+import type { Game, ImageKey } from '@/lib/domain/types';
 import { startPrecarga, startPrecargaMsdos } from '@/lib/api/games';
 import { ArchivoPanel } from './ficha/ArchivoPanel';
 import { CabinetSection } from './ficha/GabineteSection';
@@ -357,7 +357,7 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
       clave: 'manual',
       node: (
         <>
-          <ManualSection game={game} onUpload={(file) => mutations.uploadManual.mutate(file)} onDelete={(id) => mutations.deleteManual.mutate(id)} />
+          <ManualSection game={game} onUpload={(file) => mutations.uploadManual.mutate(file)} onUploadAsync={(file) => mutations.uploadManual.mutateAsync(file)} onDelete={(id) => mutations.deleteManual.mutate(id)} />
           <MagazineSection game={game} />
         </>
       ),
