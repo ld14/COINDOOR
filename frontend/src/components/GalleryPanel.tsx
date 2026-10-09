@@ -1,40 +1,41 @@
 import { useCallback, useEffect, useState } from 'react';
-import { DosButton, DosSelect, Modal, Panel, SectionHeader, Spinner, SunkenBox } from '@/components/dos';
+import { Card, DosButton, DosSelect, Modal, Spinner } from '@/components/dos';
 import { ImageModal } from '@/components/ImageModal';
 import {
   deleteGalleryImage,
   listGalleryCandidates,
   saveGallery,
-  useGalleryImageAs,
+  useGalleryImageAs as aplicarImagenGaleria,
   type GalleryCandidate,
   type GuardarGaleriaItem,
 } from '@/lib/api/gallery';
 import { getJob } from '@/lib/api/jobs';
 import { FIELDDEFS } from '@/lib/domain/types';
 import type { GalleryImage, ImageKey } from '@/lib/domain/types';
-import styles from '@/pages/ReadPages.module.css';
+import styles from './GalleryPanel.module.css';
 
 interface GalleryPanelProps {
   gameId: string;
   gallery: GalleryImage[];
   onChanged: () => void;
+  /** Solo el contenido, sin tarjeta propia: lo usa quien ya envuelve la galería en su Card numerada. */
+  bare?: boolean;
 }
 
-export function GalleryPanel({ gameId, gallery, onChanged }: GalleryPanelProps) {
+export function GalleryPanel({ gameId, gallery, onChanged, bare = false }: GalleryPanelProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [error, setError] = useState('');
 
-  return (
-    <Panel>
-      <SectionHeader>GALERÍA</SectionHeader>
-      <SunkenBox className={styles.stack}>
+  const contenido = (
+    <>
+      <div className={styles.stack}>
         <p className={styles.meta}>
           Banco de imágenes de ArcadeDB, ImageSearch y Launchbox, aparte de los campos del
-          contrato. Viaja en el paquete si la tildás al exportar.
+          contrato. Viaja en el paquete si tildás Galería al exportar.
         </p>
         {error ? <p className={styles.error}>{error}</p> : null}
         {gallery.length === 0 ? (
-          <p className={styles.empty}>No Disponible</p>
+          <p className={styles.empty}>Todavía no hay imágenes en la galería.</p>
         ) : (
           <div className={styles.galleryGrid}>
             {gallery.map((imagen) => (
@@ -49,11 +50,11 @@ export function GalleryPanel({ gameId, gallery, onChanged }: GalleryPanelProps) 
           </div>
         )}
         <div className={styles.toolbar}>
-          <DosButton onClick={() => setPickerOpen(true)} variant="primary-small">
-            Traer de imágenes
+          <DosButton onClick={() => setPickerOpen(true)} size="sm" variant="secondary">
+            Traer de ArcadeDB / LaunchBox
           </DosButton>
         </div>
-      </SunkenBox>
+      </div>
       {pickerOpen ? (
         <GalleryPicker
           gameId={gameId}
@@ -64,8 +65,11 @@ export function GalleryPanel({ gameId, gallery, onChanged }: GalleryPanelProps) 
           }}
         />
       ) : null}
-    </Panel>
+    </>
   );
+
+  if (bare) return contenido;
+  return <Card title="Galería">{contenido}</Card>;
 }
 
 function GalleryItem({
@@ -112,7 +116,7 @@ function GalleryItem({
         disabled={ocupado}
         onChange={(event) => {
           const campo = event.target.value as ImageKey;
-          if (campo) void correr(() => useGalleryImageAs(gameId, imagen.id, campo));
+          if (campo) void correr(() => aplicarImagenGaleria(gameId, imagen.id, campo));
           event.target.value = '';
         }}
         value=""
@@ -268,7 +272,10 @@ function GalleryPicker({
                 ) : (
                   <div className={styles.galleryGrid}>
                     {items.map((candidato) => (
-                      <label className={styles.galleryItem} key={candidato.id}>
+                      <label
+                        className={[styles.galleryItem, elegidos.has(candidato.id) ? styles.tildada : ''].filter(Boolean).join(' ')}
+                        key={candidato.id}
+                      >
                         <div className={styles.galleryThumb}>
                           <img
                             alt={candidato.label}

@@ -90,8 +90,8 @@ describe('Pantallas de lectura', () => {
 
     expect(await screen.findByRole('heading', { name: 'Contra' })).toBeInTheDocument();
     expect(screen.getByText('88')).toBeInTheDocument();
-    expect(screen.getByText('30 vidas')).toBeInTheDocument();
-    expect(screen.getByText('↑ ↑ ↓ ↓ ← → ← → B A')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('30 vidas')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('↑ ↑ ↓ ↓ ← → ← → B A')).toBeInTheDocument();
   });
 
   it('muestra error explícito para juego inexistente', async () => {
