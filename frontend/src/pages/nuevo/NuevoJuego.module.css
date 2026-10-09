@@ -1,0 +1,238 @@
+.page {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.title {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 400;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.subtitle,
+.hint {
+  color: var(--ink-muted);
+  font-size: var(--text-body);
+  line-height: 22px;
+  margin: var(--space-2) 0 0;
+}
+
+.hint {
+  font-size: var(--text-meta);
+  margin: 0;
+}
+
+.layout {
+  align-items: start;
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.stack,
+.form {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.fields {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.label {
+  color: var(--ink);
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.subhead {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--text-body);
+  font-weight: 400;
+  margin: 0;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.error {
+  color: var(--error);
+  font-size: var(--text-label);
+  font-weight: 600;
+  margin: var(--space-3) 0 0;
+}
+
+.actions,
+.nav {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  margin-top: var(--space-4);
+}
+
+.actions {
+  justify-content: flex-end;
+}
+
+.detected {
+  align-items: center;
+  background: var(--accent-soft);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--text-label);
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+}
+
+.chip {
+  background: var(--accent-3);
+  border-radius: var(--radius-pill);
+  color: var(--ink-on-accent);
+  font-size: var(--text-meta);
+  font-weight: 600;
+  padding: 0 var(--space-3);
+}
+
+.romGrid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  max-height: 24rem;
+  overflow-y: auto;
+  padding: var(--space-1);
+}
+
+.romCard {
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-lg);
+  color: var(--ink);
+  cursor: pointer;
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3);
+  text-align: left;
+}
+
+.romCard:hover {
+  box-shadow: var(--shadow-pop);
+}
+
+.romCard:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.romSelected {
+  background: var(--accent-soft);
+  box-shadow: var(--shadow-pop);
+}
+
+.romType {
+  align-self: start;
+  background: var(--surface-inverse);
+  border-radius: var(--radius-sm);
+  color: var(--ink-inverse);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  font-weight: 600;
+  justify-self: start;
+  padding: 0 var(--space-2);
+}
+
+.romName {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.romMeta {
+  color: var(--ink-muted);
+  font-size: var(--text-meta);
+}
+
+.romPath {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  overflow-wrap: anywhere;
+}
+
+.summary {
+  background: var(--surface-inverse);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  color: var(--ink-inverse);
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-4);
+}
+
+.summaryTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-section);
+  font-weight: 400;
+  margin: 0;
+}
+
+.sumList {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.sumRow {
+  display: grid;
+  gap: 0;
+}
+
+.sumRow dt {
+  color: var(--accent-2);
+  font-size: var(--text-meta);
+  font-weight: 600;
+}
+
+.sumRow dd {
+  font-size: var(--text-label);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.check {
+  align-items: center;
+  display: flex;
+  font-size: var(--text-label);
+  gap: var(--space-2);
+}
+
+.check input {
+  accent-color: var(--accent-2);
+  height: 18px;
+  width: 18px;
+}
