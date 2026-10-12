@@ -31,6 +31,7 @@ import { PrecargaCard } from './ficha/PrecargaCard';
 import { PresentationSection } from './ficha/PresentacionSection';
 import { ReviewSection } from './ficha/ResenaSection';
 import { TextSection } from './ficha/TextosSection';
+import { GuiaSection } from './ficha/GuiaSection';
 import { SUGGESTABLE_LABELS, suggestionStatus } from './ficha/helpers';
 import { irAPendiente } from './ficha/navegacion';
 import { resumenPrecarga } from './ficha/precarga';
@@ -259,6 +260,21 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
       node: <IdentitySection ref={registrar('identidad')} game={game} onSave={(identity) => mutations.patchGame.mutate({ identity })} onSuggest={setSuggestField} onSuggestBatch={() => setSuggestIdentityBatch(true)} />,
     },
     {
+      clave: 'presentacion',
+      soloAlSalir: true, // un hex a medio escribir no es un color válido
+      node: (
+        <PresentationSection
+          ref={(handle) => { manejadores.current.presentacion = handle; presentationRef.current = handle; }}
+          game={game}
+          onSave={(accentValue, accent2Value) => mutations.patchGame.mutate({
+            accent: accentValue ? 'manual' : 'empty',
+            accentValue,
+            accent2Value,
+          })}
+        />
+      ),
+    },
+    {
       clave: 'imagenes',
       node: (
         <ImagenesSection
@@ -270,6 +286,11 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
           onUpload={(key, file) => mutations.uploadMedia.mutate({ key, file })}
         />
       ),
+    },
+    {
+      clave: 'galeria',
+      // TODO(backend): tilde «va en el paquete» por miniatura; requiere cambiar el contrato de la galería (ADR).
+      node: <GaleriaSection game={game} numero={numeroDe('galeria')} onChanged={refetchGame} />,
     },
     {
       clave: 'video',
@@ -295,15 +316,27 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
       ),
     },
     {
+      clave: 'resena',
+      node: (
+        <ReviewSection
+          ref={registrar('resena')}
+          game={game}
+          numero={numeroDe('resena')}
+          onReview={(score, cats) => mutations.setReview.mutate({ score, cats })}
+          onSuggest={() => setSuggestField('review')}
+        />
+      ),
+    },
+    {
       clave: 'guia',
       node: (
-        <GuiaChecklist
-          items={game.guiaChecklist ?? []}
-          fallos={fallosIA}
+        <GuiaSection
+          ref={registrar('guia')}
           game={game}
           onDelete={(key) => mutations.deleteField.mutate(key)}
           onSuggest={setSuggestField}
           onText={(key, value) => mutations.setTextField.mutate({ key, value })}
+          onButtons={(cabinetButtons) => mutations.patchGame.mutate({ cabinetButtons })}
         />
       ),
     },
@@ -318,38 +351,6 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
           onCheats={(groups) => mutations.setCheats.mutate({ groups })}
           onDelete={() => mutations.deleteField.mutate('cheats')}
           onSuggest={() => setSuggestField('cheats')}
-        />
-      ),
-    },
-    {
-      clave: 'presentacion',
-      soloAlSalir: true, // un hex a medio escribir no es un color válido
-      node: (
-        <PresentationSection
-          ref={(handle) => { manejadores.current.presentacion = handle; presentationRef.current = handle; }}
-          game={game}
-          onSave={(accentValue, accent2Value) => mutations.patchGame.mutate({
-            accent: accentValue ? 'manual' : 'empty',
-            accentValue,
-            accent2Value,
-          })}
-        />
-      ),
-    },
-    {
-      clave: 'galeria',
-      // TODO(backend): tilde «va en el paquete» por miniatura; requiere cambiar el contrato de la galería (ADR).
-      node: <GaleriaSection game={game} numero={numeroDe('galeria')} onChanged={refetchGame} />,
-    },
-    {
-      clave: 'resena',
-      node: (
-        <ReviewSection
-          ref={registrar('resena')}
-          game={game}
-          numero={numeroDe('resena')}
-          onReview={(score, cats) => mutations.setReview.mutate({ score, cats })}
-          onSuggest={() => setSuggestField('review')}
         />
       ),
     },
@@ -377,6 +378,7 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
         />
       ),
     },
+    { clave: 'guia-checklist', node: <GuiaChecklist items={game.guiaChecklist ?? []} fallos={fallosIA} /> },
     { clave: 'gabinete', node: <CabinetSection game={game} /> },
     {
       clave: 'precarga',

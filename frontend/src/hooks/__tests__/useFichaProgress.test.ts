@@ -12,7 +12,7 @@ describe('computeFichaProgress', () => {
     const p = computeFichaProgress(undefined);
     expect(p.percent).toBe(0);
     expect(p.cola).toEqual([]);
-    expect(p.secciones.map((s) => s.clave)).toEqual(['identidad', 'imagenes', 'video', 'textos', 'guia', 'trucos', 'presentacion', 'galeria', 'resena', 'manual']);
+    expect(p.secciones.map((s) => s.clave)).toEqual(['identidad', 'presentacion', 'imagenes', 'galeria', 'video', 'textos', 'resena', 'guia', 'trucos', 'manual']);
   });
 
   it('una ficha completa marca 100% y no deja pendientes', () => {
@@ -51,10 +51,15 @@ describe('computeFichaProgress', () => {
   });
 
   it('una sugerencia pendiente es una revisión, no un faltante', () => {
-    const p = computeFichaProgress(juego('sonic'));
+    const p = computeFichaProgress(juego('contra'));
     expect(p.faltantes).toEqual([]);
-    expect(p.sugerencias).toEqual([expect.objectContaining({ id: 'sug:logo', seccion: 'imagenes', severity: 'review', aceptarClave: 'logo' })]);
-    expect(p.secciones.find((s) => s.clave === 'imagenes')).toMatchObject({ status: 'review', hint: '1 sugerido' });
+    expect(p.sugerencias).toEqual([expect.objectContaining({ id: 'sug:review', seccion: 'resena', severity: 'review', aceptarClave: 'review' })]);
+  });
+
+  it('una imagen cargada cuenta como aceptada aunque el dato diga sugerida', () => {
+    const p = computeFichaProgress(juego('sonic'));
+    expect(p.sugerencias).toEqual([]);
+    expect(p.secciones.find((s) => s.clave === 'imagenes')?.status).not.toBe('review');
   });
 
   it('la reseña sugerida se acepta con la clave review', () => {

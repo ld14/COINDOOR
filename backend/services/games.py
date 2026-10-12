@@ -60,7 +60,7 @@ class GamesService:
                     systemName=systems[game.systemId].name if game.systemId in systems else game.systemId,  # noqa: E501
                     identitySource=game.identitySource,
                     status=compute_game_status(game.model_dump(mode="json")),
-                    coverThumbUrl=game.coverThumbUrl,
+                    coverThumbUrl=_portada(game),
                     exportStatus=export_states[game.id],
                 )
                 for game in page_items
@@ -171,3 +171,11 @@ def _validar_rom_ref(rom_ref: str) -> None:
             f"No existe nada en '{ruta}'. Revisa la ruta: si el juego son archivos "
             f"sueltos, apunta a la carpeta que los contiene."
         )
+
+
+def _portada(game) -> str | None:
+    """Carátula para el listado: la miniatura propia o, si no hay, la carátula cargada en la ficha."""
+    if game.coverThumbUrl:
+        return game.coverThumbUrl
+    caratula = game.images.get("caratula")
+    return (caratula.url or None) if caratula else None

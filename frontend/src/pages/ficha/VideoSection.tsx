@@ -36,7 +36,7 @@ export function VideoSection({ game, onDelete, onSuggestVideo, onUpload }: {
       band="var(--accent-3)"
       bandInk="var(--ink-on-accent)"
       hint=".mp4 o descarga desde YouTube"
-      number={3}
+      number={5}
       title="Video"
     >
       <div aria-label={field.label} className={clase} data-campo={field.key} role="group">

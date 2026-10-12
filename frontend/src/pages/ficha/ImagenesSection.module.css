@@ -49,9 +49,6 @@
   font-size: var(--text-body);
   line-height: 1;
   padding: var(--space-1) var(--space-2);
-  position: absolute;
-  right: var(--space-3);
-  top: var(--space-3);
 }
 
 .suggest:hover {
@@ -102,6 +99,7 @@
 }
 
 .actions {
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
@@ -185,4 +183,33 @@
   gap: var(--space-1);
   justify-content: center;
   min-width: calc(var(--space-6) * 4);
+}
+
+.borrar {
+  align-items: center;
+  background: var(--surface-2);
+  border: var(--border-control) solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--error);
+  cursor: pointer;
+  display: inline-flex;
+  line-height: 1;
+  padding: var(--space-1) var(--space-2);
+}
+
+.borrar:hover {
+  background: var(--accent-soft);
+}
+
+.borrar:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+/* Bloque inferior (acciones, estado y carga): pegado al fondo para que todas las tarjetas alineen. */
+.pie {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: auto;
 }

@@ -58,6 +58,7 @@ export const IdentitySection = forwardRef<SaveHandle, { game: Game; onSave: (ide
       return (
         <ChoiceCards
           ariaLabel={label}
+          compact
           onChange={(value) => cambiar('format', value)}
           options={opcionesDeFormato(identity.format, recomendado)}
           value={identity.format}
@@ -108,6 +109,9 @@ export const IdentitySection = forwardRef<SaveHandle, { game: Game; onSave: (ide
               <div className={styles.head}>
                 <span className={styles.label}>{field.label}</span>
                 <OriginChip required={bloquea} source={game.identitySource} status={vacio ? 'empty' : 'manual'} />
+              </div>
+              <div className={styles.row}>
+                <div className={styles.control} data-campo={field.key}>{control(field.key, field.label, bloquea)}</div>
                 <button
                   aria-label={`Sugerir ${field.label}`}
                   className={styles.suggest}
@@ -115,10 +119,9 @@ export const IdentitySection = forwardRef<SaveHandle, { game: Game; onSave: (ide
                   title={SUGERIR}
                   type="button"
                 >
-                  ↻
+                  ↻ Sugerir
                 </button>
               </div>
-              <div data-campo={field.key}>{control(field.key, field.label, bloquea)}</div>
               {bloquea ? <span className={styles.blocks}>✕ Bloquea la exportación</span> : null}
             </div>
           );

@@ -9,7 +9,7 @@ import type { Game } from '@/lib/domain/types';
  *
  * FichaJuego la monta como `node` de la sección `galeria` (paso 8, ancla `seccion-galeria`).
  */
-export function GaleriaSection({ game, onChanged, numero = 8 }: {
+export function GaleriaSection({ game, onChanged, numero = 4 }: {
   game: Game;
   onChanged: () => void;
   numero?: number;

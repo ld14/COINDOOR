@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { DosButton, ProgressBar, StatusBadge } from '@/components/dos';
@@ -47,13 +48,19 @@ export function GameCard({ game, vista }: { game: GameSummary; vista: VistaJuego
   const act = accion(game, badge);
   const meta = `${game.systemName} · ${game.year || 'Sin Información'}`;
   const barState = badge === 'error' ? 'error' : porcentaje === 100 ? 'ok' : 'active';
+  const detalle = `/juegos/${game.id}`;
+  // Toda la tarjeta abre la ficha (también si está lista o exportada); los enlaces y botones siguen con su acción.
+  const abrir = (event: MouseEvent<HTMLLIElement>) => {
+    if ((event.target as HTMLElement).closest('a, button')) return;
+    navigate(detalle);
+  };
   const action = (
     <DosButton onClick={() => navigate(act.to)} size="sm" variant={act.variant}>{act.label}</DosButton>
   );
 
   if (vista === 'lista') {
     return (
-      <li className={styles.row}>
+      <li className={`${styles.row} ${styles.clicable}`} onClick={abrir}>
         <Caratula className={styles.rowThumb} game={game} />
         <span className={styles.rowText}>
           <Link className={styles.gameTitle} to={`/juegos/${game.id}`}>{game.title}</Link>
@@ -68,7 +75,7 @@ export function GameCard({ game, vista }: { game: GameSummary; vista: VistaJuego
   }
 
   return (
-    <li className={styles.card}>
+    <li className={`${styles.card} ${styles.clicable}`} onClick={abrir}>
       <div className={styles.cover}>
         <Caratula className={styles.coverFill} game={game} />
         <span className={styles.coverBadge}><StatusBadge status={badge} /></span>

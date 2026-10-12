@@ -33,17 +33,17 @@ export interface SeccionDef {
   label: string;
 }
 
-/** Orden y numeración de DESIGN_SPEC §5.1 (el Gabinete vive en la columna lateral y no es un paso). */
+/** Orden y numeración de DESIGN_SPEC §5.1, con Presentación en 2.º lugar por pedido posterior (el Gabinete vive en la columna lateral y no es un paso). */
 export const FICHA_SECCIONES: readonly SeccionDef[] = [
   { clave: 'identidad', label: 'Identidad' },
+  { clave: 'presentacion', label: 'Presentación' },
   { clave: 'imagenes', label: 'Imágenes' },
+  { clave: 'galeria', label: 'Galería' },
   { clave: 'video', label: 'Video' },
   { clave: 'textos', label: 'Textos' },
+  { clave: 'resena', label: 'Reseña' },
   { clave: 'guia', label: 'Cómo se juega' },
   { clave: 'trucos', label: 'Trucos' },
-  { clave: 'presentacion', label: 'Presentación' },
-  { clave: 'galeria', label: 'Galería' },
-  { clave: 'resena', label: 'Reseña' },
   { clave: 'manual', label: 'Manual y revistas' },
 ];
 
@@ -152,7 +152,9 @@ function sugerenciasDe(game: Game): PendienteFicha[] {
     items.push({ id: `sug:${aceptarClave}`, label: `${label} sugerida`, severity: 'review', seccion, campo, etiquetas, aceptarClave });
   };
   for (const f of FIELDDEFS.images) {
-    if (game.images[f.key]?.status === 'suggested') sumar('imagenes', f.key, f.label, f.key, [f.label, `Cargar ${f.label}`]);
+    // Una imagen cargada cuenta como aceptada: no queda pendiente de revisión.
+    const img = game.images[f.key];
+    if (img?.status === 'suggested' && !img.url) sumar('imagenes', f.key, f.label, f.key, [f.label, `Cargar ${f.label}`]);
   }
   for (const f of FIELDDEFS.videos) {
     if (game.video[f.key]?.status === 'suggested') sumar('video', f.key, f.label, f.key, [f.label, `Cargar ${f.label}`]);

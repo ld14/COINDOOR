@@ -17,9 +17,11 @@ interface DropzoneProps {
   label?: string;
   secondaryAction?: { label: string; onClick: () => void };
   disabled?: boolean;
+  /** Versión baja, para slots angostos: menos relleno y texto chico. */
+  compact?: boolean;
 }
 
-export function Dropzone({ accept, onFile, onFiles, multiple = false, progress, onCancel, label = 'Soltá una imagen acá o pegala con Ctrl+V', secondaryAction, disabled = false }: DropzoneProps) {
+export function Dropzone({ accept, onFile, onFiles, multiple = false, progress, onCancel, label = 'Soltá una imagen acá o pegala con Ctrl+V', secondaryAction, disabled = false, compact = false }: DropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
   const [rejected, setRejected] = useState(false);
@@ -83,7 +85,7 @@ export function Dropzone({ accept, onFile, onFiles, multiple = false, progress, 
       <div
         aria-disabled={disabled || undefined}
         aria-label={label}
-        className={[styles.zone, over ? styles.over : '', disabled ? styles.disabled : '', rejected ? styles.rejected : ''].filter(Boolean).join(' ')}
+        className={[styles.zone, compact ? styles.compact : '', over ? styles.over : '', disabled ? styles.disabled : '', rejected ? styles.rejected : ''].filter(Boolean).join(' ')}
         onClick={() => { if (!inactive) inputRef.current?.click(); }}
         onDragLeave={() => setOver(false)}
         onDragOver={(event) => {
@@ -97,7 +99,7 @@ export function Dropzone({ accept, onFile, onFiles, multiple = false, progress, 
         tabIndex={disabled ? -1 : 0}
       >
         <span className={styles.label}>{label}</span>
-        <span className={styles.hint}>o hacé clic para elegir un archivo</span>
+        {compact ? null : <span className={styles.hint}>o hacé clic para elegir un archivo</span>}
         {rejected ? <span className={styles.error} role="alert">Ese tipo de archivo no está admitido.</span> : null}
         <input
           accept={accept}

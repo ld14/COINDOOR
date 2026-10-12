@@ -12,11 +12,13 @@ describe('resumenPrecarga', () => {
     game.images.logo = { status: 'suggested', source: 'ArcadeDB', url: '/media/x.png' };
     game.images.captura = { status: 'manual', source: 'ArcadeDB', url: '/media/y.png' };
     game.images.poster = { status: 'manual', source: 'manual', url: '/media/z.png' };
+    game.review = { status: 'suggested', source: 'IA', score: 80, cats: {} };
     const r = resumenPrecarga(game);
     expect(r.pendientes).toBe(1);
-    expect(r.aplicados).toBe(1);
-    expect(r.traidos).toBe(2);
-    expect(r.fuentes).toEqual(['ArcadeDB']);
+    // La imagen sugerida pero ya cargada cuenta como aplicada.
+    expect(r.aplicados).toBe(2);
+    expect(r.traidos).toBe(3);
+    expect(r.fuentes).toEqual(['ArcadeDB', 'IA']);
   });
 
   it('la identidad de catálogo cuenta como aplicada, campo por campo', () => {

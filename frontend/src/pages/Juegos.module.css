@@ -221,3 +221,7 @@
   flex-wrap: wrap;
   gap: var(--space-3);
 }
+
+.clicable {
+  cursor: pointer;
+}

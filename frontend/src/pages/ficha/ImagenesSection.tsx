@@ -1,17 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import { Card, DosButton, OriginChip } from '@/components/dos';
+import { useState } from 'react';
+import { Card, OriginChip } from '@/components/dos';
 import { Dropzone } from '@/components/dos/entrada';
 import { ImageModal } from '@/components/ImageModal';
 import type { SuggestionCandidate } from '@/lib/api/suggestions';
 import { FIELDDEFS } from '@/lib/domain/types';
 import type { Game, ImageKey, MediaField, VideoKey } from '@/lib/domain/types';
-import { useFichaAutosave } from './autosaveContext';
 import { confirmManualDelete } from './helpers';
 import styles from './ImagenesSection.module.css';
 
 const SUGERIR = 'Sugerir desde ArcadeDB';
-/** Si una aceptación no se refleja en la ficha (falló), se sigue con la próxima pasado este tiempo. */
-const ESPERA_ACEPTAR_MS = 10000;
 
 /** Candidatas de un slot de imagen, buscadas por el orquestador (esta sección no llama a la API). */
 export interface CandidatasImagen {
@@ -73,42 +70,14 @@ function FilaCandidatas({ candidatas, field, label, onPick, onUpload }: {
 }
 
 export function ImagenesSection({ game, onDelete, onSuggestImage, onUpload, candidatas, onPickCandidata }: ImagenesSectionProps) {
-  const { aceptar } = useFichaAutosave();
-  const sugeridas = FIELDDEFS.images.filter((f) => game.images[f.key]?.status === 'suggested').map((f) => f.key);
   const cargadas = FIELDDEFS.images.filter((f) => (game.images[f.key]?.status ?? 'empty') !== 'empty').length;
-
-  // "Aceptar las N": de a una, esperando que la ficha refleje cada aceptación (cada una reescribe el game.json).
-  const [cola, setCola] = useState<string[]>([]);
-  const emitida = useRef<string | null>(null);
-  useEffect(() => {
-    if (cola.length === 0) {
-      emitida.current = null;
-      return undefined;
-    }
-    const cabeza = cola[0];
-    if (emitida.current !== cabeza) {
-      emitida.current = cabeza;
-      aceptar(cabeza);
-    }
-    if (game.images[cabeza as ImageKey]?.status !== 'suggested') {
-      setCola((actual) => actual.slice(1));
-      return undefined;
-    }
-    const espera = setTimeout(() => setCola((actual) => actual.slice(1)), ESPERA_ACEPTAR_MS);
-    return () => clearTimeout(espera);
-  }, [cola, game.images, aceptar]);
 
   return (
     <Card
-      actions={sugeridas.length > 0 ? (
-        <DosButton disabled={cola.length > 0} onClick={() => setCola(sugeridas)} size="sm" variant="ghost">
-          ✓ Aceptar las {sugeridas.length}
-        </DosButton>
-      ) : undefined}
       band="var(--accent-2)"
       bandInk="var(--ink-on-accent-2)"
       hint={`${cargadas} de ${FIELDDEFS.images.length} · arrastrá para reemplazar`}
-      number={2}
+      number={3}
       title="Imágenes"
     >
       {candidatas && aplicables(candidatas).length >= 2 ? (
@@ -127,7 +96,6 @@ export function ImagenesSection({ game, onDelete, onSuggestImage, onUpload, cand
             key={field.key}
             label={field.label}
             mediaKey={field.key}
-            onAccept={() => aceptar(field.key)}
             onDelete={onDelete}
             onSuggest={() => onSuggestImage(field.key)}
             onUpload={onUpload}
@@ -140,11 +108,10 @@ export function ImagenesSection({ game, onDelete, onSuggestImage, onUpload, cand
   );
 }
 
-function ImageSlot({ field, label, mediaKey, onAccept, onDelete, onSuggest, onUpload, ratio, required }: {
+function ImageSlot({ field, label, mediaKey, onDelete, onSuggest, onUpload, ratio, required }: {
   field?: MediaField;
   label: string;
   mediaKey: ImageKey;
-  onAccept: () => void;
   onDelete: (key: ImageKey) => void;
   onSuggest: () => void;
   onUpload: (key: ImageKey, file: File) => void;
@@ -152,10 +119,12 @@ function ImageSlot({ field, label, mediaKey, onAccept, onDelete, onSuggest, onUp
   required: boolean;
 }) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
-  const status = field?.status ?? 'empty';
+  // Una imagen cargada ya cuenta como aceptada: no pide validación (aunque venga de una fuente).
+  const estado = field?.status ?? 'empty';
+  const status = estado === 'suggested' && field?.url ? 'manual' : estado;
   const bloquea = status === 'empty' && required;
   const aceptada = status === 'manual' && !!field?.source && field.source.trim().toLowerCase() !== 'manual';
-  const clase = [styles.slot, status === 'suggested' ? styles.suggested : '', bloquea ? styles.blocking : ''].filter(Boolean).join(' ');
+  const clase = [styles.slot, bloquea ? styles.blocking : ''].filter(Boolean).join(' ');
 
   return (
     <div aria-label={label} className={clase} data-campo={mediaKey} role="group">
@@ -163,7 +132,6 @@ function ImageSlot({ field, label, mediaKey, onAccept, onDelete, onSuggest, onUp
         <span className={styles.name}>{label}</span>
       </div>
       <OriginChip required={bloquea} source={field?.source} status={status} />
-      <button aria-label={`Sugerir ${label}`} className={styles.suggest} onClick={onSuggest} title={SUGERIR} type="button">↻</button>
       <div className={styles.preview}>
         {field?.url ? (
           <button className={styles.imageButton} onClick={() => setImageModalOpen(true)} type="button">
@@ -172,21 +140,25 @@ function ImageSlot({ field, label, mediaKey, onAccept, onDelete, onSuggest, onUp
         ) : `${label.toLowerCase()} · ${ratio} · No Disponible`}
       </div>
       {bloquea ? <span className={styles.blocks}>✕ Bloquea la exportación</span> : null}
-      {status === 'suggested' ? (
+      <div className={styles.pie}>
         <div className={styles.actions}>
-          <DosButton onClick={onAccept} size="sm" variant="primary">✓ Aceptar</DosButton>
-          <DosButton onClick={onSuggest} size="sm" variant="ghost">Cambiar</DosButton>
+          <button aria-label={`Sugerir ${label}`} className={styles.suggest} onClick={onSuggest} title={SUGERIR} type="button">↻</button>
+          {status !== 'empty' ? (
+            <button aria-label={`Borrar ${label}`} className={styles.borrar} onClick={() => confirmManualDelete(status, () => onDelete(mediaKey))} title="Borrar" type="button">
+              <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6" /></svg>
+            </button>
+          ) : null}
         </div>
-      ) : null}
-      {aceptada ? <span className={styles.accepted}>✓ Aceptada</span> : null}
-      <Dropzone
-        accept="image/*"
-        label={field?.url ? 'Soltá otra imagen para reemplazar' : 'Soltá una imagen acá o pegala con Ctrl+V'}
-        onFile={(file) => onUpload(mediaKey, file)}
-      />
-      {status !== 'empty' ? (
-        <DosButton onClick={() => confirmManualDelete(status, () => onDelete(mediaKey))} size="sm" variant="danger">Borrar</DosButton>
-      ) : null}
+        {aceptada ? <span className={styles.accepted}>✓ Aceptada</span> : null}
+        <div className={styles.carga}>
+          <Dropzone
+            accept="image/*"
+            compact
+            label={field?.url ? 'Reemplazar imagen' : 'Subir imagen'}
+            onFile={(file) => onUpload(mediaKey, file)}
+          />
+        </div>
+      </div>
       {field?.url ? (
         <ImageModal alt={label} onClose={() => setImageModalOpen(false)} open={imageModalOpen} src={field.url} />
       ) : null}

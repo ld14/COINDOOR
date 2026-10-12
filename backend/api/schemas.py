@@ -243,6 +243,8 @@ class PatchGame(BaseModel):
     accent: FieldStatus | None = None
     accentValue: str | None = None
     accent2Value: str | None = None
+    # Acciones de los botones del gabinete (`cabinet.button_list`): se cargan a mano cuando ArcadeDB no las publica.
+    cabinetButtons: list[CabinetButton] | None = None
 
 
 class System(BaseModel):

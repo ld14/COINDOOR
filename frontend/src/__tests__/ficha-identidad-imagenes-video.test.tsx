@@ -96,16 +96,15 @@ describe('Ficha · Imágenes y Video', () => {
     expect(within(caratula).getByText('✕ Bloquea la exportación')).toBeInTheDocument();
   });
 
-  it('una imagen sugerida se acepta con [✓ Aceptar] y usa el endpoint de aceptar', async () => {
+  it('una imagen cargada desde una fuente se ve aceptada, sin pedir validación', async () => {
     renderApp('/juegos/sonic');
     await screen.findByRole('heading', { name: 'Sonic The Hedgehog' });
 
     const logo = screen.getByRole('group', { name: 'Logo' });
-    expect(within(logo).getByText('● Sugerido · sin revisar')).toBeInTheDocument();
-    expect(within(logo).getByRole('button', { name: 'Cambiar' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '✓ Aceptar las 1' })).toBeInTheDocument();
-
-    await userEvent.click(within(logo).getByRole('button', { name: '✓ Aceptar' }));
-    await waitFor(() => expect(llamadasA('POST', '/fields/logo/accept')).toHaveLength(1));
+    expect(within(logo).queryByText('● Sugerido · sin revisar')).not.toBeInTheDocument();
+    expect(within(logo).queryByRole('button', { name: /Aceptar/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Aceptar las/ })).not.toBeInTheDocument();
+    expect(within(logo).getByRole('button', { name: 'Sugerir Logo' })).toBeInTheDocument();
+    expect(within(logo).getByRole('button', { name: 'Borrar Logo' })).toBeInTheDocument();
   });
 });

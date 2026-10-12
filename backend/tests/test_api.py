@@ -695,6 +695,18 @@ def test_patch_de_romref_rechaza_una_ruta_que_no_existe(tmp_path: Path) -> None:
     assert response.status_code == 422
 
 
+def test_patch_cargar_acciones_de_los_botones(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+
+    botones = [{"control": "P1_BUTTON1", "color": "Rojo", "action": "Saltar"}]
+    response = api.patch(f"/api/games/{game_id}", json={"cabinetButtons": botones})
+    assert response.status_code == 200
+    assert response.json()["cabinet"]["button_list"] == botones
+    item = next(i for i in response.json()["guiaChecklist"] if i["key"] == "acciones")
+    assert item["estado"] == "ok"
+
+
 def _export_run(api: TestClient, game_id: str, incluir: list[str]) -> dict:
     created = api.post("/api/export", json={"gameId": game_id, "incluir": incluir})
     run_id = created.json()["runId"]

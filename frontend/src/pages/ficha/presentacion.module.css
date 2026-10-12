@@ -52,7 +52,17 @@
   border: var(--border-control) solid var(--line);
   border-radius: var(--radius-md);
   cursor: crosshair;
-  max-height: 220px;
-  max-width: 100%;
-  width: fit-content;
+  display: block;
+  height: auto;
+  width: 100%;
 }
+
+.cuerpo { align-items: start; display: grid; gap: var(--space-5, var(--space-4)); grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+.caratula { align-items: center; }
+.caratulaImg { width: 190px; max-width: 100%; }
+.colores { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+@media (max-width: 640px) { .cuerpo { grid-template-columns: minmax(0, 1fr); } }
+
+/* Paleta fija: una sola fila; las muestras se achican (hasta 28px) para que entren todas. */
+.muestrasUnaLinea { display: flex; flex-wrap: nowrap; gap: var(--space-1); }
+.muestrasUnaLinea .muestra { aspect-ratio: 1; flex: 1 1 0; height: auto; max-width: 28px; min-width: 0; width: auto; }

@@ -29,12 +29,12 @@ describe('La ficha no busca sugerencias por su cuenta', () => {
     expect(busquedas()).toHaveLength(0);
   });
 
-  it('la búsqueda sale recién cuando la persona la pide con ↻ o «Cambiar»', async () => {
+  it('la búsqueda sale recién cuando la persona la pide con ↻', async () => {
     renderApp('/juegos/sonic');
     await screen.findByRole('heading', { name: 'Sonic The Hedgehog' });
     expect(busquedas()).toHaveLength(0);
 
-    await userEvent.click(screen.getAllByRole('button', { name: /Cambiar/ })[0]);
+    await userEvent.click(screen.getByRole('button', { name: 'Sugerir Logo' }));
     await vi.waitFor(() => expect(busquedas().length).toBeGreaterThan(0));
   });
 });

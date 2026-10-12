@@ -1,4 +1,4 @@
-import type { Game, GameStatus, Identity, RomSource } from '@/lib/domain/types';
+import type { CabinetButton, Game, GameStatus, Identity, RomSource } from '@/lib/domain/types';
 import { fetchJson } from './client';
 
 export interface GamesQuery {
@@ -57,7 +57,7 @@ export function createGame(payload: CreateGamePayload) {
   return fetchJson<Game>('/games', { method: 'POST', body: JSON.stringify(payload) });
 }
 
-export function patchGame(id: string, payload: Partial<Pick<Game, 'systemId' | 'identity' | 'romRef' | 'file_format' | 'tratamiento' | 'accent' | 'accentValue' | 'accent2Value'>>) {
+export function patchGame(id: string, payload: Partial<Pick<Game, 'systemId' | 'identity' | 'romRef' | 'file_format' | 'tratamiento' | 'accent' | 'accentValue' | 'accent2Value'>> & { cabinetButtons?: CabinetButton[] }) {
   return fetchJson<Game>(`/games/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
 }
 

@@ -6,6 +6,7 @@ import type { Game, GuiaChecklistItem } from '@/lib/domain/types';
 import { games } from '@/mocks/seed';
 import { FichaAutosaveContext } from '../autosaveContext';
 import { GuiaChecklist } from '../ComoSeJuegaSection';
+import { GuiaSection } from '../GuiaSection';
 import { TextSection } from '../TextosSection';
 import type { SaveHandle } from '../types';
 
@@ -26,25 +27,35 @@ function montarTextos(game: Game) {
   return { aceptar, markDirty, onDelete, onSuggest, onText, ref };
 }
 
+function montarGuia(game: Game) {
+  const onText = vi.fn();
+  const onSuggest = vi.fn();
+  const onDelete = vi.fn();
+  const onButtons = vi.fn();
+  const aceptar = vi.fn();
+  const markDirty = vi.fn();
+  const ref = createRef<SaveHandle>();
+  render(
+    <FichaAutosaveContext.Provider value={{ aceptar, markDirty }}>
+      <GuiaSection game={game} onButtons={onButtons} onDelete={onDelete} onSuggest={onSuggest} onText={onText} ref={ref} />
+    </FichaAutosaveContext.Provider>,
+  );
+  return { aceptar, markDirty, onButtons, onDelete, onSuggest, onText, ref };
+}
+
 describe('TextSection', () => {
   it('muestra el contador de la sinopsis y placeholders con ejemplo', async () => {
     const game = juego();
     game.texts.sinopsis = { status: 'manual', value: 'Hola' };
     montarTextos(game);
     expect(screen.getByText(/^4 \/ \d+$/)).toBeInTheDocument();
-    expect(screen.getByLabelText('Objetivo')).toHaveAttribute('placeholder', expect.stringContaining('Ej.: «Eliminá a los criminales'));
+    expect(screen.getByLabelText('Sinopsis')).toHaveAttribute('placeholder', expect.stringContaining('Ej.: Versión norteamericana'));
   });
 
-  it('save() no toca la sinopsis ni los demás textos cuando solo cambió uno', async () => {
-    const game = juego();
-    game.texts.sinopsis = { status: 'suggested', value: 'Sinopsis sugerida', source: 'arcadedb' };
-    const { onText, ref } = montarTextos(game);
-
-    await userEvent.type(screen.getByLabelText('Objetivo'), 'Rescatar a los prisioneros.');
-    ref.current!.save();
-
-    expect(onText).toHaveBeenCalledTimes(1);
-    expect(onText).toHaveBeenCalledWith('objetivo', 'Rescatar a los prisioneros.');
+  it('ya no contiene los campos de la guía (viven en «Cómo se juega»)', () => {
+    montarTextos(juego());
+    expect(screen.queryByLabelText('Objetivo')).not.toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'Primeros pasos' })).not.toBeInTheDocument();
   });
 
   it('save() sin cambios no escribe nada', () => {
@@ -75,41 +86,6 @@ describe('TextSection', () => {
     expect(onText).not.toHaveBeenCalled();
   });
 
-  it('el objetivo obligatorio vacío bloquea con el motivo; «Proponer» usa la IA existente', async () => {
-    const game = juego();
-    game.guiaChecklist = [{ key: 'objetivo', label: 'Objetivo', estado: 'falta', detalle: '', requerido: true }];
-    const { onSuggest } = montarTextos(game);
-    expect(screen.getByText('✕ Sin objetivo la guía de «Cómo se juega» no se exporta')).toBeInTheDocument();
-    expect(screen.getByLabelText('Objetivo')).toHaveAttribute('aria-invalid', 'true');
-    await userEvent.click(screen.getByRole('button', { name: 'Proponer un objetivo' }));
-    expect(onSuggest).toHaveBeenCalledWith('objetivo');
-  });
-
-  it('los pasos son una lista editable que se serializa en líneas', async () => {
-    const game = juego();
-    game.texts.primerosPasos = { status: 'manual', value: 'Uno\nDos' };
-    const { onText, markDirty, ref } = montarTextos(game);
-    const lista = screen.getByRole('list', { name: 'Primeros pasos' });
-    expect(within(lista).getAllByRole('textbox')).toHaveLength(2);
-
-    await userEvent.click(within(lista).getByRole('button', { name: 'Quitar paso 1' }));
-    expect(markDirty).toHaveBeenCalledWith('textos');
-    ref.current!.save();
-    expect(onText).toHaveBeenCalledWith('primerosPasos', 'Dos');
-  });
-
-  it('escribir un espacio en un paso no pierde el foco ni el texto', async () => {
-    const game = juego();
-    game.texts.primerosPasos = { status: 'manual', value: 'Uno' };
-    const { onText, ref } = montarTextos(game);
-    const paso = screen.getByLabelText('Paso 1');
-    await userEvent.type(paso, ' dos tres');
-    expect(screen.getByLabelText('Paso 1')).toHaveFocus();
-    expect(screen.getByLabelText('Paso 1')).toHaveValue('Uno dos tres');
-    ref.current!.save();
-    expect(onText).toHaveBeenCalledWith('primerosPasos', 'Uno dos tres');
-  });
-
   it('Borrar un texto manual pide confirmación', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     const game = juego();
@@ -122,21 +98,60 @@ describe('TextSection', () => {
   });
 });
 
-describe('GuiaChecklist (Cómo se juega)', () => {
-  const items: GuiaChecklistItem[] = [
-    { key: 'objetivo', label: 'Objetivo', estado: 'falta', detalle: 'Sin objetivo la guía no se exporta', requerido: true },
-    { key: 'modo', label: 'Modo multijugador', estado: 'falta', detalle: 'Juego simultáneo: elegí cooperativo o versus', requerido: false },
-  ];
+describe('GuiaSection (Cómo se juega)', () => {
+  it('el objetivo obligatorio vacío bloquea con el motivo; «Proponer» usa la IA existente', async () => {
+    const game = juego();
+    game.guiaChecklist = [{ key: 'objetivo', label: 'Objetivo', estado: 'falta', detalle: '', requerido: true }];
+    const { onSuggest } = montarGuia(game);
+    expect(screen.getByText('✕ Sin objetivo la guía de «Cómo se juega» no se exporta')).toBeInTheDocument();
+    expect(screen.getByLabelText('Objetivo')).toHaveAttribute('aria-invalid', 'true');
+    await userEvent.click(screen.getByRole('button', { name: 'Proponer un objetivo' }));
+    expect(onSuggest).toHaveBeenCalledWith('objetivo');
+  });
 
-  it('resuelve el modo en la misma fila y deshabilita «Individual» en juegos simultáneos', async () => {
+  it('los pasos son una lista editable que se serializa en líneas', async () => {
+    const game = juego();
+    game.texts.primerosPasos = { status: 'manual', value: 'Uno\nDos' };
+    const { onText, markDirty, ref } = montarGuia(game);
+    const lista = screen.getByRole('list', { name: 'Primeros pasos' });
+    expect(within(lista).getAllByRole('textbox')).toHaveLength(2);
+
+    await userEvent.click(within(lista).getByRole('button', { name: 'Quitar paso 1' }));
+    expect(markDirty).toHaveBeenCalledWith('guia');
+    ref.current!.save();
+    expect(onText).toHaveBeenCalledWith('primerosPasos', 'Dos');
+  });
+
+  it('escribir un espacio en un paso no pierde el foco ni el texto', async () => {
+    const game = juego();
+    game.texts.primerosPasos = { status: 'manual', value: 'Uno' };
+    const { onText, ref } = montarGuia(game);
+    const paso = screen.getByLabelText('Paso 1');
+    await userEvent.type(paso, ' dos tres');
+    expect(screen.getByLabelText('Paso 1')).toHaveFocus();
+    expect(screen.getByLabelText('Paso 1')).toHaveValue('Uno dos tres');
+    ref.current!.save();
+    expect(onText).toHaveBeenCalledWith('primerosPasos', 'Uno dos tres');
+  });
+
+  it('save() escribe solo el texto de la guía que cambió', async () => {
+    const game = juego();
+    const { onText, ref } = montarGuia(game);
+    await userEvent.type(screen.getByLabelText('Objetivo'), 'Rescatar a los prisioneros.');
+    ref.current!.save();
+    expect(onText).toHaveBeenCalledTimes(1);
+    expect(onText).toHaveBeenCalledWith('objetivo', 'Rescatar a los prisioneros.');
+  });
+
+  it('el placeholder del objetivo trae un ejemplo', () => {
+    montarGuia(juego());
+    expect(screen.getByLabelText('Objetivo')).toHaveAttribute('placeholder', expect.stringContaining('Ej.: «Eliminá a los criminales'));
+  });
+
+  it('elige el modo multijugador y deshabilita «Individual» en juegos simultáneos', async () => {
     const game = juego();
     game.cabinet = { resolution: '', orientation: '', controls: '', buttons: 1, nplayers: '2P sim', button_list: [] };
-    const onText = vi.fn();
-    render(
-      <FichaAutosaveContext.Provider value={{ aceptar: vi.fn(), markDirty: vi.fn() }}>
-        <GuiaChecklist fallos={{}} game={game} items={items} onText={onText} />
-      </FichaAutosaveContext.Provider>,
-    );
+    const { onText } = montarGuia(game);
     const modo = screen.getByRole('radiogroup', { name: 'Modo multijugador' });
     expect(within(modo).getByRole('radio', { name: 'Individual' })).toBeDisabled();
     await userEvent.click(within(modo).getByRole('radio', { name: 'Versus' }));
@@ -146,14 +161,48 @@ describe('GuiaChecklist (Cómo se juega)', () => {
   it('un modo sugerido ofrece Aceptar', async () => {
     const game = juego();
     game.texts.modo = { status: 'suggested', value: 'cooperativo', source: 'ia' };
-    const aceptar = vi.fn();
-    render(
-      <FichaAutosaveContext.Provider value={{ aceptar, markDirty: vi.fn() }}>
-        <GuiaChecklist fallos={{}} game={game} items={items} onText={vi.fn()} />
-      </FichaAutosaveContext.Provider>,
-    );
+    const { aceptar } = montarGuia(game);
     await userEvent.click(screen.getByRole('button', { name: 'Aceptar modo multijugador' }));
     expect(aceptar).toHaveBeenCalledWith('modo');
+  });
+
+  it('ya no muestra jugadores ni periféricos', () => {
+    montarGuia(juego());
+    expect(screen.queryByText('Cantidad de jugadores')).not.toBeInTheDocument();
+    expect(screen.queryByText('Periféricos')).not.toBeInTheDocument();
+  });
+
+  it('las acciones de los botones se cargan a mano y save() las escribe', async () => {
+    const game = juego();
+    game.cabinet = { resolution: '', orientation: '', controls: '', buttons: 0, button_list: [] };
+    const { onButtons, ref } = montarGuia(game);
+    await userEvent.click(screen.getByRole('button', { name: '+ Agregar botón' }));
+    await userEvent.type(screen.getByLabelText('Control del botón 1'), 'P1_BUTTON1');
+    await userEvent.type(screen.getByLabelText('Acción del botón 1'), 'Saltar');
+    ref.current!.save();
+    expect(onButtons).toHaveBeenCalledWith([{ control: 'P1_BUTTON1', color: '', action: 'Saltar' }]);
+  });
+
+  it('save() sin cambios en los botones no los escribe', () => {
+    const game = juego();
+    game.cabinet = { resolution: '', orientation: '', controls: '', buttons: 1, button_list: [{ control: 'P1_BUTTON1', color: 'Rojo', action: 'Saltar' }] };
+    const { onButtons, ref } = montarGuia(game);
+    expect(screen.getByLabelText('Acción del botón 1')).toHaveValue('Saltar');
+    ref.current!.save();
+    expect(onButtons).not.toHaveBeenCalled();
+  });
+});
+
+describe('GuiaChecklist (columna lateral)', () => {
+  const items: GuiaChecklistItem[] = [
+    { key: 'objetivo', label: 'Objetivo', estado: 'falta', detalle: 'Sin objetivo la guía no se exporta', requerido: true },
+    { key: 'modo', label: 'Modo multijugador', estado: 'ok', detalle: 'cooperativo', requerido: false },
+  ];
+
+  it('es solo lectura: no trae el selector de modo', () => {
+    render(<GuiaChecklist fallos={{}} items={items} />);
+    expect(screen.queryByRole('radiogroup', { name: 'Modo multijugador' })).not.toBeInTheDocument();
+    expect(screen.getByText('1 de 2 listos')).toBeInTheDocument();
   });
 
   it('«Escribir ↑» lleva al campo del objetivo', async () => {

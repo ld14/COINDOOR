@@ -22,7 +22,11 @@ const esExterna = (source?: string) => !!source && source.trim() !== '' && sourc
 
 export function resumenPrecarga(game: Game): ResumenPrecarga {
   const datos: Dato[] = [
-    ...FIELDDEFS.images.map((f) => game.images[f.key]),
+    // Una imagen cargada cuenta como aceptada, aunque el dato guarde `suggested`.
+    ...FIELDDEFS.images.map((f) => {
+      const img = game.images[f.key];
+      return img?.status === 'suggested' && img.url ? { ...img, status: 'manual' as const } : img;
+    }),
     ...FIELDDEFS.videos.map((f) => game.video[f.key]),
     ...FIELDDEFS.texts.map((f) => game.texts[f.key]),
     game.review,

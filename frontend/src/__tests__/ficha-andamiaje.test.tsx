@@ -20,7 +20,7 @@ const llamadas = (): LlamadaFetch[] => vi.mocked(fetch).mock.calls as LlamadaFet
 const llamadasA = (metodo: string, fragmento: string) =>
   llamadas().filter(([url, init]) => (init?.method ?? 'GET') === metodo && String(url).includes(fragmento));
 
-const CLAVES = ['identidad', 'imagenes', 'video', 'textos', 'guia', 'trucos', 'presentacion', 'galeria', 'resena', 'manual'];
+const CLAVES = ['identidad', 'presentacion', 'imagenes', 'galeria', 'video', 'textos', 'resena', 'guia', 'trucos', 'manual'];
 
 describe('Andamiaje de la ficha', () => {
   it('arma crumbs, hero con progreso, StepNav, columna lateral y ActionBar', async () => {
@@ -146,14 +146,14 @@ describe('Andamiaje de la ficha', () => {
   });
 
   it('el banner de precarga cuenta lo que esperó revisión y «Aceptar todo» lo resuelve', async () => {
-    renderApp('/juegos/sonic');
-    await screen.findByRole('heading', { name: 'Sonic The Hedgehog' });
+    renderApp('/juegos/contra');
+    await screen.findByRole('heading', { name: 'Contra' });
 
     const banner = screen.getByRole('region', { name: 'Resumen de la precarga' });
     expect(banner).toHaveTextContent(/trajo \d+ datos · \d+ aplicados · 1 espera revisión/);
 
     await userEvent.click(within(banner).getByRole('button', { name: 'Aceptar todo' }));
-    await waitFor(() => expect(llamadasA('POST', '/fields/logo/accept')).toHaveLength(1));
+    await waitFor(() => expect(llamadasA('POST', '/fields/review/accept')).toHaveLength(1));
     await waitFor(() => expect(screen.queryByRole('region', { name: 'Resumen de la precarga' })).not.toBeInTheDocument());
   });
 

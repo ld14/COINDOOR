@@ -16,9 +16,11 @@ interface ChoiceCardsProps {
   value: string;
   onChange: (value: string) => void;
   ariaLabel: string;
+  /** Una sola fila, sin subtítulos: la recomendada se marca con borde punteado y `title`. */
+  compact?: boolean;
 }
 
-export function ChoiceCards({ options, value, onChange, ariaLabel }: ChoiceCardsProps) {
+export function ChoiceCards({ options, value, onChange, ariaLabel, compact = false }: ChoiceCardsProps) {
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   const activeIndex = options.findIndex((option) => option.value === value && !option.disabled);
   const tabbable = activeIndex >= 0 ? activeIndex : options.findIndex((option) => !option.disabled);
@@ -45,7 +47,7 @@ export function ChoiceCards({ options, value, onChange, ariaLabel }: ChoiceCards
   }
 
   return (
-    <div aria-label={ariaLabel} className={styles.group} role="radiogroup">
+    <div aria-label={ariaLabel} className={[styles.group, compact ? styles.compact : ''].filter(Boolean).join(' ')} role="radiogroup">
       {options.map((option, index) => {
         const checked = option.value === value;
         const recommended = Boolean(option.recommended);
@@ -63,10 +65,11 @@ export function ChoiceCards({ options, value, onChange, ariaLabel }: ChoiceCards
             ref={(node) => { refs.current[index] = node; }}
             role="radio"
             tabIndex={index === tabbable ? 0 : -1}
+            title={compact && recommended ? subtitle : undefined}
             type="button"
           >
             <span className={styles.label}>{option.label}</span>
-            {subtitle ? <span className={styles.subtitle}>{subtitle}</span> : null}
+            {subtitle && !compact ? <span className={styles.subtitle}>{subtitle}</span> : null}
           </button>
         );
       })}

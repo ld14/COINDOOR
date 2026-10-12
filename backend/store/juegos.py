@@ -65,7 +65,9 @@ class GamesStore:
         for key, value in patch.items():
             if value is None:
                 continue
-            if key == "identity" and isinstance(value, dict) and isinstance(data.get(key), dict):
+            if key == "cabinetButtons":
+                data["cabinet"] = {**data.get("cabinet", {}), "button_list": value}
+            elif key == "identity" and isinstance(value, dict) and isinstance(data.get(key), dict):
                 data[key].update(value)
             else:
                 data[key] = value

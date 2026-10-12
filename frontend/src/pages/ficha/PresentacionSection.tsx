@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import type { MouseEvent, ReactNode } from 'react';
-import { Card, DosInput, OriginChip } from '@/components/dos';
+import type { MouseEvent } from 'react';
+import { Card, DosInput } from '@/components/dos';
 import { InlineSuggestion } from '@/components/dos/InlineSuggestion';
 import { useDominantColors } from '@/hooks/useDominantColors';
 import type { Game } from '@/lib/domain/types';
@@ -13,10 +13,22 @@ const hex = (value: string) => `#${value}`;
 
 export const ACCENT_PRESETS = [
   { label: 'dorado', value: hex('d4a017') },
-  { label: 'cian', value: hex('00aaaa') },
+  { label: 'amarillo', value: hex('f0e010') },
+  { label: 'naranja', value: hex('f07010') },
   { label: 'rojo', value: hex('aa0000') },
-  { label: 'verde', value: hex('006600') },
+  { label: 'rojo vivo', value: hex('e8203c') },
+  { label: 'rosa', value: hex('ff5c9a') },
+  { label: 'magenta', value: hex('c0189c') },
+  { label: 'violeta', value: hex('6a2bb8') },
   { label: 'azul', value: hex('0000aa') },
+  { label: 'azul eléctrico', value: hex('2a5bd7') },
+  { label: 'celeste', value: hex('00b4ff') },
+  { label: 'cian', value: hex('00aaaa') },
+  { label: 'verde', value: hex('006600') },
+  { label: 'verde lima', value: hex('5adb2a') },
+  { label: 'marrón', value: hex('7a4a1e') },
+  { label: 'blanco', value: hex('f5f5f5') },
+  { label: 'gris', value: hex('808080') },
 ];
 
 /** Colores claros y saturados: se leen bien sobre una carátula casi negra. */
@@ -116,10 +128,9 @@ export const PresentationSection = forwardRef<PresentationHandle, Props>(functio
   };
 
   const sugerida = game.accent === 'suggested' && !!game.accentValue && !ignorada;
-  const estadoSecundario = accent2Value ? (game.accent === 'suggested' ? 'suggested' : 'manual') : 'empty';
 
   return (
-    <Card band="var(--accent)" hint="Colores del gabinete" number={7} title="Presentación">
+    <Card band="var(--accent)" hint="Colores del gabinete" number={2} title="Presentación">
       <div className={styles.stack}>
         {sugerida ? (
           <InlineSuggestion
@@ -144,34 +155,35 @@ export const PresentationSection = forwardRef<PresentationHandle, Props>(functio
           </div>
         ) : null}
 
-        {caratula ? (
-          <div className={styles.caratula}>
-            <img
-              alt="Carátula: hacé clic para tomar un color"
-              className={styles.caratulaImg}
-              crossOrigin="anonymous"
-              onClick={tomarDeCaratula}
-              src={caratula}
+        <div className={styles.cuerpo}>
+          {caratula ? (
+            <div className={styles.caratula}>
+              <img
+                alt="Carátula: hacé clic para tomar un color"
+                className={styles.caratulaImg}
+                crossOrigin="anonymous"
+                onClick={tomarDeCaratula}
+                src={caratula}
+              />
+            </div>
+          ) : null}
+          <div className={styles.colores}>
+            <AccentRow
+              campo="accent"
+              label="Color de acento primario"
+              onChange={(v) => { setAccentValue(v); markDirty('presentacion'); }}
+              value={accentValue}
             />
-            <p className={styles.meta}>{`Un clic en la carátula toma ese color como acento ${siguiente === 0 ? 'primario' : 'secundario'}.`}</p>
+            <AccentRow
+              campo="accent2"
+              label="Color de acento secundario"
+              onChange={(v) => { setAccent2Value(v); markDirty('presentacion'); }}
+              opcional
+              value={accent2Value}
+            />
+            {caratula ? <p className={styles.meta}>{`Un clic en la carátula toma ese color como acento ${siguiente === 0 ? 'primario' : 'secundario'}.`}</p> : null}
           </div>
-        ) : null}
-
-        <AccentRow
-          campo="accent"
-          chip={<OriginChip required source="manual" status={accentValue ? game.accent : 'empty'} />}
-          label="Color de acento primario"
-          onChange={(v) => { setAccentValue(v); markDirty('presentacion'); }}
-          value={accentValue}
-        />
-        <AccentRow
-          campo="accent2"
-          chip={<OriginChip source="manual" status={estadoSecundario} />}
-          label="Color de acento secundario"
-          onChange={(v) => { setAccent2Value(v); markDirty('presentacion'); }}
-          opcional
-          value={accent2Value}
-        />
+        </div>
       </div>
     </Card>
   );
@@ -195,9 +207,8 @@ function Muestras({ etiqueta, valores, onPick }: { etiqueta: string; valores: st
   );
 }
 
-function AccentRow({ campo, chip, label, onChange, opcional = false, value }: {
+function AccentRow({ campo, label, onChange, opcional = false, value }: {
   campo: string;
-  chip: ReactNode;
   label: string;
   onChange: (value: string) => void;
   opcional?: boolean;
@@ -210,11 +221,10 @@ function AccentRow({ campo, chip, label, onChange, opcional = false, value }: {
       <div className={styles.cabecera}>
         <span className={styles.rotulo}>
           {label}
-          {opcional ? <span className={styles.opcional}> (opcional)</span> : null}
+          <span className={styles.opcional}>{opcional ? ' (opcional)' : ' (obligatorio)'}</span>
         </span>
-        {chip}
       </div>
-      <div className={styles.muestras}>
+      <div className={styles.muestrasUnaLinea}>
         {ACCENT_PRESETS.map((preset) => (
           <button
             aria-label={`${label} ${preset.label}`}
