@@ -119,6 +119,33 @@ ADR: [`0023`](../../spec/decisions/0023-estetica-flyer-reemplaza-dos.md)
 - **Trucos y Galería:** sin "va en el paquete" por truco ni tilde por miniatura.
 - **Exportar:** sin descarga real del `.zip` desde la pantalla.
 
+## Ajustes tras la revisión visual (2026-10-13)
+
+Pedidos puntuales hechos mirando la app corriendo; no figuran en `DESIGN_SPEC.md`, que en
+estos puntos quedó desactualizado.
+
+- **Orden de la ficha:** Identidad, Presentación, Imágenes, Galería, Video, Textos, Reseña,
+  Cómo se juega, Trucos, Manual y revistas (antes Presentación era la 7.ª).
+- **Identidad:** el input y «Sugerir» van en una línea; Formato es una fila compacta.
+- **Presentación:** carátula a la izquierda y los dos selectores de color a la derecha, con la
+  leyenda de la carátula debajo de ellos; paleta de 17 colores en una línea; sin chips de
+  origen (el primario se marca «obligatorio»).
+- **Imágenes:** una imagen cargada cuenta como aceptada (sin «Sugerido», «Aceptar» ni
+  «Cambiar»; fuera de los pendientes y del banner de precarga). ↻ y borrar (ícono) en una fila,
+  y la zona de carga mínima al pie. En `game.json` siguen con `status: suggested`: el cambio es
+  solo de presentación y de conteo.
+- **Cómo se juega:** sección propia con Objetivo, Primeros pasos, Reglas, Modo multijugador y
+  Acciones de los botones (editables). Se quitaron Cantidad de jugadores y Periféricos. El
+  checklist pasó a la columna lateral, solo lectura. Backend: `PATCH` acepta `cabinetButtons`
+  (escribe `cabinet.button_list`, ya exportado como `guia.acciones`).
+- **Juegos:** el listado muestra la carátula cargada (el backend la toma de
+  `images.caratula.url`) y toda la tarjeta abre la ficha, también si está lista o exportada.
+- **Dependencias:** `npm audit fix` (brace-expansion, source-map-js); solo lockfiles.
+
+Sin verificar en navegador. Sin correr: `test_patch_cargar_acciones_de_los_botones` (falta
+`pydantic` en el entorno de desarrollo de Windows). Siguen fallando 3 tests por falta de
+Python/Zod (`arcade`, `parity`, `validation`).
+
 ## PENDIENTES
 
 1. Backend: `exportedAt` y fecha de modificación en el listado (Juegos no puede ordenar
