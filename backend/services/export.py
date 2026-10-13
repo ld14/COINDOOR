@@ -18,6 +18,7 @@ from backend.lib.domain.completeness import compute_game_status, missing_require
 from backend.lib.jobs.registro import JobState
 from backend.store.archivo import safe_id
 from backend.store.config import ConfigStore
+from backend.store.exports import export_status
 from backend.store.juegos import GamesStore
 from backend.store.sistemas import SystemsStore
 
@@ -121,6 +122,11 @@ class ExportService:
         bundle = self.settings.data_dir / "exports" / f"{safe_id(game.id)}.coindoor.zip"
         if not bundle.exists():
             raise Conflict("No hay un export para instalar. Exportá el juego primero.")
+        if export_status(bundle, self.games.dir_de(game) / "game.json") == "pending":
+            raise Conflict(
+                "La ficha cambió después del último export. "
+                "Volvé a exportar para que ATTRACT reciba la información nueva."
+            )
 
         attract_dir = ConfigStore(self.settings.config_path).attract_dir()
         if attract_dir is None:

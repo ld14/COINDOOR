@@ -599,6 +599,23 @@ def test_install_attract_ok(tmp_path: Path) -> None:
     assert "instalado:" in payload["salida"]
 
 
+def test_install_attract_con_ficha_editada_tras_el_export_falla(tmp_path: Path) -> None:
+    attract_dir = tmp_path / "attract"
+    _fake_installer(attract_dir, "exit 0")
+    api = client(tmp_path)
+    api.patch("/api/config", json={"attractDir": str(attract_dir)})
+    game_id = _create_arcade_game(api)
+    _make_exportable(api, game_id)
+    bundle = Path(_export_sync(api, game_id)["file"])
+    old =bundle.stat().st_mtime_ns - 1_000_000_000
+    os.utime(bundle, ns=(old, old))
+
+    response = api.post(f"/api/games/{game_id}/install-attract")
+
+    assert response.status_code == 409
+    assert "volvé a exportar" in response.json()["error"].lower()
+
+
 def test_install_attract_falla_muestra_salida_del_script(tmp_path: Path) -> None:
     attract_dir = tmp_path / "attract"
     _fake_installer(attract_dir, 'echo "error: falta wslpath" >&2; exit 1')
