@@ -7,18 +7,26 @@ from typing import Any
 
 # Nombre de romset de MAME: minusculas, digitos y guion bajo.
 _ROMSET = re.compile(r"^[a-z0-9_]+$")
-_EXT_ROM = frozenset({".zip", ".7z", ".chd"})
+# Sistemas cuyo ROM se identifica por romset de MAME ("arcade" y "mame" son lo mismo).
+_SISTEMAS_ROMSET = frozenset({"arcade", "mame"})
+_EXT_ROM =frozenset({".zip", ".7z", ".chd"})
 
 
 def set_exportado(game: Mapping[str, Any]) -> str:
     """Valor del campo ``set`` que viaja al bundle.
 
-    Con ``identitySource == "mame"`` y un ``romRef`` cuyo nombre es un romset valido,
-    es ese romset (lo que ATTRACT necesita para consultar ``-listxml``). En cualquier
-    otro caso es el ``id`` interno: el slug del titulo, como antes.
+    ``set`` es la identidad del juego para ATTRACT: si cambia entre dos exports,
+    ``attract import`` crea un bloque nuevo en vez de actualizar el existente. Por eso
+    no depende de ``identitySource``, que se sobrescribe con la fuente del ultimo campo
+    de identidad editado.
+
+    En un sistema arcade/mame con un ``romRef`` cuyo nombre es un romset valido, es ese
+    romset (lo que ATTRACT necesita para consultar ``-listxml``). En cualquier otro caso
+    es el ``id`` interno: el slug del titulo. Otros sistemas (p. ej. MS-DOS) tambien
+    tienen ``romRef``, pero ahi es una carpeta o un zip que no nombra un romset.
     """
     slug = str(game.get("id", ""))
-    if game.get("identitySource") != "mame":
+    if str(game.get("systemId") or "").strip().lower() not in _SISTEMAS_ROMSET:
         return slug
     rom_ref = str(game.get("romRef") or "").strip()
     if not rom_ref:
