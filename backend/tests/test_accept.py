@@ -79,6 +79,30 @@ def test_export_no_incluye_source_de_campos(tmp_path: Path) -> None:
         assert b'"source"' not in blob, name
 
 
+def test_la_procedencia_de_mobygames_no_viaja_al_export(tmp_path: Path) -> None:
+    """ADR-0002: el valor sí viaja; la fuente y su enlace se quedan en COINDOOR."""
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    _make_exportable(api, game_id)
+    _store(tmp_path).apply_identity_suggestion(
+        game_id,
+        "developer",
+        "Lucasfilm Games",
+        FieldProvenance(
+            source="MobyGames",
+            originUrl="https://www.mobygames.com/game/714/maniac-mansion/",
+            sourceType="scrape",
+        ),
+    )
+    result = _export_sync(api, game_id)
+    with zipfile.ZipFile(result["file"]) as bundle:
+        blobs = {n: bundle.read(n) for n in bundle.namelist()}
+    assert any(b"Lucasfilm Games" in blob for blob in blobs.values())
+    for name, blob in blobs.items():
+        assert b"MobyGames" not in blob, name
+        assert b"mobygames.com" not in blob, name
+
+
 def test_resena_con_solo_nota_conserva_las_categorias(tmp_path: Path) -> None:
     api = client(tmp_path)
     game_id = _create_arcade_game(api)

@@ -92,8 +92,16 @@
 
 ## Cierre
 
-- [ ] Comparar sobre 3 juegos MS-DOS la identidad de MobyGames contra la actual de la IA.
+- [x] Comparar sobre 3 juegos MS-DOS la identidad de MobyGames contra la actual de la IA.
       Hecho cuando: se anota cuál acertó más y cuántos campos tuvo que completar la IA en la
-      precarga.
-- [ ] `ruff`, `mypy` y `pytest` en verde.
-- [ ] Marcar la feature como hecha en [`roadmap.md`](../../constitution/roadmap.md).
+      precarga. Hecho el 2026-10-29 con *Elvira*, *Out of This World* y *Civilization* (tabla en
+      el plan, §Lo verificado): acertó más MobyGames (la IA atribuyó *Elvira* a Sierra); la IA
+      completaría 0, 0 y 4 campos. *Civilization* no se encontró: el original no está en la
+      primera página de la búsqueda.
+- [x] `ruff`, `mypy` y `pytest` en verde. Con los comandos de `tech-stack.md` §Comandos, en
+      WSL, el 2026-10-29: `ruff check .` sin errores, `mypy backend/lib` sin errores y
+      `pytest` 460 tests, también sin red. Hubo que arreglar 31 avisos de `ruff` y 8 errores
+      de `mypy` anteriores a la 020 (sin cambiar comportamiento: los prompts largos llevan
+      `noqa`), corregir `kind="referencia"` a `"media"` en dos candidatos de referencia y
+      hacer hermético el único test que salía a la red (a ArcadeDB).
+- [x] Marcar la feature como hecha en [`roadmap.md`](../../constitution/roadmap.md).

@@ -276,7 +276,7 @@ def test_media_upload_rejects_empty_file(tmp_path: Path) -> None:
 def test_suggestions_endpoint_creates_job_without_credentials(tmp_path: Path) -> None:
     api = client(tmp_path)
     # Usar sistema no-arcade para evitar que ArcadeDB sea consultado.
-    api.post("/api/systems", json={"name": "nes", "shortName": "nes", "launchCmd": "/usr/local/bin/fceux"})
+    api.post("/api/systems", json={"name": "nes", "shortName": "nes", "launchCmd": "/usr/local/bin/fceux"})  # noqa: E501
     created = api.post(
         "/api/games",
         json={
@@ -454,8 +454,8 @@ def test_export_rejects_uppercase_system_name(tmp_path: Path) -> None:
 
 def test_patch_systemId_moves_game_to_new_directory(tmp_path: Path) -> None:
     api = client(tmp_path)
-    api.post("/api/systems", json={"name": "arcade", "shortName": "arcade", "launchCmd": "/usr/bin/mame"})
-    api.post("/api/systems", json={"name": "mame", "shortName": "mame", "launchCmd": "/usr/bin/mame"})
+    api.post("/api/systems", json={"name": "arcade", "shortName": "arcade", "launchCmd": "/usr/bin/mame"})  # noqa: E501
+    api.post("/api/systems", json={"name": "mame", "shortName": "mame", "launchCmd": "/usr/bin/mame"})  # noqa: E501
     created = api.post(
         "/api/games",
         json={
@@ -485,7 +485,7 @@ def test_patch_systemId_moves_game_to_new_directory(tmp_path: Path) -> None:
 
 def test_patch_systemId_rejects_nonexistent_system(tmp_path: Path) -> None:
     api = client(tmp_path)
-    api.post("/api/systems", json={"name": "arcade", "shortName": "arcade", "launchCmd": "/usr/bin/mame"})
+    api.post("/api/systems", json={"name": "arcade", "shortName": "arcade", "launchCmd": "/usr/bin/mame"})  # noqa: E501
     created = api.post(
         "/api/games",
         json={
@@ -798,5 +798,5 @@ def test_objetivo_con_el_nombre_interno_del_juego_no_se_exporta(tmp_path: Path) 
     assert rechazado["status"] == "failed"
     assert "goldnaxe" in rechazado["error"]
 
-    api.put(f"/api/games/{game_id}/fields/objetivo", json={"value": "En Golden Axe hay que avanzar."})
+    api.put(f"/api/games/{game_id}/fields/objetivo", json={"value": "En Golden Axe hay que avanzar."})  # noqa: E501
     assert _opciones(api, game_id)["objetivo"]["disponible"] is True

@@ -105,7 +105,8 @@ def _search_archive_browse(game_title: str) -> list[ManualResult]:
     results: list[ManualResult] = []
     for match in re.finditer(r'/details/([^"?]+)', resp.text):
         identifier = match.group(1)
-        if identifier and identifier not in {r.url.split("/download/")[-1] for r in results if "/download/" in r.url}:
+        descargados = {r.url.split("/download/")[-1] for r in results if "/download/" in r.url}
+        if identifier and identifier not in descargados:
             results.append(ManualResult(
                 title=f"{game_title} — {identifier}",
                 url=f"https://archive.org/download/{identifier}",
@@ -121,7 +122,9 @@ def _search_duckduckgo(game_title: str, system: str) -> list[ManualResult]:
         resp.raise_for_status()
 
     results: list[ManualResult] = []
-    for match in re.finditer(r'<a[^>]+class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>', resp.text):
+    for match in re.finditer(
+        r'<a[^>]+class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>', resp.text
+    ):
         href = match.group(1)
         title = re.sub(r"<[^>]+>", "", match.group(2)).strip()
         domain = _domain(href)

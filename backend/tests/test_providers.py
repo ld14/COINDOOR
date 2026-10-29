@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import json
+from pathlib import Path
 
 import httpx
 import pytest
@@ -281,7 +281,9 @@ def test_ia_generador_cheats_prompt_requires_matching_platform(tmp_path: Path) -
     )
     config = AiModelConfig("https://api.test/v1", "key", "test-model")
     result = IaGenerador(config, http).buscar(
-        Consulta("ghost-n-goblins", "cheats", "Ghosts 'n Goblins", "MAME (máquinas arcade)", "1985"),
+        Consulta(
+            "ghost-n-goblins", "cheats", "Ghosts 'n Goblins", "MAME (máquinas arcade)", "1985"
+        ),
     )
 
     assert result.trace.estado == "ok"
@@ -506,8 +508,17 @@ def test_apply_suggestion_rejects_referencia_candidate(
         FieldsService(settings).apply_suggestion("golden-axe", "video", candidate_id)
 
 
-def test_identity_suggestion_uses_current_value_with_ia(tmp_path: Path) -> None:
+def test_identity_suggestion_uses_current_value_with_ia(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     settings = _seeded_settings(tmp_path)
+    # Sin esto la cadena real de `title` sale a ArcadeDB, y el test fallaba cuando ArcadeDB
+    # no respondía: los tests no dependen de la red.
+    monkeypatch.setattr(
+        "backend.lib.providers.orquestador.providers_for",
+        lambda _key, _settings, _cancel_event=None: (IdentityActualProvider(_settings),),
+    )
 
     payload = SuggestionsService(settings).suggest("golden-axe", "title")
 

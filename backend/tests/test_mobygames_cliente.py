@@ -164,3 +164,38 @@ def test_con_el_enlace_de_procedencia_se_salta_la_busqueda() -> None:
     )
     assert resultado is not None and resultado.ficha.year == "1988"
     assert all("/search/" not in u for u in fake.pedidas)
+
+
+def test_sugerir_con_la_url_de_la_procedencia_reusa_la_ficha_de_la_precarga() -> None:
+    # La precarga busca por título; "Sugerir" llega después con la URL que quedó en la
+    # procedencia. Es la misma ficha: no se vuelve a bajar.
+    fake = _Cliente(
+        {
+            "type=game": "busqueda-guy-spy.html",
+            "/guy-spy-and-the-crystals-of-armageddon/": "maniac-mansion.html",
+            "/specs/": "maniac-mansion-specs.html",
+        }
+    )
+    por_titulo = buscar_ficha(_como_cliente(fake), "Guy Spy", "1992", "DOS")
+    assert por_titulo is not None and len(fake.pedidas) == 3
+    por_url = buscar_ficha(
+        _como_cliente(fake),
+        "Guy Spy",
+        None,
+        "DOS",
+        ficha_url="https://www.mobygames.com/game/6716/guy-spy-and-the-crystals-of-armageddon/",
+    )
+    assert por_url is por_titulo
+    assert len(fake.pedidas) == 3
+
+
+def test_una_busqueda_sin_resultado_tampoco_se_repite() -> None:
+    fake = _Cliente({"type=game": "busqueda-guy-spy.html"})
+    assert buscar_ficha(_como_cliente(fake), "Titulo Inexistente", "1992", "DOS") is None
+    assert buscar_ficha(_como_cliente(fake), "Titulo Inexistente", "1992", "DOS") is None
+    assert len(fake.pedidas) == 1
+
+
+def test_sin_año_y_con_dos_ediciones_del_mismo_titulo_no_elige() -> None:
+    filas = _filas("busqueda-tmnt.html")
+    assert elegir(filas, "Teenage Mutant Ninja Turtles", None, "DOS") is None

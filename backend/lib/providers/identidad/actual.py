@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from backend.config import Settings
 from backend.lib.providers.base import Candidato, Consulta, Limite, ProviderResult, ProviderTrace
 from backend.store.juegos import GamesStore
@@ -13,7 +15,7 @@ _SOURCE_LABELS = {
 
 class IdentityActualProvider:
     nombre = "Identidad actual"
-    tipo = "api"
+    tipo: Literal["api", "scrape"] = "api"
     campos = frozenset({"title", "year", "developer", "publisher", "genre", "players", "format"})
     timeout = 1.0
     limite = Limite()

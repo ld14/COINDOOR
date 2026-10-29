@@ -115,13 +115,22 @@ def elegir(
     return elegidas[0] if len(elegidas) == 1 else None
 
 
-_memo: dict[tuple[str, str, str], FichaCompleta | None] = {}
+# Dos memorias mientras corre el proceso: qué ficha eligió cada búsqueda (o ninguna) y cada
+# ficha por su URL. La precarga busca por título y "Sugerir" llega después con la URL que
+# quedó en la procedencia: los dos caminos terminan en la misma ficha ya bajada.
+_busquedas: dict[tuple[str, str, str], str | None] = {}
+_fichas: dict[tuple[str, str], FichaCompleta] = {}
 _memo_lock = threading.Lock()
 
 
 def olvidar() -> None:
     with _memo_lock:
-        _memo.clear()
+        _busquedas.clear()
+        _fichas.clear()
+
+
+def _base(url: str) -> str:
+    return url if url.endswith("/") else url + "/"
 
 
 def buscar_ficha(
@@ -134,28 +143,34 @@ def buscar_ficha(
 ) -> FichaCompleta | None:
     """Busca el juego y baja su ficha y sus specs; ``None`` si no hay un resultado claro.
 
-    ``ficha_url`` salta la búsqueda (la procedencia ya trae el enlace de MobyGames). El
-    resultado queda en memoria mientras corre el proceso: las sugerencias de distintos
-    campos y la precarga lo reusan sin volver a bajar las páginas.
+    ``ficha_url`` salta la búsqueda (la procedencia ya trae el enlace de MobyGames). La
+    búsqueda y la ficha quedan en memoria mientras corre el proceso: las sugerencias de
+    distintos campos y la precarga las reusan sin volver a bajar las páginas.
     """
-    clave = (ficha_url or normalizar(titulo), anio or "", plataforma.lower())
-    with _memo_lock:
-        if clave in _memo:
-            return _memo[clave]
-
     url = ficha_url
     if url is None:
-        pagina = client.get_page(f"{BASE}/search/?q={quote_plus(titulo.strip())}&type=game")
-        fila = elegir(parse_busqueda(pagina), titulo, anio, plataforma)
-        url = fila.url if fila else None
+        busqueda = (normalizar(titulo), anio or "", plataforma.lower())
+        with _memo_lock:
+            conocida = busqueda in _busquedas
+            url = _busquedas.get(busqueda)
+        if not conocida:
+            pagina = client.get_page(f"{BASE}/search/?q={quote_plus(titulo.strip())}&type=game")
+            fila = elegir(parse_busqueda(pagina), titulo, anio, plataforma)
+            url = fila.url if fila else None
+            with _memo_lock:
+                _busquedas[busqueda] = url
+    if not url:
+        return None
 
-    resultado: FichaCompleta | None = None
-    if url:
-        base = url if url.endswith("/") else url + "/"
-        ficha = parse_ficha(client.get_page(base), plataforma)
-        specs = parse_specs(client.get_page(base + "specs/"), plataforma)
-        resultado = FichaCompleta(ficha, specs)
-
+    base = _base(url)
+    clave = (base, plataforma.lower())
     with _memo_lock:
-        _memo[clave] = resultado
+        guardada = _fichas.get(clave)
+    if guardada is not None:
+        return guardada
+    ficha = parse_ficha(client.get_page(base), plataforma)
+    specs = parse_specs(client.get_page(base + "specs/"), plataforma)
+    resultado = FichaCompleta(ficha, specs)
+    with _memo_lock:
+        _fichas[clave] = resultado
     return resultado

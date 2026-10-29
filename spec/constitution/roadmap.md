@@ -85,7 +85,7 @@ contra un mock server y no lo necesitan.
 | — | **Objetivo de la guía** — texto «Objetivo» editable y sugerido por IA, como la sinopsis | [`017`](../features/017-objetivo-guia-ia/spec.md) | En curso |
 | — | **Guía completa** — periféricos, primeros pasos, reglas y modo multijugador | [`018`](../features/018-guia-completa/spec.md) | En curso |
 | — | **Rediseño Flyer 80s** — tokens, primitivas, shell, ficha, alta, export y autosave | [`019`](../features/019-rediseno-flyer/spec.md) | En curso · [`ADR-0023`](../decisions/0023-estetica-flyer-reemplaza-dos.md) |
-| — | **Scrapling y MobyGames** — motor de scraping con navegador y fuente factual para PC/DOS | [`020`](../features/020-scrapling-mobygames/spec.md) | Aprobada · [`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md) |
+| — | **Scrapling y MobyGames** — motor de scraping con navegador y fuente factual para PC/DOS | [`020`](../features/020-scrapling-mobygames/spec.md) | Hecha · [`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md) · [`ADR-0025`](../decisions/0025-precalentar-mobygames-al-arrancar.md) |
 | — | **Imágenes desde SteamGridDB y ScreenScraper** — dos proveedores más de carátula, póster, logo, marquesina, captura y video | [`021`](../features/021-imagenes-steamgriddb-screenscraper/spec.md) | Aprobada · depende de la 020 |
 
 **Orden de arranque:** 003 → 004 → 005. Las tres primeras son independientes entre sí

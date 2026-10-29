@@ -174,7 +174,8 @@ def _validar_rom_ref(rom_ref: str) -> None:
 
 
 def _portada(game) -> str | None:
-    """Carátula para el listado: la miniatura propia o, si no hay, la carátula cargada en la ficha."""
+    """Carátula para el listado: la miniatura propia o, si no hay, la carátula cargada en
+    la ficha."""
     if game.coverThumbUrl:
         return game.coverThumbUrl
     caratula = game.images.get("caratula")

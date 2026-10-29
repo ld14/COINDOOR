@@ -64,7 +64,7 @@ class LaunchboxImageProvider:
                 id=f"launchbox:{result.game_id}:year",
                 key="year",
                 kind="identity",
-                nombre=f"Año (Launchbox)",
+                nombre="Año (Launchbox)",
                 fuente=self.nombre,
                 clase="aplicable",
                 value=result.year,
@@ -85,7 +85,7 @@ class LaunchboxImageProvider:
         log.info("Launchbox: %d images found for key=%s", len(images), consulta.key)
 
         # 4. Filtrar por el campo solicitado y crear candidatos
-        candidates = []
+        candidates: list[Candidato] = []
         for img in images:
             if img.field_key != consulta.key:
                 continue
@@ -112,7 +112,7 @@ class LaunchboxImageProvider:
         ref = Candidato(
             id=f"launchbox:{result.game_id}:{consulta.key}:ref",
             key=consulta.key,
-            kind="referencia",
+            kind="media",
             nombre=f"Ver galería de {result.title} en Launchbox",
             fuente=self.nombre,
             clase="referencia",

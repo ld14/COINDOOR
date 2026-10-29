@@ -92,7 +92,9 @@ class _SearchState:
     magazines_found: set[str] = field(default_factory=set)
 
 
-def search_magazines(game_title: str, system: str, settings: Settings) -> list[MagazineSearchResult]:
+def search_magazines(
+    game_title: str, system: str, settings: Settings
+) -> list[MagazineSearchResult]:
     log.info("Iniciando búsqueda de revistas para '%s' (%s)", game_title, system)
     state = _SearchState()
 
@@ -101,7 +103,10 @@ def search_magazines(game_title: str, system: str, settings: Settings) -> list[M
     except Exception:
         log.warning("AI identification failed", exc_info=True)
 
-    log.info("Fase 1 completa: %d apariciones identificadas por IA", len([r for r in state.results if r.appearance]))
+    log.info(
+        "Fase 1 completa: %d apariciones identificadas por IA",
+        len([r for r in state.results if r.appearance]),
+    )
 
     try:
         _phase2_digitized(game_title, state)
@@ -126,7 +131,9 @@ def search_magazines(game_title: str, system: str, settings: Settings) -> list[M
     return state.results
 
 
-def _phase1_ai_identify(game_title: str, system: str, state: _SearchState, settings: Settings) -> None:
+def _phase1_ai_identify(
+    game_title: str, system: str, state: _SearchState, settings: Settings
+) -> None:
     """Use AI to identify which magazine issues contain the game."""
     if not settings.ai_primary_base_url or not settings.ai_primary_api_key:
         log.info("No AI config, skipping magazine identification")
@@ -302,7 +309,7 @@ REGLAS:
 12. Responde SOLO el JSON, sin explicaciones ni texto adicional
 13. Prioriza las más relevantes por orden cronológico
 14. Si no estás seguro de un número de issue específico, deja issueNumber vacío pero incluye la revista
-15. NO inventes revistas que no existieron. Solo usa las del catálogo o revistas reales que conozcas"""
+15. NO inventes revistas que no existieron. Solo usa las del catálogo o revistas reales que conozcas"""  # noqa: E501
 
     try:
         quotas = QuotasStore(settings.quotas_path)
@@ -345,7 +352,14 @@ REGLAS:
                 source="ai_identification",
                 appearanceType=item.get("appearanceType", "no_determinado"),
             )
-            _add_result(state, f"{game_title} en {appearance.magazineName}", "", "ai", appearance.magazineName, appearance)
+            _add_result(
+                state,
+                f"{game_title} en {appearance.magazineName}",
+                "",
+                "ai",
+                appearance.magazineName,
+                appearance,
+            )
             count += 1
         log.info("IA: %d apariciones identificadas", count)
     except json.JSONDecodeError:
@@ -387,7 +401,9 @@ def _search_archive_org(game_title: str, magazine: str, state: _SearchState) -> 
     for doc in docs:
         identifier = doc.get("identifier", "")
         title = doc.get("title", "Revista")
-        _add_result(state, title, f"https://archive.org/download/{identifier}", "archive.org", magazine)
+        _add_result(
+            state, title, f"https://archive.org/download/{identifier}", "archive.org", magazine
+        )
 
 
 def _phase3_direct(game_title: str, state: _SearchState) -> None:
@@ -408,7 +424,9 @@ def _phase3_direct(game_title: str, state: _SearchState) -> None:
                 resp = client.post("https://html.duckduckgo.com/html/", data={"q": query})
                 resp.raise_for_status()
 
-            for match in re.finditer(r'<a[^>]+class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>', resp.text):
+            for match in re.finditer(
+                r'<a[^>]+class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>', resp.text
+            ):
                 href = match.group(1)
                 title = re.sub(r"<[^>]+>", "", match.group(2)).strip()
                 domain = _domain(href)
@@ -545,7 +563,10 @@ def build_magazine_links(appearance: MagazineAppearance) -> dict[str, str]:
         query_parts.append(f"issue {issue}")
     if date:
         query_parts.append(date)
-    archive_url = f"https://archive.org/search?query={quote_plus(' '.join(query_parts))}&and[]=mediatype%3Atexts"
+    archive_url = (
+        f"https://archive.org/search?query={quote_plus(' '.join(query_parts))}"
+        "&and[]=mediatype%3Atexts"
+    )
     links["archiveOrg"] = archive_url
 
     return links

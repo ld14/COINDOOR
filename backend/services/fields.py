@@ -94,7 +94,10 @@ class FieldsService:
     def _download_candidate_media(self, game_id: str, key: str, media_url: str) -> str:
         game = self.store.get(game_id)
         headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "User-Agent": (
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            ),
             "Accept": "image/*,*/*",
             "Referer": "https://duckduckgo.com/",
         }

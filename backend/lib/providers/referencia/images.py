@@ -69,8 +69,8 @@ class ImageSearchProvider:
             for q in queries
         ]
 
-        images = []
-        seen_urls = set()
+        images: list[dict[str, str]] = []
+        seen_urls: set[str] = set()
 
         for query in formatted_queries:
             if len(images) >= 10:
@@ -93,7 +93,7 @@ class ImageSearchProvider:
             candidate = Candidato(
                 id=f"image-search:{consulta.game_id}:{consulta.key}",
                 key=consulta.key,
-                kind="referencia",
+                kind="media",
                 nombre=f"Buscar imágenes de \"{consulta.title}\" en DuckDuckGo",
                 fuente=self.nombre,
                 clase="referencia",
@@ -153,7 +153,8 @@ def _search_ddg_images(query: str) -> list[dict[str, str]]:
         api_resp.raise_for_status()
 
         data = api_resp.json()
-        return data.get("results", [])
+        resultados: list[dict[str, str]] = data.get("results", [])
+        return resultados
 
 
 def _is_trusted_url(url: str) -> bool:

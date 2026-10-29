@@ -30,7 +30,9 @@ _PARSE_PROMPT_PATH = Path(__file__).parent / "ia" / "prompts" / "cheats-parse.v1
 # devuelve menos de lo que hay en el texto.
 _PARSE_MAX_TOKENS = 16000
 
-_cache: dict[tuple[str, str, str], dict[str, object]] = {}
+# Clave: (data_dir, game_id, clave, fuente) para las sugerencias y (data_dir, game_id,
+# __identity_batch__) para el bloque de identidad.
+_cache: dict[tuple[str, ...], dict[str, object]] = {}
 _cache_lock = threading.Lock()
 
 

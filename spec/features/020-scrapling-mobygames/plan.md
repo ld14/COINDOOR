@@ -90,6 +90,39 @@ La cookie `cf_clearance` que deja el desafío para `.mobygames.com` vence en **u
 primera consulta paga el desafío y las siguientes no, salvo que Cloudflare lo pida de nuevo:
 cambio de IP, de navegador o una decisión suya, que no se puede prever.
 
+**Cierre: MobyGames contra la identidad que puso la IA** (2026-10-29, sitio real). Tres
+juegos de la colección con toda la identidad aplicada desde sugerencias de IA
+(`openai/gpt-oss-20b` y `gpt-oss-120b`):
+
+| Juego (año de la ficha) | Campo | IA (lo que hay hoy) | MobyGames, DOS |
+|---|---|---|---|
+| *Elvira* (1990) | desarrollador | Sierra | **Horror Soft Ltd.** |
+| | editor | Sierra | **Accolade, Inc.** |
+| | género | Adventure | Action Adventure |
+| | jugadores · formato | 1 · Diskette | 1 · Diskette |
+| *Out of This World* (1991) | desarrollador | Delphine Software | Delphine Software International |
+| | editor | Virgin Interactive | **Interplay Productions, Inc.** |
+| | género | platformer | Action |
+| | jugadores · formato | 1 · Diskette | 1 · disquete y CD (DOS 1992: año aproximado) |
+| *Civilization* (1991) | todos | MicroProse · MicroProse · strategy · 1 · Diskette | **sin resultado** |
+
+- **Acertó más MobyGames.** La IA atribuyó *Elvira* a Sierra, que no tuvo nada que ver: es de
+  Horror Soft y la editó Accolade. Para *Out of This World* dio otro editor que el de la
+  versión DOS que lista MobyGames. Donde MobyGames encontró el juego, sus datos son los de
+  esa plataforma.
+- **La IA acertó *Civilization*, y ahí MobyGames no tuvo nada:** el original
+  (*Sid Meier's Civilization*) no está en la primera página de la búsqueda "Civilization";
+  la ocupan otro "Civilization" sin DOS, *CivWorld*, *Advanced Civilization* (DOS 1995, a
+  cuatro años) y secuelas. La regla respondió "sin resultados" en vez de adivinar. Es el
+  riesgo "Juego fuera de la primera página", ahora con un caso real.
+- **Cuántos campos completa la IA en la precarga:** *Elvira*, 0; *Out of This World*, 0 (el año
+  y el formato quedan fuera por la edición aproximada, y la IA no los propone);
+  *Civilization*, 4 (desarrollador, editor, género y jugadores; el año sale de Launchbox).
+  La IA además traduce el género de MobyGames, que llega en inglés.
+
+**Sin procesos huérfanos** (2026-10-29, WSL, Chromium real): 0 procesos antes, 12 durante
+cada sesión, 0 después de cerrarla y 0 después de cancelarla a mitad de una consulta.
+
 **Ficha de Maniac Mansion** (guardada el 2026-10-29 en
 `backend/tests/fixtures/mobygames/maniac-mansion.html`):
 
@@ -290,8 +323,9 @@ cambio de IP, de navegador o una decisión suya, que no se puede prever.
   ningún "AKA:" lo cubre, el proveedor responde "sin resultados". Es el lado seguro del
   error. En *Out Run* contra "OutRun", el AKA lo cubrió.
 - **Juego fuera de la primera página** — si un título muy común empuja al correcto a la
-  segunda página, el proveedor responde "sin resultados". El respaldo posible es el navegador
-  por plataforma (`/game/platform:dos/title:{término}/`), que no trae año.
+  segunda página, el proveedor responde "sin resultados". Pasó con *Civilization* (ver
+  §Lo verificado, cierre). El respaldo posible es el navegador por plataforma
+  (`/game/platform:dos/title:{término}/`), que no trae año; queda fuera de la 020.
 - **Página procesada por el navegador** — la fixture es el HTML del servidor y Scrapling ve
   la página después del JavaScript. El parser usa solo el JSON-LD y listas en HTML, y su
   test corre también contra una ficha bajada con `ScrapingClient`.

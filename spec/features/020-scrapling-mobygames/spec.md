@@ -1,6 +1,6 @@
 # 020 · Scrapling y MobyGames
 
-**Estado:** aprobada
+**Estado:** hecha (2026-10-29)
 
 ## Qué hace
 
@@ -38,41 +38,42 @@ referencia de esa plataforma y bloquea el HTTP simple, así que hace falta un na
 
 ## Criterios de aceptación
 
-- [ ] Dado un juego MS-DOS con título, cuando se pide sugerir `developer`, aparece un
+- [x] Dado un juego MS-DOS con título, cuando se pide sugerir `developer`, aparece un
       candidato con fuente "MobyGames" y el valor de la ficha.
-- [ ] Dado un juego que existe en varias plataformas, los datos que se ofrecen son los de la
+- [x] Dado un juego que existe en varias plataformas, los datos que se ofrecen son los de la
       plataforma de la ficha (año, editor, formato), no los de otra edición.
-- [ ] Dado un año en la ficha, entre ediciones del mismo título gana la del mismo año; se
-      acepta un año de diferencia. Sin año, un título con más de una edición en esa plataforma
+- [x] Dado un año en la ficha, entre ediciones del mismo título gana la del mismo año; se
+      acepta un año de diferencia con el título exacto y dos con el título que lo contiene
+      (acordado el 2026-10-29). Sin año, un título con más de una edición en esa plataforma
       responde "sin resultados" en vez de elegir una.
-- [ ] Dado un sistema sin equivalencia en el catálogo de plataformas, MobyGames no se consulta
+- [x] Dado un sistema sin equivalencia en el catálogo de plataformas, MobyGames no se consulta
       y el rastro dice "plataforma sin equivalencia", no "sin resultados".
-- [ ] Dado un juego arcade, MobyGames no se consulta y el rastro dice "plataforma sin
+- [x] Dado un juego arcade, MobyGames no se consulta y el rastro dice "plataforma sin
       equivalencia".
-- [ ] Agregar una plataforma nueva es una fila en el catálogo, sin tocar código.
-- [ ] Launchbox lee sus plataformas del catálogo; `_SYSTEM_TO_LAUNCHBOX` no existe más.
-- [ ] Dado un título sin coincidencia clara por nombre y plataforma, **no** se devuelve un
+- [x] Agregar una plataforma nueva es una fila en el catálogo, sin tocar código.
+- [x] Launchbox lee sus plataformas del catálogo; `_SYSTEM_TO_LAUNCHBOX` no existe más.
+- [x] Dado un título sin coincidencia clara por nombre y plataforma, **no** se devuelve un
       candidato adivinado: el proveedor responde "sin resultados".
-- [ ] Dado cualquier campo de identidad, en cualquier sistema, "Sugerir" no ofrece ningún
+- [x] Dado cualquier campo de identidad, en cualquier sistema, "Sugerir" no ofrece ningún
       candidato generado por IA, tampoco en la sugerencia de identidad en bloque.
-- [ ] Dado el alta de un juego MS-DOS, cada campo de identidad vacío se llena con MobyGames;
+- [x] Dado el alta de un juego MS-DOS, cada campo de identidad vacío se llena con MobyGames;
       si MobyGames no lo tiene, con Launchbox; si ninguno lo tiene, con la IA. Un campo con
       valor no se pisa, y cada campo escrito registra su fuente en la procedencia.
-- [ ] Dada una reseña con categorías cargadas, aplicar la nota de MobyGames cambia `score` y
+- [x] Dada una reseña con categorías cargadas, aplicar la nota de MobyGames cambia `score` y
       deja las seis categorías como estaban.
-- [ ] Dado Cloudflare sin resolver o un 403 persistente, el proveedor falla aislado y los
+- [x] Dado Cloudflare sin resolver o un 403 persistente, el proveedor falla aislado y los
       demás siguen ([`002`](../002-sugerencias-multiproveedor/spec.md)).
-- [ ] Dado que Chromium no está instalado, el proveedor no se construye y el resto de
+- [x] Dado que Chromium no está instalado, el proveedor no se construye y el resto de
       COINDOOR arranca y funciona.
-- [ ] Dada una búsqueda cancelada, el navegador se cierra: no queda ningún proceso huérfano.
-- [ ] Dos peticiones seguidas al mismo sitio quedan separadas por al menos 3 s, salvo que se
+- [x] Dada una búsqueda cancelada, el navegador se cierra: no queda ningún proceso huérfano.
+- [x] Dos peticiones seguidas al mismo sitio quedan separadas por al menos 3 s, salvo que se
       configure otro ritmo.
-- [ ] Un candidato nunca se aplica solo, y su fuente "MobyGames" queda en la procedencia
+- [x] Un candidato nunca se aplica solo, y su fuente "MobyGames" queda en la procedencia
       interna y **no** viaja al export ([`ADR-0002`](../../decisions/0002-procedencia-interna.md)).
-- [ ] Dos sugerencias del mismo juego mientras corre el proceso reutilizan la ficha ya
+- [x] Dos sugerencias del mismo juego mientras corre el proceso reutilizan la ficha ya
       descargada, también entre la precarga y "Sugerir".
-- [ ] Los tests corren sin red, contra una página guardada.
-- [ ] Al arrancar COINDOOR con Chromium y un sistema con equivalencia en MobyGames, se baja
+- [x] Los tests corren sin red, contra una página guardada.
+- [x] Al arrancar COINDOOR con Chromium y un sistema con equivalencia en MobyGames, se baja
       una página de búsqueda en segundo plano sin demorar el arranque, y la consulta que pide
       el usuario después ya no espera el desafío de Cloudflare
       ([`ADR-0025`](../../decisions/0025-precalentar-mobygames-al-arrancar.md)). Sin Chromium,
