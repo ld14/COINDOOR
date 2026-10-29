@@ -19,6 +19,8 @@ from urllib.parse import quote_plus
 
 import httpx
 
+from backend.lib.domain.plataformas import plataforma
+
 log = logging.getLogger(__name__)
 
 _BASE = "https://gamesdb.launchbox-app.com"
@@ -194,27 +196,13 @@ def _build_search_query(title: str, system: str) -> str:
     clean_title = re.sub(r"[^a-zA-Z0-9\s\-]", "", title).strip()
     words = clean_title.split()
     encoded = quote_plus("+".join(words))
-    launchbox_platform = _SYSTEM_TO_LAUNCHBOX.get(system.lower(), system)
+    fila = plataforma(system)
+    # Fuera del catálogo el sistema va tal cual; en el catálogo sin equivalencia, sin filtro.
+    launchbox_platform = system if fila is None else fila.sitios["launchbox"]
     platform = quote_plus(launchbox_platform) if launchbox_platform else ""
     if platform:
         return f"{encoded}?platform={platform}"
     return encoded
-
-
-# Mapeo de sistemas COINDOOR → nombres de plataforma Launchbox
-_SYSTEM_TO_LAUNCHBOX: dict[str, str] = {
-    "arcade": "Arcade",
-    "mame": "Arcade",
-    "msdos": "MS-DOS",
-    "ms-dos": "MS-DOS",
-    "nes": "Nintendo Entertainment System",
-    "snes": "Super Nintendo Entertainment System",
-    "genesis": "Sega Genesis",
-    "mega drive": "Sega Mega Drive",
-    "game boy": "Nintendo Game Boy",
-    "game boy advance": "Nintendo Game Boy Advance",
-    "game boy color": "Nintendo Game Boy Color",
-}
 
 
 def _parse_search_results(

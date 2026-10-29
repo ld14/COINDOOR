@@ -14,7 +14,7 @@ from backend.lib.providers.base import Candidato, Consulta, Limite, ProviderTrac
 from backend.lib.providers.cortocircuito import breaker
 from backend.lib.providers.http import ProviderHttpClient, ProviderHttpError
 from backend.lib.providers.ia.client import ModelResponseError, OpenAiCompatibleClient
-from backend.lib.providers.ia.generador import AiModelConfig, IaGenerador
+from backend.lib.providers.ia.generador import AiModelConfig
 from backend.lib.providers.registro import providers_for
 from backend.store.cuotas import QuotasStore
 from backend.store.juegos import GamesStore
@@ -150,69 +150,61 @@ class SuggestionsService:
                 return cached
         game = self.games.get(game_id)
         system = self.systems.get(game.systemId)
-        consulta = Consulta(
-            game.id,
-            "identidad",
-            game.identity.title,
-            system.name,
-            game.identity.year or None,
-        )
-        providers = providers_for("sinopsis", self.settings, cancel_event)
+        # Cada clave de identidad se pide a su propia cadena. La IA no está en ninguna
+        # (ADR-0024, punto 4); el memo de la ficha evita bajarla una vez por clave.
+        cadenas = {
+            key: providers_for(key, self.settings, cancel_event)
+            for key in sorted(_SUGGESTABLE_IDENTITY_KEYS)
+        }
         if reintentar:
-            for p in providers:
-                breaker.reset(p.nombre)
-        providers = [p for p in providers if not breaker.is_open(p.nombre)]
-        log.info("identity batch: %d providers for %s", len(providers), game_id)
+            for providers in cadenas.values():
+                for p in providers:
+                    breaker.reset(p.nombre)
         candidates: list[Candidato] = []
-        traces: list[ProviderTrace] = []
-        responded = 0
-        for provider in providers:
-            if cancel_event and cancel_event.is_set():
-                break
-            try:
-                result = provider.buscar(consulta)
-            except ProviderHttpError as exc:
-                if exc.retry_exhausted:
-                    breaker.strike(provider.nombre)
-                traces.append(ProviderTrace(provider.nombre, provider.tipo, str(exc)))
-                log.warning("identity batch: provider %s failed: %s", provider.nombre, exc)
-                continue
-            except Exception:
-                log.exception("Provider %s failed unexpectedly", provider.nombre)
-                traces.append(ProviderTrace(provider.nombre, provider.tipo, "excepción inesperada"))
-                continue
-            traces.append(result.trace)
-            if result.trace.estado == "ok":
-                responded += 1
-            if isinstance(provider, IaGenerador) and result.candidatos:
-                raw = result.candidatos[0].value
-                if raw:
-                    try:
-                        data = json.loads(raw) if isinstance(raw, str) else raw
-                    except (json.JSONDecodeError, TypeError):
-                        data = {}
-                    if isinstance(data, dict):
-                        for field_key in _SUGGESTABLE_IDENTITY_KEYS:
-                            val = str(data.get(field_key, ""))
-                            if val:
-                                candidates.append(Candidato(
-                                    id=f"ia-batch:{provider.config.model}:{field_key}",
-                                    key=field_key,
-                                    kind="identity",
-                                    nombre=f"{field_key} generado por IA",
-                                    fuente=provider.nombre,
-                                    clase="aplicable",
-                                    value=val,
-                                    generado_por_ia=True,
-                                    meta={"prompt_version": "v1", "modelo": provider.config.model},
-                                    trace=result.trace,
-                                ))
+        traces: dict[str, ProviderTrace] = {}
+        consultados: set[str] = set()
+        respondieron: set[str] = set()
+        for key, providers in cadenas.items():
+            consulta = Consulta(
+                game.id,
+                key,
+                game.identity.title,
+                system.name,
+                game.identity.year or None,
+            )
+            for provider in providers:
+                if cancel_event and cancel_event.is_set():
+                    break
+                if breaker.is_open(provider.nombre):
+                    continue
+                consultados.add(provider.nombre)
+                try:
+                    result = provider.buscar(consulta)
+                except ProviderHttpError as exc:
+                    if exc.retry_exhausted:
+                        breaker.strike(provider.nombre)
+                    traces[provider.nombre] = ProviderTrace(
+                        provider.nombre, provider.tipo, str(exc)
+                    )
+                    log.warning("identity batch: provider %s failed: %s", provider.nombre, exc)
+                    continue
+                except Exception:
+                    log.exception("Provider %s failed unexpectedly", provider.nombre)
+                    traces[provider.nombre] = ProviderTrace(
+                        provider.nombre, provider.tipo, "excepción inesperada"
+                    )
+                    continue
+                candidates.extend(result.candidatos)
+                traces.setdefault(provider.nombre, result.trace)
+                if result.candidatos or result.trace.estado == "ok":
+                    respondieron.add(provider.nombre)
+        responded = len(respondieron)
         log.info("identity batch: %d candidates, %d responded", len(candidates), responded)
         payload: dict[str, object] = {
             "candidatos": [_candidate_out(c) for c in candidates],
             "respondieron": responded,
-            "consultados": len(providers),
-            "fuentes": [_trace_out(t) for t in traces],
+            "consultados": len(consultados),
+            "fuentes": [_trace_out(t) for t in traces.values()],
         }
         with _cache_lock:
             _cache[cache_key] = payload

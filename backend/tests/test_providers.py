@@ -460,10 +460,20 @@ def test_registro_cheats_usa_el_buscador_y_nada_mas(tmp_path: Path) -> None:
     assert nombres == ["ArcadeDB", "Búsqueda web + IA"]
 
     # Los gpt-oss siguen intactos —y solos— en el resto de los campos.
-    for key in ("sinopsis", "review", "developer"):
+    for key in ("sinopsis", "review"):
         otros = [p.nombre for p in providers_for(key, settings)]
         assert "IA · gpt-oss-120b" in otros
         assert "Búsqueda web + IA" not in otros
+
+
+def test_ninguna_cadena_de_identidad_incluye_ia(tmp_path: Path) -> None:
+    """ADR-0024, punto 4: la identidad nunca la propone una IA."""
+    from backend.lib.domain.fielddefs import identity_keys
+    from backend.lib.providers.registro import _TABLE
+
+    for key in identity_keys():
+        assert not {"ia_primary", "ia_backup"} & set(_TABLE[key]), key
+        assert "mobygames" in _TABLE[key], key
 
 
 def test_registro_cheats_sin_buscador_se_queda_sin_ia(tmp_path: Path) -> None:
@@ -581,3 +591,45 @@ def test_apply_identity_suggestion_accepts_ia_candidate(
 
     assert len(payload["candidatos"]) == 1
     assert payload["candidatos"][0]["generadoPorIa"] is True
+
+
+def test_identidad_en_bloque_pide_cada_clave_a_su_cadena_y_no_usa_ia(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """ADR-0024, punto 4: el bloque ya no parte la respuesta de una IA en candidatos."""
+    settings = _seeded_settings(tmp_path)
+    pedidas: list[str] = []
+
+    class FakeMobyGames:
+        nombre = "MobyGames"
+        tipo = "scrape"
+        campos = frozenset({"developer", "genre"})
+        timeout = 1.0
+        limite = Limite()
+
+        def buscar(self, consulta: Consulta) -> ProviderResult:
+            pedidas.append(consulta.key)
+            trace = ProviderTrace("MobyGames", "scrape", "ok")
+            if consulta.key not in self.campos:
+                return ProviderResult((), trace)
+            candidate = Candidato(
+                f"mg:{consulta.key}", consulta.key, "identity", consulta.key, "MobyGames",
+                "aplicable", value=f"valor-{consulta.key}", trace=trace,
+            )
+            return ProviderResult((candidate,), trace)
+
+    monkeypatch.setattr(
+        "backend.lib.providers.orquestador.providers_for",
+        lambda _key, _settings, _cancel_event=None: (FakeMobyGames(),),
+    )
+
+    payload = SuggestionsService(settings).suggest_identity_batch("golden-axe")
+
+    candidatos = payload["candidatos"]
+    assert {c["key"] for c in candidatos} == {"developer", "genre"}
+    assert not any(str(c["id"]).startswith("ia-batch") for c in candidatos)
+    assert not any(c["generadoPorIa"] for c in candidatos)
+    assert set(pedidas) == {"developer", "publisher", "genre", "players", "format"}
+    assert payload["consultados"] == 1
+    assert payload["respondieron"] == 1

@@ -208,6 +208,12 @@ class GamesStore:
         data = game.model_dump()
         if key not in {"review", "cheats"}:
             raise NotFound(f"Campo no encontrado: {key}")
+        if key == "review" and "cats" not in payload:
+            # Un candidato que trae solo la nota (MobyGames) no borra las categorías ya
+            # cargadas: sin ellas el gabinete mostraría "-" en las seis.
+            previas = (data.get("review") or {}).get("cats")
+            if previas:
+                payload = {**payload, "cats": previas}
         data[key] = {"status": "suggested", "source": provenance.source, **payload}
         data["provenance"][key] = provenance.model_dump(mode="json")
         updated = StoredGame.model_validate(data)

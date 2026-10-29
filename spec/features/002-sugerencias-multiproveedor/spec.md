@@ -18,10 +18,10 @@ está; el usuario lo consigue y lo sube a mano).
 Es el diferencial del producto. Sin sugerencias, COINDOOR es un formulario y cargar 200
 juegos a mano es el trabajo que hoy nadie hace.
 
-Ninguna fuente cubre todo, y el scraping HTML queda fuera: no existe más como camino de
-obtención de datos. La cobertura pasa a depender de modelos de IA gratuitos para textos y
-sugerencias no autoritativas, más fuentes oficiales cuando existan. Por eso son varias, y por
-eso una sola caída no puede dejar al usuario sin nada.
+Ninguna fuente cubre todo. La cobertura sale de APIs, de modelos de IA para textos y
+sugerencias no autoritativas, y de scraping con Scrapling cuando un sitio tiene el dato y no
+ofrece API ([`ADR-0024`](../../decisions/0024-scrapling-y-mobygames-para-pc-dos.md)). Por eso
+son varias, y por eso una sola caída no puede dejar al usuario sin nada.
 
 ## Criterios de aceptación
 
@@ -50,9 +50,8 @@ eso una sola caída no puede dejar al usuario sin nada.
 - [ ] Ninguna fuente recibe llamadas más rápido que el ritmo que declara.
 - [ ] Ningún proveedor de identidad es una IA: identidad sale de MAME o de una persona
       ([`ADR-0004`](../../decisions/0004-coindoor-fuente-identidad-no-mame.md)).
-- [ ] No se scrapea HTML de ScreenScraper, MobyGames ni sitios de terceros.
-- [ ] ScreenScraper y MobyGames no son camino principal de esta feature; si vuelven por API
-      oficial, requieren verificación de términos/cuotas y decisión explícita.
+- [ ] Un proveedor puede obtener sus datos por API o por scraping; el orquestador los trata
+      igual.
 
 ## Fuera de alcance
 

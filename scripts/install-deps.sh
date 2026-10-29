@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
-# Instala ffmpeg y Deno si faltan: los usa la descarga de video de YouTube
-# (ADR-0020). macOS via brew, Linux/WSL via apt, Windows nativo (Git Bash /
+# Instala ffmpeg y Deno si faltan (los usa la descarga de video de YouTube,
+# ADR-0020) y el navegador de Scrapling (lo usa el scraping de MobyGames,
+# ADR-0024). macOS via brew, Linux/WSL via apt, Windows nativo (Git Bash /
 # MSYS) via winget o choco. Sin prompts propios; sudo/winget pueden pedir
 # confirmación del sistema por su cuenta.
 set -eu
@@ -55,9 +56,18 @@ install_deno() {
   fi
 }
 
+# Chromium para Scrapling. Va con `uv run` porque este script corre antes de `uv sync`.
+# Es idempotente: si el navegador ya está, no baja nada.
+install_chromium() {
+  command -v uv >/dev/null 2>&1 || { warn "Falta uv: no se instala el navegador de Scrapling."; return 1; }
+  warn "Instalando el navegador de Scrapling (Chromium)…"
+  uv run scrapling install
+}
+
 status=0
 install_ffmpeg || status=1
 install_deno || status=1
+install_chromium || status=1
 
 if os_is_windows && [ "$status" -eq 0 ]; then
   warn "Si winget/choco acaban de instalar algo, puede hacer falta reabrir la terminal para que el PATH lo vea."

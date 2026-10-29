@@ -13,10 +13,15 @@ from __future__ import annotations
 
 import json
 import logging
+import threading
 from collections.abc import Callable
 from pathlib import Path
 
+from backend.config import Settings
+from backend.lib.providers.http import ProviderHttpClient
 from backend.lib.providers.ia.client import OpenAiCompatibleClient
+from backend.lib.providers.ia.generador import AiModelConfig, IaGenerador
+from backend.store.cuotas import QuotasStore
 
 PROMPT_DIR = Path(__file__).parent / "prompts"
 PROMPT_VERSION = "v1"
@@ -94,3 +99,39 @@ class Traductor:
 
 def _prompt(nombre: str) -> str:
     return (PROMPT_DIR / f"{nombre}.{PROMPT_VERSION}.md").read_text(encoding="utf-8")
+
+
+def traductor_configurado(
+    settings: Settings,
+    cancel_event: threading.Event | None = None,
+) -> Traductor | None:
+    """Un ``Traductor`` con el primer modelo configurado (primario, si no el de respaldo)."""
+    quotas = QuotasStore(settings.quotas_path)
+    for config in (
+        AiModelConfig(
+            settings.ai_primary_base_url,
+            settings.ai_primary_api_key,
+            settings.ai_primary_model,
+        ),
+        AiModelConfig(
+            settings.ai_backup_base_url,
+            settings.ai_backup_api_key,
+            settings.ai_backup_model,
+        ),
+    ):
+        if not (config.base_url and config.api_key and config.model):
+            continue
+
+        def fabricar(config: AiModelConfig = config) -> OpenAiCompatibleClient:
+            # Un ProviderHttpClient nuevo por llamada: el anterior queda cerrado.
+            http = ProviderHttpClient(
+                f"ia:{config.model}",
+                IaGenerador.limite,
+                quotas,
+                timeout=IaGenerador.timeout,
+                cancel_event=cancel_event,
+            )
+            return OpenAiCompatibleClient(config.base_url, config.api_key, config.model, http)
+
+        return Traductor(fabricar, config.model)
+    return None

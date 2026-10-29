@@ -26,9 +26,7 @@ from backend.lib.providers.arcadedb.cliente import ArcadeGame, fetch_con_padre
 from backend.lib.providers.arcadedb.parser import truncar_en_oracion
 from backend.lib.providers.base import Limite
 from backend.lib.providers.http import ProviderHttpClient
-from backend.lib.providers.ia.client import OpenAiCompatibleClient
-from backend.lib.providers.ia.generador import AiModelConfig, IaGenerador
-from backend.lib.providers.ia.traductor import Traductor
+from backend.lib.providers.ia.traductor import Traductor, traductor_configurado
 from backend.store.archivo import escribir_binario, media_path, safe_id
 from backend.store.juegos import GamesStore
 
@@ -212,40 +210,7 @@ class ArcadeDbPrecargaService:
 
     def _traductor(self, job: JobState) -> Traductor | None:
         """Primer modelo configurado (primario, si no el de respaldo)."""
-        from backend.store.cuotas import QuotasStore
-
-        quotas = QuotasStore(self.settings.quotas_path)
-        candidatos = (
-            AiModelConfig(
-                self.settings.ai_primary_base_url,
-                self.settings.ai_primary_api_key,
-                self.settings.ai_primary_model,
-            ),
-            AiModelConfig(
-                self.settings.ai_backup_base_url,
-                self.settings.ai_backup_api_key,
-                self.settings.ai_backup_model,
-            ),
-        )
-        for config in candidatos:
-            if not (config.base_url and config.api_key and config.model):
-                continue
-
-            def fabricar(config: AiModelConfig = config) -> OpenAiCompatibleClient:
-                # Un ProviderHttpClient nuevo por llamada: el anterior queda cerrado.
-                http = ProviderHttpClient(
-                    f"ia:{config.model}",
-                    IaGenerador.limite,
-                    quotas,
-                    timeout=IaGenerador.timeout,
-                    cancel_event=job.cancel_event,
-                )
-                return OpenAiCompatibleClient(
-                    config.base_url, config.api_key, config.model, http
-                )
-
-            return Traductor(fabricar, config.model)
-        return None
+        return traductor_configurado(self.settings, job.cancel_event)
 
     def _escribir_campos(
         self,

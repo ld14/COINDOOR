@@ -1,0 +1,14 @@
+{
+  "sitios": ["mobygames", "launchbox"],
+  "plataformas": [
+    { "name": "msdos", "alias": ["ms-dos"], "mobygames": "DOS", "launchbox": "MS-DOS" },
+    { "name": "arcade", "alias": ["mame"], "mobygames": null, "launchbox": "Arcade" },
+    { "name": "nes", "alias": [], "mobygames": "NES", "launchbox": "Nintendo Entertainment System" },
+    { "name": "snes", "alias": [], "mobygames": "SNES", "launchbox": "Super Nintendo Entertainment System" },
+    { "name": "genesis", "alias": [], "mobygames": "Genesis", "launchbox": "Sega Genesis" },
+    { "name": "mega drive", "alias": [], "mobygames": "Genesis", "launchbox": "Sega Mega Drive" },
+    { "name": "game boy", "alias": [], "mobygames": "Game Boy", "launchbox": "Nintendo Game Boy" },
+    { "name": "game boy advance", "alias": [], "mobygames": "Game Boy Advance", "launchbox": "Nintendo Game Boy Advance" },
+    { "name": "game boy color", "alias": [], "mobygames": "Game Boy Color", "launchbox": "Nintendo Game Boy Color" }
+  ]
+}

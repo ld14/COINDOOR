@@ -6,26 +6,30 @@ from collections.abc import Sequence
 from backend.config import Settings
 from backend.lib.domain.fielddefs import identity_keys, image_keys
 from backend.lib.providers.arcadedb.proveedor import ArcadeDbProvider
-from backend.lib.providers.base import Proveedor
+from backend.lib.providers.base import Limite, Proveedor
 from backend.lib.providers.http import ProviderHttpClient
 from backend.lib.providers.ia.client import OpenAiCompatibleClient
 from backend.lib.providers.ia.generador import AiModelConfig, IaGenerador
 from backend.lib.providers.ia.trucos_web import TavilyClient, TrucosWebGenerador
 from backend.lib.providers.launchbox.proveedor import LaunchboxImageProvider
+from backend.lib.providers.mobygames.proveedor import MobyGamesProvider
 from backend.lib.providers.referencia.images import ImageSearchProvider
 from backend.lib.providers.referencia.youtube import YoutubeReferenceProvider
+from backend.lib.providers.scraping import ScrapingClient, navegador_disponible
 from backend.store.cuotas import QuotasStore
+from backend.store.juegos import GamesStore
 
 # Tabla campo → proveedores, en orden. Sumar una fuente es una fila; ver ADR-0013.
-_ARCADEDB_IDENTITY = ("arcadedb", "ia_primary", "ia_backup")
-_ARCADEDB_TEXT = ("arcadedb", "ia_primary", "ia_backup")
+# La identidad nunca la propone una IA (ADR-0004, ADR-0024 punto 4).
+_ARCADEDB_IDENTITY = ("arcadedb", "mobygames")
+_ARCADEDB_TEXT = ("arcadedb", "mobygames", "ia_primary", "ia_backup")
 # Trucos NO caen a los modelos a secas: sin evidencia devuelven vacíos falsos y
 # códigos inventados, que es peor que no sugerir nada (ADR-0019).
 _ARCADEDB_CHEATS = ("arcadedb", "trucos_web")
 _ARCADEDB_IMAGE = ("arcadedb", "image_search", "launchbox")
 _ARCADEDB_VIDEO = ("arcadedb", "youtube_referencia")
-# Cadena para identity con Launchbox (year desde search results)
-_LAUNCHBOX_IDENTITY = ("launchbox", "ia_primary", "ia_backup")
+# El año de Launchbox va al final: es el más impreciso de los tres.
+_YEAR = ("arcadedb", "mobygames", "launchbox")
 
 _TABLE: dict[str, tuple[str, ...]] = {
     **{key: _ARCADEDB_IDENTITY for key in identity_keys()},
@@ -33,11 +37,10 @@ _TABLE: dict[str, tuple[str, ...]] = {
     "sinopsis": _ARCADEDB_TEXT,
     # ArcadeDB no tiene un "objetivo": solo la IA, y siempre como candidato a revisar.
     **{key: ("ia_primary", "ia_backup") for key in ("objetivo", "primerosPasos", "reglasEsenciales", "modo")},  # noqa: E501
-    "review": ("ia_primary", "ia_backup"),
+    "review": ("mobygames", "ia_primary", "ia_backup"),
     "cheats": _ARCADEDB_CHEATS,
     "video": _ARCADEDB_VIDEO,
-    # Year: Launchbox primero (tiene año en search results), luego IA
-    "year": _LAUNCHBOX_IDENTITY,
+    "year": _YEAR,
 }
 
 
@@ -85,6 +88,8 @@ def _build(
         return LaunchboxImageProvider()
     if name == "arcadedb":
         return _arcadedb_provider(settings, quotas, cancel_event)
+    if name == "mobygames":
+        return _mobygames_provider(settings, quotas, cancel_event)
     raise ValueError(f"Proveedor desconocido: {name}")
 
 
@@ -168,3 +173,30 @@ def _arcadedb_provider(
         cancel_event=cancel_event,
     )
     return ArcadeDbProvider(settings, http)
+
+
+def _mobygames_provider(
+    settings: Settings,
+    quotas: QuotasStore,
+    cancel_event: threading.Event | None,
+) -> MobyGamesProvider | None:
+    """Sin Chromium no hay proveedor: la app arranca igual y las cadenas siguen de largo."""
+    if not navegador_disponible():
+        return None
+
+    def cliente() -> ScrapingClient:
+        return ScrapingClient(
+            "mobygames",
+            Limite(espera_min=settings.scraping_pace),
+            quotas,
+            timeout=settings.scraping_timeout,
+            cancel_event=cancel_event,
+            perfil=settings.browser_profile_dir,
+        )
+
+    return MobyGamesProvider(
+        GamesStore(settings.games_dir),
+        cliente,
+        timeout=settings.scraping_timeout,
+        pace=settings.scraping_pace,
+    )

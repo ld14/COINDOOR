@@ -259,9 +259,18 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
   LPT1-9`, sin terminar en espacio ni punto. Un error de capitalización en un asset no
   rompe nada visible: el juego simplemente no muestra la imagen en el gabinete.
 - **Todo lo que sale a la red es a pedido del usuario.** Nada corre en segundo plano, ni al
-  abrir una ficha, ni al guardar. **Única excepción:** la precarga de ArcadeDB al dar de alta
-  un juego arcade ([`ADR-0015`](../decisions/0015-precarga-con-red-al-alta.md)), acotada a un
-  endpoint con nombre propio, un juego por vez, solo sobre campos vacíos y cancelable.
+  abrir una ficha, ni al guardar. **Dos excepciones:**
+  - la precarga al dar de alta un juego ([`ADR-0015`](../decisions/0015-precarga-con-red-al-alta.md)
+    para arcade, ampliada a MS-DOS por [`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md)),
+    acotada a un endpoint con nombre propio, un juego por vez, solo sobre campos vacíos y
+    cancelable;
+  - el precalentamiento de MobyGames al arrancar
+    ([`ADR-0025`](../decisions/0025-precalentar-mobygames-al-arrancar.md)): una sola página
+    de búsqueda en un hilo, solo si hay Chromium y un sistema con equivalencia en MobyGames,
+    no más de una vez cada 6 horas, sin demorar el arranque y desactivable.
+
+  Una tercera feature que quiera salir a la red sola no suma otra excepción: reescribe la
+  regla (ADR-0015 y ADR-0025, §Qué habría que revisar).
 - **La latencia no es un problema de este producto.** Se trabaja de a un campo de un juego
   por vez, con una persona esperando a propósito el resultado que pidió. Los timeouts
   existen para que una conexión colgada termine alguna vez, no como presupuesto de
@@ -304,7 +313,9 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
   aparece la necesidad, es un cambio de misión, no una feature.
 - **Sin carga masiva ni operaciones en lote.** Un juego por vez.
 - **Sin trabajos en segundo plano, colas ni workers.** Se descartaron al confirmar que
-  no hay carga masiva; reintroducirlos exige un ADR.
+  no hay carga masiva; reintroducirlos exige un ADR. El único hilo que arranca sin pedido
+  es el precalentamiento de MobyGames ([`ADR-0025`](../decisions/0025-precalentar-mobygames-al-arrancar.md)):
+  una página y termina; no es una cola ni un worker.
 - **COINDOOR no corre en el gabinete.** El gabinete es offline y su runtime es MAME
   vanilla. Todo lo que necesite red vive de este lado.
 - **No escaneamos ni producimos revistas.** Vincular un juego con una revista sí está
@@ -336,6 +347,17 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
   ([`ADR-0011`](../decisions/0011-fielddefs-json-compartido.md)).
 - **La salida de `attract doctor` no se parsea.** Solo su código de salida
   ([`ADR-0012`](../decisions/0012-verificacion-attract-por-subproceso.md)).
+- **Un solo motor de scraping: Scrapling, importado solo desde `lib/providers/scraping.py`**,
+  con la misma política que `http.py` (cuota, ritmo, backoff, cancelación). Descartados:
+  `httpx` con parser propio contra sitios con Cloudflare, Playwright directo, un script
+  auxiliar fuera de COINDOOR, Scrapling como extra opcional y las APIs oficiales de
+  MobyGames, SteamGridDB y ScreenScraper
+  ([`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md)).
+- **En las sugerencias, la identidad nunca la propone una IA**, en ningún sistema. Sale de
+  ArcadeDB (arcade), de MobyGames (el resto) o de una persona
+  ([`ADR-0004`](../decisions/0004-coindoor-fuente-identidad-no-mame.md)). La única excepción
+  es la precarga del alta de MS-DOS: ahí la IA completa solo lo que MobyGames y Launchbox no
+  tuvieron ([`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md), punto 4).
 - **Instalar el bundle en ATTRACT es un subproceso al instalador que ya existe en
   `../attract` (`install-coindoor-wsl.sh`), nunca lógica reimplementada en Python.**
   Misma regla que `attract doctor`: se confía en el código de salida, no se parsea la
@@ -359,7 +381,9 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
    [`ADR-0013`](../decisions/0013-sin-scraping-ni-catalogo-pago.md) sacó las dos fuentes
    justamente por su credencial y su cuota, y
    [`ADR-0014`](../decisions/0014-arcadedb-fuente-arcade.md) las reemplaza en arcade con
-   ArcadeDB, que no pide ninguna de las dos.
+   ArcadeDB, que no pide ninguna de las dos. Desde
+   [`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md) MobyGames,
+   SteamGridDB y ScreenScraper vuelven por scraping, sin cuenta ni credencial.
 3. **Qué modelo de IA.** Afecta al coste por juego y a la voz de los textos. Bloquea la
    feature 002, no el arranque.
 

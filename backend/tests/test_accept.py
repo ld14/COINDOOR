@@ -77,3 +77,59 @@ def test_export_no_incluye_source_de_campos(tmp_path: Path) -> None:
     assert blobs
     for name, blob in blobs.items():
         assert b'"source"' not in blob, name
+
+
+def test_resena_con_solo_nota_conserva_las_categorias(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    cats = {
+        "adiccion": 85,
+        "animacion": 75,
+        "dificultad": 60,
+        "graficos": 80,
+        "originalidad": 90,
+        "sonido": 70,
+    }
+    cargada = api.put(f"/api/games/{game_id}/fields/review", json={"score": 70, "cats": cats})
+    assert cargada.status_code == 200
+    store = _store(tmp_path)
+
+    store.apply_rich_suggestion(
+        game_id, "review", {"score": 82}, FieldProvenance(source="MobyGames")
+    )
+
+    game = _store(tmp_path).get(game_id)
+    assert game.review.score == 82
+    assert game.review.cats == cats
+    assert game.review.status == "suggested"
+    assert game.review.source == "MobyGames"
+
+
+def test_resena_con_categorias_explicitas_las_reemplaza(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    cargada = api.put(
+        f"/api/games/{game_id}/fields/review", json={"score": 70, "cats": {"sonido": 70}}
+    )
+    assert cargada.status_code == 200
+    store = _store(tmp_path)
+
+    store.apply_rich_suggestion(
+        game_id, "review", {"score": 90, "cats": {"sonido": 10}}, FieldProvenance(source="IA")
+    )
+
+    assert _store(tmp_path).get(game_id).review.cats == {"sonido": 10}
+
+
+def test_resena_con_solo_nota_sobre_ficha_sin_resena(tmp_path: Path) -> None:
+    api = client(tmp_path)
+    game_id = _create_arcade_game(api)
+    store = _store(tmp_path)
+
+    store.apply_rich_suggestion(
+        game_id, "review", {"score": 82}, FieldProvenance(source="MobyGames")
+    )
+
+    game = _store(tmp_path).get(game_id)
+    assert game.review.score == 82
+    assert game.review.cats == {}

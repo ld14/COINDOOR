@@ -21,6 +21,11 @@ def entorno_hermetico(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         if name.startswith("COINDOOR_"):
             monkeypatch.delenv(name, raising=False)
     monkeypatch.setitem(Settings.model_config, "env_file", None)
+    # Un Chromium instalado en la máquina haría que el registro construya MobyGames y que
+    # un test salga a scrapear de verdad. Los tests del proveedor lo arman a mano.
+    monkeypatch.setattr("backend.lib.providers.registro.navegador_disponible", lambda: False)
+    monkeypatch.setattr("backend.services.msdos.navegador_disponible", lambda: False)
+    monkeypatch.setattr("backend.services.precalentar.navegador_disponible", lambda: False)
     set_settings(None)
     yield
     set_settings(None)

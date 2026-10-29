@@ -8,8 +8,9 @@ proveedores atienden cada campo, los lanza en paralelo, y devuelve lo que haya l
 La regla que ordena todo el diseño: **un proveedor es una fuente de fallas, no de
 garantías.** modelos gratuitos con cupo variable y llamadas que tardan
 treinta segundos. El sistema se diseña asumiendo que en cada búsqueda alguno va a fallar, y
-que eso es normal y no se muestra. El scraping HTML queda fuera del plan: si no hay API o
-modelo usable, el candidato será `referencia` o carga manual.
+que eso es normal y no se muestra. Si un sitio no ofrece API, un proveedor lo scrapea con
+Scrapling ([`ADR-0024`](../../decisions/0024-scrapling-y-mobygames-para-pc-dos.md)); si
+tampoco hay modelo usable, el candidato será `referencia` o carga manual.
 
 ## El contrato del proveedor
 
@@ -64,9 +65,9 @@ lib/providers/
     youtube.py               # SOLO referencias
 ```
 
-No hay `scrape/` ni sustituto basado en HTML: COINDOOR no parsea ScreenScraper, MobyGames
-ni sitios de terceros. La información que antes se pensaba obtener por scraping pasa a
-salir del proveedor de IA, marcada como IA y nunca usada para identidad.
+Los proveedores que scrapean usan `lib/providers/scraping.py` (Scrapling) con la misma
+política que `http.py`. Lo que la IA produce sigue marcado como IA y nunca se usa para
+identidad.
 
 ## Decisiones
 
@@ -159,11 +160,10 @@ el ritmo, un contador persistente para el cupo diario.
 
 - Los modelos gratuitos tienen sobre todo **cupo diario o mensual**, y pueden cambiarlo sin
   aviso.
-- Las fuentes `referencia/` no descargan ni parsean HTML: devuelven enlaces o pistas para que
-  el usuario consiga el material y lo suba a mano.
-- ScreenScraper y MobyGames quedan fuera del camino principal. Si algún día vuelven por API
-  oficial, requieren verificación de términos/cuotas y una decisión explícita antes de
-  escribir código.
+- Las fuentes `referencia/` devuelven enlaces o pistas para que el usuario consiga el
+  material y lo suba a mano.
+- ScreenScraper y MobyGames pueden ser proveedores, por API o por scraping. Un proveedor
+  que scrapea declara su `Limite` como cualquier otro; no hay un mínimo impuesto.
 
 **Agotar el cupo no es una falla que se reintente.** Es un "volvé mañana": el proveedor
 queda fuera hasta que resetee, y la pantalla lo dice con esas palabras. Confundirlo con "sin
@@ -214,7 +214,7 @@ la persona que carga el juego, como ya exige
 4. `lib/providers/orquestador.py` — fan-out con timeout individual, aislamiento de fallas,
    cortocircuito sobre reintentos agotados, caché y conteo.
 5. `lib/providers/ia/generador.py` + los prompts `.v1` como primer proveedor real: valida
-   el contrato contra el camino principal nuevo, no contra ScreenScraper ni MobyGames.
+   el contrato contra el camino principal.
 6. `lib/providers/referencia/` para enlaces que el usuario aplica a mano.
 7. API:
 

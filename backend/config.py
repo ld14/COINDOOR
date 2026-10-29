@@ -24,6 +24,15 @@ class Settings(BaseSettings):
     # sugerencia, y es deliberado: un modelo sin evidencia inventa códigos.
     search_base_url: str = "https://api.tavily.com"
     search_api_key: str = ""
+    # Scraping con navegador (ADR-0024). El timeout es por página y Scrapling lo usa además
+    # como tope de sus esperas mientras resuelve Cloudflare: más alto no ayuda, solo alarga
+    # el peor caso. Su documentación pide al menos 60 s con `solve_cloudflare`. El ritmo es la
+    # espera entre pedidos al mismo sitio.
+    scraping_timeout: float = 60.0
+    scraping_pace: float = 3.0
+    # Precalentar MobyGames al arrancar (ADR-0025): resuelve el desafío de Cloudflare antes
+    # de que el usuario pida algo. `false` lo apaga.
+    scraping_warmup: bool = True
 
     @property
     def media_dir(self) -> Path:
@@ -44,6 +53,11 @@ class Settings(BaseSettings):
     @property
     def quotas_path(self) -> Path:
         return self.data_dir / "cuotas.json"
+
+    @property
+    def browser_profile_dir(self) -> Path:
+        """Perfil del navegador de scraping: guarda la cookie de Cloudflare entre consultas."""
+        return self.data_dir / "navegador"
 
     @property
     def config_path(self) -> Path:

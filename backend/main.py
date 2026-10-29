@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -22,6 +24,7 @@ from backend.api.roms import router as roms_router
 from backend.api.roms import scan_router as roms_scan_router
 from backend.api.systems import router as systems_router
 from backend.config import Settings, ensure_data_dirs, get_settings
+from backend.services.precalentar import PrecalentamientoMobyGames
 from backend.store.config import ConfigStore
 from backend.store.cuotas import QuotasStore
 from backend.store.sistemas import SystemsStore
@@ -40,7 +43,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     QuotasStore(settings.quotas_path)
     ConfigStore(settings.config_path)
 
-    app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
+    precalentamiento = PrecalentamientoMobyGames(settings)
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        # El hilo arranca y la aplicación sigue: el arranque no espera a MobyGames.
+        precalentamiento.iniciar()
+        yield
+        precalentamiento.detener()
+
+    app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json", lifespan=lifespan)
     install_error_handlers(app)
     app.include_router(config_router)
     app.include_router(systems_router)

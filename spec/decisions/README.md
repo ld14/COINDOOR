@@ -53,6 +53,8 @@ de seis meses alguien —tú, o Claude— vuelve a proponer justo lo que ya desc
 | [0021](0021-instalar-bundle-por-subproceso.md) | Instalar el bundle exportado por subproceso, sin esperar a `attract install` | accepted | 2026-09-12 |
 | [0022](0022-configuracion-no-sensible-en-archivo-propio.md) | Configuración no sensible en un archivo propio, editable desde una pantalla nueva | accepted | 2026-09-12 |
 | [0023](0023-estetica-flyer-reemplaza-dos.md) | La estética "Flyer 80s" reemplaza a la estética DOS | accepted | 2026-10-08 |
+| [0024](0024-scrapling-y-mobygames-para-pc-dos.md) | Scrapling como motor de scraping y MobyGames como fuente de PC/DOS | accepted | 2026-10-21 |
+| [0025](0025-precalentar-mobygames-al-arrancar.md) | Precalentar MobyGames al arrancar con una página de búsqueda en segundo plano | accepted | 2026-10-29 |
 
 Los seis últimos salen del análisis de arquitectura de
 [`docs/arquitectura/`](../../docs/arquitectura/README.md), que conserva la comparación
