@@ -148,11 +148,28 @@ describe('ReviewSection', () => {
 
     await userEvent.type(screen.getByLabelText('Sonido (0–100)'), '150');
     ref.current?.save();
-    expect(onReview).toHaveBeenCalledWith(80, { graficos: 70, sonido: 100 });
+    expect(onReview).toHaveBeenCalledWith(85, { graficos: 70, sonido: 100 });
 
     await userEvent.clear(screen.getByLabelText('Gráficos (0–100)'));
     ref.current?.save();
-    expect(onReview).toHaveBeenLastCalledWith(80, { sonido: 100 });
+    expect(onReview).toHaveBeenLastCalledWith(100, { sonido: 100 });
+  });
+
+  it('al completar una categoría vacía el puntaje se recalcula como el promedio', async () => {
+    const onReview = vi.fn();
+    const ref = createRef<SaveHandle>();
+    renderConAutosave(<ReviewSection game={conReview({ score: 78, cats: { originalidad: 70, graficos: 80, adiccion: 80, sonido: 75, dificultad: 73 } })} onReview={onReview} onSuggest={vi.fn()} ref={ref} />);
+    await userEvent.type(screen.getByLabelText('Animación (0–100)'), '85');
+    expect(screen.getByLabelText('Puntaje de reseña')).toHaveValue(77);
+    ref.current?.save();
+    expect(onReview).toHaveBeenCalledWith(77, { originalidad: 70, graficos: 80, adiccion: 80, sonido: 75, dificultad: 73, animacion: 85 });
+  });
+
+  it('editar el puntaje a mano no toca las categorías', async () => {
+    renderConAutosave(<ReviewSection game={conReview({ score: 78, cats: { graficos: 80 } })} onReview={vi.fn()} onSuggest={vi.fn()} />);
+    await userEvent.clear(screen.getByLabelText('Puntaje de reseña'));
+    await userEvent.type(screen.getByLabelText('Puntaje de reseña'), '60');
+    expect(screen.getByLabelText('Gráficos (0–100)')).toHaveValue(80);
   });
 
   it('una reseña de IA sugerida se marca y se acepta sin tocar el valor', async () => {

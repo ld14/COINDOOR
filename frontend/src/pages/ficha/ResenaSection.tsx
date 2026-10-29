@@ -38,7 +38,13 @@ function catsANumeros(texto: CatsTexto): Game['review']['cats'] {
   return cats;
 }
 
-const firmaCats = (cats: Game['review']['cats']) => JSON.stringify(CATEGORIAS.map(({ key }) => cats[key] ?? null));
+/** Promedio redondeado de las categorías cargadas; null si no hay ninguna. */
+function promedioCats(cats: Game['review']['cats']): number | null {
+  const valores = CATEGORIAS.flatMap(({ key }) => (cats[key] === undefined ? [] : [cats[key] as number]));
+  return valores.length === 0 ? null : Math.round(valores.reduce((a, b) => a + b, 0) / valores.length);
+}
+
+const firmaCats =(cats: Game['review']['cats']) => JSON.stringify(CATEGORIAS.map(({ key }) => cats[key] ?? null));
 
 export const ReviewSection = forwardRef<SaveHandle, {
   game: Game;
@@ -58,6 +64,14 @@ export const ReviewSection = forwardRef<SaveHandle, {
 
   const puntajeNumero = aNumero(puntaje);
   const catsNumeros = catsANumeros(categorias);
+
+  // El puntaje sigue el promedio de las categorías cargadas; sigue siendo editable a mano.
+  const cambiarCategoria = (key: ReviewCat, valor: string) => {
+    const siguiente = { ...categorias, [key]: valor };
+    setCategorias(siguiente);
+    const promedio = promedioCats(catsANumeros(siguiente));
+    if (promedio !== null) setPuntaje(String(promedio));
+  };
 
   // Solo se escribe lo que cambió: una reseña sugerida que nadie tocó no se marca como manual.
   useImperativeHandle(ref, () => ({
@@ -129,7 +143,7 @@ export const ReviewSection = forwardRef<SaveHandle, {
                   max={100}
                   min={0}
                   onBlur={() => setCategorias((previo) => ({ ...previo, [key]: catsNumeros[key] === undefined ? '' : String(catsNumeros[key]) }))}
-                  onChange={(event) => setCategorias((previo) => ({ ...previo, [key]: event.target.value }))}
+                  onChange={(event) => cambiarCategoria(key, event.target.value)}
                   placeholder="—"
                   type="number"
                   value={categorias[key]}
