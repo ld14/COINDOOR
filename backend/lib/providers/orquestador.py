@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import threading
+from collections.abc import Sequence
 from dataclasses import asdict
 from pathlib import Path
 
@@ -10,12 +11,12 @@ from backend.api.errors import BadRequest
 from backend.api.schemas import StoredGame
 from backend.config import Settings
 from backend.lib.domain.fielddefs import identity_keys
-from backend.lib.providers.base import Candidato, Consulta, Limite, ProviderTrace
+from backend.lib.providers.base import Candidato, Consulta, Limite, Proveedor, ProviderTrace
 from backend.lib.providers.cortocircuito import breaker
 from backend.lib.providers.http import ProviderHttpClient, ProviderHttpError
 from backend.lib.providers.ia.client import ModelResponseError, OpenAiCompatibleClient
 from backend.lib.providers.ia.generador import AiModelConfig
-from backend.lib.providers.registro import providers_for
+from backend.lib.providers.registro import ULTIMO_RECURSO, proveedores_ia, providers_for
 from backend.store.cuotas import QuotasStore
 from backend.store.juegos import GamesStore
 from backend.store.sistemas import SystemsStore
@@ -35,6 +36,22 @@ _PARSE_MAX_TOKENS = 16000
 _cache: dict[tuple[str, ...], dict[str, object]] = {}
 _cache_lock = threading.Lock()
 
+
+# Campos que la IA puede proponer como último recurso, cuando ninguna fuente factual tuvo
+# el dato (ADR-0026). Los mismos que completa la precarga de MS-DOS: título, año y formato
+# nunca salen de una IA.
+_IA_RESPALDO = frozenset({"developer", "publisher", "genre", "players"})
+_ETIQUETAS_IA = {
+    "developer": "Desarrollador",
+    "publisher": "Editor",
+    "genre": "Género",
+    "players": "Jugadores",
+}
+# La identidad que respondió la IA, por juego: una sola consulta cubre todos los campos.
+_identidad_ia: dict[tuple[str, str], tuple[dict[str, str], ProviderTrace, str]] = {}
+# La traza de una fuente de último recurso que no se consultó porque el campo ya tenía
+# candidato (ADR-0027). El modal la ofrece para consultarla igual.
+NO_HIZO_FALTA = "no hizo falta"
 
 _GUIA_KEYS = frozenset({"objetivo", "primerosPasos", "reglasEsenciales", "modo"})
 _MODO_JUGADORES = {"alt": "por turnos", "sim": "a la vez"}
@@ -82,9 +99,12 @@ class SuggestionsService:
         *,
         reintentar: bool = False,
         source: str | None = None,
+        sin_memo: bool = False,
     ) -> dict[str, object]:
+        """``sin_memo`` vuelve a consultar sin reiniciar el cortocircuito, que es lo que hace
+        ``reintentar``: lo usa el completado, que no es un pedido puntual del usuario."""
         cache_key = (str(self.settings.data_dir), game_id, key, source or "")
-        if not reintentar:
+        if not (reintentar or sin_memo):
             with _cache_lock:
                 cached = _cache.get(cache_key)
             if cached is not None:
@@ -109,28 +129,60 @@ class SuggestionsService:
         candidates: list[Candidato] = []
         traces: list[ProviderTrace] = []
         responded = 0
-        for provider in providers:
-            if cancel_event and cancel_event.is_set():
-                break
+        consultados = 0
+
+        def consultar(provider: Proveedor) -> None:
+            nonlocal responded, consultados
+            consultados += 1
             try:
                 result = provider.buscar(consulta)
             except ProviderHttpError as exc:
                 if exc.retry_exhausted:
                     breaker.strike(provider.nombre)
                 traces.append(ProviderTrace(provider.nombre, provider.tipo, str(exc)))
-                continue
+                return
             except Exception:
                 log.exception("Provider %s failed unexpectedly", provider.nombre)
                 traces.append(ProviderTrace(provider.nombre, provider.tipo, "excepción inesperada"))
-                continue
+                return
             candidates.extend(result.candidatos)
             traces.append(result.trace)
             if result.trace.estado == "ok":
                 responded += 1
+
+        corte = _primer_ultimo_recurso(providers)
+        for provider in providers[:corte]:
+            if cancel_event and cancel_event.is_set():
+                break
+            consultar(provider)
+        # Sin ningún candidato factual para el campo, la IA (ADR-0026), antes que las fuentes
+        # de último recurso (ADR-0027). No corre cuando el usuario reintenta una fuente puntual.
+        if (
+            source is None
+            and key in _IA_RESPALDO
+            and not _tiene_candidato(candidates, key)
+            and not (cancel_event and cancel_event.is_set())
+        ):
+            de_ia, traza = self._respaldo_ia(game, system.name, (key,), cancel_event)
+            if traza is not None:
+                consultados += 1
+                traces.append(traza)
+                if de_ia:
+                    responded += 1
+            candidates.extend(de_ia)
+        # Una fuente de último recurso solo si el campo sigue sin candidato; las que van después
+        # (el buscador de imágenes), siempre.
+        for provider in providers[corte:]:
+            if cancel_event and cancel_event.is_set():
+                break
+            if provider.nombre in ULTIMO_RECURSO and _tiene_candidato(candidates, key):
+                traces.append(ProviderTrace(provider.nombre, provider.tipo, NO_HIZO_FALTA))
+                continue
+            consultar(provider)
         payload: dict[str, object] = {
             "candidatos": [_candidate_out(candidate) for candidate in candidates],
             "respondieron": responded,
-            "consultados": len(providers),
+            "consultados": consultados,
             "fuentes": [_trace_out(trace) for trace in traces],
         }
         with _cache_lock:
@@ -152,8 +204,10 @@ class SuggestionsService:
                 return cached
         game = self.games.get(game_id)
         system = self.systems.get(game.systemId)
-        # Cada clave de identidad se pide a su propia cadena. La IA no está en ninguna
-        # (ADR-0024, punto 4); el memo de la ficha evita bajarla una vez por clave.
+        # Cada clave de identidad se pide a su propia cadena, que no tiene IA; el memo de la
+        # ficha evita bajarla una vez por clave. Tres pasos: las fuentes de cada campo hasta la
+        # primera de último recurso; la IA, con una sola consulta, para lo que ninguna tuvo
+        # (ADR-0026); y el último recurso solo para lo que siga faltando (ADR-0027).
         cadenas = {
             key: providers_for(key, self.settings, cancel_event)
             for key in sorted(_SUGGESTABLE_IDENTITY_KEYS)
@@ -166,7 +220,8 @@ class SuggestionsService:
         traces: dict[str, ProviderTrace] = {}
         consultados: set[str] = set()
         respondieron: set[str] = set()
-        for key, providers in cadenas.items():
+
+        def consultar(key: str, providers: Sequence[Proveedor]) -> None:
             consulta = Consulta(
                 game.id,
                 key,
@@ -178,6 +233,8 @@ class SuggestionsService:
                 if cancel_event and cancel_event.is_set():
                     break
                 if breaker.is_open(provider.nombre):
+                    continue
+                if provider.nombre in ULTIMO_RECURSO and _tiene_candidato(candidates, key):
                     continue
                 consultados.add(provider.nombre)
                 try:
@@ -200,6 +257,24 @@ class SuggestionsService:
                 traces.setdefault(provider.nombre, result.trace)
                 if result.candidatos or result.trace.estado == "ok":
                     respondieron.add(provider.nombre)
+
+        for key, providers in cadenas.items():
+            consultar(key, providers[: _primer_ultimo_recurso(providers)])
+        faltan = [
+            key
+            for key in sorted(_IA_RESPALDO & _SUGGESTABLE_IDENTITY_KEYS)
+            if not _tiene_candidato(candidates, key)
+        ]
+        if faltan and not (cancel_event and cancel_event.is_set()):
+            de_ia, traza = self._respaldo_ia(game, system.name, faltan, cancel_event)
+            if traza is not None:
+                consultados.add(traza.nombre)
+                traces[traza.nombre] = traza
+                if de_ia:
+                    respondieron.add(traza.nombre)
+            candidates.extend(de_ia)
+        for key, providers in cadenas.items():
+            consultar(key, providers[_primer_ultimo_recurso(providers) :])
         responded = len(respondieron)
         log.info("identity batch: %d candidates, %d responded", len(candidates), responded)
         payload: dict[str, object] = {
@@ -211,6 +286,77 @@ class SuggestionsService:
         with _cache_lock:
             _cache[cache_key] = payload
         return payload
+
+    def _respaldo_ia(
+        self,
+        game: StoredGame,
+        sistema: str,
+        claves: Sequence[str],
+        cancel_event: threading.Event | None,
+    ) -> tuple[list[Candidato], ProviderTrace | None]:
+        """Candidatos de la IA para las claves sin candidato factual; ``None`` si no hay IA
+        configurada. La respuesta queda en memoria por juego: una consulta, todos los campos."""
+        respuesta = self._identidad_ia(game, sistema, cancel_event)
+        if respuesta is None:
+            return [], None
+        datos, traza, fuente = respuesta
+        candidatos = [
+            Candidato(
+                id=f"ia-respaldo:{fuente}:{key}",
+                key=key,
+                kind="identity",
+                nombre=f"{_ETIQUETAS_IA[key]} (IA)",
+                fuente=fuente,
+                clase="aplicable",
+                value=valor,
+                generado_por_ia=True,
+                meta={"respaldo": "sin fuente factual"},
+                trace=traza,
+            )
+            for key in claves
+            if key in _IA_RESPALDO and (valor := str(datos.get(key) or "").strip())
+        ]
+        return candidatos, traza
+
+    def _identidad_ia(
+        self,
+        game: StoredGame,
+        sistema: str,
+        cancel_event: threading.Event | None,
+    ) -> tuple[dict[str, str], ProviderTrace, str] | None:
+        memo = (str(self.settings.data_dir), game.id)
+        with _cache_lock:
+            guardada = _identidad_ia.get(memo)
+        if guardada is not None:
+            return guardada
+        consulta = Consulta(
+            game.id, "identidad", game.identity.title, sistema, game.identity.year or None
+        )
+        ultima: ProviderTrace | None = None
+        for modelo in proveedores_ia(self.settings, cancel_event):
+            if breaker.is_open(modelo.nombre) or (cancel_event and cancel_event.is_set()):
+                continue
+            try:
+                result = modelo.buscar(consulta)
+            except ProviderHttpError as exc:
+                if exc.retry_exhausted:
+                    breaker.strike(modelo.nombre)
+                ultima = ProviderTrace(modelo.nombre, modelo.tipo, str(exc))
+                continue
+            except Exception:
+                log.exception("Provider %s failed unexpectedly", modelo.nombre)
+                ultima = ProviderTrace(modelo.nombre, modelo.tipo, "excepción inesperada")
+                continue
+            ultima = result.trace
+            datos = _json_identidad(result.candidatos[0].value if result.candidatos else None)
+            if datos:
+                respuesta = (datos, result.trace, modelo.nombre)
+                with _cache_lock:
+                    _identidad_ia[memo] = respuesta
+                return respuesta
+        if ultima is None:
+            return None
+        return {}, ultima, ultima.nombre
 
     def parse_cheats_text(self, game_id: str, text: str) -> list[dict[str, object]]:
         """Convierte texto pegado a mano (Markdown, prosa, lo que sea) en `groups`."""
@@ -260,6 +406,30 @@ class SuggestionsService:
                 continue
         motivo = last_error or "sin modelo de IA configurado"
         raise BadRequest(f"No se pudo interpretar el texto: {motivo}")
+
+
+def _tiene_candidato(candidatos: Sequence[Candidato], key: str) -> bool:
+    return any(c.key == key and c.clase == "aplicable" for c in candidatos)
+
+
+def _primer_ultimo_recurso(providers: Sequence[Proveedor]) -> int:
+    """Dónde empieza el último recurso en la cadena (ADR-0027); sin ninguno, al final."""
+    return next(
+        (i for i, provider in enumerate(providers) if provider.nombre in ULTIMO_RECURSO),
+        len(providers),
+    )
+
+
+def _json_identidad(valor: str | None) -> dict[str, str]:
+    if not valor:
+        return {}
+    try:
+        datos = json.loads(valor)
+    except (json.JSONDecodeError, TypeError):
+        return {}
+    if not isinstance(datos, dict):
+        return {}
+    return {str(k): str(v) for k, v in datos.items() if v is not None}
 
 
 def _un_renglon(valor: object) -> str:

@@ -162,6 +162,16 @@ class GamesStore:
         self.save(updated)
         return updated
 
+    def apply_accent_suggestion(self, game_id: str, accent: str, accent2: str) -> StoredGame:
+        game = self.get(game_id)
+        data = game.model_dump()
+        data["accent"] = "suggested"
+        data["accentValue"] = accent
+        data["accent2Value"] = accent2
+        updated = StoredGame.model_validate(data)
+        self.save(updated)
+        return updated
+
     def apply_identity_suggestion(
         self,
         game_id: str,

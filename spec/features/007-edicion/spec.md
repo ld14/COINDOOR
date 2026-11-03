@@ -36,6 +36,13 @@ faltantes, corregir errores y dejar juegos listos para exportar sin editar JSON 
 - [x] Dado `review` o `cheats`, cuando se editan, entonces se guardan como estructuras, no como
       texto plano.
 
+- [x] Dados trucos editados, cuando se mira la sección, entonces se ve que se guarda solo y si
+      quedan cambios pendientes. No hay botón de guardar: el guardado es el autosave de
+      [019](../019-rediseno-flyer/plan.md) (agregado el 2026-11-01).
+- [x] Dado un texto en "Pegá una guía o texto suelto", cuando se aprieta "Agregar como truco",
+      entonces entra a la ficha sin IA, con `name` e `input` llenos, que ATTRACT exige
+      (agregado el 2026-11-01).
+
 ## Fuera de alcance
 
 - Buscar y aplicar sugerencias de IA o referencias — feature [002](../002-sugerencias-multiproveedor/spec.md).

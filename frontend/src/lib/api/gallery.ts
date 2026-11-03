@@ -13,15 +13,23 @@ export interface GalleryCandidate {
   source: string;
 }
 
-export function listGalleryCandidates(gameId: string, source?: string) {
-  const params = source ? `?source=${encodeURIComponent(source)}` : '';
-  return fetchJson<GalleryCandidate[]>(`/games/${gameId}/gallery/candidates${params}`);
+export function listGalleryCandidates(gameId: string, source?: string, clave?: ImageKey) {
+  const params = new URLSearchParams();
+  if (source) params.set('source', source);
+  if (clave) params.set('clave', clave);
+  const query = params.toString();
+  return fetchJson<GalleryCandidate[]>(`/games/${gameId}/gallery/candidates${query ? `?${query}` : ''}`);
 }
 
 export interface GuardarGaleriaItem {
   tipo?: string | null;
   url?: string | null;
   source?: string;
+}
+
+export interface ResultadoGuardado {
+  guardadas: string[];
+  fallidas: string[];
 }
 
 export function saveGallery(gameId: string, items: GuardarGaleriaItem[]) {

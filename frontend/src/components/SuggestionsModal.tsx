@@ -35,6 +35,10 @@ interface SuggestionsModalProps {
 }
 
 const TODAS_LAS_FUENTES = ['ArcadeDB', 'Image Search', 'Launchbox'];
+// Una fuente de último recurso (MobyGames) que no se consultó porque el campo ya tenía
+// candidato (ADR-0027): el modal la ofrece para consultarla igual.
+const NO_HIZO_FALTA = 'no hizo falta';
+const SIN_EQUIVALENCIA = 'plataforma sin equivalencia';
 
 export function SuggestionsModal({ fieldKey, gameId, hasContent, isManual, label, onApply, onClose, onOutcome, open, current }: SuggestionsModalProps) {
   const { phase, result, retry, retrySource } = useSuggestionsJob(gameId, fieldKey, open);
@@ -58,10 +62,15 @@ export function SuggestionsModal({ fieldKey, gameId, hasContent, isManual, label
     onClose();
   }
 
-  // Agrupar candidatos por fuente
+  // Agrupar candidatos por fuente, en el orden en que se consultaron: la cadena va de la fuente
+  // preferida a la de último recurso (ADR-0027).
   const porFuente = new Map<string, SuggestionCandidate[]>();
-  for (const fuente of TODAS_LAS_FUENTES) {
-    porFuente.set(fuente, []);
+  const orden = [
+    ...(result?.fuentes ?? []).filter((trace) => trace.estado !== SIN_EQUIVALENCIA).map((trace) => trace.nombre),
+    ...TODAS_LAS_FUENTES,
+  ];
+  for (const fuente of orden) {
+    if (!porFuente.has(fuente)) porFuente.set(fuente, []);
   }
   if (result) {
     for (const c of result.candidatos) {
@@ -71,11 +80,11 @@ export function SuggestionsModal({ fieldKey, gameId, hasContent, isManual, label
     }
   }
 
-  // Fuentes que no respondieron
-  const fuentesNoOk = new Set<string>();
+  // Fuentes que no respondieron, con su estado
+  const fuentesNoOk = new Map<string, string>();
   if (result) {
     for (const trace of result.fuentes) {
-      if (trace.estado !== 'ok') fuentesNoOk.add(trace.nombre);
+      if (trace.estado !== 'ok' && !fuentesNoOk.has(trace.nombre)) fuentesNoOk.set(trace.nombre, trace.estado);
     }
   }
 
@@ -150,7 +159,7 @@ export function SuggestionsModal({ fieldKey, gameId, hasContent, isManual, label
                     onClick={() => retrySource(fuente)}
                     variant="ghost-small"
                   >
-                    Reintentar
+                    {fuentesNoOk.get(fuente) === NO_HIZO_FALTA ? 'Consultar' : 'Reintentar'}
                   </DosButton>
                 )}
               </div>

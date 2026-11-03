@@ -6,11 +6,14 @@ export interface FichaAutosaveApi {
   markDirty: (seccion: string) => void;
   /** Acepta la sugerencia de un campo: pasa a `manual` conservando valor y `source`. */
   aceptar: (clave: string) => void;
+  /** Hay ediciones que todavía no se mandaron a guardar. */
+  pendiente: boolean;
 }
 
 export const FichaAutosaveContext = createContext<FichaAutosaveApi>({
   markDirty: () => undefined,
   aceptar: () => undefined,
+  pendiente: false,
 });
 
 export function useFichaAutosave(): FichaAutosaveApi {

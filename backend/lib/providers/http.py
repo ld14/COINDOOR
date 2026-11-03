@@ -73,7 +73,7 @@ class ProviderHttpClient:
             self._client.close()
 
     def get_json(self, url: str, *, params: dict[str, str] | None = None) -> ProviderResponse:
-        return self._request_json(lambda: self._client_or_raise().get(url, params=params))
+        return _como_json(self._request(lambda: self._client_or_raise().get(url, params=params)))
 
     def post_json(
         self,
@@ -82,11 +82,19 @@ class ProviderHttpClient:
         json: dict[str, Any],
         headers: dict[str, str] | None = None,
     ) -> ProviderResponse:
-        return self._request_json(
-            lambda: self._client_or_raise().post(url, json=json, headers=headers),
+        return _como_json(
+            self._request(lambda: self._client_or_raise().post(url, json=json, headers=headers)),
         )
 
-    def _request_json(self, send: Callable[[], httpx.Response]) -> ProviderResponse:
+    def get_text(self, url: str) -> str:
+        """El cuerpo como texto: las páginas de un sitio que responde a HTTP común."""
+        return self._request(lambda: self._client_or_raise().get(url)).text
+
+    def get_bytes(self, url: str) -> bytes:
+        """El cuerpo tal cual llega, para un archivo comprimido (un ``sitemap.xml.gz``)."""
+        return self._request(lambda: self._client_or_raise().get(url)).content
+
+    def _request(self, send: Callable[[], httpx.Response]) -> httpx.Response:
         self._politica.reservar()
         last_error: ProviderHttpError | None = None
         for attempt in range(INTENTOS):
@@ -131,11 +139,7 @@ class ProviderHttpClient:
                     retry_exhausted=True,
                 )
             response.raise_for_status()
-            return ProviderResponse(
-                str(response.url),
-                response.status_code,
-                response.json(),
-            )
+            return response
         if last_error is None:
             raise ProviderHttpError("fallo de proveedor", retry_exhausted=True)
         last_error.retry_exhausted = True
@@ -145,6 +149,10 @@ class ProviderHttpClient:
         if self._client is None:
             raise RuntimeError("ProviderHttpClient must be used as a context manager")
         return self._client
+
+
+def _como_json(response: httpx.Response) -> ProviderResponse:
+    return ProviderResponse(str(response.url), response.status_code, response.json())
 
 
 def _detalle_error(response: httpx.Response) -> str:

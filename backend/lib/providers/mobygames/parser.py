@@ -42,6 +42,9 @@ class Ficha:
     genre: str
     description: str
     score: int | None
+    # El nombre de la plataforma en las URL de MobyGames ("dos"): lleva a las carátulas y las
+    # capturas de esa plataforma.
+    plataforma_slug: str = ""
 
 
 @dataclass(frozen=True)
@@ -113,6 +116,17 @@ def _nota_criticos(page: Pagina) -> int | None:
     return None
 
 
+def _slug_plataforma(page: Pagina, plataforma: str) -> str:
+    """El slug de la plataforma, del enlace "/platform/{slug}/" de su fila en "Releases"."""
+    for fila in page.css("#platformLinks li"):
+        enlaces = fila.css("a")
+        if enlaces and _mismo(_texto(enlaces[-1]), plataforma):
+            encontrado = re.search(r"/platform/([^/]+)/", str(enlaces[-1].attrib.get("href", "")))
+            if encontrado:
+                return encontrado.group(1)
+    return ""
+
+
 def parse_ficha(page: Pagina, plataforma: str) -> Ficha:
     """Lee la ficha de un juego para una plataforma (el nombre de MobyGames, ej. "DOS")."""
     datos = _json_ld(page)
@@ -131,6 +145,7 @@ def parse_ficha(page: Pagina, plataforma: str) -> Ficha:
         genre=", ".join(_como_lista(datos.get("genre"))),
         description="\n\n".join(p for p in parrafos if p),
         score=_nota_criticos(page),
+        plataforma_slug=_slug_plataforma(page, plataforma),
     )
 
 
@@ -230,3 +245,78 @@ def parse_busqueda(page: Pagina) -> tuple[Fila, ...]:
             )
         )
     return tuple(filas)
+
+
+@dataclass(frozen=True)
+class Portada:
+    """Una portada frontal de la página de carátulas de una plataforma."""
+
+    enlace: str  # la página de esa carátula, donde está la imagen grande
+    miniatura: str
+    pais: str
+
+
+@dataclass(frozen=True)
+class Captura:
+    url: str
+    miniatura: str
+    leyenda: str
+
+
+def parse_portadas(page: Pagina) -> tuple[Portada, ...]:
+    """Las portadas frontales de la página de carátulas, en el orden de la página.
+
+    Cada edición es una ``<section>`` con una tabla (país, empaque) y una ``<figure>`` por
+    imagen, rotulada en ``figcaption`` ("Front Cover", "Back Cover"…).
+    """
+    portadas: list[Portada] = []
+    for seccion in page.css("main section"):
+        pais = ""
+        for fila in seccion.css("tr"):
+            celdas = fila.css("td")
+            if len(celdas) >= 2 and _texto(celdas[0]).rstrip(":").lower() == "country":
+                pais = ", ".join(_texto(li) for li in celdas[1].css("li") if _texto(li))
+        for figura in seccion.css("figure"):
+            leyenda = figura.css("figcaption")
+            enlace = figura.css("a")
+            imagen = figura.css("img")
+            if not leyenda or not enlace or not imagen:
+                continue
+            if _texto(leyenda[0]).lower() != "front cover":
+                continue
+            portadas.append(
+                Portada(
+                    enlace=str(enlace[0].attrib.get("href", "")),
+                    miniatura=str(imagen[0].attrib.get("src", "")),
+                    pais=pais,
+                )
+            )
+    return tuple(portadas)
+
+
+def parse_portada_grande(page: Pagina) -> str:
+    """La imagen grande de la página de una carátula (su ``alt`` empieza con "Front Cover")."""
+    for imagen in page.css("main img"):
+        if str(imagen.attrib.get("alt", "")).lower().startswith("front cover"):
+            return str(imagen.attrib.get("src", ""))
+    return ""
+
+
+def parse_capturas(page: Pagina) -> tuple[Captura, ...]:
+    """Las capturas de la página de una plataforma; en DOS (320×200) la miniatura ya es la
+    imagen completa."""
+    capturas: list[Captura] = []
+    for figura in page.css("main figure"):
+        enlace = figura.css("a")
+        imagen = figura.css("img")
+        if not enlace or not imagen:
+            continue
+        leyenda = figura.css("figcaption")
+        capturas.append(
+            Captura(
+                url=str(enlace[0].attrib.get("href", "")),
+                miniatura=str(imagen[0].attrib.get("src", "")),
+                leyenda=_texto(leyenda[0]) if leyenda else "",
+            )
+        )
+    return tuple(capturas)

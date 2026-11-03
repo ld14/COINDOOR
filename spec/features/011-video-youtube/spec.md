@@ -2,7 +2,8 @@
 
 **Estado:** implementada   <!-- borrador | aprobada | en curso | implementada -->
 
-Decisión en [`ADR-0020`](../../decisions/0020-descarga-de-video-youtube.md).
+Decisión en [`ADR-0020`](../../decisions/0020-descarga-de-video-youtube.md); el recorte, en
+[`ADR-0029`](../../decisions/0029-recorte-de-videos-largos-de-youtube.md).
 
 ## Qué hace
 
@@ -12,7 +13,9 @@ Decisión en [`ADR-0020`](../../decisions/0020-descarga-de-video-youtube.md).
 progreso y cancelación.
 
 **No cubre** encontrar el video: el modal Sugerir sigue ofreciendo YouTube como `referencia`
-([002](../002-sugerencias-multiproveedor/spec.md)). Tampoco recorta: el video entra entero.
+([002](../002-sugerencias-multiproveedor/spec.md)). Un video de hasta 10 minutos entra entero;
+uno más largo se guarda con sus primeros 3 minutos. Tampoco recorta los archivos subidos a mano
+ni el video de ArcadeDB.
 
 ## Por qué
 
@@ -24,7 +27,10 @@ herramienta y subirlo con `Cargar`. ArcadeDB solo resuelve arcade
 
 - [x] Dado un juego sin video y `https://youtu.be/<id>` de 10 min o menos, cuando termina el job, entonces existe `media/<sistema>/<juego>/video.mp4` con H.264 + AAC y alto ≤720, y `video.video` es `{status: suggested, source: YouTube}` con `provenance.video.originUrl` igual a `https://www.youtube.com/watch?v=<id>`.
 - [x] Dada una URL que no es de un video de YouTube —otro host, una lista, un canal, `file://`, `ytsearch:`—, el endpoint responde 422 sin crear job ni salir a la red; dado un `game_id` inexistente, responde 404.
-- [x] Dado un video de más de 600 s o en vivo, el job termina `failed` con el mensaje correspondiente, sin descargar y sin tocar `game.json`.
+- [x] Dado un video de más de 600 s, cuando termina el job, entonces el campo `video` queda con sus primeros 180 s en H.264 + AAC, sin haber bajado el resto; la barra avanza durante la descarga (agregado el 2026-10-31).
+- [x] Dado un video de 600 s o menos, cuando termina el job, entonces entra entero (agregado el 2026-10-31).
+- [x] Dado un recorte en curso, cuando se cancela, entonces se corta enseguida (agregado el 2026-10-31).
+- [x] Dada una transmisión en vivo, el job termina `failed` con su mensaje, sin descargar y sin tocar `game.json`.
 - [x] Dado un video sin variante H.264 de 720p o menos, el job termina `failed` con su mensaje.
 - [x] Dado que YouTube responde con el muro anti-bot, el job termina `failed` con el mensaje que lo nombra.
 - [x] Dado un job en curso, cuando se cancela, termina `cancelled` y el campo `video` no cambia.
@@ -40,12 +46,13 @@ No están en `docs/claude_diseño/`. Estos son los literales:
 - Campo `URL de YouTube` · botones `Descargar` y `Cancelar` · en curso `Descargando de YouTube… {n}%`
 - URL inválida: `La URL tiene que ser de un video de youtube.com o youtu.be.`
 - Reemplazo: `El video actual fue cargado a mano. ¿Reemplazarlo con el de YouTube?`
-- Job fallido: `El video dura más de 10 minutos.` · `No se pueden descargar transmisiones en vivo.` · `Este video no tiene versión H.264 de 720p o menos.` · `YouTube pidió verificación anti-bot. Probá más tarde o actualizá yt-dlp.` · `La descarga terminó sin archivo.` · `Falta ffmpeg en el equipo: instalalo para descargar video de YouTube.`
+- Job fallido: `No se pudo bajar el comienzo del video.` · `No se pueden descargar transmisiones en vivo.` · `Este video no tiene versión H.264 de 720p o menos.` · `YouTube pidió verificación anti-bot. Probá más tarde o actualizá yt-dlp.` · `La descarga terminó sin archivo.` · `Falta ffmpeg en el equipo: instalalo para descargar video de YouTube.`
 
 ## Fuera de alcance
 
 - **Buscar el video** o volver aplicable el candidato de YouTube del modal Sugerir: sigue siendo [002](../002-sugerencias-multiproveedor/spec.md), y buscar dentro de YouTube roza el "sin scraping" de ADR-0013.
-- **Recortar un tramo.** El video entra entero, hasta 10 min.
+- **Elegir el tramo o la duración del recorte:** son siempre los primeros 3 minutos
+  ([`ADR-0029`](../../decisions/0029-recorte-de-videos-largos-de-youtube.md)).
 - **Cookies del navegador** para sortear el muro anti-bot.
 - **Otros sitios de video**, como archive.org o Vimeo.
 - **Videos en la galería:** eso es [009](../009-galeria/spec.md).

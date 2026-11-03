@@ -42,6 +42,25 @@ los tiene.
 - [ ] Dado un conjunto de tipos seleccionados, cuando se guardan, entonces se
       descargan a `_gallery/` numerados `g001`…`gNNN`, con la extensión derivada del
       contenido y no del nombre de la URL.
+- [x] Dado que alguna imagen elegida no se pudo bajar, cuando termina el guardado, entonces
+      se avisa cuántas se guardaron y cuántas no (agregado el 2026-10-30).
+- [x] Dada una búsqueda de imágenes para la galería, cuando trae URLs de
+      `www.mobygames.com/images/`, que responden 403 a su descarga, entonces no se ofrecen;
+      las de `cdn.mobygames.com` sí (agregado el 2026-10-30).
+- [x] Dada la galería, cuando se traen imágenes, entonces suma todas las fuentes de imágenes
+      (ArcadeDB, MyAbandonware, Launchbox, MobyGames y el buscador), sin orden de cadena: MobyGames
+      entra aunque otra fuente ya tenga imágenes, y de Launchbox vienen también las categorías
+      que no van en un casillero (agregado el 2026-10-31).
+- [x] Dado el buscador en la galería, cuando se consulta, entonces pide un casillero por vez y
+      cada tanda aparece al llegar; una búsqueda completa queda en memoria mientras corre el
+      proceso, para no repetirla (agregado el 2026-10-31).
+- [x] Dado un GIF de un cuadro elegido, cuando se guarda, entonces queda como PNG:
+      `attract doctor` rechaza `.gif` en la galería (agregado el 2026-10-30).
+- [x] Dado un GIF animado, cuando se elige, entonces no se guarda y se avisa; el buscador de
+      imágenes tampoco ofrece GIF (decisión del dueño del producto, 2026-10-31).
+- [x] Dado un juego que myabandonware tiene, cuando se piden los candidatos, entonces se
+      listan sus capturas de la plataforma del juego, elegidas con la misma regla que en
+      "Sugerir" (agregado el 2026-10-30).
 - [ ] Dada una imagen de la galería, cuando se la asigna a un campo del contrato,
       entonces ese campo queda apuntando a esa imagen y la entrada de galería sigue
       existiendo.
@@ -63,7 +82,5 @@ los tiene.
   fuera de este repo. Hasta entonces `attract doctor` la ignora sin fallar.
 - Rasterizar, recortar o normalizar las imágenes: se guardan tal como las entrega
   ArcadeDB, igual que hace la precarga con los cinco campos.
-- Traer imágenes de galería de otras fuentes (búsqueda de imágenes, IA). Sólo
-  ArcadeDB — eso es la feature [002](../002-sugerencias-multiproveedor/spec.md).
-- Sistemas sin catálogo de romsets: la galería sólo aplica donde aplica ArcadeDB, con
-  el mismo gate de `soporta_arcadedb()`.
+- Generar imágenes con IA. Hoy la galería trae de ArcadeDB, myabandonware, el buscador y
+  Launchbox, sin número máximo ([024](../024-ficha-completa-al-cargar/spec.md)).

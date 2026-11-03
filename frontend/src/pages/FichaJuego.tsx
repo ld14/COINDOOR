@@ -11,10 +11,9 @@ import { invalidarListas, useGameMutations } from '@/hooks/useGameMutations';
 import { saveStatusStore } from '@/hooks/useSaveStatus';
 import { useSuggestionsJob } from '@/hooks/useSuggestionsJob';
 import { useSystems } from '@/hooks/useSystems';
-import { soportaArcadeDb, soportaMsdos } from '@/lib/domain/arcade';
 import { computeGameStatus, missingRequired } from '@/lib/domain/completeness';
 import type { Game, ImageKey } from '@/lib/domain/types';
-import { startPrecarga, startPrecargaMsdos } from '@/lib/api/games';
+import { startCompletar } from '@/lib/api/games';
 import { ArchivoPanel } from './ficha/ArchivoPanel';
 import { CabinetSection } from './ficha/GabineteSection';
 import { CheatsSection } from './ficha/TrucosSection';
@@ -104,8 +103,6 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
   const progress = useFichaProgress(gameVivo);
   const missing = missingRequired(gameVivo);
   const status = computeGameStatus(gameVivo);
-  const isArcade = soportaArcadeDb(gameVivo.systemId);
-  const isMsdos = soportaMsdos(gameVivo.systemId);
 
   // Candidatas de un slot de imagen: la sección no llama a la API, las busca el orquestador. La búsqueda
   // sale a la red, así que corre SOLO a pedido (clic en ↻ o «Cambiar»), nunca al abrir la ficha
@@ -154,9 +151,7 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
   const handlePrecarga = async () => {
     setPrecargaLoading(true);
     try {
-      const result = isMsdos
-        ? await startPrecargaMsdos(gameVivo.id)
-        : await startPrecarga(gameVivo.id);
+      const result = await startCompletar(gameVivo.id);
       setSearchParams({ precarga: result.jobId });
     } catch {
       // Error silenciado: el usuario puede reintentar.
@@ -206,9 +201,7 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
   };
 
   const resumen = useMemo(() => resumenPrecarga(gameVivo), [gameVivo]);
-  const fuente = resumen.fuentes.length === 1
-    ? resumen.fuentes[0]
-    : isArcade ? 'ArcadeDB' : isMsdos ? 'Launchbox + IA' : 'Las fuentes';
+  const fuente = resumen.fuentes.length === 1 ? resumen.fuentes[0] : 'Las fuentes';
 
   const banner = precargaJobId ? (
     <PrecargaBanner
@@ -382,8 +375,8 @@ function FichaContenido({ game: gameVivo, refetchGame }: { game: Game; refetchGa
     { clave: 'gabinete', node: <CabinetSection game={game} /> },
     {
       clave: 'precarga',
-      node: (isArcade || isMsdos) && !precargaJobId
-        ? <PrecargaCard cargando={precargaLoading} onPrecargar={() => void handlePrecarga()} tipo={isMsdos ? 'msdos' : 'arcade'} />
+      node: !precargaJobId
+        ? <PrecargaCard cargando={precargaLoading} onPrecargar={() => void handlePrecarga()} />
         : null,
     },
   ];

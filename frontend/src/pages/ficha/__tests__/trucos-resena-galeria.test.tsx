@@ -17,8 +17,8 @@ function conGrupos(groups: Game['cheats']['groups'], status: Game['cheats']['sta
   return { ...base, cheats: { status, source, groups } };
 }
 
-function renderConAutosave(ui: React.ReactElement, aceptar = vi.fn(), markDirty = vi.fn()) {
-  render(<FichaAutosaveContext.Provider value={{ aceptar, markDirty }}>{ui}</FichaAutosaveContext.Provider>);
+function renderConAutosave(ui: React.ReactElement, aceptar = vi.fn(), markDirty = vi.fn(), pendiente = false) {
+  render(<FichaAutosaveContext.Provider value={{ aceptar, markDirty, pendiente }}>{ui}</FichaAutosaveContext.Provider>);
   return { aceptar, markDirty };
 }
 
@@ -107,6 +107,54 @@ describe('TrucosSection', () => {
     expect(aceptar).toHaveBeenCalledWith('cheats');
   });
 
+  it('«Agregar como truco» pasa el texto a la ficha sin IA: la primera línea nombra al truco', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    const onCheats = vi.fn();
+    const ref = createRef<SaveHandle>();
+    renderConAutosave(<CheatsSection game={conGrupos([])} onCheats={onCheats} onDelete={vi.fn()} onSuggest={vi.fn()} ref={ref} />);
+    const caja = screen.getByLabelText('Texto de trucos a interpretar');
+
+    await userEvent.type(caja, 'Vidas infinitas{enter}Escribir IDDQD');
+    expect(screen.getByText('Este texto todavía no está en la ficha.')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Agregar como truco' }));
+
+    expect(caja).toHaveValue('');
+    expect(fetchMock).not.toHaveBeenCalled();
+    ref.current?.save();
+    expect(onCheats).toHaveBeenCalledWith([{ name: 'Trucos', entries: [{ name: 'Vidas infinitas', input: 'Escribir IDDQD' }] }]);
+    vi.unstubAllGlobals();
+  });
+
+  it('una sola línea entra como código, con nombre, y va al último grupo: ATTRACT exige los dos campos', async () => {
+    const onCheats = vi.fn();
+    const ref = createRef<SaveHandle>();
+    const grupos = [{ name: 'Códigos', entries: [{ name: 'Nivel 1', input: 'DBQ7' }] }];
+    renderConAutosave(<CheatsSection game={conGrupos(grupos)} onCheats={onCheats} onDelete={vi.fn()} onSuggest={vi.fn()} ref={ref} />);
+
+    await userEvent.type(screen.getByLabelText('Texto de trucos a interpretar'), 'Abajo Abajo A');
+    await userEvent.click(screen.getByRole('button', { name: 'Agregar como truco' }));
+    ref.current?.save();
+
+    expect(onCheats).toHaveBeenCalledWith([{
+      name: 'Códigos',
+      entries: [{ name: 'Nivel 1', input: 'DBQ7' }, { name: 'Truco', input: 'Abajo Abajo A' }],
+    }]);
+  });
+
+  it('muestra que se guarda solo y si quedan cambios pendientes, sin botón de guardar', () => {
+    renderConAutosave(<CheatsSection game={conGrupos([])} onCheats={vi.fn()} onDelete={vi.fn()} onSuggest={vi.fn()} />, vi.fn(), vi.fn(), true);
+
+    expect(screen.getByText('Se guarda solo · Cambios sin guardar')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Guardar/ })).not.toBeInTheDocument();
+  });
+
+  it('sin cambios pendientes dice que está todo guardado', () => {
+    renderConAutosave(<CheatsSection game={conGrupos([])} onCheats={vi.fn()} onDelete={vi.fn()} onSuggest={vi.fn()} />);
+
+    expect(screen.getByText('Se guarda solo · Todo guardado')).toBeInTheDocument();
+  });
+
   it('«Separar en trucos» deja una propuesta que recién se usa al aceptarla', async () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({ groups: [{ name: 'Guía', entries: [{ name: 'Vida extra', input: 'A B' }] }] }), { status: 200 }));
     vi.stubGlobal('fetch', fetchMock);
@@ -131,7 +179,7 @@ describe('ReviewSection', () => {
   const conReview = (review: Partial<Game['review']>): Game => ({ ...base, review: { status: 'manual', score: null, cats: {}, ...review } });
 
   it('muestra «sin reseña» y distingue las categorías incompletas', () => {
-    const { unmount } = render(<FichaAutosaveContext.Provider value={{ aceptar: vi.fn(), markDirty: vi.fn() }}><ReviewSection game={conReview({ status: 'empty' })} onReview={vi.fn()} onSuggest={vi.fn()} /></FichaAutosaveContext.Provider>);
+    const { unmount } = render(<FichaAutosaveContext.Provider value={{ aceptar: vi.fn(), markDirty: vi.fn(), pendiente: false }}><ReviewSection game={conReview({ status: 'empty' })} onReview={vi.fn()} onSuggest={vi.fn()} /></FichaAutosaveContext.Provider>);
     expect(screen.getByText(/Todavía no hay reseña/)).toBeInTheDocument();
     unmount();
     renderConAutosave(<ReviewSection game={conReview({ score: 80, cats: { graficos: 70 } })} onReview={vi.fn()} onSuggest={vi.fn()} />);
@@ -191,6 +239,6 @@ describe('GaleriaSection', () => {
     render(<GaleriaSection game={{ ...base, gallery }} numero={8} onChanged={vi.fn()} />);
     expect(screen.getByRole('heading', { name: 'Galería' })).toBeInTheDocument();
     expect(screen.getByAltText('Captura 1')).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Traer de ArcadeDB / LaunchBox' })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Traer de todas las fuentes' })).toBeInTheDocument());
   });
 });

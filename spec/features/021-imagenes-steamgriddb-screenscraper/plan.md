@@ -37,10 +37,17 @@ Mega Drive, "Battletoads" cae en la página 1 de la letra B.
    de una plataforma y letra ya recorrido se guarda en la sesión.
 3. `lib/providers/scraping.py` — la descarga de páginas acepta cabeceras por petición. Para
    ScreenScraper envía `Referer: …/gameinfos.php?gameid={id}`.
-4. `lib/providers/registro.py` — filas nuevas (el orden es provisional, es un dato):
-   - `caratula` y `captura`: ArcadeDB → ScreenScraper → búsqueda de imágenes → Launchbox.
-   - `poster`, `marquesina` y `logo`: ArcadeDB → ScreenScraper → SteamGridDB → búsqueda de
-     imágenes → Launchbox.
+4. `lib/providers/registro.py` — filas nuevas (el orden es provisional, es un dato). La
+   feature [022](../022-edicion-correcta-en-las-fuentes/plan.md) dejó las fuentes de la
+   edición primero y el buscador de imágenes al final, y
+   [`ADR-0027`](../../decisions/0027-myabandonware-primera-fuente-de-pc-dos.md) dejó a
+   MobyGames como último recurso, que se saltea si el campo ya tiene candidato. Los dos sitios
+   nuevos van antes de Launchbox; si van antes que MobyGames, lo apagan cuando responden:
+   - `caratula`: ArcadeDB → ScreenScraper → Launchbox → MobyGames → búsqueda de imágenes.
+   - `captura`: ArcadeDB → myabandonware → ScreenScraper → Launchbox → MobyGames → búsqueda
+     de imágenes.
+   - `poster`, `marquesina` y `logo`: ArcadeDB → ScreenScraper → SteamGridDB → Launchbox →
+     búsqueda de imágenes.
    - `video`: ArcadeDB → ScreenScraper → YouTube (referencia).
 5. `services/fields.py` — `_download_candidate_media` hoy manda siempre
    `Referer: https://duckduckgo.com/`, y con eso ScreenScraper responde 403. El proveedor

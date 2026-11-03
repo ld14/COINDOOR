@@ -34,13 +34,30 @@ describe('Fila de candidatas de imágenes', () => {
   it('con varias opciones muestra la fila, resalta la de la fuente del slot y aplica la elegida', async () => {
     const onPick = montar([cand('a', 'ArcadeDB'), cand('b', 'Launchbox'), cand('c', 'Image Search', 'referencia')]);
 
-    expect(screen.getByText(/encontró 2 opciones — elegí una/)).toBeInTheDocument();
+    expect(screen.getByText(/Las fuentes encontraron 2 opciones — elegí una/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Usar la opción de ArcadeDB' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', { name: 'Usar la opción de Launchbox' })).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByText('Usar la mía')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Usar la opción de Launchbox' }));
     expect(onPick).toHaveBeenCalledWith('caratula', 'b');
+  });
+
+  it.each([[2, 1], [4, 1], [5, 2], [9, 3], [63, 3]])('con %i opciones usa %i filas', (cuantas, filas) => {
+    montar(Array.from({ length: cuantas }, (_, i) => cand(`c${i}`, 'Launchbox')));
+    const carril = screen.getAllByRole('button', { name: 'Usar la opción de Launchbox' })[0].parentElement;
+    expect(carril).toHaveStyle({ gridTemplateRows: `repeat(${filas}, auto)` });
+  });
+
+  it('«Usar la mía» queda fuera del carril que se desplaza', () => {
+    montar(Array.from({ length: 63 }, (_, i) => cand(`c${i}`, 'Launchbox')));
+    const carril = screen.getAllByRole('button', { name: 'Usar la opción de Launchbox' })[0].parentElement;
+    expect(carril).not.toContainElement(screen.getByText('Usar la mía'));
+  });
+
+  it('con una sola fuente, el encabezado la nombra', () => {
+    montar([cand('a', 'Launchbox'), cand('b', 'Launchbox')]);
+    expect(screen.getByText(/Launchbox encontró 2 opciones — elegí una/)).toBeInTheDocument();
   });
 
   it('con una sola opción no dibuja la fila (queda el botón Cambiar y el modal)', () => {

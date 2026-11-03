@@ -6,6 +6,8 @@ from collections.abc import Iterator
 import pytest
 
 from backend.config import Settings, set_settings
+from backend.lib.providers.myabandonware import cliente as myabandonware
+from backend.lib.providers.referencia import images as busqueda_de_imagenes
 
 
 @pytest.fixture(autouse=True)
@@ -26,6 +28,13 @@ def entorno_hermetico(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.setattr("backend.lib.providers.registro.navegador_disponible", lambda: False)
     monkeypatch.setattr("backend.services.msdos.navegador_disponible", lambda: False)
     monkeypatch.setattr("backend.services.precalentar.navegador_disponible", lambda: False)
+    # myabandonware va por HTTP común (ADR-0027): sin índice no encuentra ningún juego y no
+    # baja nada. Los tests del cliente le dan un índice a mano.
+    monkeypatch.setattr(
+        "backend.lib.providers.myabandonware.cliente.indice", lambda _http, _carpeta: ()
+    )
+    myabandonware.olvidar()
+    busqueda_de_imagenes.olvidar()
     set_settings(None)
     yield
     set_settings(None)

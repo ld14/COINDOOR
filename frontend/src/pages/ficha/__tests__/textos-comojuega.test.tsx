@@ -20,7 +20,7 @@ function montarTextos(game: Game) {
   const markDirty = vi.fn();
   const ref = createRef<SaveHandle>();
   render(
-    <FichaAutosaveContext.Provider value={{ aceptar, markDirty }}>
+    <FichaAutosaveContext.Provider value={{ aceptar, markDirty, pendiente: false }}>
       <TextSection game={game} onDelete={onDelete} onSuggest={onSuggest} onText={onText} ref={ref} />
     </FichaAutosaveContext.Provider>,
   );
@@ -36,7 +36,7 @@ function montarGuia(game: Game) {
   const markDirty = vi.fn();
   const ref = createRef<SaveHandle>();
   render(
-    <FichaAutosaveContext.Provider value={{ aceptar, markDirty }}>
+    <FichaAutosaveContext.Provider value={{ aceptar, markDirty, pendiente: false }}>
       <GuiaSection game={game} onButtons={onButtons} onDelete={onDelete} onSuggest={onSuggest} onText={onText} ref={ref} />
     </FichaAutosaveContext.Provider>,
   );

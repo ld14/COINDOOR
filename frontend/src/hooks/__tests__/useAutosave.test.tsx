@@ -1,5 +1,6 @@
 import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { useRef, useState, type RefObject } from 'react';
+import { flushSync } from 'react-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AUTOSAVE_DELAY_MS, useAutosave, useCongeladoMientrasEdita, type Autosave } from '@/hooks/useAutosave';
 import { saveStatusStore } from '@/hooks/useSaveStatus';
@@ -28,6 +29,17 @@ function Formulario({ save, waitIdle, isSaving }: Opciones) {
   );
 }
 
+function CampoControlado() {
+  const [valor, setValor] = useState('');
+  return <input aria-label="URL" onChange={(event) => setValor(event.target.value)} value={valor} />;
+}
+
+function FormularioControlado() {
+  const ref = useRef<HTMLDivElement>(null);
+  autosave = useAutosave({ containerRef: ref, save: () => {} });
+  return <div data-seccion="video" data-testid="contenedor" ref={ref}><CampoControlado /></div>;
+}
+
 const escribir = (etiqueta: string, value = 'x') => fireEvent.input(screen.getByLabelText(etiqueta), { target: { value } });
 
 describe('useAutosave', () => {
@@ -38,6 +50,26 @@ describe('useAutosave', () => {
   afterEach(() => {
     vi.useRealTimers();
     saveStatusStore.reset();
+  });
+
+  it('no pierde lo pegado en un campo controlado, aunque la ficha estuviera limpia', () => {
+    render(<FormularioControlado />);
+    // Un evento real del navegador corre microtareas entre listeners, y `fireEvent` no: esto hace lo
+    // mismo que React entre el contenedor y la raíz, redibujar lo pendiente.
+    screen.getByTestId('contenedor').addEventListener('input', () => { flushSync(() => {}); });
+
+    fireEvent.input(screen.getByLabelText('URL'), { target: { value: 'https://youtu.be/x' } });
+
+    expect(screen.getByLabelText('URL')).toHaveValue('https://youtu.be/x');
+    expect(autosave.dirty).toBe(true);
+  });
+
+  it('una edición fuera del contenedor no marca la ficha como sucia', () => {
+    render(<><FormularioControlado /><input aria-label="Afuera" /></>);
+
+    fireEvent.input(screen.getByLabelText('Afuera'), { target: { value: 'x' } });
+
+    expect(autosave.dirty).toBe(false);
   });
 
   it('guarda ~800 ms después de la última tecla (debounce) y reinicia la espera al seguir escribiendo', () => {

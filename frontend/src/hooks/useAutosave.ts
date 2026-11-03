@@ -142,6 +142,7 @@ export function useAutosave({ containerRef, save, waitIdle, isSaving, delay = AU
     const el = containerRef.current;
     if (!el) return undefined;
     const alEditar = (event: Event) => {
+      if (!(event.target instanceof Node) || !el.contains(event.target)) return;
       const id = seccionDe(event.target);
       if (!id) return;
       const soloAlSalir = event.target instanceof HTMLElement && event.target.closest(`[${ATRIBUTO_SOLO_AL_SALIR}="blur"]`) !== null;
@@ -151,12 +152,17 @@ export function useAutosave({ containerRef, save, waitIdle, isSaving, delay = AU
       if (event.target instanceof HTMLElement && esCambioRelevante(event.target)) alEditar(event);
     };
     const alPerderFoco = () => { flush(); };
-    el.addEventListener('input', alEditar);
-    el.addEventListener('change', alCambiar);
+    // En `document`, no en el contenedor: tienen que correr después de los `onChange` de React,
+    // que escucha en la raíz. Un evento del navegador deja correr microtareas entre un listener y
+    // otro, así que marcar la sección antes redibujaría la ficha con el estado viejo: el campo
+    // controlado volvería a su valor anterior y React ya no vería el cambio (se perdía lo pegado).
+    const doc = el.ownerDocument;
+    doc.addEventListener('input', alEditar);
+    doc.addEventListener('change', alCambiar);
     el.addEventListener('focusout', alPerderFoco);
     return () => {
-      el.removeEventListener('input', alEditar);
-      el.removeEventListener('change', alCambiar);
+      doc.removeEventListener('input', alEditar);
+      doc.removeEventListener('change', alCambiar);
       el.removeEventListener('focusout', alPerderFoco);
     };
   }, [containerRef, markDirty, flush]);

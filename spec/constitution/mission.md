@@ -51,4 +51,6 @@ valida y ensambla. El gabinete nunca se conecta.
   completitud sí.
 - **No decidimos nada automáticamente.** Toda sugerencia la acepta una persona. Una
   sinopsis inventada o una carátula del juego equivocado quedan permanentes en el
-  gabinete.
+  gabinete. La precarga deja los campos cargados para ahorrar trabajo, pero como
+  sugerencia a revisar, y antes de exportar los ve una persona
+  ([`ADR-0028`](../decisions/0028-la-precarga-completa-toda-la-ficha.md)).

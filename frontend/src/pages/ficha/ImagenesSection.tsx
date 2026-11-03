@@ -9,6 +9,8 @@ import { confirmManualDelete } from './helpers';
 import styles from './ImagenesSection.module.css';
 
 const SUGERIR = 'Sugerir desde ArcadeDB';
+const MAX_FILAS = 3;
+const OPCIONES_POR_FILA = 4;
 
 /** Candidatas de un slot de imagen, buscadas por el orquestador (esta sección no llama a la API). */
 export interface CandidatasImagen {
@@ -40,13 +42,16 @@ function FilaCandidatas({ candidatas, field, label, onPick, onUpload }: {
 }) {
   const lista = aplicables(candidatas);
   const fuentes = [...new Set(lista.map((c) => c.fuente))];
-  const origen = fuentes.length === 1 ? fuentes[0] : 'Las fuentes';
+  const origen = fuentes.length === 1 ? `${fuentes[0]} encontró` : 'Las fuentes encontraron';
+  // Hasta tres filas, y las columnas que hagan falta: con pocas opciones, tres filas fijas las
+  // apilarían en una sola columna.
+  const filas = Math.min(MAX_FILAS, Math.ceil(lista.length / OPCIONES_POR_FILA));
   // Resalta la que la precarga dejó puesta (misma fuente que el slot), nunca una a ojo.
   const elegida = field?.source ? lista.find((c) => c.fuente === field.source)?.id : undefined;
   return (
     <div aria-label={`Opciones de ${label}`} className={styles.cands} role="group">
-      <p className={styles.candsHead}><b>{label}</b> · {origen} encontró {lista.length} opciones — elegí una</p>
-      <div className={styles.candsRow}>
+      <p className={styles.candsHead}><b>{label}</b> · {origen} {lista.length} opciones — elegí una</p>
+      <div className={styles.candsRow} style={{ gridTemplateRows: `repeat(${filas}, auto)` }}>
         {lista.map((c) => (
           <button
             aria-label={`Usar la opción de ${c.fuente}`}
@@ -60,10 +65,10 @@ function FilaCandidatas({ candidatas, field, label, onPick, onUpload }: {
             <span>{c.fuente}</span>
           </button>
         ))}
-        <div className={styles.candDrop}>
-          <b>Usar la mía</b>
-          <Dropzone accept="image/*" label="Soltá o pegá con Ctrl+V" onFile={onUpload} />
-        </div>
+      </div>
+      <div className={styles.candDrop}>
+        <b>Usar la mía</b>
+        <Dropzone accept="image/*" label="Soltá o pegá con Ctrl+V" onFile={onUpload} />
       </div>
     </div>
   );

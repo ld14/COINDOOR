@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from pathlib import Path
 from time import sleep
 from typing import Any
@@ -56,6 +56,54 @@ def _simular_yt_dlp(
             (Path(self.params["paths"]["home"]) / "video.mp4").write_bytes(b"mp4")
 
     monkeypatch.setattr(youtube, "YoutubeDL", FakeYoutubeDL)
+
+
+class _FfmpegFalso:
+    """Reemplaza a ``subprocess.Popen``: escribe el archivo y emite su progreso."""
+
+    def __init__(self, *, codigo: int = 0, colgado: bool = False) -> None:
+        self.codigo = codigo
+        self.colgado = colgado
+        self.comandos: list[list[str]] = []
+        self.terminado = threading.Event()
+
+    def __call__(self, comando: list[str], **_: object) -> _FfmpegFalso:
+        self.comandos.append(comando)
+        self.returncode: int | None = None
+        self.stdout = self._lineas(Path(comando[-1]))
+        return self
+
+    def _lineas(self, archivo: Path) -> Iterator[str]:
+        if self.colgado:
+            self.terminado.wait(5)
+            self.returncode = -15
+            return
+        yield "out_time_us=N/A\n"
+        yield "out_time_us=90000000\n"
+        if self.codigo:
+            yield "Server returned 403 Forbidden\n"
+        else:
+            archivo.write_bytes(b"mp4")
+        self.returncode = self.codigo
+
+    def poll(self) -> int | None:
+        return self.returncode
+
+    def terminate(self) -> None:
+        self.terminado.set()
+
+    def __enter__(self) -> _FfmpegFalso:
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        return None
+
+
+FORMATOS_LARGO: list[dict[str, Any]] = [
+    {"url": "https://v.test/video", "http_headers": {"User-Agent": "yt"}},
+    {"url": "https://v.test/audio"},
+]
+LARGO = {"duration": 2340, "requested_formats": FORMATOS_LARGO}
 
 
 def _settings(tmp_path: Path) -> Settings:
@@ -143,11 +191,11 @@ def test_descarga_escribe_el_video_con_su_procedencia(
 @pytest.mark.parametrize(
     ("info", "mensaje"),
     [
-        ({"duration": 601}, "El video dura más de 10 minutos."),
         ({"duration": None, "is_live": True}, "No se pueden descargar transmisiones en vivo."),
+        ({"duration": None}, "No se pueden descargar transmisiones en vivo."),
     ],
 )
-def test_video_largo_o_en_vivo_falla_antes_de_bajar(
+def test_video_en_vivo_falla_antes_de_bajar(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, info: dict[str, Any], mensaje: str
 ) -> None:
     settings = _settings(tmp_path)
@@ -158,6 +206,84 @@ def test_video_largo_o_en_vivo_falla_antes_de_bajar(
 
     assert str(fallo.value) == mensaje
     assert _sin_video_ni_restos(settings)
+
+
+def test_un_video_de_mas_de_10_minutos_baja_solo_sus_primeros_3(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    settings = _settings(tmp_path)
+    _simular_yt_dlp(monkeypatch, info=LARGO, al_bajar=lambda: pytest.fail("no debía bajarlo"))
+    ffmpeg = _FfmpegFalso()
+    monkeypatch.setattr(youtube.subprocess, "Popen", ffmpeg)
+    job = JobState(job_id="yt")
+
+    resultado = YoutubeVideoService(settings).run("golden-axe", URL)(job)
+
+    assert resultado == {"url": VIDEO}
+    assert (settings.media_dir / "arcade" / "golden-axe" / "video.mp4").read_bytes() == b"mp4"
+    assert _juego(settings)["provenance"]["video"]["originUrl"] == URL
+    comando = ffmpeg.comandos[0]
+    assert comando.count("-t") == 2 and comando.count(str(youtube.RECORTE_S)) == 2
+    assert "https://v.test/video" in comando and "https://v.test/audio" in comando
+    assert "User-Agent: yt\r\n" in comando
+    assert comando[comando.index("-c") + 1] == "copy"
+    assert job.progress == 47  # 90 de 180 s, sobre 95
+    assert list(settings.tmp_dir.iterdir()) == []
+
+
+@pytest.mark.parametrize("duracion", [181, 599, 600])
+def test_hasta_10_minutos_el_video_entra_entero(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, duracion: int
+) -> None:
+    settings = _settings(tmp_path)
+    _simular_yt_dlp(monkeypatch, info={"duration": duracion})
+    monkeypatch.setattr(
+        youtube.subprocess, "Popen", lambda *_a, **_k: pytest.fail("no debía recortar")
+    )
+
+    assert YoutubeVideoService(settings).run("golden-axe", URL)(JobState(job_id="yt"))
+
+
+def test_cancelar_corta_el_recorte_sin_esperar_a_que_termine(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    settings = _settings(tmp_path)
+    _simular_yt_dlp(monkeypatch, info=LARGO)
+    ffmpeg = _FfmpegFalso(colgado=True)
+    monkeypatch.setattr(youtube.subprocess, "Popen", ffmpeg)
+    job = JobState(job_id="yt")
+    threading.Timer(0.05, job.cancel_event.set).start()
+
+    assert YoutubeVideoService(settings).run("golden-axe", URL)(job) == {}
+
+    assert ffmpeg.terminado.is_set()
+    assert _sin_video_ni_restos(settings)
+
+
+def test_si_ffmpeg_falla_el_job_falla_sin_dejar_restos(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    settings = _settings(tmp_path)
+    _simular_yt_dlp(monkeypatch, info=LARGO)
+    monkeypatch.setattr(youtube.subprocess, "Popen", _FfmpegFalso(codigo=1))
+
+    with pytest.raises(youtube.YoutubeError, match="No se pudo bajar el comienzo del video."):
+        YoutubeVideoService(settings).run("golden-axe", URL)(JobState(job_id="yt"))
+
+    assert _sin_video_ni_restos(settings)
+
+
+def test_sin_ffmpeg_el_recorte_lo_dice(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    settings = _settings(tmp_path)
+    _simular_yt_dlp(monkeypatch, info=LARGO)
+
+    def sin_ffmpeg(*_a: object, **_k: object) -> None:
+        raise FileNotFoundError("ffmpeg")
+
+    monkeypatch.setattr(youtube.subprocess, "Popen", sin_ffmpeg)
+
+    with pytest.raises(youtube.YoutubeError, match="Falta ffmpeg"):
+        YoutubeVideoService(settings).run("golden-axe", URL)(JobState(job_id="yt"))
 
 
 @pytest.mark.parametrize(

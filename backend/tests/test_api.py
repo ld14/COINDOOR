@@ -301,8 +301,9 @@ def test_suggestions_endpoint_creates_job_without_credentials(tmp_path: Path) ->
     assert result.status_code == 200
     assert result.json()["status"] == "succeeded"
     payload = result.json()["result"]
-    # ArcadeDB siempre se consulta (gate por sistema dentro de buscar), IA se salta.
-    assert payload["consultados"] == 1
+    # ArcadeDB y myabandonware siempre se consultan (gate por sistema dentro de buscar), IA se
+    # salta.
+    assert payload["consultados"] == 2
     assert payload["candidatos"] == []
 
 

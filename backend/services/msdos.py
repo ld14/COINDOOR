@@ -1,8 +1,10 @@
 """Precarga de datos para juegos MSDOS/DOS/PC/Windows.
 
-Cada campo de identidad vacío se llena con MobyGames, después con Launchbox y, si ninguno
-lo tiene, con la IA, que solo recibe los campos que quedaron vacíos (ADR-0024, punto 4).
-Cada campo escrito deja su fuente en la procedencia. Las imágenes salen de Launchbox.
+Cada campo de identidad vacío se llena con myabandonware, después con Launchbox, después con
+la IA, que solo recibe los campos que quedaron vacíos, y por último con MobyGames, que se abre
+solo si todavía falta algo que tiene: el formato, el año, un campo que la IA no dio o la
+carátula (ADR-0027). Cada campo escrito deja su fuente en la procedencia. Las imágenes salen de
+Launchbox; si no tiene, la carátula sale de MobyGames y la captura, de myabandonware.
 Solo escribe campos vacíos, igual que ArcadeDB.
 """
 
@@ -20,14 +22,28 @@ from backend.config import Settings
 from backend.lib.domain.fielddefs import contract_asset, image_keys, max_length_for
 from backend.lib.domain.plataformas import nombre_en
 from backend.lib.jobs.registro import JobState
-from backend.lib.media import ext_por_magic
+from backend.lib.media import ext_por_magic, sin_gif
 from backend.lib.providers.base import Limite
 from backend.lib.providers.http import ProviderHttpClient
 from backend.lib.providers.ia.client import OpenAiCompatibleClient
 from backend.lib.providers.ia.generador import AiModelConfig, IaGenerador
 from backend.lib.providers.ia.traductor import traductor_configurado
-from backend.lib.providers.launchbox.cliente import fetch_images, search_game
-from backend.lib.providers.mobygames.cliente import FichaCompleta, buscar_ficha
+from backend.lib.providers.launchbox.cliente import (
+    LaunchboxFicha,
+    LaunchboxSearchResult,
+    fetch_details,
+    fetch_images,
+    search_game,
+)
+from backend.lib.providers.launchbox.proveedor import valor_identidad
+from backend.lib.providers.mobygames.cliente import (
+    FichaCompleta,
+    Imagen,
+    buscar_ficha,
+    buscar_imagenes,
+)
+from backend.lib.providers.myabandonware import cliente as myabandonware
+from backend.lib.providers.myabandonware.parser import Ficha as FichaMyAbandonware
 from backend.lib.providers.politica import ProviderHttpError
 from backend.lib.providers.scraping import ScrapingClient, navegador_disponible
 from backend.store.archivo import escribir_binario, media_path, safe_id
@@ -39,10 +55,13 @@ log = logging.getLogger(__name__)
 _SOURCE = "Launchbox"
 _SOURCE_IA = "IA"
 _SOURCE_MOBYGAMES = "MobyGames"
+_SOURCE_MYABANDONWARE = "MyAbandonware"
 _URL_MOBYGAMES = "mobygames.com/game/"
 # Identidad que la IA puede completar cuando ninguna fuente factual la tiene. Ni el año ni el
 # formato: la IA no los propone.
 _CAMPOS_IA = ("developer", "publisher", "genre", "players")
+# Lo que MobyGames puede dar cuando ya pasaron myabandonware, Launchbox y la IA (ADR-0027).
+_CAMPOS_MOBYGAMES = ("year", "format", *_CAMPOS_IA)
 _DESCRIPCION_IA = {
     "developer": "nombre del desarrollador",
     "publisher": "nombre del editor/publicador",
@@ -113,34 +132,47 @@ class MsdosPrecargaService:
         if not game.identity.title:
             return {"estado": "sin-titulo", "escritos": [], "omitidos": []}
 
-        # 1. Buscar en Launchbox.
+        # 1. myabandonware, la primera fuente de PC/DOS (ADR-0027), por HTTP común.
         job.progress = 10
-        launchbox_result = search_game(game.identity.title, game.systemId)
+        mya = self._fetch_myabandonware(game, job)
+
+        if job.cancel_event.is_set():
+            job.status = "cancelled"
+            return {"estado": "cancelado", "escritos": [], "omitidos": []}
+
+        # 2. Launchbox, con la misma regla que MobyGames (feature 022): su página completa la
+        # identidad que myabandonware no tenga, y de ahí salen las imágenes. El año de
+        # myabandonware ayuda a elegir el juego cuando la ficha todavía no tiene año.
+        job.progress = 20
+        anio_buscado = game.identity.year or (mya.year if mya else "")
+        launchbox_result = search_game(
+            game.identity.title, game.systemId, anio=anio_buscado or None
+        )
         launchbox_year = launchbox_result.year if launchbox_result else ""
+        launchbox_ficha = (
+            fetch_details(launchbox_result.game_id, launchbox_result.slug)
+            if launchbox_result
+            else None
+        )
         launchbox_images = (
             fetch_images(launchbox_result.game_id, launchbox_result.slug)
             if launchbox_result
             else []
         )
+        anio_buscado = anio_buscado or launchbox_year
 
         if job.cancel_event.is_set():
             job.status = "cancelled"
             return {"estado": "cancelado", "escritos": [], "omitidos": []}
 
-        # 2. MobyGames: identidad factual para PC/DOS. El año de Launchbox ayuda a elegir la
-        # ficha cuando la del juego todavía no tiene año.
-        job.progress = 20
-        anio_buscado = game.identity.year or launchbox_year
-        moby = self._fetch_mobygames(game, anio_buscado, job)
-        genero, genero_traducido = self._genero(moby, game.identity.title, job)
+        valores = self._valores(
+            mya,
+            launchbox_ficha,
+            launchbox_year,
+            launchbox_url=launchbox_ficha.url if launchbox_ficha else None,
+        )
 
-        if job.cancel_event.is_set():
-            job.status = "cancelled"
-            return {"estado": "cancelado", "escritos": [], "omitidos": []}
-
-        valores = self._valores(moby, genero, genero_traducido, launchbox_year, anio_buscado)
-
-        # 3. IA solo para lo que ni MobyGames ni Launchbox dieron.
+        # 3. IA solo para lo que ni myabandonware ni Launchbox dieron.
         job.progress = 30
         faltan = self._faltan_para_ia(game, valores)
         ia_data = (
@@ -156,28 +188,85 @@ class MsdosPrecargaService:
             job.status = "cancelled"
             return {"estado": "cancelado", "escritos": [], "omitidos": []}
 
-        # 4. Escribir campos.
+        # 4. MobyGames, el último recurso: solo si todavía falta algo que tiene. Si
+        # myabandonware enlaza su ficha, va directo a ella.
+        sin_caratula = not _tiene_caratula(launchbox_images) and not self._imagen_cargada(
+            game.model_dump(), "caratula"
+        )
+        portadas: tuple[Imagen, ...] = ()
+        if sin_caratula or self._falta_de_mobygames(game, valores):
+            job.progress = 40
+            moby, portadas = self._fetch_mobygames(
+                game,
+                anio_buscado,
+                job,
+                enlace=mya.mobygames_url if mya else None,
+                con_portadas=sin_caratula,
+            )
+            self._completar_con_mobygames(valores, moby, anio_buscado)
+
+        if job.cancel_event.is_set():
+            job.status = "cancelled"
+            return {"estado": "cancelado", "escritos": [], "omitidos": []}
+
+        self._traducir_genero(valores, game.identity.title, job)
+
+        # 5. Escribir campos.
         return self._escribir_campos(
             game_id, game, job,
             valores=valores,
             launchbox_images=launchbox_images,
             ia_data=ia_data,
+            portada_moby=portadas[0] if portadas else None,
+            captura_mya=mya.capturas[0].url if mya and mya.capturas else None,
         )
+
+    def _fetch_myabandonware(self, game: Any, job: JobState) -> FichaMyAbandonware | None:
+        """La página del juego en myabandonware; nada si no hay equivalencia, resultado o red."""
+        plataforma = nombre_en(game.systemId, "myabandonware")
+        if plataforma is None:
+            return None
+        http = ProviderHttpClient(
+            "myabandonware",
+            myabandonware.LIMITE,
+            QuotasStore(self.settings.quotas_path),
+            timeout=myabandonware.TIMEOUT,
+            cancel_event=job.cancel_event,
+        )
+        try:
+            with http:
+                return myabandonware.buscar(
+                    http,
+                    self.settings.myabandonware_dir,
+                    game.identity.title,
+                    game.identity.year or None,
+                    plataforma,
+                )
+        except ProviderHttpError as exc:
+            log.warning("myabandonware falló para %s: %s", game.id, exc)
+        except Exception:
+            log.warning("myabandonware falló para %s", game.id, exc_info=True)
+        return None
 
     def _fetch_mobygames(
         self,
         game: Any,
         anio: str,
         job: JobState,
-    ) -> FichaCompleta | None:
-        """La ficha de MobyGames, o ``None`` si no hay equivalencia, Chromium o resultado."""
+        *,
+        enlace: str | None = None,
+        con_portadas: bool = True,
+    ) -> tuple[FichaCompleta | None, tuple[Imagen, ...]]:
+        """La ficha de MobyGames y, si hacen falta, sus portadas de la plataforma, en la misma
+        sesión del navegador; nada si no hay equivalencia, Chromium o resultado. ``enlace`` es
+        la ficha que dio otra fuente (myabandonware): con ella no se busca."""
         plataforma = nombre_en(game.systemId, "mobygames")
         if plataforma is None:
-            return None
+            return None, ()
         client = self._cliente_scraping(job)
         if client is None:
             log.info("Sin Chromium: la precarga de %s sigue sin MobyGames", game.id)
-            return None
+            return None, ()
         ficha_url = next(
             (
                 p.originUrl
@@ -185,17 +274,26 @@ class MsdosPrecargaService:
                 if p.originUrl and _URL_MOBYGAMES in p.originUrl
             ),
             None,
-        )
+        ) or (enlace if enlace and _URL_MOBYGAMES in enlace else None)
+        moby: FichaCompleta | None = None
         try:
             with client:
-                return buscar_ficha(
+                moby = buscar_ficha(
                     client, game.identity.title, anio or None, plataforma, ficha_url=ficha_url,
                 )
+                if moby is None or not con_portadas:
+                    return moby, ()
+                portadas = buscar_imagenes(
+                    client, game.identity.title, anio or None, plataforma, "caratula",
+                    ficha_url=moby.ficha.url or ficha_url, cuantas=1,
+                )
+                return moby, portadas
         except ProviderHttpError as exc:
             log.warning("MobyGames falló para %s: %s", game.id, exc)
         except Exception:
             log.warning("MobyGames falló para %s", game.id, exc_info=True)
-        return None
+        # Si fallaron las portadas, la ficha ya bajada igual sirve.
+        return moby, ()
 
     def _cliente_scraping(self, job: JobState) -> ScrapingClient | None:
         if not navegador_disponible():
@@ -209,61 +307,95 @@ class MsdosPrecargaService:
             perfil=self.settings.browser_profile_dir,
         )
 
-    def _genero(
+    def _traducir_genero(
         self,
-        moby: FichaCompleta | None,
+        valores: dict[str, _Valor],
         titulo: str,
         job: JobState,
-    ) -> tuple[str, bool]:
-        """El género de MobyGames llega en inglés: se traduce si hay IA y, si no, queda así."""
-        genero = moby.ficha.genre if moby else ""
-        if not genero:
-            return "", False
+    ) -> None:
+        """El género de myabandonware, Launchbox y MobyGames llega en inglés: se traduce si hay
+        IA y, si no, queda así. La procedencia dice si se tradujo."""
+        if "genre" not in valores:
+            return
+        genero, fuente, origen, tipo = valores["genre"]
+        if fuente not in (_SOURCE_MYABANDONWARE, _SOURCE, _SOURCE_MOBYGAMES):
+            return
         traductor = traductor_configurado(self.settings, job.cancel_event)
         if traductor is None:
-            return genero, False
+            return
         try:
             traducido = traductor.lote([genero], titulo=titulo)[0].strip()
         except Exception:
-            log.warning("No se pudo traducir el género de MobyGames", exc_info=True)
-            return genero, False
-        return (traducido, True) if traducido else (genero, False)
+            log.warning("No se pudo traducir el género de %s", fuente, exc_info=True)
+            return
+        if traducido:
+            valores["genre"] = (traducido, f"{fuente} · traducido por IA", origen, tipo)
 
     @staticmethod
     def _valores(
-        moby: FichaCompleta | None,
-        genero: str,
-        genero_traducido: bool,
+        mya: FichaMyAbandonware | None,
+        launchbox_ficha: LaunchboxFicha | None,
         launchbox_year: str,
-        anio_buscado: str = "",
+        *,
+        launchbox_url: str | None = None,
     ) -> dict[str, _Valor]:
+        """Cada campo de identidad con su fuente: myabandonware primero y, lo que no tenga, de
+        la página del juego en Launchbox. Lo que falte después lo completan la IA y MobyGames."""
         valores: dict[str, _Valor] = {}
-        if moby is not None:
-            origen = moby.ficha.url or None
-            fuente = _SOURCE_MOBYGAMES
-            # Si la ficha se eligió por año aproximado (Monkey Island 1990 → la edición VGA
-            # CD-ROM, DOS 1992), su año y su soporte son de otra edición: no se toman.
-            # Desarrollador, editor, género y jugadores son del juego y sí.
-            aproximada = bool(
-                anio_buscado and moby.ficha.year and moby.ficha.year != anio_buscado
-            )
-            unico_formato = moby.specs.formatos[0] if len(moby.specs.formatos) == 1 else ""
+        if mya is not None:
             for key, valor in (
-                ("year", "" if aproximada else moby.ficha.year),
-                ("developer", moby.ficha.developer),
-                ("publisher", moby.ficha.publisher),
-                ("players", moby.specs.players),
-                # Con más de un soporte (disquete y CD) no se elige por el usuario.
-                ("format", "" if aproximada else unico_formato),
+                ("year", mya.year),
+                ("developer", mya.developer),
+                ("publisher", mya.publisher),
+                ("genre", mya.genre),
             ):
                 if valor:
-                    valores[key] = (valor, fuente, origen, "scrape")
-            if genero:
-                fuente_genero = f"{fuente} · traducido por IA" if genero_traducido else fuente
-                valores["genre"] = (genero, fuente_genero, origen, "scrape")
-        if "year" not in valores and launchbox_year:
-            valores["year"] = (launchbox_year, _SOURCE, None, "scrape")
+                    valores[key] = (valor, _SOURCE_MYABANDONWARE, mya.url, "scrape")
+        if launchbox_ficha is not None or launchbox_year:
+            busqueda = LaunchboxSearchResult("", "", "", "", launchbox_url or "", launchbox_year)
+            for key in ("year", "developer", "publisher", "genre", "players"):
+                if key in valores:
+                    continue
+                valor = valor_identidad(key, launchbox_ficha, busqueda)
+                if valor:
+                    valores[key] = (valor, _SOURCE, launchbox_url, "scrape")
         return valores
+
+    @staticmethod
+    def _falta_de_mobygames(game: Any, valores: dict[str, _Valor]) -> bool:
+        """Si queda vacío algo que MobyGames tiene. El formato casi siempre: ninguna otra
+        fuente lo da."""
+        return any(
+            key not in valores and not getattr(game.identity, key, "")
+            for key in _CAMPOS_MOBYGAMES
+        )
+
+    @staticmethod
+    def _completar_con_mobygames(
+        valores: dict[str, _Valor],
+        moby: FichaCompleta | None,
+        anio_buscado: str,
+    ) -> None:
+        """Lo que todavía falta, de la ficha de MobyGames."""
+        if moby is None:
+            return
+        origen = moby.ficha.url or None
+        # Si la ficha se eligió por año aproximado (Monkey Island 1990 → la edición VGA CD-ROM,
+        # DOS 1992), su año y su soporte son de otra edición: no se toman. Desarrollador,
+        # editor, género y jugadores son del juego y sí.
+        aproximada = bool(anio_buscado and moby.ficha.year and moby.ficha.year != anio_buscado)
+        # Con más de un soporte (disquete y CD) no se elige por el usuario.
+        unico_formato = moby.specs.formatos[0] if len(moby.specs.formatos) == 1 else ""
+        for key, valor in (
+            ("year", "" if aproximada else moby.ficha.year),
+            ("developer", moby.ficha.developer),
+            ("publisher", moby.ficha.publisher),
+            ("genre", moby.ficha.genre),
+            ("players", moby.specs.players),
+            ("format", "" if aproximada else unico_formato),
+        ):
+            if valor and key not in valores:
+                valores[key] = (valor, _SOURCE_MOBYGAMES, origen, "scrape")
 
     @staticmethod
     def _faltan_para_ia(game: Any, valores: dict[str, _Valor]) -> list[str]:
@@ -384,6 +516,8 @@ class MsdosPrecargaService:
         valores: dict[str, _Valor],
         launchbox_images: list[Any],
         ia_data: dict[str, str],
+        portada_moby: Imagen | None = None,
+        captura_mya: str | None = None,
     ) -> dict[str, Any]:
         from backend.api.schemas import StoredGame
 
@@ -398,9 +532,19 @@ class MsdosPrecargaService:
         # Texts: sinopsis de IA.
         self._escribir_texts(data, ia_data, escritos, omitidos)
 
-        # Images: de Launchbox.
+        # Images: de Launchbox, que dice cuál captura es de juego. Si no tiene, la carátula de
+        # MobyGames y la primera captura de la plataforma en myabandonware.
         job.progress = 50
         self._escribir_images(game_id, data, launchbox_images, escritos, omitidos, job)
+        if portada_moby is not None and "caratula" not in escritos:
+            self._escribir_imagen(
+                game_id, data, "caratula", portada_moby.media_url, _SOURCE_MOBYGAMES,
+                escritos, omitidos,
+            )
+        if captura_mya and "captura" not in escritos:
+            self._escribir_imagen(
+                game_id, data, "captura", captura_mya, _SOURCE_MYABANDONWARE, escritos, omitidos,
+            )
 
         # Guardar.
         updated = StoredGame.model_validate(data)
@@ -455,6 +599,41 @@ class MsdosPrecargaService:
             "source": _SOURCE_IA,
         }
         escritos.append("sinopsis")
+
+    def _escribir_imagen(
+        self,
+        game_id: str,
+        data: dict[str, Any],
+        key: str,
+        url: str,
+        fuente: str,
+        escritos: list[str],
+        omitidos: list[str],
+    ) -> None:
+        """Una imagen que no es de Launchbox: la portada de MobyGames o una captura de
+        myabandonware, las dos de la edición ya elegida."""
+        if self._imagen_cargada(data, key):
+            if key not in omitidos:
+                omitidos.append(key)
+            return
+        try:
+            local_url = self._download_media(game_id, key, url)
+        except Exception:
+            log.warning("No se pudo bajar %s de %s para %s", key, fuente, game_id)
+            return
+        data.setdefault("images", {})[key] = {
+            "status": "suggested",
+            "url": local_url,
+            "source": fuente,
+        }
+        escritos.append(key)
+
+    def _imagen_cargada(self, data: dict[str, Any], field_key: str) -> bool:
+        actual_url = data.get("images", {}).get(field_key, {}).get("url", "")
+        if not actual_url:
+            return False
+        local = media_path(self.settings.media_dir, actual_url)
+        return local is not None and local.exists()
 
     def _escribir_images(
         self,
@@ -529,6 +708,7 @@ class MsdosPrecargaService:
             or Path(httpx.URL(url).path).suffix.lower()
             or ".jpg"
         )
+        contenido, suffix = sin_gif(response.content, suffix)
 
         system_dir = safe_id(game.systemId)
         game_dir = safe_id(game.id)
@@ -536,8 +716,13 @@ class MsdosPrecargaService:
         asset_name = contract_asset(section, key)
         path = self.settings.media_dir / system_dir / game_dir / f"{asset_name}{suffix}"
 
-        escribir_binario(path, response.content)
+        escribir_binario(path, contenido)
         return f"/media/{system_dir}/{game_dir}/{asset_name}{suffix}"
+
+
+def _tiene_caratula(launchbox_images: list[Any]) -> bool:
+    categorias = next(c for key, c in _IMAGENES if key == "caratula")
+    return any(img.category in categorias for img in launchbox_images)
 
 
 def _suffix_from_content_type(content_type: str) -> str:

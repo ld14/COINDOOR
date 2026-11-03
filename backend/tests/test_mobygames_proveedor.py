@@ -114,7 +114,7 @@ def test_arcade_no_se_consulta(tmp_path: Path) -> None:
 
 
 def test_una_clave_que_no_responde_no_abre_el_navegador(tmp_path: Path) -> None:
-    resultado = _buscar(_provider(tmp_path), "caratula")
+    resultado = _buscar(_provider(tmp_path), "marquesina")
     assert resultado.candidatos == ()
     assert _Cliente.abiertos == 0
 
@@ -139,12 +139,38 @@ def test_registro_construye_mobygames_solo_con_navegador(
 
     monkeypatch.setattr("backend.lib.providers.registro.navegador_disponible", lambda: True)
     con = [p.nombre for p in providers_for("developer", settings)]
-    assert con == ["ArcadeDB", "MobyGames"]
-    assert [p.nombre for p in providers_for("year", settings)] == [
-        "ArcadeDB",
-        "MobyGames",
-        "Launchbox",
-    ]
+    # MobyGames es el último recurso (ADR-0027).
+    assert con == ["ArcadeDB", "MyAbandonware", "Launchbox", "MobyGames"]
+
+
+def test_con_el_enlace_de_otra_fuente_no_busca(tmp_path: Path) -> None:
+    fake = _Cliente()
+    provider = MobyGamesProvider(
+        GamesStore(tmp_path / "juegos"),
+        lambda: cast("ScrapingClient", fake),
+        timeout=60,
+        pace=3.0,
+        enlace=lambda _consulta: "https://www.mobygames.com/game/714/maniac-mansion/",
+    )
+    resultado = _buscar(provider, "developer")
+    assert [c.value for c in resultado.candidatos] == ["Lucasfilm Games"]
+    assert not [url for url in fake.pedidas if "/search/" in url]
+
+
+def test_si_el_enlace_falla_busca_como_siempre(tmp_path: Path) -> None:
+    def enlace(_consulta: Consulta) -> str | None:
+        raise RuntimeError("myabandonware caído")
+
+    fake = _Cliente()
+    provider = MobyGamesProvider(
+        GamesStore(tmp_path / "juegos"),
+        lambda: cast("ScrapingClient", fake),
+        timeout=60,
+        pace=3.0,
+        enlace=enlace,
+    )
+    assert _buscar(provider, "developer").candidatos
+    assert [url for url in fake.pedidas if "/search/" in url]
 
 
 def test_navegador_disponible_busca_chromium_en_la_ruta_de_playwright(

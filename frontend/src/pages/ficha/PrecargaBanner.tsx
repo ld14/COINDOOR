@@ -9,7 +9,7 @@ interface PrecargaBannerProps {
   onComplete: () => void;
 }
 
-/** Progreso de la precarga mientras corre el job (ArcadeDB o LaunchBox + IA). Al terminar avisa con `onComplete`. */
+/** Progreso mientras corre el job que completa la ficha. Al terminar avisa con `onComplete`. */
 export function PrecargaBanner({ jobId, onComplete }: PrecargaBannerProps) {
   const [status, setStatus] = useState<JobStatus>('queued');
   const [progress, setProgress] = useState(0);
@@ -50,18 +50,18 @@ export function PrecargaBanner({ jobId, onComplete }: PrecargaBannerProps) {
   const failed = status === 'failed' || (status === 'succeeded' && jobResult && 'error' in jobResult);
   const notFound = status === 'succeeded' && jobResult?.estado === 'no-encontrado';
   const noRomset = status === 'succeeded' && jobResult?.estado === 'sin-romset';
-  const systemUnsupported = status === 'succeeded' && jobResult?.estado === 'sistema-no-soportado';
+  const sinTitulo = status === 'succeeded' && jobResult?.estado === 'sin-titulo';
   const isActive = status === 'queued' || status === 'running';
 
   if (!isActive && !failed) {
-    if (notFound || noRomset || systemUnsupported) {
+    if (notFound || noRomset || sinTitulo) {
       const reason = notFound
         ? `Romset "${jobResult?.romset}" no encontrado en ArcadeDB.`
         : noRomset
           ? 'El juego no tiene romset definido.'
-          : 'El sistema no es compatible con ArcadeDB.';
+          : 'Hace falta el título para buscar el juego.';
       return (
-        <Card band="var(--accent-2)" title="PRECARGA DE ARCADEDB">
+        <Card band="var(--accent-2)" title="COMPLETAR LA FICHA">
           <p className={styles.meta}>{reason}</p>
         </Card>
       );
@@ -70,16 +70,16 @@ export function PrecargaBanner({ jobId, onComplete }: PrecargaBannerProps) {
   }
 
   return (
-    <Card band="var(--accent-2)" title="PRECARGA DE ARCADEDB">
+    <Card band="var(--accent-2)" title="COMPLETAR LA FICHA">
       <div className={styles.stack}>
         <div className={styles.filaProgreso}>
-          <span className={styles.nombre}>{failed ? 'Error en la precarga' : 'Buscando datos en ArcadeDB…'}</span>
+          <span className={styles.nombre}>{failed ? 'Error al completar la ficha' : 'Buscando datos en las fuentes…'}</span>
           <span className={styles.meta}>{progress}%</span>
         </div>
         <ProgressBar state={failed ? 'error' : 'active'} value={progress} />
         {error ? <p className={styles.error}>{error}</p> : null}
         {failed ? (
-          <p className={styles.error}>La precarga falló. Podés reintentar desde la ficha del juego.</p>
+          <p className={styles.error}>No se pudo completar. Podés reintentar desde la ficha del juego.</p>
         ) : null}
       </div>
     </Card>

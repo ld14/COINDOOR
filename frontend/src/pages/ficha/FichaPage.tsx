@@ -146,7 +146,11 @@ export function FichaPage({
     target.blur();
   };
 
-  const api = useMemo<FichaAutosaveApi>(() => ({ markDirty: autosave.markDirty, aceptar: onAcceptKey }), [autosave.markDirty, onAcceptKey]);
+  const api = useMemo<FichaAutosaveApi>(() => ({
+    markDirty: autosave.markDirty,
+    aceptar: onAcceptKey,
+    pendiente: autosave.dirty,
+  }), [autosave.markDirty, autosave.dirty, onAcceptKey]);
 
   const envolver = (s: FichaSeccion) => (
     <section

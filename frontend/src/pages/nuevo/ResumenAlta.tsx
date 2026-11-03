@@ -6,15 +6,13 @@ interface Props {
   sistema: string;
   tratamiento: string;
   titulo: string;
-  /** null = el sistema no tiene precarga. */
-  precargaLabel: string | null;
   precarga: boolean;
   onPrecarga: (valor: boolean) => void;
   creando: boolean;
   onCrear: () => void;
 }
 
-export function ResumenAlta({ archivo, sistema, tratamiento, titulo, precargaLabel, precarga, onPrecarga, creando, onCrear }: Props) {
+export function ResumenAlta({ archivo, sistema, tratamiento, titulo, precarga, onPrecarga, creando, onCrear }: Props) {
   const fila = (etiqueta: string, valor: string, mono = false) => (
     <div className={styles.sumRow}>
       <dt>{etiqueta}</dt>
@@ -31,8 +29,8 @@ export function ResumenAlta({ archivo, sistema, tratamiento, titulo, precargaLab
         {fila('Título', titulo)}
       </dl>
       <label className={styles.check}>
-        <input checked={precargaLabel !== null && precarga} disabled={precargaLabel === null} onChange={(event) => onPrecarga(event.target.checked)} type="checkbox" />
-        <span>{precargaLabel ?? 'Este sistema no tiene precarga'}</span>
+        <input checked={precarga} onChange={(event) => onPrecarga(event.target.checked)} type="checkbox" />
+        <span>Completar la ficha al crear</span>
       </label>
       <DosButton disabled={creando} onClick={onCrear} variant="primary">
         {creando ? 'Creando…' : 'Crear ficha y empezar a cargar →'}

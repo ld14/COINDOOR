@@ -55,6 +55,10 @@ de seis meses alguien —tú, o Claude— vuelve a proponer justo lo que ya desc
 | [0023](0023-estetica-flyer-reemplaza-dos.md) | La estética "Flyer 80s" reemplaza a la estética DOS | accepted | 2026-10-08 |
 | [0024](0024-scrapling-y-mobygames-para-pc-dos.md) | Scrapling como motor de scraping y MobyGames como fuente de PC/DOS | accepted | 2026-10-21 |
 | [0025](0025-precalentar-mobygames-al-arrancar.md) | Precalentar MobyGames al arrancar con una página de búsqueda en segundo plano | accepted | 2026-10-29 |
+| [0026](0026-ia-ultimo-recurso-en-sugerir-identidad.md) | La IA vuelve a "Sugerir" identidad como último recurso, marcada como IA | accepted | 2026-10-29 |
+| [0027](0027-myabandonware-primera-fuente-de-pc-dos.md) | myabandonware es la primera fuente de PC/DOS y MobyGames queda como último recurso | accepted | 2026-10-30 |
+| [0028](0028-la-precarga-completa-toda-la-ficha.md) | La precarga completa toda la ficha, en todos los sistemas, y juzga qué imagen va en cada casillero | accepted | 2026-10-31 |
+| [0029](0029-recorte-de-videos-largos-de-youtube.md) | Recortar a sus primeros 3 minutos los videos de YouTube de más de 10, en vez de rechazarlos | accepted | 2026-10-31 |
 
 Los seis últimos salen del análisis de arquitectura de
 [`docs/arquitectura/`](../../docs/arquitectura/README.md), que conserva la comparación

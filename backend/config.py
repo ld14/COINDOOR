@@ -60,6 +60,11 @@ class Settings(BaseSettings):
         return self.data_dir / "navegador"
 
     @property
+    def myabandonware_dir(self) -> Path:
+        """El índice de juegos de myabandonware.com (su ``sitemap``), renovado cada 30 días."""
+        return self.data_dir / "myabandonware"
+
+    @property
     def config_path(self) -> Path:
         return self.data_dir / "configuracion.json"
 

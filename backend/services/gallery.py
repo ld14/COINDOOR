@@ -1,8 +1,9 @@
 """Banco de imagenes por juego, aparte de los cinco campos del contrato.
 
-Tres fuentes de imágenes:
+Cuatro fuentes de imágenes:
 - ArcadeDB: publica entre 8 y 16 tipos por romset (flyer, marquee, cpanel, etc.)
-- ImageSearch: imágenes de DuckDuckGo de fuentes confiables
+- MyAbandonware: capturas de la plataforma del juego (hoy, solo MS-DOS)
+- ImageSearch: imágenes de DuckDuckGo de fuentes confiables, de los cinco casilleros
 - Launchbox: imágenes categorizadas de Games Database
 
 La galeria conserva todas: se listan, se eligen y se guardan en
@@ -30,7 +31,7 @@ from backend.lib.domain.arcade import soporta_arcadedb
 from backend.lib.domain.fielddefs import image_keys
 from backend.lib.domain.gallery import label_para
 from backend.lib.jobs.registro import JobState
-from backend.lib.media import ext_por_magic
+from backend.lib.media import ext_por_magic, sin_gif
 from backend.lib.providers.arcadedb.cliente import fetch_con_padre
 from backend.lib.providers.base import Consulta, Limite
 from backend.lib.providers.http import ProviderHttpClient
@@ -40,7 +41,9 @@ from backend.lib.providers.launchbox.cliente import (
 from backend.lib.providers.launchbox.cliente import (
     search_game as launchbox_search_game,
 )
+from backend.lib.providers.myabandonware.proveedor import MyAbandonwareProvider
 from backend.lib.providers.referencia.images import ImageSearchProvider
+from backend.lib.providers.registro import proveedor_mobygames
 from backend.store.archivo import escribir_binario, safe_id
 from backend.store.cuotas import QuotasStore
 from backend.store.juegos import GamesStore
@@ -62,10 +65,14 @@ class GuardarGaleriaItem(BaseModel):
 
 _SOURCE_ARCADEDB = "ArcadeDB"
 _SOURCE_ARCADEDB_PADRE = "ArcadeDB (romset padre)"
+_SOURCE_MYABANDONWARE = "MyAbandonware"
 _SOURCE_IMAGESEARCH = "ImageSearch"
 _SOURCE_LAUNCHBOX = "Launchbox"
+_SOURCE_MOBYGAMES = "MobyGames"
 _LIMITE = Limite()
 _SUBCARPETA = "_gallery"
+# Responden 403 a la descarga: se ofrecerían para fallar después. cdn.mobygames.com sí baja.
+_RUTA_SIN_DESCARGA = "://www.mobygames.com/images/"
 
 
 class GalleryService:
@@ -77,12 +84,15 @@ class GalleryService:
     # -- candidatos ---------------------------------------------------------
 
     def candidatos(
-        self, game_id: str, *, source: str | None = None,
+        self, game_id: str, *, source: str | None = None, clave: str | None = None,
     ) -> list[dict[str, Any]]:
-        """Imágenes disponibles de las tres fuentes: ArcadeDB, ImageSearch, Launchbox.
+        """Imágenes de todas las fuentes: ArcadeDB, MyAbandonware, Launchbox, MobyGames e
+        ImageSearch. La galería es un banco que elige el usuario: suma, sin orden de cadena.
 
-        Si se pasa ``source``, solo consulta esa fuente (para reintentos individuales).
-        Sincrono: fetch memoizado (ArcadeDB) + requests a DDG y Launchbox.
+        Si se pasa ``source``, solo consulta esa fuente (para reintentos individuales), y
+        ``clave`` limita ImageSearch a un casillero: sumando los cinco son minutos, y así los
+        resultados llegan de a tandas.
+        Sincrono: fetch memoizado (ArcadeDB) + requests a las demás.
         Un romset desconocido no devuelve error, solo no muestra ArcadeDB.
         """
         game = self.games.get(game_id)
@@ -103,27 +113,52 @@ class GalleryService:
                 except Exception:
                     log.warning("Gallery: ArcadeDB failed for %s", game_id, exc_info=True)
 
-        # 2. ImageSearch (todos los sistemas)
+        # 2. MyAbandonware (los sistemas de su catálogo)
+        if (source is None or source == _SOURCE_MYABANDONWARE) and game.identity.title:
+            try:
+                candidatos.extend(
+                    self._candidatos_myabandonware(
+                        game_id, game.identity.title, system.name, game.identity.year,
+                    )
+                )
+            except Exception:
+                log.warning("Gallery: MyAbandonware failed for %s", game_id, exc_info=True)
+
+        # 3. ImageSearch (todos los sistemas)
         if (source is None or source == "ImageSearch") and game.identity.title:
             try:
                 candidatos.extend(
                     self._candidatos_imagesearch(
-                        game_id, game.identity.title, system.name, ya_guardados_urls,
+                        game_id, game.identity.title, system.name, game.identity.year,
+                        ya_guardados_urls, clave,
                     )
                 )
             except Exception:
                 log.warning("Gallery: ImageSearch failed for %s", game_id, exc_info=True)
 
-        # 3. Launchbox (todos los sistemas)
+        # 4. Launchbox (todos los sistemas)
         if (source is None or source == "Launchbox") and game.identity.title:
             try:
                 candidatos.extend(
                     self._candidatos_launchbox(
-                        game_id, game.identity.title, system.name, ya_guardados_urls,
+                        game_id, game.identity.title, system.name, game.identity.year,
+                        ya_guardados_urls,
                     )
                 )
             except Exception:
                 log.warning("Gallery: Launchbox failed for %s", game_id, exc_info=True)
+
+        # 5. MobyGames (las plataformas de su catálogo)
+        if (source is None or source == _SOURCE_MOBYGAMES) and game.identity.title:
+            try:
+                candidatos.extend(
+                    self._candidatos_mobygames(
+                        game_id, game.identity.title, system.name, game.identity.year,
+                        ya_guardados_urls,
+                    )
+                )
+            except Exception:
+                log.warning("Gallery: MobyGames failed for %s", game_id, exc_info=True)
 
         return candidatos
 
@@ -151,21 +186,59 @@ class GalleryService:
             for tipo, url in sorted(juego.images.items(), key=lambda par: label_para(par[0]))
         ]
 
+    def _candidatos_myabandonware(
+        self, game_id: str, title: str, system: str, year: str,
+    ) -> list[dict[str, Any]]:
+        quotas = QuotasStore(self.settings.quotas_path)
+
+        def fabricar() -> ProviderHttpClient:
+            return ProviderHttpClient(
+                "myabandonware",
+                MyAbandonwareProvider.limite,
+                quotas,
+                timeout=MyAbandonwareProvider.timeout,
+            )
+
+        provider = MyAbandonwareProvider(fabricar, self.settings.myabandonware_dir)
+        result = provider.buscar(Consulta(game_id, "captura", title, system, year or None))
+        return [
+            {
+                "id": c.id,
+                "tipo": None,
+                "label": c.nombre,
+                "url": c.media_url,
+                "previewUrl": c.preview_url,
+                "origenUrl": c.origen_url,
+                "delPadre": False,
+                "yaGuardada": False,
+                "source": _SOURCE_MYABANDONWARE,
+            }
+            for c in result.candidatos
+        ]
+
     def _candidatos_imagesearch(
-        self, game_id: str, title: str, system: str, ya_guardados_urls: set[str],
+        self,
+        game_id: str,
+        title: str,
+        system: str,
+        year: str,
+        ya_guardados_urls: set[str],
+        clave: str | None = None,
     ) -> list[dict[str, Any]]:
         provider = ImageSearchProvider()
         candidatos: list[dict[str, Any]] = []
         seen_urls: set[str] = set()
 
-        # Consultar los campos más útiles para la galería
-        for key in ("caratula", "captura", "marquesina"):
-            consulta = Consulta(game_id, key, title, system, None)
+        # El año acerca la edición de la ficha: sin él vienen las secuelas (feature 022).
+        for key in sorted(image_keys() if clave is None else {clave} & set(image_keys())):
+            consulta = Consulta(game_id, key, title, system, year or None)
             result = provider.buscar(consulta)
             for _i, c in enumerate(result.candidatos):
                 if c.kind != "media" or not c.media_url:
                     continue
                 if c.media_url in seen_urls or c.media_url in ya_guardados_urls:
+                    continue
+                if _RUTA_SIN_DESCARGA in c.media_url.lower():
                     continue
                 seen_urls.add(c.media_url)
                 candidatos.append({
@@ -182,13 +255,13 @@ class GalleryService:
         return candidatos
 
     def _candidatos_launchbox(
-        self, game_id: str, title: str, system: str, ya_guardados_urls: set[str],
+        self, game_id: str, title: str, system: str, year: str, ya_guardados_urls: set[str],
     ) -> list[dict[str, Any]]:
-        result = launchbox_search_game(title, system)
+        result = launchbox_search_game(title, system, anio=year or None)
         if result is None:
             return []
 
-        images = launchbox_fetch_images(result.game_id, result.slug)
+        images = launchbox_fetch_images(result.game_id, result.slug, todas=True)
         candidatos = []
         for i, img in enumerate(images):
             candidatos.append({
@@ -202,6 +275,33 @@ class GalleryService:
                 "yaGuardada": img.media_url in ya_guardados_urls,
                 "source": _SOURCE_LAUNCHBOX,
             })
+        return candidatos
+
+    def _candidatos_mobygames(
+        self, game_id: str, title: str, system: str, year: str, ya_guardados_urls: set[str],
+    ) -> list[dict[str, Any]]:
+        provider = proveedor_mobygames(self.settings)
+        if provider is None:
+            return []
+        candidatos: list[dict[str, Any]] = []
+        for key in ("caratula", "captura"):
+            result = provider.buscar(Consulta(game_id, key, title, system, year or None))
+            for c in result.candidatos:
+                if c.clase != "aplicable" or not c.media_url:
+                    continue
+                if _RUTA_SIN_DESCARGA in c.media_url.lower():
+                    continue
+                candidatos.append({
+                    "id": c.id,
+                    "tipo": None,
+                    "label": c.nombre,
+                    "url": c.media_url,
+                    "previewUrl": c.preview_url,
+                    "origenUrl": c.origen_url,
+                    "delPadre": False,
+                    "yaGuardada": c.media_url in ya_guardados_urls,
+                    "source": _SOURCE_MOBYGAMES,
+                })
         return candidatos
 
     # -- guardar ------------------------------------------------------------
@@ -348,10 +448,12 @@ class GalleryService:
 
         # Por contenido y no por el nombre de la URL: ArcadeDB sirve todo desde
         # endpoints .php, sin extension util en el path.
-        suffix = ext_por_magic(response.content[:16]) or ".png"
+        contenido, suffix = sin_gif(
+            response.content, ext_por_magic(response.content[:16]) or ".png",
+        )
         nombre = f"g{numero:03d}{suffix}"
         system_dir, game_dir = safe_id(game.systemId), safe_id(game.id)
-        escribir_binario(self._carpeta(game.systemId, game.id) / nombre, response.content)
+        escribir_binario(self._carpeta(game.systemId, game.id) / nombre, contenido)
         return GalleryImage(
             id=f"{tipo}-{numero:03d}",
             tipo=tipo,

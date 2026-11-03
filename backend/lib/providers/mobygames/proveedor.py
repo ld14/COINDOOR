@@ -1,7 +1,8 @@
-"""Proveedor MobyGames: sugiere identidad, sinopsis y nota de críticos para PC/DOS.
+"""Proveedor MobyGames: sugiere identidad, sinopsis, nota de críticos e imágenes para PC/DOS.
 
 No sabe de navegadores: recibe una fábrica de ``ScrapingClient``. Su gate es el catálogo de
-plataformas: un sistema sin equivalencia en MobyGames (arcade incluido) no se consulta.
+plataformas: un sistema sin equivalencia en MobyGames (arcade incluido) no se consulta. Es el
+último recurso de las cadenas (ADR-0027): el orquestador lo consulta solo si falta el dato.
 """
 
 from __future__ import annotations
@@ -19,13 +20,19 @@ from backend.lib.providers.base import (
     ProviderResult,
     ProviderTrace,
 )
-from backend.lib.providers.mobygames.cliente import FichaCompleta, buscar_ficha
+from backend.lib.providers.mobygames.cliente import (
+    FichaCompleta,
+    Imagen,
+    buscar_ficha,
+    buscar_imagenes,
+)
 from backend.lib.providers.scraping import ScrapingClient
 from backend.store.juegos import GamesStore
 
 log = logging.getLogger(__name__)
 
 _URL_FICHA = "mobygames.com/game/"
+_IMAGENES = frozenset({"caratula", "captura"})
 
 
 class MobyGamesProvider:
@@ -34,7 +41,7 @@ class MobyGamesProvider:
     campos: frozenset[str] = frozenset(
         {
             "title", "year", "developer", "publisher", "genre", "players", "format",
-            "sinopsis", "review",
+            "sinopsis", "review", "caratula", "captura",
         }
     )
 
@@ -45,11 +52,14 @@ class MobyGamesProvider:
         *,
         timeout: float,
         pace: float,
+        enlace: Callable[[Consulta], str | None] | None = None,
     ) -> None:
         self.games = games
         self._client_factory = client_factory
         self.timeout = timeout
         self.limite = Limite(espera_min=pace)
+        # La ficha que enlaza otra fuente (myabandonware): con ella no se busca.
+        self._enlace = enlace
 
     def buscar(self, consulta: Consulta) -> ProviderResult:
         trace = ProviderTrace(self.nombre, self.tipo, "sin resultados")
@@ -60,13 +70,29 @@ class MobyGamesProvider:
             sin_equivalencia = ProviderTrace(self.nombre, self.tipo, "plataforma sin equivalencia")
             return ProviderResult((), sin_equivalencia)
 
+        ficha_url = self._url_conocida(consulta.game_id) or self._url_enlazada(consulta)
+        if consulta.key in _IMAGENES:
+            with self._client_factory() as client:
+                imagenes = buscar_imagenes(
+                    client,
+                    consulta.title,
+                    consulta.year,
+                    plataforma,
+                    consulta.key,
+                    ficha_url=ficha_url,
+                )
+            candidatos = self._imagenes(consulta.key, imagenes)
+            if candidatos:
+                trace = ProviderTrace(self.nombre, self.tipo, "ok")
+            return ProviderResult(tuple(candidatos), trace)
+
         with self._client_factory() as client:
             completa = buscar_ficha(
                 client,
                 consulta.title,
                 consulta.year,
                 plataforma,
-                ficha_url=self._url_conocida(consulta.game_id),
+                ficha_url=ficha_url,
             )
         if completa is None:
             return ProviderResult((), trace)
@@ -86,6 +112,35 @@ class MobyGamesProvider:
             if _URL_FICHA in url:
                 return url
         return None
+
+    def _url_enlazada(self, consulta: Consulta) -> str | None:
+        """El enlace a MobyGames de otra fuente; si falla, MobyGames busca como siempre."""
+        if self._enlace is None:
+            return None
+        try:
+            url = self._enlace(consulta)
+        except Exception:
+            log.warning("Sin enlace a MobyGames para %s", consulta.game_id, exc_info=True)
+            return None
+        return url if url and _URL_FICHA in url else None
+
+    def _imagenes(self, key: str, imagenes: tuple[Imagen, ...]) -> list[Candidato]:
+        trace = ProviderTrace(self.nombre, self.tipo, "ok")
+        return [
+            Candidato(
+                id=f"mobygames:{imagen.origen_url}:{key}:{i}",
+                key=key,
+                kind="media",
+                nombre=f"{imagen.etiqueta} (MobyGames)",
+                fuente=self.nombre,
+                clase="aplicable",
+                media_url=imagen.media_url,
+                preview_url=imagen.preview_url,
+                origen_url=imagen.origen_url,
+                trace=trace,
+            )
+            for i, imagen in enumerate(imagenes)
+        ]
 
     def _mapear(self, key: str, completa: FichaCompleta) -> list[Candidato]:
         ficha, specs = completa.ficha, completa.specs

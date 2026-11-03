@@ -15,7 +15,7 @@
 | HTTP saliente | httpx (sincrónico) | — | [`0006`](../decisions/0006-fuentes-externas-multiproveedor.md) |
 | Descarga de video | yt-dlp como librería (`yt-dlp[default]`, incluye `yt-dlp-ejs`) | ≥2026.8.19 | [`0020`](../decisions/0020-descarga-de-video-youtube.md) |
 | Runtime JS de yt-dlp | Deno, en el host | ≥2.3 | [`0020`](../decisions/0020-descarga-de-video-youtube.md) |
-| Video: remux y transcode | ffmpeg, en el host | — | [`0020`](../decisions/0020-descarga-de-video-youtube.md) |
+| Video: remux y transcode; GIF a PNG | ffmpeg, en el host | — | [`0020`](../decisions/0020-descarga-de-video-youtube.md) |
 | PDF → páginas | pymupdf | — | — |
 | Imágenes / miniaturas / acento | Pillow | — | — |
 | Configuración: credenciales | pydantic-settings + `.env` fuera del repo | — | — |
@@ -261,7 +261,8 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
 - **Todo lo que sale a la red es a pedido del usuario.** Nada corre en segundo plano, ni al
   abrir una ficha, ni al guardar. **Dos excepciones:**
   - la precarga al dar de alta un juego ([`ADR-0015`](../decisions/0015-precarga-con-red-al-alta.md)
-    para arcade, ampliada a MS-DOS por [`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md)),
+    para arcade, ampliada a MS-DOS por [`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md)
+    y a toda la ficha y todos los sistemas por [`ADR-0028`](../decisions/0028-la-precarga-completa-toda-la-ficha.md)),
     acotada a un endpoint con nombre propio, un juego por vez, solo sobre campos vacíos y
     cancelable;
   - el precalentamiento de MobyGames al arrancar
@@ -327,7 +328,9 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
 - **Cargar, editar y exportar funcionan sin internet.** Solo salen a la red las
   sugerencias, la precarga de ArcadeDB ([`ADR-0015`](../decisions/0015-precarga-con-red-al-alta.md))
   y la descarga de video de YouTube a pedido
-  ([`ADR-0020`](../decisions/0020-descarga-de-video-youtube.md)): solo YouTube, hasta 10 min,
+  ([`ADR-0020`](../decisions/0020-descarga-de-video-youtube.md)): solo YouTube; un video de más
+  de 10 min se guarda con sus primeros 3 min
+  ([`ADR-0029`](../decisions/0029-recorte-de-videos-largos-de-youtube.md)),
   MP4 H.264 de 720p o menos.
 - **Sin base de datos.** Descartadas SQLite (con y sin ORM), las bases documentales
   embebidas y el archivo único con toda la colección
@@ -353,11 +356,22 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
   auxiliar fuera de COINDOOR, Scrapling como extra opcional y las APIs oficiales de
   MobyGames, SteamGridDB y ScreenScraper
   ([`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md)).
-- **En las sugerencias, la identidad nunca la propone una IA**, en ningún sistema. Sale de
-  ArcadeDB (arcade), de MobyGames (el resto) o de una persona
-  ([`ADR-0004`](../decisions/0004-coindoor-fuente-identidad-no-mame.md)). La única excepción
-  es la precarga del alta de MS-DOS: ahí la IA completa solo lo que MobyGames y Launchbox no
-  tuvieron ([`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md), punto 4).
+- **La identidad sale de fuentes factuales**: ArcadeDB (arcade); myabandonware, Launchbox y
+  MobyGames (PC/DOS); o una persona
+  ([`ADR-0004`](../decisions/0004-coindoor-fuente-identidad-no-mame.md)). En PC/DOS el orden es
+  myabandonware → Launchbox → IA → MobyGames, y MobyGames se consulta solo para el campo que
+  ninguna fuente anterior tuvo
+  ([`ADR-0027`](../decisions/0027-myabandonware-primera-fuente-de-pc-dos.md)). La IA solo
+  propone desarrollador, editor, género y jugadores **cuando ni myabandonware ni Launchbox
+  tuvieron el dato**: en "Sugerir", marcada como IA
+  ([`ADR-0026`](../decisions/0026-ia-ultimo-recurso-en-sugerir-identidad.md)); en la precarga
+  del alta de MS-DOS, completando lo que faltó. Título, año y formato nunca salen de una IA.
+- **Toda fuente que busca por título elige con la misma regla**
+  (`lib/providers/coincidencia.py`): título exacto primero, plataforma y año; sin una
+  coincidencia clara, ninguna. Elegir otro juego contamina la ficha
+  ([feature 022](../features/022-edicion-correcta-en-las-fuentes/spec.md)). myabandonware no
+  tiene buscador (encuentra el juego en su `sitemap`) y solo acepta el título o un nombre
+  alternativo exacto ([`ADR-0027`](../decisions/0027-myabandonware-primera-fuente-de-pc-dos.md)).
 - **Instalar el bundle en ATTRACT es un subproceso al instalador que ya existe en
   `../attract` (`install-coindoor-wsl.sh`), nunca lógica reimplementada en Python.**
   Misma regla que `attract doctor`: se confía en el código de salida, no se parsea la

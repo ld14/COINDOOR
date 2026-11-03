@@ -13,6 +13,7 @@ from backend.lib.providers.ia.generador import AiModelConfig, IaGenerador
 from backend.lib.providers.ia.trucos_web import TavilyClient, TrucosWebGenerador
 from backend.lib.providers.launchbox.proveedor import LaunchboxImageProvider
 from backend.lib.providers.mobygames.proveedor import MobyGamesProvider
+from backend.lib.providers.myabandonware.proveedor import MyAbandonwareProvider
 from backend.lib.providers.referencia.images import ImageSearchProvider
 from backend.lib.providers.referencia.youtube import YoutubeReferenceProvider
 from backend.lib.providers.scraping import ScrapingClient, navegador_disponible
@@ -20,28 +21,45 @@ from backend.store.cuotas import QuotasStore
 from backend.store.juegos import GamesStore
 
 # Tabla campo → proveedores, en orden. Sumar una fuente es una fila; ver ADR-0013.
-# La identidad nunca la propone una IA (ADR-0004, ADR-0024 punto 4).
-_ARCADEDB_IDENTITY = ("arcadedb", "mobygames")
-_ARCADEDB_TEXT = ("arcadedb", "mobygames", "ia_primary", "ia_backup")
+# El orden de PC/DOS es el de ADR-0027: myabandonware, Launchbox, la IA y, al final, MobyGames.
+# Ninguna cadena de identidad tiene IA: si ninguna fuente tiene el dato, el orquestador la
+# consulta como último recurso (ADR-0026), antes de las fuentes de ULTIMO_RECURSO.
+_IDENTIDAD = ("arcadedb", "myabandonware", "launchbox", "mobygames")
+_TITULO = ("arcadedb", "myabandonware", "mobygames")
+# myabandonware no da jugadores (su `playMode` dice "SinglePlayer" en todos los juegos) y solo
+# MobyGames da el formato.
+_JUGADORES = ("arcadedb", "launchbox", "mobygames")
+_FORMATO = ("arcadedb", "mobygames")
+_SINOPSIS = ("arcadedb", "myabandonware", "ia_primary", "ia_backup", "mobygames")
 # Trucos NO caen a los modelos a secas: sin evidencia devuelven vacíos falsos y
 # códigos inventados, que es peor que no sugerir nada (ADR-0019).
 _ARCADEDB_CHEATS = ("arcadedb", "trucos_web")
-_ARCADEDB_IMAGE = ("arcadedb", "image_search", "launchbox")
+# Imágenes: primero las de la edición y al final el buscador, que no sabe de ediciones
+# (feature 022). myabandonware no tiene carátulas.
+_CARATULA = ("arcadedb", "launchbox", "mobygames", "image_search")
+_CAPTURA = ("arcadedb", "myabandonware", "launchbox", "mobygames", "image_search")
+_ARCADEDB_IMAGE = ("arcadedb", "launchbox", "image_search")
 _ARCADEDB_VIDEO = ("arcadedb", "youtube_referencia")
-# El año de Launchbox va al final: es el más impreciso de los tres.
-_YEAR = ("arcadedb", "mobygames", "launchbox")
 
 _TABLE: dict[str, tuple[str, ...]] = {
-    **{key: _ARCADEDB_IDENTITY for key in identity_keys()},
+    **{key: _IDENTIDAD for key in identity_keys()},
+    "title": _TITULO,
+    "players": _JUGADORES,
+    "format": _FORMATO,
     **{key: _ARCADEDB_IMAGE for key in image_keys()},
-    "sinopsis": _ARCADEDB_TEXT,
+    "caratula": _CARATULA,
+    "captura": _CAPTURA,
+    "sinopsis": _SINOPSIS,
     # ArcadeDB no tiene un "objetivo": solo la IA, y siempre como candidato a revisar.
     **{key: ("ia_primary", "ia_backup") for key in ("objetivo", "primerosPasos", "reglasEsenciales", "modo")},  # noqa: E501
-    "review": ("mobygames", "ia_primary", "ia_backup"),
+    "review": ("ia_primary", "ia_backup"),
     "cheats": _ARCADEDB_CHEATS,
     "video": _ARCADEDB_VIDEO,
-    "year": _YEAR,
 }
+
+# Fuentes de último recurso (ADR-0027): se consultan solo si ninguna fuente anterior de la
+# cadena dio un candidato para el campo, y la IA de respaldo va antes que ellas.
+ULTIMO_RECURSO = frozenset({MobyGamesProvider.nombre})
 
 
 def providers_for(
@@ -56,6 +74,22 @@ def providers_for(
         if provider is not None:
             providers.append(provider)
     return tuple(providers)
+
+
+def proveedor_mobygames(settings: Settings) -> MobyGamesProvider | None:
+    """MobyGames fuera de una cadena: la galería suma todas las fuentes, no las recorre en orden."""
+    return _mobygames_provider(settings, QuotasStore(settings.quotas_path), None)
+
+
+def proveedores_ia(
+    settings: Settings,
+    cancel_event: threading.Event | None = None,
+) -> Sequence[Proveedor]:
+    """Los modelos configurados, primario y respaldo: el último recurso de la identidad
+    (ADR-0026), que el orquestador consulta solo si ninguna fuente factual tuvo el dato."""
+    quotas = QuotasStore(settings.quotas_path)
+    modelos = (_build(name, settings, quotas, cancel_event) for name in ("ia_primary", "ia_backup"))
+    return tuple(modelo for modelo in modelos if modelo is not None)
 
 
 def _build(
@@ -88,6 +122,8 @@ def _build(
         return LaunchboxImageProvider()
     if name == "arcadedb":
         return _arcadedb_provider(settings, quotas, cancel_event)
+    if name == "myabandonware":
+        return _myabandonware_provider(settings, quotas, cancel_event)
     if name == "mobygames":
         return _mobygames_provider(settings, quotas, cancel_event)
     raise ValueError(f"Proveedor desconocido: {name}")
@@ -194,9 +230,31 @@ def _mobygames_provider(
             perfil=settings.browser_profile_dir,
         )
 
+    # myabandonware enlaza la ficha de MobyGames del juego: con ella no hace falta buscar.
+    myabandonware = _myabandonware_provider(settings, quotas, cancel_event)
     return MobyGamesProvider(
         GamesStore(settings.games_dir),
         cliente,
         timeout=settings.scraping_timeout,
         pace=settings.scraping_pace,
+        enlace=myabandonware.enlace_mobygames,
     )
+
+
+def _myabandonware_provider(
+    settings: Settings,
+    quotas: QuotasStore,
+    cancel_event: threading.Event | None,
+) -> MyAbandonwareProvider:
+    """HTTP común, sin navegador: el sitio no tiene Cloudflare (ADR-0027)."""
+
+    def http() -> ProviderHttpClient:
+        return ProviderHttpClient(
+            "myabandonware",
+            MyAbandonwareProvider.limite,
+            quotas,
+            timeout=MyAbandonwareProvider.timeout,
+            cancel_event=cancel_event,
+        )
+
+    return MyAbandonwareProvider(http, settings.myabandonware_dir)

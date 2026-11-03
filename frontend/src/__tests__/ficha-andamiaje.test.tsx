@@ -145,6 +145,15 @@ describe('Andamiaje de la ficha', () => {
     expect(await screen.findByText(/Error al guardar/)).toBeInTheDocument();
   });
 
+  it('«Completar lo que falta» lanza el job en cualquier sistema', async () => {
+    renderApp('/juegos/sonic');
+    await screen.findByRole('heading', { name: 'Sonic The Hedgehog' });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Completar lo que falta' }));
+
+    await waitFor(() => expect(llamadasA('POST', '/games/sonic/completar')).toHaveLength(1));
+  });
+
   it('el banner de precarga cuenta lo que esperó revisión y «Aceptar todo» lo resuelve', async () => {
     renderApp('/juegos/contra');
     await screen.findByRole('heading', { name: 'Contra' });

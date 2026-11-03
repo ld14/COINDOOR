@@ -56,6 +56,10 @@ Además hay bugs visibles (contadores en 0, Exportar sin id, labels en inglés).
 - [ ] Los tests existentes siguen pasando; se suman los de `useFichaProgress` y del mapeo
       de origen.
 
+- [x] Dado un campo controlado dentro de la ficha, cuando se escribe o se pega con la ficha sin
+      cambios pendientes, entonces el valor queda en el campo: el autosave marca la sección
+      después de que React lee el cambio (agregado el 2026-10-31).
+
 ## Fuera de alcance
 
 - Cambiar contratos de API o el modelo de datos, salvo conservar `source` al aceptar

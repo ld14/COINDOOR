@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Card, DosButton, DosSelect, Modal, Spinner } from '@/components/dos';
 import { ImageModal } from '@/components/ImageModal';
 import {
@@ -8,11 +8,18 @@ import {
   useGalleryImageAs as aplicarImagenGaleria,
   type GalleryCandidate,
   type GuardarGaleriaItem,
+  type ResultadoGuardado,
 } from '@/lib/api/gallery';
 import { getJob } from '@/lib/api/jobs';
 import { FIELDDEFS } from '@/lib/domain/types';
 import type { GalleryImage, ImageKey } from '@/lib/domain/types';
 import styles from './GalleryPanel.module.css';
+
+// Se piden por separado: el buscador tarda minutos y las demás no tienen por qué esperarlo.
+const TODAS_LAS_FUENTES = ['ArcadeDB', 'MyAbandonware', 'Launchbox', 'MobyGames', 'ImageSearch'];
+// El buscador va de a un casillero, y de a uno por vez: cada tanda aparece cuando llega en vez
+// de hacer esperar un par de minutos por todas juntas.
+const CASILLEROS_DEL_BUSCADOR: ImageKey[] = ['caratula', 'captura', 'poster', 'logo', 'marquesina'];
 
 interface GalleryPanelProps {
   gameId: string;
@@ -30,8 +37,8 @@ export function GalleryPanel({ gameId, gallery, onChanged, bare = false }: Galle
     <>
       <div className={styles.stack}>
         <p className={styles.meta}>
-          Banco de imágenes de ArcadeDB, ImageSearch y Launchbox, aparte de los campos del
-          contrato. Viaja en el paquete si tildás Galería al exportar.
+          Banco de imágenes de ArcadeDB, MyAbandonware, ImageSearch y Launchbox, aparte de los
+          campos del contrato. Viaja en el paquete si tildás Galería al exportar.
         </p>
         {error ? <p className={styles.error}>{error}</p> : null}
         {gallery.length === 0 ? (
@@ -51,7 +58,7 @@ export function GalleryPanel({ gameId, gallery, onChanged, bare = false }: Galle
         )}
         <div className={styles.toolbar}>
           <DosButton onClick={() => setPickerOpen(true)} size="sm" variant="secondary">
-            Traer de ArcadeDB / LaunchBox
+            Traer de todas las fuentes
           </DosButton>
         </div>
       </div>
@@ -59,8 +66,9 @@ export function GalleryPanel({ gameId, gallery, onChanged, bare = false }: Galle
         <GalleryPicker
           gameId={gameId}
           onClose={() => setPickerOpen(false)}
-          onSaved={() => {
+          onSaved={(resultado) => {
             setPickerOpen(false);
+            setError(avisoDeFallidas(resultado));
             onChanged();
           }}
         />
@@ -150,43 +158,54 @@ function GalleryPicker({
 }: {
   gameId: string;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (resultado: ResultadoGuardado) => void;
 }) {
-  const [candidatos, setCandidatos] = useState<GalleryCandidate[] | null>(null);
+  const [candidatos, setCandidatos] = useState<GalleryCandidate[]>([]);
+  const [buscando, setBuscando] = useState<Set<string>>(new Set());
   const [elegidos, setElegidos] = useState<Set<string>>(new Set());
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState('');
-  const [retrying, setRetrying] = useState<string | null>(null);
 
-  const cargar = (source?: string) => {
-    listGalleryCandidates(gameId, source)
-      .then((nuevos) => {
-        if (source) {
-          // Agregar o reemplazar candidatos de esa fuente
-          setCandidatos((prev) => {
-            if (!prev) return nuevos;
-            const sinFuente = prev.filter((c) => c.source !== source);
-            return [...sinFuente, ...nuevos];
-          });
-        } else {
-          setCandidatos(nuevos);
-        }
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : 'No se pudieron traer las imágenes.'));
-  };
+  // Al cerrar el modal, una búsqueda en curso deja de pedir las tandas que le faltan.
+  const corrida = useRef(0);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- recarga solo al cambiar de juego
-  useEffect(() => { cargar(); }, [gameId]);
-
-  const reintentar = async (source: string) => {
-    setRetrying(source);
-    setError('');
+  const cargar = useCallback(async (fuente: string, propia: number) => {
+    setBuscando((previo) => new Set(previo).add(fuente));
+    // La misma fuente incluye las del romset padre, que llegan con otro `source`.
+    setCandidatos((previos) => previos.filter((c) => !c.source.startsWith(fuente)));
     try {
-      await new Promise((r) => setTimeout(r, 300)); // pausa visual
-      cargar(source);
-    } finally {
-      setRetrying(null);
+      for (const clave of fuente === 'ImageSearch' ? CASILLEROS_DEL_BUSCADOR : [undefined]) {
+        const nuevos = await listGalleryCandidates(gameId, fuente, clave);
+        if (corrida.current !== propia) return;
+        // La misma imagen aparece en la búsqueda de más de un casillero.
+        setCandidatos((previos) => {
+          const vistas = new Set(previos.map((c) => c.url));
+          return [...previos, ...nuevos.filter((c) => !vistas.has(c.url))];
+        });
+      }
+    } catch (err) {
+      if (corrida.current === propia) {
+        setError(err instanceof Error ? err.message : 'No se pudieron traer las imágenes.');
+      }
     }
+    if (corrida.current !== propia) return;
+    setBuscando((previo) => {
+      const siguiente = new Set(previo);
+      siguiente.delete(fuente);
+      return siguiente;
+    });
+  }, [gameId]);
+
+  useEffect(() => {
+    corrida.current += 1;
+    const propia = corrida.current;
+    TODAS_LAS_FUENTES.forEach((fuente) => { void cargar(fuente, propia); });
+    return () => { corrida.current += 1; };
+  }, [cargar]);
+
+  const reintentar = (fuente: string) => {
+    setError('');
+    void cargar(fuente, corrida.current);
   };
 
   const alternar = useCallback((id: string) => {
@@ -199,7 +218,7 @@ function GalleryPicker({
   }, []);
 
   // Sólo lo que todavía no está guardado: retildar algo ya bajado lo duplicaría.
-  const disponibles = (candidatos ?? []).filter((c) => !c.yaGuardada);
+  const disponibles = candidatos.filter((c) => !c.yaGuardada);
   const todosElegidos = disponibles.length > 0 && disponibles.every((c) => elegidos.has(c.id));
 
   async function guardar() {
@@ -215,8 +234,7 @@ function GalleryPicker({
           return { url: c.url, source: c.source };
         });
       const { jobId } = await saveGallery(gameId, items);
-      await esperarJob(jobId);
-      onSaved();
+      onSaved(await esperarJob(jobId));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudieron guardar las imágenes.');
       setGuardando(false);
@@ -224,7 +242,6 @@ function GalleryPicker({
   }
 
   // Agrupar candidatos por fuente, incluyendo fuentes sin resultados
-  const TODAS_LAS_FUENTES = ['ArcadeDB', 'ImageSearch', 'Launchbox'];
   const porFuente = new Map<string, GalleryCandidate[]>();
   for (const fuente of TODAS_LAS_FUENTES) {
     porFuente.set(fuente, []);
@@ -239,9 +256,7 @@ function GalleryPicker({
     <Modal onClose={onClose} open size="large" title="Imágenes disponibles">
       <div className={styles.stack}>
         {error ? <p className={styles.error}>{error}</p> : null}
-        {candidatos === null ? (
-          <Spinner />
-        ) : candidatos.length === 0 ? (
+        {candidatos.length === 0 && buscando.size === 0 ? (
           <p className={styles.empty}>No se encontraron imágenes para este juego.</p>
         ) : (
           <>
@@ -258,18 +273,13 @@ function GalleryPicker({
               <div key={fuente} className={styles.sourceSection}>
                 <div className={styles.sourceHeaderRow}>
                   <h4 className={styles.sourceHeader}>{fuente}</h4>
-                  {items.length === 0 && (
-                    <DosButton
-                      disabled={retrying === fuente}
-                      onClick={() => void reintentar(fuente)}
-                      variant="ghost-small"
-                    >
-                      {retrying === fuente ? 'Reintentando…' : 'Reintentar'}
-                    </DosButton>
+                  {items.length > 0 && buscando.has(fuente) && <span className={styles.meta}>Buscando más…</span>}
+                  {items.length === 0 && !buscando.has(fuente) && (
+                    <DosButton onClick={() => reintentar(fuente)} variant="ghost-small">Reintentar</DosButton>
                   )}
                 </div>
-                {items.length === 0 && retrying !== fuente ? (
-                  <p className={styles.meta}>Sin resultados</p>
+                {items.length === 0 ? (
+                  buscando.has(fuente) ? <Spinner /> : <p className={styles.meta}>Sin resultados</p>
                 ) : (
                   <div className={styles.galleryGrid}>
                     {items.map((candidato) => (
@@ -281,6 +291,7 @@ function GalleryPicker({
                           <img
                             alt={candidato.label}
                             className={styles.previewImage}
+                            loading="lazy"
                             src={candidato.previewUrl || candidato.url}
                           />
                         </div>
@@ -324,11 +335,18 @@ function GalleryPicker({
   );
 }
 
+/** Vacío si se bajaron todas: el guardado termina bien aunque falle alguna de las elegidas. */
+function avisoDeFallidas({ guardadas, fallidas }: ResultadoGuardado): string {
+  if (fallidas.length === 0) return '';
+  const total = guardadas.length + fallidas.length;
+  return `Se guardaron ${guardadas.length} de ${total}: ${fallidas.length === 1 ? 'la otra no se pudo bajar' : `las otras ${fallidas.length} no se pudieron bajar`} de su sitio.`;
+}
+
 /** Espera a que el job termine. La precarga usa polling propio; acá alcanza con esto. */
-async function esperarJob(jobId: string): Promise<void> {
+async function esperarJob(jobId: string): Promise<ResultadoGuardado> {
   for (;;) {
-    const job = await getJob(jobId);
-    if (job.status === 'succeeded') return;
+    const job = await getJob<ResultadoGuardado>(jobId);
+    if (job.status === 'succeeded') return job.result ?? { guardadas: [], fallidas: [] };
     if (job.status === 'failed') throw new Error(job.error || 'La descarga falló.');
     if (job.status === 'cancelled') throw new Error('La descarga se canceló.');
     await new Promise((resolve) => setTimeout(resolve, 400));

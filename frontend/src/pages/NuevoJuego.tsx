@@ -5,10 +5,9 @@ import type { StepNavItem } from '@/components/dos';
 import { useGameMutations } from '@/hooks/useGameMutations';
 import { useRomCandidates } from '@/hooks/useRomCandidates';
 import { useSystems } from '@/hooks/useSystems';
-import { uploadRom, startPrecarga, startPrecargaMsdos } from '@/lib/api/games';
+import { startCompletar, uploadRom } from '@/lib/api/games';
 import type { RomCandidate } from '@/lib/api/roms';
 import type { Identity, Tratamiento } from '@/lib/domain/types';
-import { soportaArcadeDb, soportaMsdos, soportaPrecarga } from '@/lib/domain/arcade';
 import { absolutePath, ABSOLUTE_PATH_MESSAGE } from '@/lib/domain/validation';
 import { NuevoSistemaModal } from './nuevo/NuevoSistemaModal';
 import { PasoArchivo, type ModoArchivo } from './nuevo/PasoArchivo';
@@ -173,11 +172,11 @@ export function NuevoJuego() {
       if (romSource === 'upload' && romFile) {
         await uploadRom(game.id, romFile);
       }
-      // Precarga externa: ArcadeDB para romsets MAME, Launchbox+IA para MSDOS/PC.
+      // Completa la ficha en cualquier sistema (ADR-0028).
       let precargaJobId = '';
-      if (precarga && soportaPrecarga(systemId)) {
+      if (precarga) {
         try {
-          const result = soportaMsdos(systemId) ? await startPrecargaMsdos(game.id) : await startPrecarga(game.id);
+          const result = await startCompletar(game.id);
           precargaJobId = result.jobId;
         } catch {
           // La precarga es best-effort: si falla, el juego se creó igual.
@@ -200,9 +199,6 @@ export function NuevoJuego() {
 
   const nombreSistema = sistemas.find((s) => s.id === systemId)?.name ?? systemId;
   const archivo = romSource === 'upload' ? romFile?.name ?? '' : romRef;
-  const precargaLabel = !soportaPrecarga(systemId)
-    ? null
-    : soportaArcadeDb(systemId) ? 'Precargar ArcadeDB al crear' : 'Precargar LaunchBox + IA al crear';
 
   return (
     <div className={styles.page}>
@@ -250,7 +246,7 @@ export function NuevoJuego() {
           {paso === 3 ? <PasoIdentidad identity={identity} onChange={setIdentity} precargada={Boolean(identity.title)} /> : null}
           {paso === 4 ? (
             <p className={styles.hint}>
-              Revisá el resumen de la derecha. Al crear la ficha se abre para seguir cargando; la precarga corre en segundo plano y no frena el alta.
+              Revisá el resumen de la derecha. Al crear la ficha se abre para seguir cargando; el completado corre en segundo plano y no frena el alta.
             </p>
           ) : null}
           {error ? <p className={styles.error} role="alert">{error}</p> : null}
@@ -265,7 +261,6 @@ export function NuevoJuego() {
           onCrear={() => void submit()}
           onPrecarga={setPrecarga}
           precarga={precarga}
-          precargaLabel={precargaLabel}
           sistema={nombreSistema}
           titulo={identity.title}
           tratamiento={tratamiento === 'copiar' ? 'Copiar (romset)' : 'Descomprimir (archivos sueltos)'}

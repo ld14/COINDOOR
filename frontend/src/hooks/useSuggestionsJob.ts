@@ -54,12 +54,17 @@ export function useSuggestionsJob(gameId: string, key: string, open: boolean) {
         const job = await getJob<SuggestionsResult>(jobId);
         if (requestId.current !== id) return;
         if (job.status === 'succeeded' && job.result) {
-          // Merge: keep existing candidates from other sources, replace this source
+          // Merge: keep existing candidates from other sources, replace this source. Its trace
+          // stays in place: the modal lists sources in the order they were consulted.
           setResult((prev) => {
             if (!prev) return job.result;
             const kept = prev.candidatos.filter((c) => c.fuente !== source);
             const nuevos = job.result!.candidatos;
-            const merged = { ...job.result!, candidatos: [...kept, ...nuevos] };
+            const traza = job.result!.fuentes.find((t) => t.nombre === source);
+            const fuentes = prev.fuentes.some((t) => t.nombre === source)
+              ? prev.fuentes.map((t) => (t.nombre === source && traza ? traza : t))
+              : [...prev.fuentes, ...job.result!.fuentes];
+            const merged = { ...job.result!, candidatos: [...kept, ...nuevos], fuentes };
             setPhase(deriveFase(merged));
             return merged;
           });

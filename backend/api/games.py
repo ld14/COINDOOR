@@ -8,6 +8,7 @@ from backend.api.schemas import CreateGame, GameOut, GamesPage, PatchGame, Sugge
 from backend.config import get_settings
 from backend.lib.jobs.ejecutor import submit
 from backend.services.arcadedb import ArcadeDbPrecargaService
+from backend.services.completar import CompletarFichaService
 from backend.services.games import GamesService
 from backend.services.msdos import MsdosPrecargaService
 
@@ -63,4 +64,11 @@ def precarga_msdos(game_id: str, force: bool = False) -> SuggestionJob:
     """Lanza la precarga de datos MSDOS (Launchbox + IA) como un job."""
     service = MsdosPrecargaService(get_settings())
     job = submit(service.run(game_id, force=force))
+    return SuggestionJob(jobId=job.job_id)
+
+
+@router.post("/{game_id}/completar")
+def completar_ficha(game_id: str) -> SuggestionJob:
+    """Lanza el job que llena los campos vacíos de la ficha (ADR-0028)."""
+    job = submit(CompletarFichaService(get_settings()).run(game_id))
     return SuggestionJob(jobId=job.job_id)

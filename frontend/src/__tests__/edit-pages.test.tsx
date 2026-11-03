@@ -197,12 +197,12 @@ describe('Video desde YouTube', () => {
   it('job fallido muestra su mensaje', async () => {
     const base = vi.mocked(fetch).getMockImplementation()!;
     vi.mocked(fetch).mockImplementation(async (input, init) => (String(input).includes('/api/jobs/')
-      ? ({ ok: true, status: 200, json: async () => ({ jobId: 'yt-job', status: 'failed', progress: 0, result: null, error: 'El video dura más de 10 minutos.' }) } as Response)
+      ? ({ ok: true, status: 200, json: async () => ({ jobId: 'yt-job', status: 'failed', progress: 0, result: null, error: 'No se pueden descargar transmisiones en vivo.' }) } as Response)
       : base(input, init)));
 
     await pedirDescarga('https://youtu.be/earaCnLVL98');
 
-    expect(await screen.findByText('El video dura más de 10 minutos.')).toBeInTheDocument();
+    expect(await screen.findByText('No se pueden descargar transmisiones en vivo.')).toBeInTheDocument();
   });
 });
 

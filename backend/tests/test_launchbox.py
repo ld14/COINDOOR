@@ -173,9 +173,14 @@ class TestParseSearchResults:
         assert result.game_id == "76996"
 
     def test_different_platform(self):
-        result = _parse_search_results(_SEARCH_HTML, "Super Mario", "NES")
+        result = _parse_search_results(_SEARCH_HTML, "Super Mario Bros", "NES")
         assert result is not None
         assert result.game_id == "1234"
+
+    def test_titulo_que_solo_contiene_sin_anio_no_elige(self):
+        # Antes elegía el primer título que lo contenía: así "Prince of Persia" daba
+        # "4D Prince of Persia" (feature 022).
+        assert _parse_search_results(_SEARCH_HTML, "Super Mario", "NES") is None
 
     def test_empty_html(self):
         result = _parse_search_results("", "Golden Axe", "Arcade")
@@ -310,7 +315,7 @@ class TestLaunchboxImageProvider:
         provider = LaunchboxImageProvider()
         assert provider.campos == frozenset({
             "caratula", "marquesina", "poster", "logo", "captura",
-            "year",
+            "year", "developer", "publisher", "genre", "players",
         })
 
 

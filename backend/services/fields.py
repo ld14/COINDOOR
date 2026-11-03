@@ -9,6 +9,7 @@ from backend.api.errors import BadRequest, NotFound
 from backend.api.schemas import CheatsValue, FieldProvenance, GameOut, ReviewValue
 from backend.config import Settings
 from backend.lib.domain.fielddefs import identity_keys, image_keys, rich_keys, text_keys, video_keys
+from backend.lib.media import GifAnimado, sin_gif
 from backend.lib.providers.orquestador import cached_candidate, cached_identity_candidate
 from backend.store.archivo import escribir_binario, safe_id
 from backend.store.juegos import GamesStore, to_out
@@ -66,6 +67,9 @@ class FieldsService:
                 raise BadRequest("URL de media inválida")
             try:
                 url = self._download_candidate_media(game_id, key, media_url)
+            except GifAnimado as exc:
+                # Sin probar la miniatura: seria el mismo GIF, congelado y mas chico.
+                raise BadRequest("Es un GIF animado: no se usa en la ficha") from exc
             except BadRequest:
                 if preview_url.startswith(("https://", "http://")) and preview_url != media_url:
                     url = self._download_candidate_media(game_id, key, preview_url)
@@ -107,11 +111,11 @@ class FieldsService:
         suffix = _suffix_from_content_type(response.headers.get("content-type", ""))
         if not suffix:
             suffix = Path(httpx.URL(media_url).path).suffix.lower()
-        suffix = suffix or ".jpg"
+        contenido, suffix = sin_gif(response.content, suffix or ".jpg")
         system_dir = safe_id(game.systemId)
         game_dir = safe_id(game.id)
         path = self.settings.media_dir / system_dir / game_dir / f"{key}{suffix}"
-        escribir_binario(path, response.content)
+        escribir_binario(path, contenido)
         return f"/media/{system_dir}/{game_dir}/{key}{suffix}"
 
     def _provenance(self, candidate: dict[str, object]) -> FieldProvenance:

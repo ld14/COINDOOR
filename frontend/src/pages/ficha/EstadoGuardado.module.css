@@ -1,0 +1,15 @@
+.estado,
+.error {
+  font-size: var(--text-meta);
+  margin: 0;
+  text-align: right;
+}
+
+.estado {
+  color: var(--ink-muted);
+}
+
+.error {
+  color: var(--error);
+  font-weight: 600;
+}

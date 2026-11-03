@@ -4,6 +4,7 @@ import { FICHA_SECCIONES } from '@/hooks/useFichaProgress';
 import type { CheatGroup, Game } from '@/lib/domain/types';
 import { parseCheatsText } from '@/lib/api/fields';
 import { useFichaAutosave } from './autosaveContext';
+import { EstadoGuardado } from './EstadoGuardado';
 import { confirmManualDelete } from './helpers';
 import { AvisoSugerido, EtiquetaIA } from './origenIA';
 import type { SaveHandle } from './types';
@@ -38,6 +39,16 @@ const firma = (groups: CheatGroup[]) => JSON.stringify(groups.map((g) => ({
   name: g.name,
   entries: g.entries.map((e) => ({ name: e.name, input: e.input })),
 })));
+
+/**
+ * Texto pegado a un truco, sin IA. ATTRACT exige `name` e `input`: la primera línea nombra al
+ * truco y lo demás es el código; una sola línea es el código, con un nombre para editar después.
+ */
+const trucoDeTexto = (texto: string): Fila => {
+  const [primera, ...resto] = texto.trim().split('\n');
+  const codigo = resto.join('\n').trim();
+  return { id: nuevoId(), name: codigo ? primera.trim() : 'Truco', input: codigo || primera.trim() };
+};
 
 const esLarga = (fila: Fila) => fila.name.length + fila.input.length > LARGO_COLAPSADO || fila.input.includes('\n');
 const plural = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`;
@@ -183,6 +194,17 @@ export const CheatsSection = forwardRef<SaveHandle, {
       setSeparando(false);
     }
   };
+  const agregarTexto = () => {
+    const fila = trucoDeTexto(pegado);
+    const destino = grupos[grupos.length - 1]?.id ?? nuevoId();
+    setAbiertas((prev) => marcar(prev, fila.id));
+    setExpandidos((prev) => marcar(prev, destino));
+    cambiar((prev) => (prev.length > 0
+      ? prev.map((g) => (g.id === destino ? { ...g, entries: [...g.entries, fila] } : g))
+      : [{ id: destino, name: 'Trucos', entries: [fila] }]));
+    setPegado('');
+    setPropuesta([]);
+  };
   const usarPropuesta = () => {
     cambiar((prev) => [...prev, ...conIds(propuesta)]);
     setPropuesta([]);
@@ -239,7 +261,20 @@ export const CheatsSection = forwardRef<SaveHandle, {
             <DosButton disabled={separando || !pegado.trim()} disabledReason={!pegado.trim() ? 'Pegá primero el texto de los trucos.' : undefined} onClick={() => void separar()} size="sm" variant="secondary">
               {separando ? 'Separando…' : '✦ Separar en trucos'}
             </DosButton>
-            {separando ? <Spinner /> : <span className={styles.ayuda}>la propuesta se revisa antes de entrar</span>}
+            <DosButton
+              disabled={separando || !pegado.trim()}
+              disabledReason={!pegado.trim() ? 'Pegá primero el texto de los trucos' : undefined}
+              onClick={agregarTexto}
+              size="sm"
+              variant="secondary"
+            >
+              Agregar como truco
+            </DosButton>
+            {separando ? <Spinner /> : (
+              <span className={styles.ayuda}>
+                {pegado.trim() ? 'Este texto todavía no está en la ficha.' : 'La propuesta de la IA se revisa antes de entrar.'}
+              </span>
+            )}
           </div>
           {errorSeparar ? <p className={styles.error}>{errorSeparar}</p> : null}
           {propuesta.length > 0 ? (
@@ -384,6 +419,7 @@ export const CheatsSection = forwardRef<SaveHandle, {
             </div>
           );
         })}
+        <EstadoGuardado />
       </div>
     </Card>
   );

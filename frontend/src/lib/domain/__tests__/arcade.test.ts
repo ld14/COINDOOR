@@ -1,9 +1,9 @@
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { soportaArcadeDb, soportaMsdos, soportaPrecarga } from '../arcade';
+import { soportaArcadeDb } from '../arcade';
 
-// Sistemas reales, variantes de mayusculas y los que no deben disparar precarga.
+// Sistemas reales, variantes de mayusculas y los que no son romsets de MAME.
 const casos = ['arcade', 'mame', 'MAME', 'Arcade', 'fbneo', 'neogeo', 'cps2', 'msdos', 'MSDOS', 'nes', 'genesis', 'snes', ''];
 
 const script = `
@@ -34,23 +34,5 @@ describe('soportaArcadeDb', () => {
     expect(result.stderr).toBe('');
     expect(result.status).toBe(0);
     expect(JSON.parse(result.stdout)).toEqual(casos.map(soportaArcadeDb));
-  });
-});
-
-describe('soportaMsdos', () => {
-  it('habilita sistemas MSDOS/DOS/PC/Windows', () => {
-    expect(casos.map(soportaMsdos)).toEqual([
-      false, false, false, false, false, false, false,
-      true, true, false, false, false, false,
-    ]);
-  });
-});
-
-describe('soportaPrecarga', () => {
-  it('habilita arcade o MSDOS', () => {
-    expect(casos.map(soportaPrecarga)).toEqual([
-      true, true, true, true, true, true, true,
-      true, true, false, false, false, false,
-    ]);
   });
 });

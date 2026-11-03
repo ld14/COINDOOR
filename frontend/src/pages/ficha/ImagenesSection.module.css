@@ -126,6 +126,7 @@
   flex-direction: column;
   gap: var(--space-2);
   margin-bottom: var(--space-4);
+  min-width: 0;
   padding: var(--space-3);
 }
 
@@ -135,10 +136,14 @@
   margin: 0;
 }
 
+/* Las filas las fija el componente; lo que no entra sigue a la derecha, en orden de columna. */
 .candsRow {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--space-3);
+  grid-auto-columns: max-content;
+  grid-auto-flow: column;
+  overflow-x: auto;
+  padding: var(--space-1) var(--space-1) var(--space-2);
 }
 
 .cand {

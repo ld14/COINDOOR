@@ -7,32 +7,42 @@ eso la elección no mira la posición sino los datos de cada fila (ver ``elegir`
 
 from __future__ import annotations
 
-import re
 import threading
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 from urllib.parse import quote_plus
 
+from backend.lib.providers import coincidencia
+from backend.lib.providers.coincidencia import normalizar
 from backend.lib.providers.mobygames.parser import (
     Ficha,
     Fila,
     Specs,
     parse_busqueda,
+    parse_capturas,
     parse_ficha,
+    parse_portada_grande,
+    parse_portadas,
     parse_specs,
 )
 
 if TYPE_CHECKING:
     from backend.lib.providers.scraping import ScrapingClient
 
+__all__ = [
+    "BASE",
+    "FichaCompleta",
+    "Imagen",
+    "buscar_ficha",
+    "buscar_imagenes",
+    "elegir",
+    "normalizar",
+    "olvidar",
+]
+
 BASE = "https://www.mobygames.com"
-# Diferencia máxima de años entre la ficha de COINDOOR y la de MobyGames. Las fechas varían
-# por región y por plataforma. Con el título exacto alcanza ±1; con "contiene" el título ya
-# es menos seguro, pero MobyGames suele listar otra edición de DOS (Monkey Island: 1990 en
-# la ficha, DOS 1992 allá) y hay que mirar más lejos; ahí también se exige la plataforma y
-# que quede una sola fila.
-TOLERANCIA_EXACTO = 1
-TOLERANCIA_CONTIENE = 2
+# Cada portada pide una página más para la imagen grande, a 3 s: tres alcanzan para elegir
+# entre ediciones (la original, la española…).
 
 
 @dataclass(frozen=True)
@@ -41,39 +51,12 @@ class FichaCompleta:
     specs: Specs
 
 
-def normalizar(texto: str) -> str:
-    """Minúsculas, sin puntuación y sin espacios de más."""
-    limpio = re.sub(r"[^\w\s]", " ", texto.casefold())
-    return " ".join(limpio.split())
-
-
-def _anio(valor: str | None) -> int | None:
-    return int(valor) if valor and valor.isdigit() else None
-
-
-def _por_anio(
-    filas: list[Fila],
-    plataforma: str,
-    anio: int | None,
-    tolerancia: int,
-) -> list[Fila]:
-    """Si el año separa los candidatos, los que quedan; si no, todos.
-
-    Primero gana el mismo año de esa plataforma; si no hay, el más cercano dentro de
-    ``tolerancia``.
-    """
-    if anio is None:
-        return filas
-    clave = plataforma.lower()
-    for margen in range(tolerancia + 1):
-        cerca = [
-            f
-            for f in filas
-            if (a := _anio(f.plataformas.get(clave))) is not None and abs(a - anio) == margen
-        ]
-        if cerca:
-            return cerca
-    return []
+@dataclass(frozen=True)
+class Imagen:
+    media_url: str
+    preview_url: str
+    etiqueta: str
+    origen_url: str
 
 
 def elegir(
@@ -84,35 +67,19 @@ def elegir(
 ) -> Fila | None:
     """La fila de la ficha, o ``None`` si no hay una que lo sea sin ambigüedad.
 
-    Solo cuentan las filas con esa plataforma. Dos niveles:
-
-    1. Título exacto: el título o algún "AKA:" es igual al de la ficha. Con una fila, esa;
-       con varias, desempata el año de la plataforma.
-    2. Solo si el nivel 1 no dio ninguna: el título tiene todas las palabras del de la
-       ficha. Acá el año es obligatorio aunque quede una sola fila.
+    Solo cuentan las filas con esa plataforma; entre ellas elige la regla común de
+    ``coincidencia`` con el título, los "AKA:" y el año de esa plataforma.
     """
     clave = plataforma.lower()
     con_plataforma = [f for f in filas if clave in f.plataformas]
-    buscado = normalizar(titulo)
-    if not buscado:
-        return None
-    ano = _anio(anio)
-
-    exactas = [
-        f for f in con_plataforma if buscado in {normalizar(f.title), *map(normalizar, f.alias)}
-    ]
-    if exactas:
-        if len(exactas) == 1:
-            return exactas[0]
-        elegidas = _por_anio(exactas, plataforma, ano, TOLERANCIA_EXACTO)
-        return elegidas[0] if len(elegidas) == 1 else None
-
-    if ano is None:
-        return None
-    palabras = set(buscado.split())
-    contienen = [f for f in con_plataforma if palabras <= set(normalizar(f.title).split())]
-    elegidas = _por_anio(contienen, plataforma, ano, TOLERANCIA_CONTIENE)
-    return elegidas[0] if len(elegidas) == 1 else None
+    return coincidencia.elegir(
+        con_plataforma,
+        titulo,
+        anio,
+        titulos_de=lambda f: (f.title, *f.alias),
+        principal_de=lambda f: f.title,
+        anio_de=lambda f: coincidencia.anio_entero(f.plataformas.get(clave)),
+    )
 
 
 # Dos memorias mientras corre el proceso: qué ficha eligió cada búsqueda (o ninguna) y cada
@@ -120,6 +87,7 @@ def elegir(
 # quedó en la procedencia: los dos caminos terminan en la misma ficha ya bajada.
 _busquedas: dict[tuple[str, str, str], str | None] = {}
 _fichas: dict[tuple[str, str], FichaCompleta] = {}
+_imagenes: dict[tuple[str, str], tuple[Imagen, ...]] = {}
 _memo_lock = threading.Lock()
 
 
@@ -127,6 +95,7 @@ def olvidar() -> None:
     with _memo_lock:
         _busquedas.clear()
         _fichas.clear()
+        _imagenes.clear()
 
 
 def _base(url: str) -> str:
@@ -173,4 +142,60 @@ def buscar_ficha(
     resultado = FichaCompleta(ficha, specs)
     with _memo_lock:
         _fichas[clave] = resultado
+    return resultado
+
+
+def buscar_imagenes(
+    client: ScrapingClient,
+    titulo: str,
+    anio: str | None,
+    plataforma: str,
+    clave: str,
+    *,
+    ficha_url: str | None = None,
+    cuantas: int | None = None,
+) -> tuple[Imagen, ...]:
+    """Carátulas (``caratula``) o capturas (``captura``) de la plataforma, de la misma ficha
+    que eligió ``buscar_ficha``: la edición correcta, no cualquier juego con ese nombre.
+
+    Todas, salvo que se pida ``cuantas``: cada portada es una página más por el navegador. Una
+    respuesta recortada no queda en memoria.
+    """
+    if clave not in ("caratula", "captura"):
+        return ()
+    completa = buscar_ficha(client, titulo, anio, plataforma, ficha_url=ficha_url)
+    if completa is None or not completa.ficha.plataforma_slug:
+        return ()
+    base = _base(completa.ficha.url)
+    memo = (base, clave)
+    with _memo_lock:
+        guardadas = _imagenes.get(memo)
+    if guardadas is not None:
+        return guardadas[:cuantas]
+
+    slug = completa.ficha.plataforma_slug
+    imagenes: list[Imagen] = []
+    if clave == "caratula":
+        portadas = parse_portadas(client.get_page(f"{base}covers/{slug}/"))[:cuantas]
+        for portada in portadas:
+            grande = parse_portada_grande(client.get_page(portada.enlace)) or portada.miniatura
+            pais = f" ({portada.pais})" if portada.pais else ""
+            imagenes.append(
+                Imagen(grande, portada.miniatura, f"Portada frontal{pais}", portada.enlace)
+            )
+    else:
+        capturas = parse_capturas(client.get_page(f"{base}screenshots/{slug}/"))[:cuantas]
+        for captura in capturas:
+            imagenes.append(
+                Imagen(
+                    captura.miniatura,
+                    captura.miniatura,
+                    captura.leyenda or "Captura",
+                    captura.url,
+                )
+            )
+    resultado = tuple(imagenes)
+    if cuantas is None:
+        with _memo_lock:
+            _imagenes[memo] = resultado
     return resultado

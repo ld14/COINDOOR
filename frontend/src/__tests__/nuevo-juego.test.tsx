@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { App } from '@/App';
 import { FIELDDEFS } from '@/lib/domain/types';
 import type { System } from '@/lib/domain/types';
@@ -139,10 +139,32 @@ describe('Asistente de alta', () => {
     await siguiente();
 
     const resumen = screen.getByRole('complementary', { name: 'Resumen del alta' });
-    expect(within(resumen).getByRole('checkbox', { name: 'Precargar ArcadeDB al crear' })).toBeChecked();
+    expect(within(resumen).getByRole('checkbox', { name: 'Completar la ficha al crear' })).toBeChecked();
     await userEvent.click(within(resumen).getByRole('button', { name: /Crear ficha y empezar a cargar/ }));
 
     expect(await screen.findByRole('heading', { name: 'Nuevo Juego' })).toBeInTheDocument();
+  });
+
+  it('en un sistema que no es arcade ni MS-DOS también completa la ficha', async () => {
+    renderApp();
+    await userEvent.click(await screen.findByRole('radio', { name: 'Indicar ruta' }));
+    await userEvent.type(screen.getByLabelText('ROM'), '/roms/otros/nuevo.bin');
+    await siguiente();
+    await userEvent.click(await screen.findByRole('radio', { name: /Sega Genesis/ }));
+    await siguiente();
+    await userEvent.type(screen.getByLabelText('Título'), 'Otro Nuevo');
+    await siguiente();
+
+    const resumen = screen.getByRole('complementary', { name: 'Resumen del alta' });
+    const casilla = within(resumen).getByRole('checkbox', { name: 'Completar la ficha al crear' });
+    expect(casilla).toBeChecked();
+    expect(casilla).toBeEnabled();
+    await userEvent.click(within(resumen).getByRole('button', { name: /Crear ficha y empezar a cargar/ }));
+
+    await waitFor(() => {
+      const posts = vi.mocked(fetch).mock.calls.filter(([url, init]) => init?.method === 'POST' && String(url).endsWith('/completar'));
+      expect(posts).toHaveLength(1);
+    });
   });
 
   it('el botón Atrás y la píldora vuelven a pasos ya visitados', async () => {

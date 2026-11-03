@@ -26,12 +26,14 @@ def _service() -> GalleryService:
 def list_candidates(
     game_id: str,
     source: str | None = None,
+    clave: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Imágenes disponibles de ArcadeDB, ImageSearch y Launchbox.
+    """Imágenes disponibles de todas las fuentes.
 
-    Si se pasa ``source``, solo consulta esa fuente (para reintentos individuales).
+    Si se pasa ``source``, solo consulta esa fuente, y ``clave`` limita el buscador a un
+    casillero.
     """
-    return _service().candidatos(game_id, source=source)
+    return _service().candidatos(game_id, source=source, clave=clave)
 
 
 @router.post("")
