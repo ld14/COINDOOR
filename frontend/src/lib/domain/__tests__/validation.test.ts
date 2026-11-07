@@ -29,6 +29,11 @@ describe('domain validation', () => {
   });
 
   it('valida sistema nuevo', () => {
-    expect(newSystemSchema.parse({ name: 'Arcade', shortName: 'arcade', launchCmd: '/usr/local/bin/mame' })).toEqual({ name: 'Arcade', shortName: 'arcade', launchCmd: '/usr/local/bin/mame' });
+    expect(newSystemSchema.parse({ name: 'arcade', shortName: 'arcade', launchCmd: '/usr/local/bin/mame' })).toEqual({ name: 'arcade', shortName: 'arcade', launchCmd: '/usr/local/bin/mame' });
+  });
+
+  it('rechaza sistema con mayúsculas en el nombre', () => {
+    const result = newSystemSchema.safeParse({ name: 'Arcade', shortName: 'arcade', launchCmd: '/usr/local/bin/mame' });
+    expect(result.success).toBe(false);
   });
 });

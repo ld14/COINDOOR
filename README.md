@@ -84,6 +84,43 @@ trabajo manual.
 
 Detalle en [`spec/constitution/tech-stack.md`](spec/constitution/tech-stack.md).
 
+## Instalar en otra máquina
+
+```bash
+git clone git@github.com:ld14/COINDOOR.git
+git clone git@github.com:ld14/attract.git   # al lado: ../attract
+cd COINDOOR
+./dev.sh                                     # instala lo que falte y levanta todo
+```
+
+`./dev.sh` hace `uv sync`, `npm install` y `scripts/install-deps.sh` (ffmpeg, Deno y el
+Chromium de Scrapling). La app queda en `http://127.0.0.1:5173`.
+
+Tres cosas no viajan en el repo, a propósito:
+
+| Qué | Por qué | Cómo llevarlo |
+|---|---|---|
+| `.env` | Tiene las claves de la IA y del buscador | Crearlo a mano (abajo) o copiarlo |
+| `games/` | Las fichas, su media y los exports: pesa GB | Copiar la carpeta entera si se quieren los mismos juegos |
+| La ruta de ATTRACT | Depende de cada máquina | Configurarla en la app. Si se copia `games/`, revisarla: `configuracion.json` guarda la ruta de esta máquina |
+
+Sin `.env` la app funciona, pero la IA no propone sinopsis, reseña ni trucos. Variables
+(todas con prefijo `COINDOOR_`, ver `backend/config.py`):
+
+```bash
+COINDOOR_AI_PRIMARY_BASE_URL=   # IA principal, API compatible con OpenAI
+COINDOOR_AI_PRIMARY_API_KEY=
+COINDOOR_AI_PRIMARY_MODEL=
+COINDOOR_AI_BACKUP_BASE_URL=    # IA de respaldo, mismo formato
+COINDOOR_AI_BACKUP_API_KEY=
+COINDOOR_AI_BACKUP_MODEL=
+COINDOOR_SEARCH_API_KEY=        # Tavily, para trucos (ADR-0019)
+```
+
+Opcionales: `COINDOOR_DATA_DIR` (otra carpeta en vez de `games/`) y
+`COINDOOR_SCRAPING_WARMUP=false` (no precalentar MobyGames al arrancar). El puerto es
+8765: el backend solo acepta ese `Host` y Vite apunta ahí.
+
 ## Desarrollo
 
 Spec Driven Development: primero la spec, luego el plan, luego las tareas, y solo
