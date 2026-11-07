@@ -1,88 +1,81 @@
 # COINDOOR
 
-Herramienta para preparar la metadata de juegos de una colección arcade —video, carátula,
-marquesina, sinopsis, reseña, trucos, manual— y entregarla como un `.zip` instalable en
-[ATTRACT](../attract), que la ensambla en la librería que Pegasus muestra en el gabinete.
+Herramienta local para preparar la ficha completa de un juego —identidad, carátula,
+marquesina, video, sinopsis, reseña, trucos, guía, manual, galería— y entregarla como un
+`.zip` que [ATTRACT](https://github.com/ld14/attract) instala en la librería que Pegasus
+muestra en el gabinete.
 
 El gabinete es offline por diseño y ATTRACT no descarga nada. COINDOOR es la mitad
-conectada del sistema: busca, propone, arma y empaqueta.
+conectada: busca en las fuentes, propone, deja editar, arma el paquete y lo instala.
 
-> **Estado: diseño cerrado, sin código.** Están la misión, el modelo de datos, doce
-> decisiones de arquitectura, la especificación del front-end, el stack completo y cinco
-> features listas para implementar. **La Fase 1 puede arrancar.**
-
-## Por dónde empezar
-
-| Si querés… | Leé |
+| Pieza | Qué es |
 |---|---|
-| Entender qué se está construyendo | [`spec/constitution/mission.md`](spec/constitution/mission.md) |
-| Diseñar la interfaz | [`docs/ux/requerimiento-funcional.md`](docs/ux/requerimiento-funcional.md) |
-| Saber por qué se decidió algo | [`spec/decisions/`](spec/decisions/README.md) |
-| Escribir código | [`spec/constitution/tech-stack.md`](spec/constitution/tech-stack.md) |
-| Entender el stack y qué se descartó | [`docs/arquitectura/`](docs/arquitectura/README.md) |
-| Ver qué sigue | [`spec/constitution/roadmap.md`](spec/constitution/roadmap.md) |
-| Entender un término | [`spec/constitution/glosario.md`](spec/constitution/glosario.md) |
+| **Pegasus** | El frontend del gabinete: lo que ve el jugador |
+| **ATTRACT** | CLI en Python que arma y valida la librería que lee Pegasus |
+| **COINDOOR** | *Este repo.* Prepara el material de cada juego y produce el bundle |
 
-## Las decisiones tomadas
+## Estado
 
-Las doce están en `proposed`, con sus alternativas descartadas.
+**En uso.** 25 features especificadas, la gran mayoría implementadas, y 29 decisiones de
+arquitectura. El detalle de qué está hecho y qué sigue está en el
+[roadmap](spec/constitution/roadmap.md).
 
-**Del producto y el contrato:**
+## Qué hace
 
-1. [**0001**](spec/decisions/0001-contrato-coindoor-attract.md) — el contrato de ATTRACT
-   se consume como dato versionado; su CLI es la autoridad final.
-2. [**0002**](spec/decisions/0002-procedencia-interna.md) — la procedencia de cada campo
-   vive solo en COINDOOR y no viaja al export.
-3. [**0003**](spec/decisions/0003-bundle-por-juego.md) — cada juego se entrega como un
-   `.zip` instalable, no por API. Transporta campos, no sintaxis.
-4. [**0004**](spec/decisions/0004-coindoor-fuente-identidad-no-mame.md) — para las
-   plataformas que MAME no conoce, COINDOOR es la fuente de identidad.
-5. [**0005**](spec/decisions/0005-contrato-vendoreado-vs-politica-propia.md) — el contrato
-   vendoreado y la política de completitud son archivos distintos, atados por un test.
-6. [**0006**](spec/decisions/0006-fuentes-externas-multiproveedor.md) — varias fuentes por
-   campo; una caída no rompe la búsqueda.
+1. **Alta:** se elige el sistema y el título, y opcionalmente la ROM.
+2. **Precarga:** un trabajo en segundo plano completa todos los campos vacíos con las
+   fuentes del sistema. Elige qué imagen va en cada casillero, y si ninguna encaja deja el
+   casillero vacío ([ADR-0028](spec/decisions/0028-la-precarga-completa-toda-la-ficha.md)).
+3. **Ficha:** cada sección se revisa y se edita, y se guarda sola, sin botón de guardar.
+   «Sugerir» trae candidatos de varias fuentes con su procedencia, y lo que propone la IA
+   aparece marcado como IA.
+4. **Export:** genera el `.zip` del juego, lo verifica con `attract doctor` y lo instala
+   en ATTRACT con un botón.
 
-**Del stack:**
+Las pantallas son el listado de juegos (exportados y pendientes), los sistemas, la ficha,
+el export y la configuración (la ruta de ATTRACT).
 
-7. [**0007**](spec/decisions/0007-fastapi-como-framework-backend.md) — FastAPI, no Django
-   ni Flask: el contrato de API ya está escrito como tipos.
-8. [**0008**](spec/decisions/0008-persistencia-en-archivos.md) — **sin base de datos**: un
-   `game.json` por juego, con su media al lado.
-9. [**0009**](spec/decisions/0009-proceso-local-en-loopback.md) — un proceso en
-   `127.0.0.1`; ese bind reemplaza a la autenticación.
-10. [**0010**](spec/decisions/0010-jobs-en-proceso.md) — los cuatro trabajos largos corren
-    en hilos del propio proceso. Sin colas, sin workers.
-11. [**0011**](spec/decisions/0011-fielddefs-json-compartido.md) — la política de
-    completitud es un JSON que leen el front y el back.
-12. [**0012**](spec/decisions/0012-verificacion-attract-por-subproceso.md) — `attract
-    doctor` se invoca por subproceso y su salida no se parsea.
+### Fuentes
 
-## Features especificadas
-
-| # | Feature | Qué es |
+| Fuente | Para qué | Sistemas |
 |---|---|---|
-| [003](spec/features/003-base-frontend/spec.md) | **Base del frontend** | Vite + React + las primitivas DOS. **El arranque** |
-| [004](spec/features/004-dominio-y-contrato/spec.md) | **Dominio y contrato** | `contract.json`, `fielddefs.json`, completitud y el seed |
-| [005](spec/features/005-esqueleto-backend/spec.md) | **Esqueleto del backend** | FastAPI, escritura atómica, patrón de job |
-| [002](spec/features/002-sugerencias-multiproveedor/spec.md) | **Sugerencias** | El orquestador de fuentes externas |
-| [001](spec/features/001-export-bundle/spec.md) | **Export a bundle** | El `.zip` instalable y su manifiesto |
+| [ArcadeDB](spec/decisions/0014-arcadedb-fuente-arcade.md) | Identidad, imágenes, video, sinopsis, trucos y manual | Arcade |
+| [MyAbandonware](spec/decisions/0027-myabandonware-primera-fuente-de-pc-dos.md) | Identidad, sinopsis y capturas, por HTTP común | MS-DOS (primera fuente) |
+| Launchbox | Identidad, carátulas y capturas de la edición, galería | Todos |
+| [MobyGames](spec/decisions/0024-scrapling-y-mobygames-para-pc-dos.md) | El dato que ninguna fuente anterior tuvo, por scraping con Scrapling | MS-DOS y consolas |
+| IA (API compatible con OpenAI) | Sinopsis, reseña, objetivo y guía; identidad solo como [último recurso](spec/decisions/0026-ia-ultimo-recurso-en-sugerir-identidad.md) | Todos |
+| Buscador web (Tavily) + IA | [Trucos](spec/decisions/0019-buscador-mas-modelo-para-trucos.md) con evidencia, no de memoria | Todos |
+| DuckDuckGo Images | Imágenes cuando las fuentes no tienen | Todos |
+| [YouTube](spec/decisions/0020-descarga-de-video-youtube.md) | Video a pedido con yt-dlp. Si dura más de 10 minutos se [recorta](spec/decisions/0029-recorte-de-videos-largos-de-youtube.md) a los 3 primeros | Todos |
 
-001 y 002 son las de mayor riesgo técnico y se especificaron primero a propósito. **El
-orden de trabajo es 003 → 004 → 005.** Las fases 3 y 4 del roadmap todavía no tienen
-carpeta.
+Sistemas configurados: arcade, MS-DOS, NES, SNES, Genesis / Mega Drive, Game Boy, Game Boy
+Color y Game Boy Advance
+([`plataformas.json`](backend/lib/domain/plataformas.json)). Una fuente caída no rompe la
+búsqueda: ese campo queda vacío y el resto sigue.
+
+## Cómo está hecho
+
+| Capa | Qué |
+|---|---|
+| Backend | Python 3.12, FastAPI, un solo proceso en `127.0.0.1` sin autenticación: el bind y la validación del `Host` la reemplazan ([ADR-0009](spec/decisions/0009-proceso-local-en-loopback.md)) |
+| Frontend | Vite + React + TypeScript + TanStack Query, estética «Flyer 80s» ([ADR-0023](spec/decisions/0023-estetica-flyer-reemplaza-dos.md)) |
+| Datos | Sin base de datos: un `game.json` por juego, con su media al lado y escritura atómica ([ADR-0008](spec/decisions/0008-persistencia-en-archivos.md)) |
+| Trabajos largos | Hilos del propio proceso, cancelables. Sin colas ni workers ([ADR-0010](spec/decisions/0010-jobs-en-proceso.md)) |
+| Contrato con ATTRACT | Se consume como dato versionado. El bundle lleva campos, nunca sintaxis de Pegasus ([ADR-0001](spec/decisions/0001-contrato-coindoor-attract.md), [ADR-0003](spec/decisions/0003-bundle-por-juego.md)) |
+
+Un solo usuario y un juego por vez, por diseño: sin carga masiva.
 
 ## Requisitos
 
-Python 3.12 · [uv](https://docs.astral.sh/uv/) · Node 22.12+ · ffmpeg · [Deno](https://deno.com) 2.3+.
-ffmpeg y Deno los usan el video de ArcadeDB y la descarga desde YouTube
-([`ADR-0020`](spec/decisions/0020-descarga-de-video-youtube.md)). `./dev.sh` los instala solo
-si faltan (`scripts/install-deps.sh`: brew en macOS, apt en WSL/Linux, winget o choco en
-Windows nativo con Git Bash); si no puede, ver
-[`docs/troubleshooting.md`](docs/troubleshooting.md).
-Opcionales: los binarios `mame` y `attract` — sin ellos la aplicación funciona con más
-trabajo manual.
+Python 3.12 · [uv](https://docs.astral.sh/uv/) · Node 22.12+ · ffmpeg · [Deno](https://deno.com) 2.3+
+· el Chromium de Scrapling.
 
-Detalle en [`spec/constitution/tech-stack.md`](spec/constitution/tech-stack.md).
+`./dev.sh` instala ffmpeg, Deno y Chromium si faltan (`scripts/install-deps.sh`: brew en
+macOS, apt en WSL/Linux, winget o choco en Windows con Git Bash). Si no puede, ver
+[`docs/troubleshooting.md`](docs/troubleshooting.md).
+
+Opcionales: los binarios `mame` y `attract`. Sin ellos la aplicación funciona, con más
+trabajo manual.
 
 ## Instalar en otra máquina
 
@@ -93,8 +86,8 @@ cd COINDOOR
 ./dev.sh                                     # instala lo que falte y levanta todo
 ```
 
-`./dev.sh` hace `uv sync`, `npm install` y `scripts/install-deps.sh` (ffmpeg, Deno y el
-Chromium de Scrapling). La app queda en `http://127.0.0.1:5173`.
+`./dev.sh` corre `uv sync`, `npm install` y `scripts/install-deps.sh`. La app queda en
+`http://127.0.0.1:5173`.
 
 Tres cosas no viajan en el repo, a propósito:
 
@@ -102,10 +95,10 @@ Tres cosas no viajan en el repo, a propósito:
 |---|---|---|
 | `.env` | Tiene las claves de la IA y del buscador | Crearlo a mano (abajo) o copiarlo |
 | `games/` | Las fichas, su media y los exports: pesa GB | Copiar la carpeta entera si se quieren los mismos juegos |
-| La ruta de ATTRACT | Depende de cada máquina | Configurarla en la app. Si se copia `games/`, revisarla: `configuracion.json` guarda la ruta de esta máquina |
+| La ruta de ATTRACT | Depende de cada máquina | Configurarla en la app. Si se copia `games/`, revisarla: `configuracion.json` guarda la ruta de la máquina de origen |
 
-Sin `.env` la app funciona, pero la IA no propone sinopsis, reseña ni trucos. Variables
-(todas con prefijo `COINDOOR_`, ver `backend/config.py`):
+Sin `.env` la app funciona, pero la IA no propone sinopsis, reseña ni trucos. Las
+variables llevan el prefijo `COINDOOR_` (ver `backend/config.py`):
 
 ```bash
 COINDOOR_AI_PRIMARY_BASE_URL=   # IA principal, API compatible con OpenAI
@@ -114,20 +107,42 @@ COINDOOR_AI_PRIMARY_MODEL=
 COINDOOR_AI_BACKUP_BASE_URL=    # IA de respaldo, mismo formato
 COINDOOR_AI_BACKUP_API_KEY=
 COINDOOR_AI_BACKUP_MODEL=
-COINDOOR_SEARCH_API_KEY=        # Tavily, para trucos (ADR-0019)
+COINDOOR_SEARCH_API_KEY=        # Tavily, para trucos
 ```
 
 Opcionales: `COINDOOR_DATA_DIR` (otra carpeta en vez de `games/`) y
 `COINDOOR_SCRAPING_WARMUP=false` (no precalentar MobyGames al arrancar). El puerto es
 8765: el backend solo acepta ese `Host` y Vite apunta ahí.
 
-## Desarrollo
+## Comandos
 
-Spec Driven Development: primero la spec, luego el plan, luego las tareas, y solo
-entonces el código. Ver [`spec/README.md`](spec/README.md).
+| Comando | Qué hace |
+|---|---|
+| `./dev.sh` | Instala dependencias y levanta backend (`8765`) y Vite (`5173`) |
+| `uv run coindoor` | Levanta el proceso y sirve el build del frontend (antes, `npm run build`) |
+| `uv run pytest` | Tests del backend |
+| `uv run ruff check .` · `uv run mypy backend/lib` | Lint y tipos |
+| `npm run dev` · `npm run build` | Vite con proxy a `8765` · build estático |
+| `npm test` · `npm run lint` | Vitest · ESLint |
 
-La constitución manda: si una feature choca con `spec/constitution/`, se replantea la
-feature.
+## Mapa del repo
+
+| Ruta | Qué es |
+|---|---|
+| [`backend/`](backend/) | API, fuentes (`lib/providers/`), bundle y tests |
+| [`frontend/`](frontend/) | La interfaz |
+| [`spec/constitution/`](spec/constitution/) | Misión, stack, modelo de datos, límites duros, [glosario](spec/constitution/glosario.md) y roadmap |
+| [`spec/decisions/`](spec/decisions/README.md) | Los ADRs: por qué se decidió cada cosa y qué se descartó |
+| [`spec/features/`](spec/features/) | Spec, plan y tareas de cada feature |
+| [`docs/`](docs/) | Análisis del stack, UX, diseño del frontend e insumos de ATTRACT |
+
+## Cómo se trabaja
+
+Spec Driven Development: primero la spec, después el plan, después las tareas y recién
+entonces el código. Ver [`spec/README.md`](spec/README.md). La constitución manda: si una
+feature choca con `spec/constitution/`, se replantea la feature. Una decisión con
+alternativas descartadas va en un ADR nuevo, y los ADRs aceptados no se editan: se
+reemplazan con otro.
 
 ## Licencia
 
