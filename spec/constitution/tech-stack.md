@@ -88,13 +88,15 @@ que consumen el front y el back
 
 | Comando | Qué hace |
 |---|---|
-| `uv run coindoor` | Levanta el proceso en `127.0.0.1:8765` y abre el navegador |
+| `./dev.sh` | Instala lo que falte (`uv sync`, `npm install`, ffmpeg, Deno, Chromium) y levanta backend y Vite |
+| `uv run coindoor` | Levanta el proceso en `127.0.0.1:8765` y sirve el build del frontend (no abre el navegador) |
 | `uv run pytest` | Tests del backend |
 | `uv run ruff check .` · `uv run ruff format .` | Lint y formato |
 | `uv run mypy backend/lib` | Tipos, estricto solo en `lib/` |
 | `npm run dev` | Vite en `5173`, con proxy de `/api` a `8765` |
 | `npm run build` | Build estático que sirve el backend |
 | `npm test` | Vitest |
+| `npm run lint` | ESLint |
 
 ## Modelo de datos / dominio
 
@@ -388,9 +390,12 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
 
 ## Pendientes que bloquean
 
-1. **`contract.json` no existe todavía.** Hay que traerlo a mano de ATTRACT hasta que lo
-   publique ([`ADR-0005`](../decisions/0005-contrato-vendoreado-vs-politica-propia.md)).
-   Bloquea la feature [004](../features/004-dominio-y-contrato/spec.md).
+**Hoy no hay ninguno.** Los tres que hubo quedaron así:
+
+1. ~~**`contract.json` no existe todavía.**~~ **Ya no bloquea.** Está vendoreado en
+   `frontend/src/lib/domain/contract.json`
+   ([`ADR-0005`](../decisions/0005-contrato-vendoreado-vs-politica-propia.md)). ATTRACT ya lo
+   publica con `attract contrato`. Pasar a consumir esa salida queda por decidir.
 2. ~~**Credenciales de ScreenScraper y MobyGames.**~~ **Ya no bloquea.**
    [`ADR-0013`](../decisions/0013-sin-scraping-ni-catalogo-pago.md) sacó las dos fuentes
    justamente por su credencial y su cuota, y
@@ -398,8 +403,10 @@ reproceso pisa. Ver [`ADR-0002`](../decisions/0002-procedencia-interna.md).
    ArcadeDB, que no pide ninguna de las dos. Desde
    [`ADR-0024`](../decisions/0024-scrapling-y-mobygames-para-pc-dos.md) MobyGames,
    SteamGridDB y ScreenScraper vuelven por scraping, sin cuenta ni credencial.
-3. **Qué modelo de IA.** Afecta al coste por juego y a la voz de los textos. Bloquea la
-   feature 002, no el arranque.
+3. ~~**Qué modelo de IA.**~~ **Ya no bloquea.** No está fijado en el código: se configura
+   por `.env`, con una IA principal y una de respaldo de cualquier API compatible con
+   OpenAI (`COINDOOR_AI_PRIMARY_*`, `COINDOOR_AI_BACKUP_*`). Los prompts están en
+   `backend/lib/providers/ia/prompts/`.
 
 **Ya no bloquea:** el stack de backend, decidido en los ADRs
 [0007](../decisions/0007-fastapi-como-framework-backend.md) a

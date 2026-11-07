@@ -2,8 +2,8 @@
 
 ## Qué es esto
 
-Interfaz visual para preparar la metadata completa de un juego arcade —video, carátula,
-marquesina, sinopsis, reseña, trucos, manual— y entregarla como un `.zip` instalable en
+Interfaz visual para preparar la metadata completa de un juego —arcade, MS-DOS o
+consolas: video, carátula, marquesina, sinopsis, reseña, trucos, guía, manual— y entregarla como un `.zip` instalable en
 **ATTRACT**, que la ensambla en la librería que **Pegasus** muestra en el gabinete.
 
 Tres piezas, no confundirlas:
@@ -17,8 +17,8 @@ Tres piezas, no confundirlas:
 El gabinete es **offline** por diseño y ATTRACT no descarga nada. COINDOOR es la mitad
 conectada: busca, propone, arma y empaqueta.
 
-**Estado: sin código, stack decidido.** Doce ADRs y cinco features especificadas. La
-Fase 1 puede arrancar.
+**Estado: en uso.** 25 features y 29 ADRs. Qué está hecho y qué sigue:
+[`spec/constitution/roadmap.md`](spec/constitution/roadmap.md).
 
 ## Método de trabajo
 
@@ -30,9 +30,9 @@ feature, no la constitución.
 
 ## Comandos
 
-Los define la feature [003](spec/features/003-base-frontend/tasks.md). Hasta que existan
-los scripts, la tabla de `spec/constitution/tech-stack.md` §Comandos es el contrato a
-cumplir, no una descripción de algo que corre. **No inventes otros.**
+Están en `spec/constitution/tech-stack.md` §Comandos y corren todos: `./dev.sh`,
+`uv run pytest`, `uv run ruff check .`, `uv run mypy backend/lib`, `npm test`,
+`npm run lint`, `npm run build`. **No inventes otros.**
 
 ## Claude Code en este proyecto (OmniRoute)
 
@@ -72,17 +72,17 @@ proyecto — no tocan `comboInicial` ni otros repos:
 | Ruta | Qué es |
 |---|---|
 | `spec/constitution/` | Misión, stack, modelo de datos, límites duros, glosario, roadmap |
-| `spec/decisions/` | ADRs: por qué se decidió así y qué se descartó. Son **doce** |
-| `spec/features/NNN-*/` | spec + plan + tasks por feature. Hay **cinco**; arrancar por la 003 |
+| `spec/decisions/` | ADRs: por qué se decidió así y qué se descartó. Son **29**; el estado de cada uno está en su índice |
+| `spec/features/NNN-*/` | spec + plan + tasks por feature, de la 001 a la 025. El estado de cada una está en el roadmap |
 | `docs/arquitectura/` | Análisis del stack con las alternativas comparadas. **Se consulta, no manda**: mandan los ADRs |
 | `docs/claude_diseño/` | **Especificación del front-end.** Fuente de consulta: stack, tokens, tipos, las 5 pantallas con textos literales |
 | `docs/attract/` | Insumos copiados del repo ATTRACT. **No son features de acá** |
 | `docs/ux/` | Requerimiento funcional: el *por qué* de cada pantalla. El *qué* está en `claude_diseño/` |
-| `frontend/`, `backend/` | Código. Sin crear. Sus `CLAUDE.md` ya tienen las reglas |
+| `frontend/`, `backend/` | Código. Sus `CLAUDE.md` ya tienen las reglas |
 
 **`docs/claude_diseño/` se consulta, no se edita.** Lo que COINDOOR decide encima —o en
-contra— va en `spec/`. Tiene tres conflictos con el contrato de ATTRACT sin resolver:
-ver `tech-stack.md` §Conflictos abiertos antes de implementar nada.
+contra— va en `spec/`. Donde se contradicen, manda `spec/`: ver `tech-stack.md`
+§Contradicciones abiertas antes de implementar nada.
 
 **Si dudás de un término** —`set`, colección, marquesina, VÁLIDA vs COMPLETA, bundle,
 artefacto, candidato referencia— está en
@@ -96,9 +96,10 @@ El contrato de datos real vive en **`../attract`** y es la referencia autoritati
 | Qué | Dónde |
 |---|---|
 | Contrato de datos | `docs/CONVENCION.md` — §1 estructura, §2 campos, §3 procedencia, §4 validación |
-| 25 ADRs aceptados | `spec/decisions/` |
-| Comandos reales | `src/attract/cli.py` — `doctor`, `synopsis`, `ingest`, `rasterize`, `mags`, `mcp` |
-| Único juego completo | `library/arcade/media/goldnaxe/` — la vara operativa de COMPLETO |
+| 39 ADRs | `spec/decisions/` |
+| Comandos reales | `src/attract/cli.py` — `doctor`, `synopsis`, `ingest`, `import`, `rasterize`, `mags`, `controles`, `carga`, `contrato`, `mcp` |
+| El contrato como JSON | `attract contrato`. COINDOOR todavía usa su copia vendoreada, `frontend/src/lib/domain/contract.json` |
+| Juego de referencia | Era `library/arcade/media/goldnaxe/`, que **ya no está** en ATTRACT (verificado el 2026-11-07). Mientras no haya otro, la vara es `CONVENCION.md` |
 
 **Leelo antes de afirmar cómo funciona ATTRACT.** Los documentos de `docs/attract/` son
 una copia parcial y ya se les detectaron dos citas equivocadas de su propio contrato.
@@ -120,9 +121,14 @@ Están en los ADRs con sus alternativas; acá solo para que no se re-propongan:
    conserva sus dos caminos: `attract ingest` y COINDOOR.
 5. **El contrato vendoreado y la política de completitud son archivos distintos**, atados
    por un test ([`ADR-0005`](spec/decisions/0005-contrato-vendoreado-vs-politica-propia.md)).
-6. **Varias fuentes por campo, y una caída no rompe la búsqueda**
-   ([`ADR-0006`](spec/decisions/0006-fuentes-externas-multiproveedor.md)). La IA produce
-   sinopsis, reseña y trucos; **nunca** identidad.
+6. **Varias fuentes por campo, en una cadena ordenada, y una caída no rompe la búsqueda**
+   ([`ADR-0006`](spec/decisions/0006-fuentes-externas-multiproveedor.md), hoy con la cadena
+   de [`ADR-0014`](spec/decisions/0014-arcadedb-fuente-arcade.md),
+   [`ADR-0024`](spec/decisions/0024-scrapling-y-mobygames-para-pc-dos.md) y
+   [`ADR-0027`](spec/decisions/0027-myabandonware-primera-fuente-de-pc-dos.md)). La IA
+   produce sinopsis, reseña, trucos y guía. En identidad solo propone como último recurso,
+   marcada como IA y nunca aplicada sola, y **nunca** título, año ni formato
+   ([`ADR-0026`](spec/decisions/0026-ia-ultimo-recurso-en-sugerir-identidad.md)).
 7. **Un solo usuario, un juego por vez, sin carga masiva.** De ahí se siguen: sin auth,
    sin workers, sin colas.
 8. **La latencia no es un problema de este producto.** Todo es a pedido y esperar no
@@ -136,7 +142,7 @@ Están en los ADRs con sus alternativas; acá solo para que no se re-propongan:
 11. **Un proceso en `127.0.0.1` que sirve API y frontend desde el mismo origen.** Ese
     bind, más la validación del header `Host`, reemplaza a la autenticación. **Sin
     Docker** ([`ADR-0009`](spec/decisions/0009-proceso-local-en-loopback.md)).
-12. **Los cuatro trabajos largos corren en hilos del propio proceso.** Sin Celery, sin
+12. **Los trabajos largos corren en hilos del propio proceso.** Sin Celery, sin
     Redis ([`ADR-0010`](spec/decisions/0010-jobs-en-proceso.md)).
 13. **La política de completitud es `fielddefs.json`**, un archivo que leen TypeScript y
     Python ([`ADR-0011`](spec/decisions/0011-fielddefs-json-compartido.md)).
@@ -147,18 +153,18 @@ Están en los ADRs con sus alternativas; acá solo para que no se re-propongan:
 
 - Antes de proponer arquitectura, leé `spec/constitution/tech-stack.md` (en especial
   §Límites duros y §Contradicciones abiertas) y el índice de `spec/decisions/`.
-- **Empezá por la feature [003](spec/features/003-base-frontend/spec.md).** El orden es
-  003 → 004 → 005; las fases 3 y 4 del roadmap todavía no tienen carpeta.
+- **Qué sigue está en el roadmap**, en §Siguiente. Una feature nueva lleva el número que
+  sigue a la última carpeta de `spec/features/`.
 - No propongas nada listado como descartado en un ADR sin decir explícitamente qué
   cambió para reabrirlo.
 - Decisión con alternativas descartadas → ADR nuevo (`/new-adr`).
-- Los ADRs no se editan: se supersedan con uno nuevo. **Los doce actuales están en
-  `accepted`**; cualquier cambio ahora requiere un ADR nuevo que superseda al anterior.
+- Los ADRs no se editan: se supersedan con uno nuevo. Un ADR `accepted` solo cambia con
+  un ADR nuevo que lo superseda.
 - El paquete de diseño (`docs/claude_diseño/`) se consulta y no se edita. Donde el
   contrato de ATTRACT no admite lo que propone, mandan los **deltas D1–D5** de
   `spec/constitution/frontend-architecture.md`.
 - **No inventes campos del contrato.** Verificalos contra `../attract/docs/CONVENCION.md`
-  o contra `goldnaxe`. Un campo inventado acá contamina bundles que se instalan en otras
+  o contra la salida de `attract contrato`. Un campo inventado acá contamina bundles que se instalan en otras
   máquinas.
 - No toques código sin que exista `spec.md` y `plan.md` de esa feature.
 
